@@ -1,4 +1,5 @@
 \documentclass[11pt]{article}
+\usepackage[margin=3cm]{geometry}
 \usepackage[swedish]{babel}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
@@ -10,8 +11,9 @@
 \usepackage{tabularx}
 \usepackage{longtable}
 \usepackage{tabu}
-\graphicspath{ {images/} }
+\usepackage{url}
 
+\graphicspath{ {images/} }
 \newcommand{\subtitle}[1]{%
   \posttitle{%
     \par\end{center}
@@ -20,33 +22,12 @@
 }
 
 \pagestyle{fancy}
-\title{Kravspecifikation}
 
-\subtitle{Version 0.1}
 
-\author{
-	Agafonov, Nikolaj, 
-	\texttt{nikag669}
-	\\
-	Berberovic, Adnan, 
-	\texttt{adnbe196}
-	\\
-	Brorsson, Andreas, 
-	\texttt{andbr981}
-	\\
-	Fridborn, Fredrik, 
-	\texttt{frefr166}
-	\\
-	Oprea, Robert, 
-	\texttt{robop806}
-	\\
-	Skytt, Måns, 
-	\texttt{mansk700}
-}
 \date{}
 \pagenumbering{arabic}
 \chead{Undsättningsrobot}
-\rhead{2015-01-27}
+\rhead{2015-01-29}
 \lhead{}
 \lfoot{
 	TSEA56
@@ -59,10 +40,51 @@
 	e-post: adnbe196@student.liu.se
 }
 
-
 \begin{document}
+\begin{titlepage}
+\begin{center}
+{\Large\bfseries Kravspecifikation}\\
+%
+\vspace{2\baselineskip}
+%
+Version 0.1
+\vspace{2\baselineskip}
+%
+Agafonov, Nikolaj, 
+\texttt{nikag669}
+\\
+Berberovic, Adnan, 
+\texttt{adnbe196}
+\\
+Brorsson, Andreas, 
+\texttt{andbr981}
+\\
+Fridborn, Fredrik, 
+\texttt{frefr166}
+\\
+Oprea, Robert, 
+\texttt{robop806}
+\\
+Skytt, Måns, 
+\texttt{mansk700}
 
-\maketitle
+\vspace{2\baselineskip}
+2015-01-29
+
+\vspace{25\baselineskip}
+Status
+\begin{longtable}{|l|l|l|} \hline
+
+Granskad &
+Måns Skytt &
+2015-01-29 \\ \hline
+Godkänd &
+ &
+ \\ \hline
+\end{longtable}
+
+\end{center}
+\end{titlepage}
 
 \pagebreak
 \begin{center}
@@ -86,12 +108,12 @@ Måns Skytt & Projektdeltagare (PD) & 070-354 28 84 & mansk700@student.liu.se
 
 E-postlista för hela gruppen: adnbe196@student.liu.se
 \\[1in]
-Kund: Kent Palmkvist, 581 83 Linköping
+Kund: Kent Palmkvist, 581 83 Linköping,
 Kundtelefon: 013-28 13 47, kentp@isy.liu.se
 \\[1in]
 Kursansvarig: Tomas Svensson, 013-28 13 68, tomass@isy.liu.se
 \\
-Handledare: namn, tel, e-post
+Handledare: Kent Palmkvist, 013-28 13 47, kentp@isy.liu.se
 \end{center}
 \pagebreak
 
@@ -120,7 +142,7 @@ Dokumentet innehåller de krav och avgränsningar som beskriver det projekt som 
 Kraven är uppdelade i två grupper. Bas-krav är de grundkrav som ska vara uppfyllda för att genomföra projektet och extra-krav utförs i mån av tid. Dessutom är alla krav prioriterade i förhållande till varandra, vilket markeras med att varje krav har ett prioritetsnummer.
 
 \subsection{Parter}
-Leverantörer är grupp 2. Kund är ISY genom beställare Kent Palmkvist.
+Leverantörer är projektgrupp 2. Kund är ISY genom beställare Kent Palmkvist.
 
 \subsection{Syfte och Mål}
 Mål är att leverera en produkt, en robot, som kan köra autonomt och via fjärrstyrning i okända, möjligtvis farliga, miljöer. Dessutom ska projektet visa hur man tillämpar kunskap från de kurser man läst, samt ge erfarenhet i projektarbete.
@@ -145,13 +167,13 @@ Roboten består av ett chassi med bland annat tre moduler, nämligen en kommunik
 Figur 1. \textit{Denna bild visar en översikt av systemet.}
 
 \subsection{Grov beskrivning av produkten}
-Roboten kommer att köras på hjul, kunna känna av vad som finns framför, vid sidan av och bakom sin position, greppa tag i medicin eller annan produkt som roboten är avsedd till att leverera, kartlägga ett okänt område och utifrån kartan beräkna samt köra den kortaste vägen från start- till slutdestination. 
+Roboten kommer att köras på hjul. Kunna känna av vad som finns framför, vid sidan av och bakom. Kunna greppa tag i medicin eller annan produkt som roboten är avsedd att leverera. Roboten ska kunna kartlägga ett okänt område och utifrån kartan beräkna samt köra den kortaste vägen från start- till slutdestination. 
 
 \subsection{Produktkomponenter}
-Roboten kommer bestå av ett flertalet olika sensorer med avståndsmätning. Minst tre stycken mikroprocessoerer (en per delmodul). 
+Roboten kommer bestå av ett flertale olika sensorer med avståndsmätning. Minst tre stycken mikroprocessorer (en per delmodul). Roboten har fyra hjul som alla drivs av motorer som går att kontrollera individuellt.
 
 \subsection{Beroenden till andra system}
-Banan som roboten ska köra i måste uppfylla tävlingsreglerna (se bifogat dokument Tävlingsregler.pdf)
+Banan som roboten ska köra i måste uppfylla tävlingsreglerna (se bifogat dokument \textit{Banspecifikation och tävlingsregler})
 
 \subsection{Ingående delsystem}
 Roboten består av tre stycken delsystem (moduler). Kommunikationsmodul, styrmodul och sensormodul. Den förstnämnda sköter kommunikationen mellan roboten och en PC, denna kommunikation sköts via blåtand. Styrmodulen hanterar styrlogik och motorer. Sensormodulen skickar data till kommunikationsmodulen och styrmodulen som tar in dessa och korrigerar riktning efter datan.
@@ -161,8 +183,6 @@ Miljön som roboten körs i är begränsad på så sätt att den max ska vara 6x
 
 \subsection{Designfilosofi}
 Målet är att roboten ska vara så snabb och energieffektiv som möjligt och samtidigt utföra uppgiften utan komplikationer. 
-
-\pagebreak
 
 \subsection{Generella krav på hela systemet}
 Nedan listas generella krav på hela systemet
@@ -207,115 +227,86 @@ Varje modul ska innehålla minst en egen processor. &
 
 Krav nr 8 &
 Original &
-Roboten ska kunna skicka mätdata (avstånd till väggar, avlagd sträcka, vridning), styrbeslut och styrdata till PC via blåtand. &
-1 \\ \hline
-
-Krav nr 9 &
-Original &
 Det ska finnas en brytare på roboten för att växla mellan autonomt läge och fjärrstyrningsläge. &
 1 \\ \hline
 
-Krav nr 10 &
+Krav nr 9 &
 Original & 
 Projektet skall bedrivas enligt LIPS-modellen.&
 1 \\ \hline
 
-Krav nr 11 &
+Krav nr 10 &
 Original &
 Vid slutleverans skall en fungerande robot finnas. &
 1 \\ \hline
 
-Krav nr 12 &
-Original &
-Markeringen av målrutan ska göras med en svart ruta på golvet (alternativt med en RFID-tag). &
-1 \\ \hline
-
-Krav nr 13 & 
-Original & 
-Teknisk dokumentation med användaranvisning skall finnas. &
-1 \\ \hline
-
-Krav nr 14 &
-Original &
-Utföra kontinuerlig (veckovis) tidrapportering till beställaren. &
-1 \\ \hline
-
-Krav nr 15 &
-Original &
-Projektet får ta maximalt 1380 arbetstimmar att slutföra. &
-1 \\ \hline
-
-Krav nr 16 &
-Original &
-Tidsplan över hela projektet skall finnas. &
-1 \\ \hline
-
-Krav nr 17 &
+Krav nr 11 &
 Original &
 En knapp skall finnas som startar roboten i autonomt läge vid tävlingstillfället. &
 1 \\ \hline
 
-Krav nr 18 &
-Original &
-Någon form av styralgoritm skall finnas. &
-1 \\ \hline
-
-Krav nr 19 &
-Original &
-Roboten ska skicka mätdata kontinuerligt till en PC via blåtandslänk. &
-1 \\ \hline
-
-Krav nr 20 &
-Original &
-Roboten ska kunna bestämma den kortaste vägen till målrutan. &
-1 \\ \hline
-
-Krav nr 21 &
+Krav nr 12 &
 Original &
 Styrmodul skall finnas. &
 1 \\ \hline
 
-Krav nr 22 &
+Krav nr 13 &
 Original &
 Sensormodul skall finnas. &
 1 \\ \hline
 
-Krav nr 23 &
+Krav nr 14 &
 Original &
 Kommunikationsmodul skall finnas. &
 1 \\ \hline
 
-Krav nr 24 &
+Krav nr 15 &
 Original &
 Tävlingsbanan är i enlighet med bifogade regler. &
 1 \\ \hline
 
-Krav nr 25 &
+Krav nr 16 &
 Original &
 Roboten skall vara med i tävlingen. &
 1 \\ \hline
 
-Krav nr 26 &
+
+\end{longtable}
+\end{center}
+
+\pagebreak
+
+\section{Delsystem 1 - Sensormodul}
+Delsystem 1 är sensormodulen som består av minst en mikroprocessor samt de olika typer av sensorer som används för att mäta av robotens omgivning.
+
+
+\subsection{Inledande beskrivning av delsystem 1}
+Sensormodulen samlar in mätdata från sina olika sensorer och skickar denna data till styrmodulen (delsystem 2) där denna behandlas och eventuella åtgärder vidtas.
+
+\begin{center}
+\begin{longtable}{|l|l|p{.70\linewidth}|l|} \hline
+
+Krav nr 17 &
 Original &
-Roboten skall klara av upprepade uppdrag i följd. &
+Felmeddelanden ska vara på svenska &
 1 \\ \hline
 
-Krav nr 27 &
+Krav nr 18 & 
 Original &
-En karta över miljön roboten rör sig i skall målas upp i 2D. &
-2 \\ \hline
+Någon form av styralgoritm skall finnas. &
+1 \\ \hline
 
-Krav nr 28 &
-Original &
-En LCD-skärm skall finnas på roboten och visa värden från sensorer kontinuerligt. &
-2 \\ \hline
 
-Krav nr 29 &
-Original &
-Roboten bör kunna skicka positionsdata till PC och presentera en karta över grottan med en projektor. &
-2 \\ \hline
+\end{longtable}
+\end{center}
 
-Krav nr 30 &
+\subsection{Funktionella krav för delsystem 1}
+För att roboten skall kunna utföra uppdrag i enlighet med banspecifikationen ställs vissa krav på sensorer o.d.
+
+\begin{center}
+\begin{longtable}{|l|l|p{.70\linewidth}|l|} \hline
+
+Krav nr 19 &
 Original &
 Roboten skall klara passager bredare större än 40 cm. &
 2 \\ \hline
@@ -324,41 +315,173 @@ Roboten skall klara passager bredare större än 40 cm. &
 \end{center}
 
 
-
-
-\pagebreak
-
-\section{Delsystem 1 - Sensormodul}
-Delsystem 1 är sensormodulen som består av minst en mikroprocessor samt de olika typer av sensorer som används för att mäta av robotens omgivning.
-
-\subsection{Inledande beskrivning av delsystem 1}
-Sensormodulen samlar in mätdata från sina olika sensorer och skickar denna data till styrmodulen (delsystem 2) där denna behandlas och eventuella åtgärder vidtas.
-
-\pagebreak
-
 \section{Delsystem 2 - Styrmodul}
 Styrmodulen ska bestå av minst en mikroprocessor.  Denna samlar information från sensor- och kommunikationsmodulerna, och agerar utefter svaren.
+
 
 \subsection{Inledande beskrivning av delsystem 2}
 Styrmodulen ska styra LCD:n, styrlogiken och motorerna.
 LCD:n kommer att visa resultat som sensormodulen har skickat till styrmodulen. Styrlogiken kommer bestämma hur motorerna ska kontrolleras, och motorerna kommer utifrån svar från styrlogiken att drivas på.
 
+\begin{center}
+\begin{longtable}{|l|l|p{.70\linewidth}|l|} \hline
+
+Krav nr 20 &
+Original &
+Roboten ska kunna bestämma den kortaste vägen till målrutan. &
+1 \\ \hline
+
+Krav nr 21 &
+Original &
+Någon form av styralgoritm skall finnas. &
+1 \\ \hline
+
+Krav nr 22 &
+Original &
+Roboten skall klara passager bredare större än 40 cm. &
+2 \\ \hline
+
+Krav nr 23 &
+Original &
+En LCD-skärm skall finnas på roboten och visa värden från sensorer kontinuerligt. &
+2 \\ \hline
+
+\end{longtable}
+\end{center}
+
+
 \pagebreak
 
 \section{Delsystem 3 - Kommunikationsmodul}
+Delsystem 3 är kommunikationsmodulen som sköter stor del av kommunikationen mellan de olika delsystemen. 
+\begin{center}
+\begin{longtable}{|l|l|p{.70\linewidth}|l|} \hline
 
-\pagebreak
+Krav nr 24 &
+Original &
+Roboten ska kunna skicka mätdata (avstånd till väggar, avlagd sträcka, vridning), styrbeslut och styrdata till PC via blåtand. &
+1 \\ \hline
+
+Krav nr 25 &
+Original &
+Roboten ska skicka mätdata kontinuerligt till en PC via blåtandslänk. &
+1 \\ \hline
+\end{longtable}
+\end{center}
+
+\section{Delsystem 4 - PC}
+
+PC:n används då data från roboten skall behandlas och kartor, positionsdata, osv.
+
+\begin{center}
+\begin{longtable}{|l|l|p{.70\linewidth}|l|} \hline
+
+Krav nr 26 &
+Original &
+PC:n skall kunna ta emot data från kommunikationsmodueln via blåtand. &
+1 \\ \hline
+
+Krav nr 27 &
+Original &
+Data som visas på PC:n skall vara lätta att tolka och läsa av. &
+1 \\ \hline
+
+Krav nr 28 &
+Original &
+Kommandon ska ges till roboten från PC:n via blåtand. &
+1 \\ \hline
+
+Krav nr 29 &
+Original &
+Roboten bör kunna skicka positionsdata till PC och presentera en karta över grottan med en projektor. &
+2 \\ \hline
+
+Krav nr 30 &
+Original &
+Den karta över miljön roboten rör sig i skall målas upp i 2D. &
+2 \\ \hline
+
+Krav nr 31 &
+Original &
+En karta över miljön roboten rör sig i skall målas upp i 2D. &
+2 \\ \hline
+
+Krav nr 32 &
+Original &
+Roboten bör kunna skicka positionsdata till PC och presentera en karta över grottan med en projektor. &
+3 \\ \hline
+
+\end{longtable}
+\end{center}
+
 
 \section{Prestandakrav}
-text
+Prestandakrav ställs för att garantera en robot som klarar av att utföra uppdraget med tillfredsställande resultat samt även för att garantera en viss grad av användandenytta.
+
+\begin{center}
+\begin{longtable}{|l|l|p{.70\linewidth}|l|} \hline
+
+Krav nr 33 &
+Original &
+Drift skall uppfylla det som specificerats i banspecifikationen. &
+1 \\ \hline
+
+Krav nr 34 &
+Original &
+Roboten skall klara av upprepade uppdrag utan driftproblem (laddning av batteri räknas ej till detta). &
+2 \\ \hline
+
+\end{longtable}
+\end{center}
+
 \section{Krav på vidareutveckling}
-text
+Utöver krav nr 6 så ställs inga krav på vidareutveckling.
+
 \section{Tillförlitlighet}
-text
+För att öka robotens användandenytta ställs krav på tillförlitligheten hos roboten.
+
+\begin{center}
+\begin{longtable}{|l|l|p{.70\linewidth}|l|} \hline
+
+Krav nr 35 &
+Original &
+Roboten skall klara av att utforska given bana utifrån olika startpositioner. &
+1 \\ \hline
+
+Krav nr 36 &
+Original &
+Roboten skall upptäcka mål som är utmärkt i enlighet med banspecifikationen. &
+2 \\ \hline
+
+\end{longtable}
+\end{center}
+
 \section{Ekonomi}
-De resurser som finns att tillgå är X timmar fördelat på gruppens 6 medlemmar. 
+De resurser som finns att tillgå är 1360 timmar fördelat på gruppens 6 medlemmar. 
+
+\begin{center}
+\begin{longtable}{|l|l|p{.70\linewidth}|l|} \hline
+
+Krav nr 37 &
+Original &
+Projektet får ta maximalt 1380 arbetstimmar att utföra efter godkänd plan. &
+1 \\ \hline
+\end{longtable}
+\end{center}
+
 \section{Krav på säkerhet}
-text
+Roboten ska uppfylla följande krav när det gäller säkerhet:
+
+\begin{center}
+\begin{longtable}{|l|l|p{.70\linewidth}|l|} \hline
+
+Krav nr 38 &
+Original &
+Roboten skall inte kollidera med några hinder i labyrinten. &
+1 \\ \hline
+
+\end{longtable}
+\end{center}
 
 \pagebreak
 \section{Leveranskrav och delleveranser}
@@ -417,6 +540,15 @@ Bärbar dator och övrig utrustning ska vara återlämnade.
 \end{center}
 En tidrapport ska lämnas senast kl 16.00 vid följande datum: 4 febr, 23 febr, 9 mars, 23 mars, 30 mars, 13 april, 20 april, 27 april, 4 maj, 11 maj, 18 maj, 25 maj, 1 juni och 8 juni.
 
+
+\begin{center}
+\begin{longtable}{|l|l|p{.70\linewidth}|l|} \hline
+
+\end{longtable}
+\end{center}
+
+\pagebreak
+
 \section{Dokumentation}
 
 \begin{center}
@@ -434,29 +566,87 @@ Teknisk dokumentation & SE & Beskriver hur produkten fungerar & Beställare & .p
 Användar-handledning & SE & Beskriver hur man använder produkten& Beställare & .pdf \\ \hline
 Efterstudie & SE & En reflektion kring hur projektet bedrevs. Vad kunde man ha gjort bättre, etc.& Projektgrupp & .pdf \\ \hline
 
-\end {longtable}
-\end {center}
+\end{longtable}
+\end{center}
+
+\begin{center}
+\begin{longtable}{|l|l|p{.70\linewidth}|l|} \hline
+Krav nr 39 & 
+Original & 
+Teknisk dokumentation med användaranvisning skall finnas. &
+1 \\ \hline
+
+Krav nr 40 &
+Original &
+Utföra kontinuerlig (veckovis) tidrapportering till beställaren. &
+1 \\ \hline
+
+Krav nr 41 &
+Original &
+Tidsplan över hela projektet skall finnas. &
+1 \\ \hline
+
+Krav nr 42 &
+Original &
+Förstudier för vissa delsystem skall finnas. &
+1 \\ \hline
+\end{longtable}
+\end{center}
 
 \section{Utbildning}
 Vid slutfört projekt skall en utförlig teknisk dokumentation av hela systemet samt alla ingående delsystem finnas. Det skall också finnas en godkänd användarhandledning att tillgå vid projektets slutleverans som ska garantera kunden tillräcklig kunskap för användande av roboten.
 
 
+\begin{center}
+\begin{longtable}{|l|l|p{.70\linewidth}|l|} \hline
+
+Krav nr 43 &
+Original &
+Användarhandledningen skall vara så pass utförlig att gemene man kan utföra ett uppdrag utan några specifika förkunskapskrav. &
+1 \\ \hline
+
+\end{longtable}
+\end{center}
+
 \section{Kvalitetskrav}
+Kvalitetskrav ställer krav på robotens pålitlighet samt stabilitet hos program och komponenter i systemet.
 
+\begin{center}
+\begin{longtable}{|l|l|p{.70\linewidth}|l|} \hline
 
+Krav nr 44 &
+Original &
+Roboten skall klara av upprepade uppdrag i följd. &
+1 \\ \hline
+
+\end{longtable}
+\end{center}
 
 \section{Underhållsbarhet}
-text
+För att garantera robotens funktionalitet för en översiktlig framtid ska underlag för underhåll finnas i någon form.
+
+\begin{center}
+\begin{longtable}{|l|l|p{.70\linewidth}|l|} \hline
+Krav nr 45 &
+Original &
+Den tekniska dokumentationen skall ge möjlighet till fullständig förståelse för de olika delsystemen och systemet som helhet. &
+1 \\ \hline
+
+\end{longtable}
+\end{center}
+
+
 
 \setcounter{secnumdepth}{0}
-\section{Referenser}
-text
-\setcounter{secnumdepth}{2}
-
 \pagebreak
+\section{Referenser}
+Banspecifikation och tävlingsregler \\
+Banspecifikation och tävlingsregler v0.1.pdf
+\\[0.1in]
+Projektdirektiv för en undsättningsrobot, Tomas Svensson
+http://www.isy.liu.se/edu/kurs/TSEA56/Dokument/Projektdirektiv\%20undsattningsrobot\_15.pdf
 
-\section{Appendix A}
-text
+\setcounter{secnumdepth}{2}
 
 
 
@@ -466,10 +656,3 @@ text
 
 
 \end{document}
-
-\begin{comment}
-
-
-
-
-\end{comment}
