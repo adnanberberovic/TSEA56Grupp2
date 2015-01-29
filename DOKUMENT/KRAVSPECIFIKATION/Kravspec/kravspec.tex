@@ -123,10 +123,18 @@ Handledare: Kent Palmkvist, 013-28 13 47, kentp@isy.liu.se
 
 \section*{Dokumenthistorik}
 \begin{table}[h]
-\begin{tabular}{lllll}
+\begin{tabular}{|l|l|l|l|l|} \hline
 
-Version & Datum & Utförda förändringar & Utförda av & Granskad \\[0.1in]
-0.1 & 2015-01-27 & Första utkastet & Grupp 2 &
+Version & 
+Datum & 
+Utförda förändringar & 
+Utförda av & 
+Granskad \\[0.1in] \hline
+0.1 &
+2015-01-29 & 
+Första utkastet & 
+Grupp 2 & 
+Nikolaj Agafonov \\ \hline
 
 \end{tabular}
 \end{table}
@@ -139,7 +147,7 @@ Version & Datum & Utförda förändringar & Utförda av & Granskad \\[0.1in]
 \section{Inledning}
 
 Dokumentet innehåller de krav och avgränsningar som beskriver det projekt som beställare och projektdeltagare kommit överens om att genomföra i kursen “TSEA56 - Kandidatprojekt i elektronik”. Projektet går ut på att konstruera en Undsättningsrobot och kraven är konstruerade utifrån givna projektdirektiv samt dialog mellan beställare och projektgrupp.
-Kraven är uppdelade i två grupper. Bas-krav är de grundkrav som ska vara uppfyllda för att genomföra projektet och extra-krav utförs i mån av tid. Dessutom är alla krav prioriterade i förhållande till varandra, vilket markeras med att varje krav har ett prioritetsnummer.
+Alla är krav prioriterade i förhållande till varandra, vilket markeras med att varje krav har ett prioritetsnummer.
 
 \subsection{Parter}
 Leverantörer är projektgrupp 2. Kund är ISY genom beställare Kent Palmkvist.
@@ -170,7 +178,7 @@ Figur 1. \textit{Denna bild visar en översikt av systemet.}
 Roboten kommer att köras på hjul. Kunna känna av vad som finns framför, vid sidan av och bakom. Kunna greppa tag i medicin eller annan produkt som roboten är avsedd att leverera. Roboten ska kunna kartlägga ett okänt område och utifrån kartan beräkna samt köra den kortaste vägen från start- till slutdestination. 
 
 \subsection{Produktkomponenter}
-Roboten kommer bestå av ett flertal olika sensorer med avståndsmätning. Minst tre stycken mikroprocessorer (en per delmodul). Roboten har fyra hjul som alla drivs av motorer som går att kontrollera individuellt.
+Roboten kommer bestå av ett flertal olika sensorer med avståndsmätning. Minst tre stycken mikroprocessorer (en per delmodul). Roboten kommer att ha fyra hjul som alla drivs av motorer som går att kontrollera individuellt.
 
 \subsection{Beroenden till andra system}
 Banan som roboten ska köra i måste uppfylla tävlingsreglerna (se bifogat dokument \textit{Banspecifikation och tävlingsregler})
@@ -338,7 +346,7 @@ Någon form av styralgoritm skall finnas. &
 
 Krav nr 22 &
 Original &
-Roboten skall klara passager bredare större än 40 cm. &
+Roboten skall klara passager bredare än 40 cm. &
 2 \\ \hline
 
 Krav nr 23 &
@@ -371,14 +379,14 @@ Roboten ska skicka mätdata kontinuerligt till en PC via blåtandslänk. &
 
 \section{Delsystem 4 - PC}
 
-PC:n används då data från roboten skall behandlas och kartor, positionsdata, osv.
+PC:n används då data från roboten skall behandlas.
 
 \begin{center}
 \begin{longtable}{|l|l|p{.70\linewidth}|l|} \hline
 
 Krav nr 26 &
 Original &
-PC:n skall kunna ta emot data från kommunikationsmodueln via blåtand. &
+PC:n skall kunna ta emot data från kommunikationsmodulen via blåtand. &
 1 \\ \hline
 
 Krav nr 27 &
@@ -487,55 +495,55 @@ Roboten skall inte kollidera med några hinder i labyrinten. &
 \section{Leveranskrav och delleveranser}
 Leveranser skall göras senast på nedan nämnda tider och datum om inte annat är överenskommet mellan beställare och projektgrupp
 \begin{center}
-\begin{longtable}{l p{.8\linewidth} }
+\begin{longtable}{|l |p{.8\linewidth}|} \hline
 
 3 feb: & 
-kl 16.00: Kravspecifikationen ska vara klar. (BP1) \\
+kl 16.00: Kravspecifikationen ska vara klar. (BP1) \\ \hline
 
 16 feb: & 
-kl 16.00: Första versionen av projektplan, tidplan och systemskiss ska vara inlämnade till beställaren. \\
+kl 16.00: Första versionen av projektplan, tidplan och systemskiss ska vara inlämnade till beställaren. \\ \hline
 
 20 feb: & 
-kl 16.00: Slutgiltig version av projektplan, tidplan och systemskiss ska vara inlämnade till beställaren. \\
+kl 16.00: Slutgiltig version av projektplan, tidplan och systemskiss ska vara inlämnade till beställaren. \\ \hline
 
 5 mars: &
-kl 16.00: första version av förstudien (minst 5 sidor) ska skickas till respektive handledare och till er beställare. \\
+kl 16.00: första version av förstudien (minst 5 sidor) ska skickas till respektive handledare och till er beställare. \\ \hline
 
 11 mars: & 
-kl 16.00: Första versionen av designspecifikationen ska vara inlämnad till handledaren. \\
+kl 16.00: Första versionen av designspecifikationen ska vara inlämnad till handledaren. \\ \hline
 
 24 mars: &
-Designspecifikationen ska vara godkänd av handledaren vid ett beslutsmöte BP3. \\
+Designspecifikationen ska vara godkänd av handledaren vid ett beslutsmöte BP3. \\ \hline
 
 1 april: &
-kl 16:00 Version 1.0 av förstudien ska skickas till respektive handledare och till beställare. \\
+kl 16:00 Version 1.0 av förstudien ska skickas till respektive handledare och till beställare. \\ \hline
 
 17 april: & 
-Nuvarande design ska vara presenterad för och godkänd av handledaren vid ett beslutsmöte BP4. \\
+Nuvarande design ska vara presenterad för och godkänd av handledaren vid ett beslutsmöte BP4. \\ \hline
 
 25 maj: &
-Verifiering av kraven (BP5) bör ske i god tid innan redovisningen. Utan detta beslut får ni inte leverera! \\
+Verifiering av kraven (BP5) bör ske i god tid innan redovisningen. Utan detta beslut får ni inte leverera! \\ \hline
 
 21 maj: &
-Kappan, version 1.0, (exklusive appendix) ska levereras. Se nedan. \\
+Kappan, version 1.0, (exklusive appendix) ska levereras. Se nedan. \\ \hline
 
 27 maj: &
-Teknisk dokumentation och användarhandledning (båda version 1.0) ska vara inlämnade. Slutversion av skrivarbete skall också skickas med vid detta tillfälle. \\
+Teknisk dokumentation och användarhandledning (båda version 1.0) ska vara inlämnade. Slutversion av skrivarbete skall också skickas med vid detta tillfälle. \\ \hline
 
 Vecka 23: &
-Redovisning och demonstration.\\
+Redovisning och demonstration.\\ \hline
 
 2 juni: &
-(preliminärt) 8.15-17 muntliga presentationer och opposition. Tider se nedan. \\
+(preliminärt) 8.15-17 muntliga presentationer och opposition. Tider se nedan. \\ \hline
 
 3 juni: &
-(preliminärt) 9.15-17 tävlingar utanför café Java. \\
+(preliminärt) 9.15-17 tävlingar utanför café Java. \\ \hline
 
 5 juni: &
-Efterstudien ska vara inlämnad. Vid denna tidpunkt ska även källkod skickas in i en zip-fil. \\
+Efterstudien ska vara inlämnad. Vid denna tidpunkt ska även källkod skickas in i en zip-fil. \\ \hline
 
 12 juni: &
-Bärbar dator och övrig utrustning ska vara återlämnade.
+Bärbar dator och övrig utrustning ska vara återlämnade. \\ \hline
 \end{longtable}
 \end{center}
 En tidrapport ska lämnas senast kl 16.00 vid följande datum: 4 febr, 23 febr, 9 mars, 23 mars, 30 mars, 13 april, 20 april, 27 april, 4 maj, 11 maj, 18 maj, 25 maj, 1 juni och 8 juni.
