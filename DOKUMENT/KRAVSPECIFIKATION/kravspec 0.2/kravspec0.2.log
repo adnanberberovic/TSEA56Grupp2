@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-2.4-1.40.13 (MiKTeX 2.9) (preloaded format=pdflatex 2013.9.10)  2 FEB 2015 00:41
+This is pdfTeX, Version 3.1415926-2.4-1.40.13 (MiKTeX 2.9) (preloaded format=pdflatex 2013.9.10)  2 FEB 2015 08:40
 entering extended mode
 **kravspec0.2.tex
 
@@ -593,9 +593,9 @@ Package Fancyhdr Warning: \headheight is too small (12.0pt):
 File: images/anvandnings_exempel.png Graphic file (type png)
 
 <use images/anvandnings_exempel.png>
-Package pdftex.def Info: images/anvandnings_exempel.png used on input line 172.
+Package pdftex.def Info: images/anvandnings_exempel.png used on input line 173.
 
-(pdftex.def)             Requested size: 337.25917pt x 355.32661pt.
+(pdftex.def)             Requested size: 236.08038pt x 248.72754pt.
 
 
 Package Fancyhdr Warning: \headheight is too small (12.0pt): 
@@ -605,12 +605,12 @@ Package Fancyhdr Warning: \headheight is too small (12.0pt):
 
 [2 <G:/Dokument/Applied Physics and Electrical Engineering/KANDIDATPROJEKT/TSEA
 56/Kravspec/kravspec 0.2/images/anvandnings_exempel.png>]
-Overfull \hbox (10.37648pt too wide) in alignment at lines 183--198
+Overfull \hbox (10.37648pt too wide) in alignment at lines 185--200
  [] [] [] [] 
  []
 
 
-Underfull \vbox (badness 10000) detected at line 198
+Underfull \vbox (badness 10000) detected at line 200
  []
 
 
@@ -623,7 +623,7 @@ Package Fancyhdr Warning: \headheight is too small (12.0pt):
 File: images/systemskiss.png Graphic file (type png)
 
 <use images/systemskiss.png>
-Package pdftex.def Info: images/systemskiss.png used on input line 206.
+Package pdftex.def Info: images/systemskiss.png used on input line 210.
 (pdftex.def)             Requested size: 356.07944pt x 210.78699pt.
 
 
@@ -634,12 +634,12 @@ Package Fancyhdr Warning: \headheight is too small (12.0pt):
 
 [4 <G:/Dokument/Applied Physics and Electrical Engineering/KANDIDATPROJEKT/TSEA
 56/Kravspec/kravspec 0.2/images/systemskiss.png>]
-Overfull \hbox (13.10332pt too wide) in alignment at lines 232--303
+Overfull \hbox (13.10332pt too wide) in alignment at lines 237--308
  [] [] [] [] 
  []
 
 
-Underfull \vbox (badness 10000) detected at line 303
+Underfull \vbox (badness 10000) detected at line 308
  []
 
 
@@ -649,30 +649,30 @@ Package Fancyhdr Warning: \headheight is too small (12.0pt):
  This may cause the page layout to be inconsistent, however.
 
 [5]
-Overfull \hbox (13.10332pt too wide) in alignment at lines 316--329
+Overfull \hbox (13.10332pt too wide) in alignment at lines 321--334
  [] [] [] [] 
  []
 
 
-Underfull \vbox (badness 10000) detected at line 329
+Underfull \vbox (badness 10000) detected at line 334
  []
 
 
-Overfull \hbox (13.10332pt too wide) in alignment at lines 336--343
+Overfull \hbox (13.10332pt too wide) in alignment at lines 341--348
  [] [] [] [] 
  []
 
 
-Underfull \vbox (badness 10000) detected at line 343
+Underfull \vbox (badness 10000) detected at line 348
  []
 
 
-Overfull \hbox (13.10332pt too wide) in alignment at lines 356--378
+Overfull \hbox (13.10332pt too wide) in alignment at lines 361--383
  [] [] [] [] 
  []
 
 
-Underfull \vbox (badness 10000) detected at line 378
+Underfull \vbox (badness 10000) detected at line 383
  []
 
 
@@ -682,36 +682,33 @@ Package Fancyhdr Warning: \headheight is too small (12.0pt):
  This may cause the page layout to be inconsistent, however.
 
 [6]
-Overfull \hbox (13.10332pt too wide) in alignment at lines 387--394
+Overfull \hbox (13.10332pt too wide) in alignment at lines 392--399
  [] [] [] [] 
  []
 
 
-Underfull \vbox (badness 10000) detected at line 394
+Underfull \vbox (badness 10000) detected at line 399
  []
 
+<images/anvandargranssnitt.png, id=47, 613.54219pt x 481.8pt>
+File: images/anvandargranssnitt.png Graphic file (type png)
 
-Underfull \hbox (badness 1286) in paragraph at lines 426--426
+<use images/anvandargranssnitt.png>
+Package pdftex.def Info: images/anvandargranssnitt.png used on input line 408.
+(pdftex.def)             Requested size: 306.77034pt x 240.8994pt.
+
+Underfull \hbox (badness 1286) in paragraph at lines 438--438
 []|\T1/cmr/m/n/10.95 En kar-ta över grot-tan ska kun-na pre-sen-te-ras på en mo
 -ni-
  []
 
 
-Overfull \hbox (13.10332pt too wide) in alignment at lines 402--428
+Overfull \hbox (13.10332pt too wide) in alignment at lines 414--440
  [] [] [] [] 
  []
 
 
-Underfull \vbox (badness 10000) detected at line 428
- []
-
-
-Overfull \hbox (13.10332pt too wide) in alignment at lines 436--443
- [] [] [] [] 
- []
-
-
-Underfull \vbox (badness 10000) detected at line 443
+Underfull \vbox (badness 10000) detected at line 440
  []
 
 
@@ -720,31 +717,14 @@ Package Fancyhdr Warning: \headheight is too small (12.0pt):
  We now make it that large for the rest of the document.
  This may cause the page layout to be inconsistent, however.
 
-[7]
-Overfull \hbox (13.10332pt too wide) in alignment at lines 455--467
+[7 <G:/Dokument/Applied Physics and Electrical Engineering/KANDIDATPROJEKT/TSEA
+56/Kravspec/kravspec 0.2/images/anvandargranssnitt.png>]
+Overfull \hbox (13.10332pt too wide) in alignment at lines 448--455
  [] [] [] [] 
  []
 
 
-Underfull \vbox (badness 10000) detected at line 467
- []
-
-
-Overfull \hbox (13.10332pt too wide) in alignment at lines 474--480
- [] [] [] [] 
- []
-
-
-Underfull \vbox (badness 10000) detected at line 480
- []
-
-
-Overfull \hbox (13.10332pt too wide) in alignment at lines 487--494
- [] [] [] [] 
- []
-
-
-Underfull \vbox (badness 10000) detected at line 494
+Underfull \vbox (badness 10000) detected at line 455
  []
 
 
@@ -754,16 +734,30 @@ Package Fancyhdr Warning: \headheight is too small (12.0pt):
  This may cause the page layout to be inconsistent, however.
 
 [8]
-Underfull \vbox (badness 10000) detected at line 550
- []
-
-
-Overfull \hbox (13.10332pt too wide) in alignment at lines 555--562
+Overfull \hbox (13.10332pt too wide) in alignment at lines 467--479
  [] [] [] [] 
  []
 
 
-Underfull \vbox (badness 10000) detected at line 562
+Underfull \vbox (badness 10000) detected at line 479
+ []
+
+
+Overfull \hbox (13.10332pt too wide) in alignment at lines 486--492
+ [] [] [] [] 
+ []
+
+
+Underfull \vbox (badness 10000) detected at line 492
+ []
+
+
+Overfull \hbox (13.10332pt too wide) in alignment at lines 499--506
+ [] [] [] [] 
+ []
+
+
+Underfull \vbox (badness 10000) detected at line 506
  []
 
 
@@ -773,47 +767,16 @@ Package Fancyhdr Warning: \headheight is too small (12.0pt):
  This may cause the page layout to be inconsistent, however.
 
 [9]
-Underfull \hbox (badness 2237) in paragraph at lines 574--574
-[]|\T1/cmr/m/n/10.95 Listar al-la krav som
+Underfull \vbox (badness 10000) detected at line 562
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 578--578
-[]|\T1/cmr/m/n/10.95 Analysera huruvi-da
+Overfull \hbox (13.10332pt too wide) in alignment at lines 567--574
+ [] [] [] [] 
  []
 
 
-Underfull \hbox (badness 7433) in paragraph at lines 578--578
-\T1/cmr/m/n/10.95 pro-jek-tet kan dri-vas
- []
-
-
-Underfull \hbox (badness 1448) in paragraph at lines 580--580
-\T1/cmr/m/n/10.95 ku-ment som be-stäl-la-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 581--581
-[]|\T1/cmr/m/n/10.95 Teknisk do-ku-men-ta-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 582--582
-[]|\T1/cmr/m/n/10.95 Användar-
- []
-
-
-Underfull \hbox (badness 2644) in paragraph at lines 583--583
-\T1/cmr/m/n/10.95 kun-de man ha gjort
- []
-
-
-Overfull \hbox (0.30597pt too wide) in alignment at lines 571--585
- [] [] [] [] [] 
- []
-
-
-Underfull \vbox (badness 10000) detected at line 585
+Underfull \vbox (badness 10000) detected at line 574
  []
 
 
@@ -823,6 +786,49 @@ Package Fancyhdr Warning: \headheight is too small (12.0pt):
  This may cause the page layout to be inconsistent, however.
 
 [10]
+Underfull \hbox (badness 2237) in paragraph at lines 586--586
+[]|\T1/cmr/m/n/10.95 Listar al-la krav som
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 590--590
+[]|\T1/cmr/m/n/10.95 Analysera huruvi-da
+ []
+
+
+Underfull \hbox (badness 7433) in paragraph at lines 590--590
+\T1/cmr/m/n/10.95 pro-jek-tet kan dri-vas
+ []
+
+
+Underfull \hbox (badness 1448) in paragraph at lines 592--592
+\T1/cmr/m/n/10.95 ku-ment som be-stäl-la-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 593--593
+[]|\T1/cmr/m/n/10.95 Teknisk do-ku-men-ta-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 594--594
+[]|\T1/cmr/m/n/10.95 Användar-
+ []
+
+
+Underfull \hbox (badness 2644) in paragraph at lines 595--595
+\T1/cmr/m/n/10.95 kun-de man ha gjort
+ []
+
+
+Overfull \hbox (0.30597pt too wide) in alignment at lines 583--597
+ [] [] [] [] [] 
+ []
+
+
+Underfull \vbox (badness 10000) detected at line 597
+ []
+
 
 Package Fancyhdr Warning: \headheight is too small (12.0pt): 
  Make it at least 13.59999pt.
@@ -830,7 +836,14 @@ Package Fancyhdr Warning: \headheight is too small (12.0pt):
  This may cause the page layout to be inconsistent, however.
 
 [11]
-Overfull \hbox (28.68394pt too wide) in paragraph at lines 603--605
+
+Package Fancyhdr Warning: \headheight is too small (12.0pt): 
+ Make it at least 13.59999pt.
+ We now make it that large for the rest of the document.
+ This may cause the page layout to be inconsistent, however.
+
+[12]
+Overfull \hbox (28.68394pt too wide) in paragraph at lines 615--617
 \T1/cmr/m/n/10.95 http://www.isy.liu.se/edu/kurs/TSEA56/Dokument/Projektdirekti
 v%20undsattningsrobot_15.pdf  
  []
@@ -841,17 +854,17 @@ Package Fancyhdr Warning: \headheight is too small (12.0pt):
  We now make it that large for the rest of the document.
  This may cause the page layout to be inconsistent, however.
 
-[12]
+[13]
 ("G:\Dokument\Applied Physics and Electrical Engineering\KANDIDATPROJEKT\TSEA56
 \Kravspec\kravspec 0.2\kravspec0.2.aux") ) 
 Here is how much of TeX's memory you used:
- 3815 strings out of 493921
- 51011 string characters out of 3144876
+ 3820 strings out of 493921
+ 51168 string characters out of 3144876
  132164 words of memory out of 3000000
- 7045 multiletter control sequences out of 15000+200000
+ 7049 multiletter control sequences out of 15000+200000
  12017 words of font info for 31 fonts, out of 3000000 for 9000
  841 hyphenation exceptions out of 8191
- 27i,10n,43p,590b,313s stack positions out of 5000i,500n,10000p,200000b,50000s
+ 27i,10n,43p,590b,333s stack positions out of 5000i,500n,10000p,200000b,50000s
  <C:\Users\Adnan\AppData\Local\MiKTeX
 \2.9\fonts\pk\ljfour\jknappen\ec\dpi600\ecti1095.pk> <C:\Users\Adnan\AppData\Lo
 cal\MiKTeX\2.9\fonts\pk\ljfour\jknappen\ec\dpi600\ecbx1200.pk> <C:\Users\Adnan\
@@ -860,9 +873,9 @@ ers\Adnan\AppData\Local\MiKTeX\2.9\fonts\pk\ljfour\jknappen\ec\dpi600\ectt1095.
 pk> <C:\Users\Adnan\AppData\Local\MiKTeX\2.9\fonts\pk\ljfour\jknappen\ec\dpi600
 \ecrm1095.pk> <C:\Users\Adnan\AppData\Local\MiKTeX\2.9\fonts\pk\ljfour\jknappen
 \ec\dpi600\ecbx1440.pk>
-Output written on kravspec0.2.pdf (17 pages, 159950 bytes).
+Output written on kravspec0.2.pdf (18 pages, 190696 bytes).
 PDF statistics:
- 364 PDF objects out of 1000 (max. 8388607)
+ 368 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)
- 11 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 16 words of extra memory for PDF output out of 10000 (max. 10000000)
 

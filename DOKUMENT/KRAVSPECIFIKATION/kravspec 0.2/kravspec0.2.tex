@@ -77,8 +77,8 @@ Status
 \begin{longtable}{|l|l|l|} \hline
 
 Granskad &
-Nikolaj Agafonov &
-2015-01-29 \\ \hline
+Måns Skytt &
+2015-02-02 \\ \hline
 Godkänd &
  &
  \\ \hline
@@ -141,7 +141,7 @@ Nikolaj Agafonov \\ \hline
 2015-01-02 &
 Andra utkastet &
 Grupp 2 &
-NAMN \\ \hline
+Måns Skytt \\ \hline
 \end{tabular}
 \end{table}
 
@@ -169,8 +169,10 @@ Mål är att leverera en produkt, en robot, som kan köra autonomt och via fjär
 Undsättningsroboten kan användas för att utforska en grotta eller någon form av en labyrint (området är begränsat) och leverera ett objekt från en punkt till en annan. 
 Roboten ska kunna styras autonomt med hjälp av olika typer av sensorer runt om roboten. Den ska även kunna styras via blåtand av en användare. 
 Helst ska roboten skicka data till PC:n som behandlas så att en karta kan ritas ut på PC:ns skärm.
-\includegraphics{anvandnings_exempel}\\
+\begin{center}
+\includegraphics[scale=0.7]{anvandnings_exempel}\\
 Figur 1. \textit{Denna figur visar ett exempel på hur roboten kommer användas. Den svartmarkerade rutan indikerar målet. Den gröna rutan är ett exempel på var föremålet kan befinna sig. Sträckan markerad med (1) visar hur roboten kan köra under utforskningsfasen, dvs kartläggning. Sträckan markerad med (2,3,4) visar hur roboten kan köra under undsättningsfasen, dvs (2) köra ut kortaste sträckan och plocka upp föremålet (grön ruta), (3), köra in och lämna av föremålet på svart ruta och sist (4), köra ut och stanna utanför.}
+\end{center}
 \pagebreak
 \subsection{Bakgrundsinformation}
 Det kan finnas tillfällen då en robot behövs istället för en eller flera människor för att undsätta ett antal nödställda människor genom att skicka med mediciner eller förnödenheter i miljöer som är för farliga för människor att ta sig igenom. En prototyp för hur en sådan robot skulle kunna konstrueras ger en bra uppfattning om hur tillämpbara olika lösningar är.
@@ -203,9 +205,12 @@ Ett krav som utförs om allt annat är gjort och projektgruppen känner för det
 
 \section{Översikt av systemet}
 Roboten består av ett chassi med bland annat tre moduler, nämligen en kommunikations-, styr-, samt sensormodul. Användaren och systemet kommunicerar via en dator. I chassit ingår dessutom motor, hjul och gripklo.
+
+\begin{center}
 \includegraphics{systemskiss}
-\\
+
 Figur 2. \textit{Denna bild visar en översikt av systemet.}
+\end{center}
 
 \subsection{Grov beskrivning av produkten}
 Roboten kommer att köras på hjul och kommer att kunna känna av vad som finns framför, vid sidan av och bakom. Den ska kunna greppa tag i medicin eller annan produkt som roboten är avsedd att leverera. Den ska kunna kartlägga ett okänt område och utifrån kartan beräkna samt köra den kortaste vägen från start- till slutdestination. 
@@ -396,7 +401,14 @@ Roboten ska kunna skicka mätdata (avstånd till väggar, avlagd sträcka, vridn
 
 \section{Delsystem 4 - PC}
 
-PC:n används då data från roboten skall behandlas.
+PC:n används då data från roboten skall behandlas, och visas upp i ett användargränssnitt.
+\\
+
+\begin{center}
+\includegraphics[scale=0.5]{anvandargranssnitt}
+
+Figur 3. \textit{Skiss över användargränssnittet.}
+\end{center}
 
 \begin{center}
 \begin{longtable}{|l|l|p{.70\linewidth}|l|} \hline
