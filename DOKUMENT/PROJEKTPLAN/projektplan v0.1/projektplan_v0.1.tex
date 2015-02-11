@@ -26,6 +26,12 @@
 	\thekravc
 	\stepcounter{kravc}
 }
+\newcounter{refc}
+\setcounter{refc}{1}
+\newcommand{\reff}{
+	\therefc
+	\stepcounter{refc}
+}
 \pagestyle{fancy}
 
 
@@ -152,10 +158,8 @@ Grupp 2 &
 \pagenumbering{arabic}
 
 \begin{flushleft}
-
 \section{Beställare}
 Projektets beställare är Kent Palmkvist som representerar ISY.
-\pagebreak
 
 \section{Översiktlig beskrivning av projektet}
 
@@ -222,7 +226,6 @@ En tidrapport ska lämnas senast kl 16.00 vid följande datum: 4 febr, 23 febr, 
 
 \subsection{Begränsningar} %Vad behöver vi inte göra?
 Miljön som roboten körs i är begränsad på så sätt att den max ska vara 6x6m och passager måste vara bredare än 40 cm. Inga blockerande hinder får förekomma i vägen för roboten, den kan endast röra sig på släta ytor.
-\pagebreak
 
 
 \section{Fasplan}
@@ -270,71 +273,168 @@ Person \\ \hline
 Leveransansvarig 
 %Ange alla inblandade personer och deras ansvarsområden.
 %Definiera arbetsinnehållet för projektets roller.
+
 \pagebreak
 
 \section{Dokumentplan}
+
 
 \pagebreak
 
 \section{Utvecklingsmetodik}
 
+
 \pagebreak
 
 \section{Utbildningsplan}
 
+
 \subsection{Egen utbildning}
+
 
 \pagebreak
 
 \section{Rapporteringsplan}
+Vid bestämda datum, ungefär varje vecka, kommer projektledaren att rapportera den tid som gruppen har spenderat fram till rapporteringen. Tidsrapporten uppdateras löpande av alla gruppmedlemmar. Till tidrapporteringen kommer även en statusrapport att skickas med, som beskriver:\\
+$\bullet$ \textit{Vilka framsteg har gjorts sedan förra tidrapporteringen?}\\
+$\bullet$ \textit{Finns det några problem?}\\ 
+$\bullet$ \textit{Vad ska göras under kommande veckan?}
 
-\pagebreak
 
 \section{Mötesplan}
+Projektgruppen kommer att träffas löpande under projektet för avstämningar mot tidplanen, samt planera kommande dagar. Möten kommer att ske 1 gång i veckan. Extra möten kan tillkomma, exempelvis möte med handledare och beställare.
 
-\pagebreak
 
 \section{Resursplan}
-
 \subsection{Personer}
+Till projektgruppens förfogande kommer det att finnas en handledare tillgänglig som hjälp om det så behövs.
 
 \subsection{Material}
+Projektgruppen har till förfogande ett robotchassi och ett antal sensorer som finns beskrivna på Vanheden$^{[\reff]}$, ISY:s datablad.
 
 \subsection{Lokaler}
+Projektgruppen kommer att ha tillgång till laborationssalen MUXEN, där större delen av projektets tid kommer att spenderas. Projektgruppen kommer även att vid gruppmöten och/eller dokumentering att utnyttja till exempel ISYtan:s grupprum.
 
 \subsection{Ekonomi}
+Projektgruppen har tillgång till 1380 timmar totalt arbete och labutrustning i laborationssal MUXEN. Projektgruppen har inga finansiella tillgångar.
 
 \pagebreak
 
 \section{Milstolpar och beslutspunkter}
 
+
 \subsection{Milstolpar}
+\begin{table}[h]
+\begin{tabular}{|l|p{.75\linewidth}|l|} \hline
+
+Nr &
+Beskrivning &
+Datum \\ \hline
+
+1 &
+Fungerande sensorsystem &
+ \\ \hline
+2 &
+Fungerande reglersystem &
+ \\ \hline
+3 &
+Fungerande kommunikationssystem &
+ \\ \hline
+4 &
+Fungerande kartläggningsalgoritm &
+ \\ \hline
+5 &
+Fungerande optimeringsalgoritm för kortast väg &
+ \\ \hline
+6 &
+... &
+ \\ \hline
+7 &
+Färdig robot &
+ \\ \hline
+ 
+\end{tabular}
+\end{table}
 
 \subsection{Beslutspunkter}
+\begin{table}[h]
+\begin{tabular}{|l|p{.75\linewidth}|l|} \hline
+
+Nr &
+Beskrivning &
+Datum \\ \hline
+
+0 &
+Godkännande av uppdrag, beslut att skriva kravspecifikation &
+2015-01-23 \\ \hline
+1 &
+Godkännande av kravspecifikation, beslut att göra projektplan, systemskiss &
+2015-02-03 \\ \hline
+2 &
+Godkännande av projektplan och systemskiss, beslut att påbörja under-fasen &
+2015-02-20 \\ \hline
+3 &
+Godkännande av designspecifikation, beslut att påbörja konstruktion &
+2015-03-24 \\ \hline
+4 &
+Godkännande av nuvarande design &
+2015-04-17 \\ \hline
+5 &
+Verifiering av kravspecifikationen, beslut att leverera och påbörja efterfasen &
+2015-05-25 \\ \hline
+6 &
+Godkännande av slutrapport, beslut att upplösa projektgruppen &
+2015-06-05 \\ \hline
+ 
+\end{tabular}
+\end{table}
 
 \pagebreak
 
 \section{Aktiviteter}
+\begin{table}[h]
+\begin{tabular}{|l|p{.30\linewidth}|l|p{.40\linewidth}|p{.10\linewidth}|} \hline
 
-\pagebreak
+Nr & 
+Aktivitet & 
+Ansvar & 
+Beskrivning & 
+Beräknad total tid \\[0.1in] \hline
+
+
+
+
+\end{tabular}
+\end{table}
+
 
 \section{Tidplan}
+Se bifogat dokument \textit{tidplan\_v0.1}.
 
 \pagebreak
 
 \section{Kvalitetsplan}
+För att se till att minska på problematiska händelser under projektets gång kommer vi att vidta åtgärder som kodgranskning och hårdvarutester. Dessa förklaras närmare i de kommande delsektionerna.
 
 \subsection{Granskningar}
+Kod ska granskas på så sätt att de följer en kodkonvention som gruppen har kommit överens om.\\
+Dokument granskas så tekniska och språkliga begrepp används korrekt och att formateringar på dokumentens innehåll inte är fel.
 
 \subsection{Testplan}
+Tester kommer att utföras löpande under projektets gång. Varje delkomponent kommer att testas för sig. När en funktion är färdig testas den och arbetet går vidare till nästa problem.
 
 \pagebreak
 
 \section{Prioriteringar}
 
+
 \pagebreak
 
 \section{Projektavslut}
+Projektet kommer att avslutas med en avstämning mot alla krav och dokumentationer. Dessutom kommer en redovisning och demonstration av projektet att ske vecka 23. När allt är godkänt upphör gruppkontraktet och projektgruppen upplöses.
+\\[0.1in]
+
+
 
 \setcounter{secnumdepth}{0}
 \pagebreak
@@ -342,7 +442,9 @@ Leveransansvarig
 Kravspecifikation för TSEA56 2015, grupp 2\\
 kravspec\_v1.0.pdf \\[0.1in]
 
-LIPS
+LIPS \\[0.1in]
+
+[1] Vanheden, ISY:s datablad: \url{https://docs.isy.liu.se/twiki/bin/view/VanHeden}
 
 \setcounter{secnumdepth}{2}
 
