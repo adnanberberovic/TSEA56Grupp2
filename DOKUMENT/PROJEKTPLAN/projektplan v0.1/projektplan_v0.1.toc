@@ -3,32 +3,32 @@
 \contentsline {section}{\numberline {2}\IeC {\"O}versiktlig beskrivning av projektet}{2}
 \contentsline {subsection}{\numberline {2.1}Syfte och m\IeC {\r a}l}{2}
 \contentsline {subsection}{\numberline {2.2}Leveranser}{2}
-\contentsline {subsection}{\numberline {2.3}Begr\IeC {\"a}nsningar}{2}
-\contentsline {section}{\numberline {3}Fasplan}{3}
-\contentsline {subsection}{\numberline {3.1}Under projektet}{3}
-\contentsline {subsection}{\numberline {3.2}Efter projektet}{3}
-\contentsline {section}{\numberline {4}Organisationsplan f\IeC {\"o}r hela projektet}{4}
-\contentsline {subsection}{\numberline {4.1}Villkor f\IeC {\"o}r samarbetet inom projektgruppen}{4}
-\contentsline {subsection}{\numberline {4.2}Definition av arbetsinneh\IeC {\r a}ll och ansvar}{4}
-\contentsline {section}{\numberline {5}Dokumentplan}{5}
-\contentsline {section}{\numberline {6}Utvecklingsmetodik}{6}
-\contentsline {section}{\numberline {7}Utbildningsplan}{7}
-\contentsline {subsection}{\numberline {7.1}Egen utbildning}{7}
-\contentsline {section}{\numberline {8}Rapporteringsplan}{8}
-\contentsline {section}{\numberline {9}M\IeC {\"o}tesplan}{9}
-\contentsline {section}{\numberline {10}Resursplan}{10}
-\contentsline {subsection}{\numberline {10.1}Personer}{10}
-\contentsline {subsection}{\numberline {10.2}Material}{10}
-\contentsline {subsection}{\numberline {10.3}Lokaler}{10}
-\contentsline {subsection}{\numberline {10.4}Ekonomi}{10}
-\contentsline {section}{\numberline {11}Milstolpar och beslutspunkter}{11}
-\contentsline {subsection}{\numberline {11.1}Milstolpar}{11}
-\contentsline {subsection}{\numberline {11.2}Beslutspunkter}{11}
-\contentsline {section}{\numberline {12}Aktiviteter}{12}
-\contentsline {section}{\numberline {13}Tidplan}{13}
-\contentsline {section}{\numberline {14}Kvalitetsplan}{14}
-\contentsline {subsection}{\numberline {14.1}Granskningar}{14}
-\contentsline {subsection}{\numberline {14.2}Testplan}{14}
-\contentsline {section}{\numberline {15}Prioriteringar}{15}
-\contentsline {section}{\numberline {16}Projektavslut}{16}
-\contentsline {section}{Referenser}{17}
+\contentsline {subsection}{\numberline {2.3}Begr\IeC {\"a}nsningar}{3}
+\contentsline {section}{\numberline {3}Fasplan}{4}
+\contentsline {subsection}{\numberline {3.1}Under projektet}{4}
+\contentsline {subsection}{\numberline {3.2}Efter projektet}{4}
+\contentsline {section}{\numberline {4}Organisationsplan f\IeC {\"o}r hela projektet}{5}
+\contentsline {subsection}{\numberline {4.1}Villkor f\IeC {\"o}r samarbetet inom projektgruppen}{5}
+\contentsline {subsection}{\numberline {4.2}Definition av arbetsinneh\IeC {\r a}ll och ansvar}{5}
+\contentsline {section}{\numberline {5}Dokumentplan}{6}
+\contentsline {section}{\numberline {6}Utvecklingsmetodik}{7}
+\contentsline {section}{\numberline {7}Utbildningsplan}{8}
+\contentsline {subsection}{\numberline {7.1}Egen utbildning}{8}
+\contentsline {section}{\numberline {8}Rapporteringsplan}{9}
+\contentsline {section}{\numberline {9}M\IeC {\"o}tesplan}{10}
+\contentsline {section}{\numberline {10}Resursplan}{11}
+\contentsline {subsection}{\numberline {10.1}Personer}{11}
+\contentsline {subsection}{\numberline {10.2}Material}{11}
+\contentsline {subsection}{\numberline {10.3}Lokaler}{11}
+\contentsline {subsection}{\numberline {10.4}Ekonomi}{11}
+\contentsline {section}{\numberline {11}Milstolpar och beslutspunkter}{12}
+\contentsline {subsection}{\numberline {11.1}Milstolpar}{12}
+\contentsline {subsection}{\numberline {11.2}Beslutspunkter}{12}
+\contentsline {section}{\numberline {12}Aktiviteter}{13}
+\contentsline {section}{\numberline {13}Tidplan}{14}
+\contentsline {section}{\numberline {14}Kvalitetsplan}{15}
+\contentsline {subsection}{\numberline {14.1}Granskningar}{15}
+\contentsline {subsection}{\numberline {14.2}Testplan}{15}
+\contentsline {section}{\numberline {15}Prioriteringar}{16}
+\contentsline {section}{\numberline {16}Projektavslut}{17}
+\contentsline {section}{Referenser}{18}
