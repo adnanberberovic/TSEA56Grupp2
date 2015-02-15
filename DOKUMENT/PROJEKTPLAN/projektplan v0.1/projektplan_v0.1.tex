@@ -113,8 +113,8 @@ Namn & Ansvar & Telefon & E-post \\[0.1in] \hline
 Nikolaj Agafonov & Dokumentansvarig (DA) & 072-276 99 46 & nikag669@student.liu.se \\ \hline
 Adnan Berberovic & Projektledare (PL) & 070-491 96 07 & adnbe196@student.liu.se \\ \hline
 Andreas Brorsson & Testansvarig (TA) & 073-524 44 60 & andbr981@student.liu.se \\ \hline
-Fredrik Fridborn & Designansvarig Sensormodul (DS) & 073-585 52 01 & frefr166@student.liu.se \\ \hline
-Robert Oprea & Designansvarig Reglermodul (DR) & 070-022 10 18 & robop806@student.liu.se \\ \hline
+Fredrik Fridborn & Designansvarig Sensormodul (DSE) & 073-585 52 01 & frefr166@student.liu.se \\ \hline
+Robert Oprea & Designansvarig Styrmodul (DST) & 070-022 10 18 & robop806@student.liu.se \\ \hline
 Måns Skytt & Designansvarig Kommunikationsenhet (DK) & 070-354 28 84 & mansk700@student.liu.se \\ \hline
 \end{tabular}
 \end{table}
@@ -253,7 +253,7 @@ Testansvarig & Andreas Brorsson & Ansvarig för testning \\
 \hline
 Designansvarig Sensormodul & Fredrik Fridborn  & Ansvarig för robotens sensorer\\
 \hline
-Designansvarig Reglermodul & Robert Oprea & Ansvarig för reglering av roboten\\
+Designansvarig Styrmodul & Robert Oprea & Ansvarig för reglering av roboten\\
 \hline
 Designansvarig Kommunikationsmodul & Måns Skytt & Ansvarig för kommunikation mellan robot och användare \\
 \hline
@@ -292,9 +292,9 @@ Efterstudie & NA & En reflektion kring hur projektet bedrevs. Vad kunde man ha g
 Arbetet kommer att delas upp mellan gruppmedlemmarna på så sätt att projektgrupp kommer att bestå av mindre grupper (exempelvis grupper om två eller tre personer). Uppdelningen beror på uppgiftens svårighet och tidsåtgång. En sådan uppdelning är tänkt att förbättra och snabba upp utförandet av projektet. Projektets delar som implementeras var för sig måste kunna fungera tillsammans med de andra delar, därför ska de mindre projektgrupper komma överens om olika delars detaljer och veta hur det hela systemet ska fungera.
 
 
-Tänker ni använda er av någon speciell metodik?
-Alltid jobba i par? Använda ett visst
-programspråk?
+%Tänker ni använda er av någon speciell metodik?
+%Alltid jobba i par? Använda ett visst
+%programspråk?
 
 
 \section{Utbildningsplan}
@@ -433,9 +433,124 @@ Ansvar &
 Beskrivning & 
 Beräknad total tid \\[0.1in] \hline
 
+1 &
+Kravspecifikation &
+AB &
+Skriva kravspecifikation &
+40 \\ \hline
 
+2 &
+Projektplan &
+AB &
+Skriva projektplan &
+27 \\ \hline
 
+3 &
+Tidplan &
+AB &
+Skriva tidplan &
+3 \\ \hline
+ 
+4 &
+Designspecifikation &
+AB &
+Skriv designspecifikation &
+20 \\ \hline
+ 
+5-8 &
+Styrmodul &
+RO &
+Konstruera styrmodulen &
+250 \\ \hline
 
+5 &
+Kortaste väg till målet &
+RO &
+Optimeringsproblem: Beräkna kortaste väg till målet, och kör denna &
+30 \\ \hline
+ 
+4 &
+Kartläggning &
+RO &
+Kartlägga det undersökta området &
+50 \\ \hline
+ 
+6 &
+Motorstyrning &
+RO &
+Driftproblem: Få roboten att drivas med hjälp av motorerna &
+50 \\ \hline
+ 
+7 &
+PD reglering &
+RO &
+Reglerproblem: Se till att roboten kör i en rak och inte svängig bana &
+80 \\ \hline
+ 
+8 &
+Programmering av LCD &
+RO &
+Visa viss data som begärs på en LCD på roboten &
+30 \\ \hline
+ 
+9-11 &
+Kommunikationsmodul &
+MS &
+Konstruera kommunikationsmodulen &
+150 \\ \hline
+ 
+ 
+9 &
+Installera blåtandslänk &
+MS &
+Få igång blåtand på roboten. &
+20 \\ \hline
+ 
+10 &
+Skapa kontakt mellan Robot och PC &
+MS &
+Få igång kommunkation mellan robot och PC &
+40 \\ \hline
+ 
+11 &
+Intermodulär kommunikation &
+MS &
+Få kommunikationsmodulen att vidarebefodra data mellan PC och andra moduler &
+50 \\ \hline
+ 
+12-?? &
+Sensormodul &
+FF &
+Konstruera sensormodulen &
+300 \\ \hline
+ 
+ &
+ &
+ &
+ &
+ \\ \hline
+ 
+ &
+ &
+ &
+ &
+ \\ \hline
+ 
+ &
+ &
+ &
+ &
+ \\ \hline
+ 
+- &
+- &
+- &
+Total &
+1500 \\ \hline
+%SE TILL ATT ALLA TIDER ÖVERRENSSTÄMMER MED VARANDRA!!!
+ 
+ 
+ 
 \end{tabular}
 \end{table}
 
