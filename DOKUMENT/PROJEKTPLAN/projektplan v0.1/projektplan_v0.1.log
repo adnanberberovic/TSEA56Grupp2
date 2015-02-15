@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.15 (TeX Live 2014) (preloaded format=pdflatex 2015.2.11)  15 FEB 2015 14:58
+This is pdfTeX, Version 3.14159265-2.6-1.40.15 (TeX Live 2014) (preloaded format=pdflatex 2015.2.11)  15 FEB 2015 16:43
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -734,7 +734,7 @@ Overfull \hbox (1.15393pt too wide) in paragraph at lines 416--416
  []
 
 
-Overfull \hbox (19.40723pt too wide) in paragraph at lines 410--422
+Overfull \hbox (19.40723pt too wide) in paragraph at lines 410--487
 [][] 
  []
 
@@ -791,7 +791,7 @@ super/sfbx1440.pfb></usr/local/texlive/2014/texmf-dist/fonts/type1/public/cm-su
 per/sfrm1095.pfb></usr/local/texlive/2014/texmf-dist/fonts/type1/public/cm-supe
 r/sfti1095.pfb></usr/local/texlive/2014/texmf-dist/fonts/type1/public/cm-super/
 sftt1095.pfb>
-Output written on projektplan_v0.1.pdf (18 pages, 191230 bytes).
+Output written on projektplan_v0.1.pdf (18 pages, 192172 bytes).
 PDF statistics:
  95 PDF objects out of 1000 (max. 8388607)
  66 compressed objects within 1 object stream
