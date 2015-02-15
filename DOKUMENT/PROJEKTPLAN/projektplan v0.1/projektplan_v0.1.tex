@@ -108,14 +108,14 @@ Godkänd &
 Linköpings tekniska högskola, ISY
 \\[0.5in]
 \begin{table}[h]
-\begin{tabular}{|l|l|l|l|} \hline
+\begin{tabular}{|l|p{0.3\linewidth}|l|l|} \hline
 Namn & Ansvar & Telefon & E-post \\[0.1in] \hline
 Nikolaj Agafonov & Dokumentansvarig (DA) & 072-276 99 46 & nikag669@student.liu.se \\ \hline
 Adnan Berberovic & Projektledare (PL) & 070-491 96 07 & adnbe196@student.liu.se \\ \hline
-Andreas Brorsson & Leveransansvarig (LA) & 073-524 44 60 & andbr981@student.liu.se \\ \hline
-Fredrik Fridborn & Designansvarig mjukvara (DAM) & 073-585 52 01 & frefr166@student.liu.se \\ \hline
-Robert Oprea & Testansvarig (TA) & 070-022 10 18 & robop806@student.liu.se \\ \hline
-Måns Skytt & Designansvarig hårdvara (DAH) & 070-354 28 84 & mansk700@student.liu.se \\ \hline
+Andreas Brorsson & Testansvarig (TA) & 073-524 44 60 & andbr981@student.liu.se \\ \hline
+Fredrik Fridborn & Designansvarig Sensormodul (DS) & 073-585 52 01 & frefr166@student.liu.se \\ \hline
+Robert Oprea & Designansvarig Reglermodul (DR) & 070-022 10 18 & robop806@student.liu.se \\ \hline
+Måns Skytt & Designansvarig Kommunikationsenhet (DK) & 070-354 28 84 & mansk700@student.liu.se \\ \hline
 \end{tabular}
 \end{table}
 
@@ -225,8 +225,7 @@ Bärbar dator och övrig utrustning ska vara återlämnade. \\ \hline
 En tidrapport ska lämnas senast kl 16.00 vid följande datum: 4 febr, 23 febr, 9 mars, 23 mars, 30 mars, 13 april, 20 april, 27 april, 4 maj, 11 maj, 18 maj, 25 maj, 1 juni och 8 juni.
 
 \subsection{Begränsningar} %Vad behöver vi inte göra?
-Miljön som roboten körs i är begränsad på så sätt att den max ska vara 6x6m och passager måste vara minst 40 cm breda. Inga blockerande hinder får förekomma i vägen för roboten, den kan endast röra sig på släta ytor.
-
+Roboten anses vara en prototyp. Detta innebär att den kommer vara designad på sådant sätt att den kommer kunna klara av en bana av fördefinierad storlek med plan mark, och inte en miljö av godtyckligt väglag och storlek. 
 
 \section{Fasplan}
 Nedan ges en grov beskrivning av aktiviteterna i varje fas.
@@ -245,18 +244,18 @@ Samarbetet inom projektgruppen sker i enlighet med gruppkontraktet (se appendix)
 \subsection{Definition av arbetsinnehåll och ansvar}
 
 \begin{tabu} to 1.05\textwidth { | X[c] | X[c] | X[c] | }
- \hline
- Projektledare & Adnan Berberovic & Ansvarig för projektgruppen \\
- \hline
- Dokumentansvarig & Person & Ansvarig för dokument\\
- \hline
-Testansvarig & Person & Ansvarig för testning \\ 
 \hline
-Designansvarig hårdvara & Person  & Ansvarig för hårdvarudesign\\
+Projektledare & Adnan Berberovic & Ansvarig för projektgruppen \\
 \hline
-Designansvarig mjukvara & Person  & Ansvarig för mjukvarudesign\\
+Dokumentansvarig & Nikolaj Agafonov & Ansvarig för dokument\\
 \hline
-Leveransansvarig & Person & Ansvarig för leveranser \\
+Testansvarig & Andreas Brorsson & Ansvarig för testning \\ 
+\hline
+Designansvarig Sensormodul & Fredrik Fridborn  & Ansvarig för robotens sensorer\\
+\hline
+Designansvarig Reglermodul & Robert Oprea & Ansvarig för reglering av roboten\\
+\hline
+Designansvarig Kommunikationsmodul & Måns Skytt & Ansvarig för kommunikation mellan robot och användare \\
 \hline
  \end{tabu}
 
@@ -274,16 +273,16 @@ Följande tabell räknar upp de dokument som kommer att skapas under projektets 
 \begin{longtable}{|p{.28\linewidth}|p{.1\linewidth}|p{.25\linewidth}|p{.19\linewidth}|p{.15\linewidth}|}\hline
 \textbf{Dokument} & \textbf{Ansvarig} & \textbf{Syfte} & \textbf{Målgrupp} & \textbf{Godkännare} \\ \hline
 
-Kravspecifikation & AB & Listar alla krav som slutprodukten ska uppfylla. & Projektgrupp och beställare & Beställare \\ \hline
-Projektplan & AB & Beskriver hur projektet ska utföras & Projektgrupp & Beställare \\ \hline
-Tidplan & ?? & Beskriver när aktiviteter ska utföras och av vem & Projektgrupp & Beställare \\ \hline
-Systemskiss & ?? & Beskriver hur produkten ska konstrueras& Projektgrupp och beställare & Beställare \\ \hline
-Förstudie & ?? & Analysera huruvida projektet kan drivas framåt eller inte & Projektgrupp & Beställare \\ \hline
-Design-specifikation & ?? & Beskriver mer detaljerat hur produkten ska konstrueras & Projektgrupp & Beställare \\ \hline
-Kappa & ?? & Sammanfattar alla dokument som beställaren kan vara intresserad av & Beställare & Beställare \\ \hline
-Teknisk dokumentation & ?? & Beskriver hur produkten fungerar & Beställare & Beställare \\ \hline
-Användar-handledning & ?? & Beskriver hur man använder produkten& Beställare & Beställare \\ \hline
-Efterstudie & ?? & En reflektion kring hur projektet bedrevs. Vad kunde man ha gjort bättre, etc.& Projektgrupp & Beställare\\ \hline
+Kravspecifikation & Alla & Listar alla krav som slutprodukten ska uppfylla. & Projektgrupp och beställare & Beställare \\ \hline
+Projektplan & ABe, FF, NA & Beskriver hur projektet ska utföras & Projektgrupp & Beställare \\ \hline
+Tidplan & ABe, FF, NA & Beskriver när aktiviteter ska utföras och av vem & Projektgrupp & Beställare \\ \hline
+Systemskiss & MS, ABr, RO & Beskriver hur produkten ska konstrueras& Projektgrupp och beställare & Beställare \\ \hline
+Förstudie & Alla & Analysera huruvida projektet kan drivas framåt eller inte & Projektgrupp & Beställare \\ \hline
+Design-specifikation & AB & Beskriver mer detaljerat hur produkten ska konstrueras & Projektgrupp & Beställare \\ \hline
+Kappa & RO & Sammanfattar alla dokument som beställaren kan vara intresserad av & Beställare & Beställare \\ \hline
+Teknisk dokumentation & MS, ABr & Beskriver hur produkten fungerar & Beställare & Beställare \\ \hline
+Användar-handledning & FF & Beskriver hur man använder produkten& Beställare & Beställare \\ \hline
+Efterstudie & NA & En reflektion kring hur projektet bedrevs. Vad kunde man ha gjort bättre, etc.& Projektgrupp & Beställare\\ \hline
 
 \end{longtable}
 \end{center}
@@ -298,13 +297,14 @@ Alltid jobba i par? Använda ett visst
 programspråk?
 
 
-\pagebreak
-
 \section{Utbildningsplan}
 
 
 \subsection{Egen utbildning}
 För att kunna implementera och testa systemets olika komponenter, både mjukvara och hårdvara, behöver gruppen att inhämta kunskap om de program och mätverktyg, som är relevanta för projektet. Exempelvis kommer gruppen att kunna använda utvecklingssystemet AVR-Studio och debugverktyget JTAGICE för att programmera de AVR-processorer som kommer att finnas i varje delmodul. Projektgruppen kommer att lära sig att programmera kretsar med VHDL-programmeringsspråk samt utföra mätningar med en logikanalysator.
+
+\subsection{Kundens utbildning}
+En demonstration av roboten och överlämning av bruksanvisning kommer att ske i samband med slutleveransen.
 
 \pagebreak
 
@@ -348,46 +348,40 @@ Datum \\ \hline
 1 &
 Designspecifikationen är klar &
  \\ \hline
- 2 &
+2 &
 Roboten kan mäta sin position &
  \\ \hline
-  3 &
+3 &
 Sensordata kan skickas från sensor till rätt dator &
  \\ \hline
- 4 &
- PC-klienten kan rita en karta &
+4 &
+Fungerande sensorsystem &
  \\ \hline
- 5 &
-Fjärrmottagningsmodulen är testad o klar &
+5 &
+Roboten kan köra rakt utan instabilitet &
  \\ \hline
- 6 &
+6 &
 Roboten kan styras manuellt &
  \\ \hline
 7 &
-Motor kan styras från processor &
+Roboten kan köra autonomt &
  \\ \hline
- 8 &
+8 &
 Fungerande reglersystem &
  \\ \hline
 9 &
+Roboten kan skicka och ta emot data från användaren &
+ \\ \hline
+10 &
 Fungerande kommunikationssystem &
  \\ \hline
-10 & 
- Roboten kan köra autonomt &
- \\ \hline
- 11 &
- Roboten kan skicka kartdata till PC-klient &
- \\ \hline
-12 &
+11 &
 Fungerande kartläggningsalgoritm &
  \\ \hline
-13 &
+12 &
 Fungerande optimeringsalgoritm för kortast väg &
  \\ \hline
-14 &
-... &
- \\ \hline
-15 &
+13 &
 Färdig robot &
  \\ \hline
  
@@ -439,80 +433,15 @@ Ansvar &
 Beskrivning & 
 Beräknad total tid \\[0.1in] \hline
 
-1 & 
-Kravspecifikation& 
-AB & 
-Skriv kravspecifikationen& 
-40\\[0.1in] \hline
 
-2 & 
-Projektplan& 
-AB & 
-Skriv projektplanen& 
-27\\[0.1in] \hline
 
-3 & 
-Tidplan& 
-AB & 
-Skriv tidplanen& 
-3\\[0.1in] \hline
-
-4 & 
-Designspecifikation& 
-AB & 
-Skriv designspecifikationen& 
-20\\[0.1in] \hline
-
-5 & 
-Sensorsystem& 
-AB & 
-Bygg sensorsystem& 
-310\\[0.1in] \hline
-
-6 & 
-Reglersystem& 
-AB & 
-Bygg reglersystem& 
-285\\[0.1in] \hline
-
-7 & 
-Kommunikationssystem& 
-AB & 
-Bygg kommunikationssystem& 
-300\\[0.1in] \hline
-
-8 & 
-Användargränssnitt& 
-AB & 
-Programmera användargränssnittet& 
-50\\[0.1in] \hline
-
-9 & 
-Kartläggningsalgoritm& 
-AB & 
-Programmera kartläggningsalgoritm& 
-400\\[0.1in] \hline
-
-10 & 
-Optimeringsalgoritm& 
-AB & 
-Programmera optimeringsalgoritm& 
-20\\[0.1in] \hline
-
-- &
--&
--&
-Total tid&
-1458
-
- \\ \hline
 
 \end{tabular}
 \end{table}
 
 
 \section{Tidplan}
-Se bifogat dokument \textit{tidplan\_v0.1}.
+Se bifogat dokument \textit{tidplan\_v0.1}$^{[\reff]}$.
 
 \pagebreak
 
@@ -526,12 +455,9 @@ Dokument granskas så tekniska och språkliga begrepp används korrekt och att f
 \subsection{Testplan}
 Tester kommer att utföras löpande under projektets gång. Varje delkomponent kommer att testas för sig. När en funktion är färdig testas den och arbetet går vidare till nästa problem.
 
-\pagebreak
 
 \section{Prioriteringar}
-
-
-\pagebreak
+Det absolut viktigaste är att se till att allt fungerar enligt alla grundkrav (se Kravspecifikation$^{\reff}$), annars kommer projektet inte att fungera. Så länge detta är uppfyllt kommer gruppens arbete att kunna drivas framåt utan större komplikationer.
 
 \section{Projektavslut}
 Projektet kommer att avslutas med en avstämning mot alla krav och dokumentationer. Dessutom kommer en redovisning och demonstration av projektet att ske vecka 23. När allt är godkänt upphör gruppkontraktet och projektgruppen upplöses.
@@ -542,12 +468,13 @@ Projektet kommer att avslutas med en avstämning mot alla krav och dokumentation
 \setcounter{secnumdepth}{0}
 \pagebreak
 \section{Referenser}
-Kravspecifikation för TSEA56 2015, grupp 2\\
-kravspec\_v1.0.pdf \\[0.1in]
 
-LIPS \\[0.1in]
 
-[1] Vanheden, ISY:s datablad: \url{https://docs.isy.liu.se/twiki/bin/view/VanHeden}
+$^{[1]}$Vanheden, ISY:s datablad: \url{https://docs.isy.liu.se/twiki/bin/view/VanHeden} \\[0.1in]
+
+$^{[2]}$Tidplan för TSEA56 2015, grupp 2: tidplan\_v0.1.pdf \\[0.1in]
+
+$^{[3]}$Kravspecifikation för TSEA56 2015, grupp 2: kravspec\_v1.0.pdf \\[0.1in]
 
 \setcounter{secnumdepth}{2}
 

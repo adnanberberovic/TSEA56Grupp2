@@ -12,23 +12,24 @@
 \contentsline {subsection}{\numberline {4.2}Definition av arbetsinneh\IeC {\r a}ll och ansvar}{3}
 \contentsline {section}{\numberline {5}Dokumentplan}{4}
 \contentsline {section}{\numberline {6}Utvecklingsmetodik}{5}
-\contentsline {section}{\numberline {7}Utbildningsplan}{6}
-\contentsline {subsection}{\numberline {7.1}Egen utbildning}{6}
-\contentsline {section}{\numberline {8}Rapporteringsplan}{7}
-\contentsline {section}{\numberline {9}M\IeC {\"o}tesplan}{7}
-\contentsline {section}{\numberline {10}Resursplan}{7}
-\contentsline {subsection}{\numberline {10.1}Personer}{7}
-\contentsline {subsection}{\numberline {10.2}Material}{7}
-\contentsline {subsection}{\numberline {10.3}Lokaler}{7}
-\contentsline {subsection}{\numberline {10.4}Ekonomi}{7}
-\contentsline {section}{\numberline {11}Milstolpar och beslutspunkter}{8}
-\contentsline {subsection}{\numberline {11.1}Milstolpar}{8}
-\contentsline {subsection}{\numberline {11.2}Beslutspunkter}{8}
-\contentsline {section}{\numberline {12}Aktiviteter}{9}
-\contentsline {section}{\numberline {13}Tidplan}{9}
-\contentsline {section}{\numberline {14}Kvalitetsplan}{10}
-\contentsline {subsection}{\numberline {14.1}Granskningar}{10}
-\contentsline {subsection}{\numberline {14.2}Testplan}{10}
-\contentsline {section}{\numberline {15}Prioriteringar}{11}
-\contentsline {section}{\numberline {16}Projektavslut}{12}
-\contentsline {section}{Referenser}{13}
+\contentsline {section}{\numberline {7}Utbildningsplan}{5}
+\contentsline {subsection}{\numberline {7.1}Egen utbildning}{5}
+\contentsline {subsection}{\numberline {7.2}Kundens utbildning}{5}
+\contentsline {section}{\numberline {8}Rapporteringsplan}{6}
+\contentsline {section}{\numberline {9}M\IeC {\"o}tesplan}{6}
+\contentsline {section}{\numberline {10}Resursplan}{6}
+\contentsline {subsection}{\numberline {10.1}Personer}{6}
+\contentsline {subsection}{\numberline {10.2}Material}{6}
+\contentsline {subsection}{\numberline {10.3}Lokaler}{6}
+\contentsline {subsection}{\numberline {10.4}Ekonomi}{6}
+\contentsline {section}{\numberline {11}Milstolpar och beslutspunkter}{7}
+\contentsline {subsection}{\numberline {11.1}Milstolpar}{7}
+\contentsline {subsection}{\numberline {11.2}Beslutspunkter}{7}
+\contentsline {section}{\numberline {12}Aktiviteter}{8}
+\contentsline {section}{\numberline {13}Tidplan}{8}
+\contentsline {section}{\numberline {14}Kvalitetsplan}{9}
+\contentsline {subsection}{\numberline {14.1}Granskningar}{9}
+\contentsline {subsection}{\numberline {14.2}Testplan}{9}
+\contentsline {section}{\numberline {15}Prioriteringar}{9}
+\contentsline {section}{\numberline {16}Projektavslut}{9}
+\contentsline {section}{Referenser}{10}
