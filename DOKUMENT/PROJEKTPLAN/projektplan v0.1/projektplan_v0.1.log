@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.15 (TeX Live 2014) (preloaded format=pdflatex 2015.2.11)  13 FEB 2015 11:28
+This is pdfTeX, Version 3.14159265-2.6-1.40.15 (TeX Live 2014) (preloaded format=pdflatex 2015.2.11)  15 FEB 2015 14:58
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -651,6 +651,11 @@ Package Fancyhdr Warning: \headheight is too small (12.0pt):
  This may cause the page layout to be inconsistent, however.
 
 [3]
+Overfull \hbox (3.98288pt too wide) in paragraph at lines 275--275
+[]|\T1/cmr/bx/n/10.95 Ansvarig| 
+ []
+
+
 Underfull \hbox (badness 2237) in paragraph at lines 277--277
 []|\T1/cmr/m/n/10.95 Listar al-la krav som
  []
@@ -671,22 +676,12 @@ Underfull \hbox (badness 1448) in paragraph at lines 283--283
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 284--284
-[]|\T1/cmr/m/n/10.95 Teknisk do-ku-men-ta-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 285--285
-[]|\T1/cmr/m/n/10.95 Användar-
- []
-
-
 Underfull \hbox (badness 2644) in paragraph at lines 286--286
 \T1/cmr/m/n/10.95 kun-de man ha gjort
  []
 
 
-Overfull \hbox (22.47948pt too wide) in alignment at lines 274--288
+Overfull \hbox (49.09312pt too wide) in alignment at lines 274--288
  [] [] [] [] [] 
  []
 
@@ -722,7 +717,7 @@ Package Fancyhdr Warning: \headheight is too small (12.0pt):
  This may cause the page layout to be inconsistent, however.
 
 [7]
-Underfull \hbox (badness 2229) in paragraph at lines 379--379
+Underfull \hbox (badness 2229) in paragraph at lines 385--385
 []|\T1/cmr/m/n/10.95 Godkännande av krav-spe-ci-fi-ka-tion, be-slut att gö-ra p
 ro-jekt-plan,
  []
@@ -734,12 +729,12 @@ Package Fancyhdr Warning: \headheight is too small (12.0pt):
  This may cause the page layout to be inconsistent, however.
 
 [8]
-Overfull \hbox (1.15393pt too wide) in paragraph at lines 410--410
+Overfull \hbox (1.15393pt too wide) in paragraph at lines 416--416
 []|\T1/cmr/m/n/10.95 Beräknad
  []
 
 
-Overfull \hbox (19.40723pt too wide) in paragraph at lines 404--416
+Overfull \hbox (19.40723pt too wide) in paragraph at lines 410--422
 [][] 
  []
 
@@ -781,11 +776,11 @@ Package Fancyhdr Warning: \headheight is too small (12.0pt):
 Here is how much of TeX's memory you used:
  4253 strings out of 493117
  57795 string characters out of 6135433
- 149699 words of memory out of 5000000
+ 149698 words of memory out of 5000000
  7630 multiletter control sequences out of 15000+600000
  12017 words of font info for 31 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 38i,13n,43p,466b,426s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 38i,13n,43p,574b,426s stack positions out of 5000i,500n,10000p,200000b,80000s
 {/usr/local/texlive/2014/texmf-dist/fonts/enc/dv
 ips/cm-super/cm-super-t1.enc}</usr/local/texlive/2014/texmf-dist/fonts/type1/pu
 blic/amsfonts/cm/cmr8.pfb></usr/local/texlive/2014/texmf-dist/fonts/type1/publi
@@ -796,7 +791,7 @@ super/sfbx1440.pfb></usr/local/texlive/2014/texmf-dist/fonts/type1/public/cm-su
 per/sfrm1095.pfb></usr/local/texlive/2014/texmf-dist/fonts/type1/public/cm-supe
 r/sfti1095.pfb></usr/local/texlive/2014/texmf-dist/fonts/type1/public/cm-super/
 sftt1095.pfb>
-Output written on projektplan_v0.1.pdf (18 pages, 189789 bytes).
+Output written on projektplan_v0.1.pdf (18 pages, 191230 bytes).
 PDF statistics:
  95 PDF objects out of 1000 (max. 8388607)
  66 compressed objects within 1 object stream
