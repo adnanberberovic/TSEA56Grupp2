@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.15 (TeX Live 2014) (preloaded format=pdflatex 2015.2.11)  16 FEB 2015 13:44
+This is pdfTeX, Version 3.14159265-2.6-1.40.15 (TeX Live 2014) (preloaded format=pdflatex 2015.2.11)  16 FEB 2015 14:24
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -730,7 +730,7 @@ Package Fancyhdr Warning: \headheight is too small (12.0pt):
  This may cause the page layout to be inconsistent, however.
 
 [6]
-Underfull \hbox (badness 2229) in paragraph at lines 403--403
+Underfull \hbox (badness 2229) in paragraph at lines 415--415
 []|\T1/cmr/m/n/10.95 Godkännande av krav-spe-ci-fi-ka-tion, be-slut att gö-ra p
 ro-jekt-plan,
  []
@@ -742,22 +742,22 @@ Package Fancyhdr Warning: \headheight is too small (12.0pt):
  This may cause the page layout to be inconsistent, however.
 
 [7]
-Overfull \hbox (1.15393pt too wide) in paragraph at lines 434--434
+Overfull \hbox (1.15393pt too wide) in paragraph at lines 446--446
 []|\T1/cmr/m/n/10.95 Beräknad
  []
 
 
-Underfull \hbox (badness 3158) in paragraph at lines 475--475
+Underfull \hbox (badness 3158) in paragraph at lines 487--487
 []|\T1/cmr/m/n/10.95 Optimeringsproblem: Be-räk-na kor-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 522--522
+Underfull \hbox (badness 10000) in paragraph at lines 533--533
 []|\T1/cmr/m/n/10.95 Intermodulär kom-mu-ni-ka-
  []
 
 
-Overfull \hbox (32.41747pt too wide) in paragraph at lines 428--574
+Overfull \hbox (32.41747pt too wide) in paragraph at lines 440--596
 [][] 
  []
 
@@ -810,7 +810,7 @@ super/sfbx1440.pfb></usr/local/texlive/2014/texmf-dist/fonts/type1/public/cm-su
 per/sfrm1095.pfb></usr/local/texlive/2014/texmf-dist/fonts/type1/public/cm-supe
 r/sfti1095.pfb></usr/local/texlive/2014/texmf-dist/fonts/type1/public/cm-super/
 sftt1095.pfb>
-Output written on projektplan_v0.1.pdf (16 pages, 194073 bytes).
+Output written on projektplan_v0.1.pdf (16 pages, 194349 bytes).
 PDF statistics:
  89 PDF objects out of 1000 (max. 8388607)
  62 compressed objects within 1 object stream
