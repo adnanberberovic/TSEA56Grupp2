@@ -14,7 +14,7 @@
 \usepackage{url}
 \usepackage{float}
 
-\graphicspath{ {images/} }
+\graphicspath{ {../images/} }
 \newcommand{\subtitle}[1]{%
   \posttitle{%
     \par\end{center}
@@ -246,6 +246,9 @@ Sensormodulens uppgift är att känna av omgivningen runtomkring roboten och beh
 
 \subsection{Sensorer}
 Sensorerna består främst av IR- och optiska sensorer men även andra typer kan komma att användas. Sensorerna kopplas till mikroprocessorn i sensormodulen som tar hand om all deras data.
+
+Det kommer finnas
+
 
 \section{Delsystem 2 - Styrmodul}
 Styrmodulen ska kunna ta in data både från sensormodulen och från kommunikationsmodulen beroende på om roboten ligger i autonomt eller manuellt läge. När roboten är i autonomt läge får den strömmande data från sensormodulen som den sedan jämför med kartan som roboten själv bygger upp. Med informationen den fått och har görs ett beslut om vart den ska. När roboten vet vart den ska används reglerteknik för att hålla sig centrerad och att svänga utan att fastna mot väggar.    
