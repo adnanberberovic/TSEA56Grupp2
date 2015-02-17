@@ -13,10 +13,10 @@
 \contentsline {section}{\numberline {4}Delsystem 2 - Styrmodul}{4}
 \contentsline {subsection}{\numberline {4.1}LCD-Display}{4}
 \contentsline {subsection}{\numberline {4.2}Motorer}{4}
-\contentsline {subsection}{\numberline {4.3}Gripklo}{4}
-\contentsline {subsection}{\numberline {4.4}Gr\IeC {\"a}nssnitt - Display}{4}
-\contentsline {subsection}{\numberline {4.5}Brytare f\IeC {\"o}r val av autonom eller manuell styrning}{4}
-\contentsline {section}{\numberline {5}Delsystem 3 - Kommunikationsmodul}{4}
+\contentsline {subsection}{\numberline {4.3}Gripklo}{5}
+\contentsline {subsection}{\numberline {4.4}Gr\IeC {\"a}nssnitt - Display}{5}
+\contentsline {subsection}{\numberline {4.5}Brytare f\IeC {\"o}r val av autonom eller manuell styrning}{5}
+\contentsline {section}{\numberline {5}Delsystem 3 - Kommunikationsmodul}{5}
 \contentsline {subsection}{\numberline {5.1}Bluetooth}{5}
 \contentsline {section}{\numberline {6}Delsystem 4 - PC}{5}
 \contentsline {subsection}{\numberline {6.1}Anv\IeC {\"a}ndargr\IeC {\"a}nssnitt - Visualisering}{5}

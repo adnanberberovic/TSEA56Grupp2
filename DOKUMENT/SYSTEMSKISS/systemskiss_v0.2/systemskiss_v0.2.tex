@@ -240,8 +240,27 @@ Laptop, Bluetooth- sändare/mottagare \\
 \end{figure}
 
 \subsection{Intermodulär kommunikation}
-Den intermodulära kommunikationen sker genom att alla mikrokontroller får varsin FBART $^{[4]}$ och kopplas samman via systembuss. Kommunikationen kommer alltså ske seriellt mellan de olika modulerna.
+Den intermodulära kommunikationen kommer ske på något av följande sätt:
+\\
 
+[1] Gemensam buss eller ej
+\\
+
+[2] Vilken som lagrar vad var
+Styrmodulen lagrar och sköter all styrlogik samt reglering av styrning. Den kommunicerar med sensormodulen och när sensormodulen säger åt den att svänga gör den det.
+\\
+
+[3] Typ av buss, seriell, I2C-buss (Skicka åt båda håll, 2-vägs), osv
+\\
+
+
+
+\begin{figure}
+\centering
+\includegraphics[width=0.7\linewidth]{../Images/Intermodular_Komm}
+\caption{}
+\label{fig:Intermodulär_Komm}
+\end{figure}
 
 
 
