@@ -6,16 +6,19 @@
 \contentsline {section}{\numberline {2}System\IeC {\"o}versikt}{1}
 \contentsline {subsection}{\numberline {2.1}Grov beskrivning av systemet}{2}
 \contentsline {subsection}{\numberline {2.2}Ing\IeC {\r a}ende delsystem}{2}
+\contentsline {subsection}{\numberline {2.3}Intermodul\IeC {\"a}r kommunikation}{3}
 \contentsline {section}{\numberline {3}Delsystem 1 - Sensormodul}{3}
 \contentsline {subsection}{\numberline {3.1}Sensorer}{3}
-\contentsline {section}{\numberline {4}Delsystem 2 - Styrmodul}{3}
-\contentsline {subsection}{\numberline {4.1}LCD-Display}{3}
+\contentsline {subsection}{\numberline {3.2}RFID}{4}
+\contentsline {section}{\numberline {4}Delsystem 2 - Styrmodul}{4}
+\contentsline {subsection}{\numberline {4.1}LCD-Display}{4}
 \contentsline {subsection}{\numberline {4.2}Motorer}{4}
 \contentsline {subsection}{\numberline {4.3}Gripklo}{4}
 \contentsline {subsection}{\numberline {4.4}Gr\IeC {\"a}nssnitt - Display}{4}
 \contentsline {subsection}{\numberline {4.5}Brytare f\IeC {\"o}r val av autonom eller manuell styrning}{4}
 \contentsline {section}{\numberline {5}Delsystem 3 - Kommunikationsmodul}{4}
-\contentsline {subsection}{\numberline {5.1}Bluetooth}{4}
-\contentsline {section}{\numberline {6}Delsystem 4 - PC}{4}
-\contentsline {subsection}{\numberline {6.1}Anv\IeC {\"a}ndargr\IeC {\"a}nssnitt - Visualisering}{4}
+\contentsline {subsection}{\numberline {5.1}Bluetooth}{5}
+\contentsline {section}{\numberline {6}Delsystem 4 - PC}{5}
+\contentsline {subsection}{\numberline {6.1}Anv\IeC {\"a}ndargr\IeC {\"a}nssnitt - Visualisering}{5}
 \contentsline {subsection}{\numberline {6.2}Bluetooth}{5}
+\contentsline {section}{Referenser}{6}

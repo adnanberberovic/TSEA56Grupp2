@@ -239,6 +239,11 @@ Laptop, Bluetooth- sändare/mottagare \\
 \label{figure:robot}
 \end{figure}
 
+\subsection{Intermodulär kommunikation}
+Den intermodulära kommunikationen sker genom att alla mikrokontroller får varsin FBART $^{[4]}$ och kopplas samman via systembuss. Kommunikationen kommer alltså ske seriellt mellan de olika modulerna.
+
+
+
 
 \section{Delsystem 1 - Sensormodul}
 Sensormodulens uppgift är att känna av omgivningen runtomkring roboten och behandla denna data för att skicka behandlad data med rätt gränssnitt till styrmodulen.
@@ -247,8 +252,12 @@ Sensormodulens uppgift är att känna av omgivningen runtomkring roboten och beh
 \subsection{Sensorer}
 Sensorerna består främst av IR- och optiska sensorer men även andra typer kan komma att användas. Sensorerna kopplas till mikroprocessorn i sensormodulen som tar hand om all deras data.
 
-Det kommer finnas
+Det kommer finnas 6-7 avståndssensorer på roboten, 2 sensorer på höger- och vänster sida, samt framsidan (i färdriktningen). Eventuellt en avståndssensor bak. På vardera sida kommer det sitta Optisk avståndsmätare för kortare avstånd (4-30 cm) och för längre avstånd (10-80 cm). Eventuellt kommer även ultraljudssensorer att användas och optiska avståndsmätare för större avstånd.
 
+På undersidan kommer en reflexsensor/reflexsensormodul sitta för att detektera start och mål. Denna reflexsensor använder infrarött ljus.$^{[1]}$
+
+\subsection{RFID}
+För detektion av RFID-tag kommer en RFID Card Reader, Serial (\#28140) användas. Denna/dessa kommer vara placerad(-e) på sidorna av roboten.
 
 \section{Delsystem 2 - Styrmodul}
 Styrmodulen ska kunna ta in data både från sensormodulen och från kommunikationsmodulen beroende på om roboten ligger i autonomt eller manuellt läge. När roboten är i autonomt läge får den strömmande data från sensormodulen som den sedan jämför med kartan som roboten själv bygger upp. Med informationen den fått och har görs ett beslut om vart den ska. När roboten vet vart den ska används reglerteknik för att hålla sig centrerad och att svänga utan att fastna mot väggar.    
@@ -261,7 +270,7 @@ Displayen kommer vara fäst på roboten synligt. Data som skickas till displayen
 Motorerna styrs parvis (båda på höger sida och båda på vänster sida) med två signaler per sida. Roboten styrs differentiellt, det vill säga genom olika hastighet på höger och vänster sida. 
 
 \subsection{Gripklo}
-Roboten kommer att utrustas med en gripklo för att kunna greppa och släppa material till de nödställda. Gripklon kommer kopplas till strymodulen som ger instruktioner när den ska greppa och släppa. Gripklon kommer att sitta på antingen framsidan eller baksidan av roboten. 
+Roboten kommer att utrustas med en gripklo för att kunna greppa och släppa material till de nödställda. Gripklon kommer kopplas till strymodulen som ger instruktioner när den ska greppa och släppa. Gripklon kommer att sitta på antingen framsidan eller baksidan av roboten. Upplockning och greppning sker i enlighet med Banspecifikation och tävlingsregler. $^{[2]}$$^{[3]}$
 
 \subsection{Gränssnitt - Display}
 Displayen ska visa aktuell status och data från roboten på ett tydligt vis.
@@ -284,6 +293,22 @@ I användargränssnittet så kommer det dels finnas en visualisering av den kart
 \subsection{Bluetooth}
 På PC:n sitter det ett Bluetooth-modem som kan skicka och ta emot data från roboten.  
 
+
+\setcounter{secnumdepth}{0}
+\pagebreak
+\section{Referenser}
+
+
+$^{[1]}$Vanheden, ISY:s datablad: \url{https://docs.isy.liu.se/twiki/bin/view/VanHeden} \\[0.1in]
+
+$^{[2]}$Tävlingsregler för TSEA56 2015, Undsättningsrobot: Tävlingsregler0.4.pdf \\[0.1in]
+
+$^{[3]}$Banspecifikation för TSEA56 2015, Undsättningsrobot: Banspec0.3.pdf \\[0.1in]
+
+$^{[4]}$Vanheden, ISY:s datablad, FBART: \url{https://docs.isy.liu.se/twiki/pub/VanHeden/DataSheets/fbart2010.pdf} \\[0.1in]
+DataSheets/fbart2010.pdf
+
+\setcounter{secnumdepth}{2}
 
 
 

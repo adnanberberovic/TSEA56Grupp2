@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-2.5-1.40.14 (MiKTeX 2.9 64-bit) (preloaded format=pdflatex 2015.1.28)  17 FEB 2015 12:37
+This is pdfTeX, Version 3.1415926-2.5-1.40.14 (MiKTeX 2.9 64-bit) (preloaded format=pdflatex 2015.1.28)  17 FEB 2015 14:35
 entering extended mode
 **systemskiss_v0.2.tex
 
@@ -654,25 +654,33 @@ Package Fancyhdr Warning: \headheight is too small (12.0pt):
  This may cause the page layout to be inconsistent, however.
 
 [5]
+
+Package Fancyhdr Warning: \headheight is too small (12.0pt): 
+ Make it at least 13.59999pt.
+ We now make it that large for the rest of the document.
+ This may cause the page layout to be inconsistent, however.
+
+[6]
 (C:\Users\Måns\Documents\GitHub\TSEA56Grupp2\DOKUMENT\SYSTEMSKISS\systemskiss_
 v0.2\systemskiss_v0.2.aux) ) 
 Here is how much of TeX's memory you used:
  3862 strings out of 493921
  51113 string characters out of 3147282
- 117576 words of memory out of 3000000
+ 118576 words of memory out of 3000000
  7088 multiletter control sequences out of 15000+200000
  11328 words of font info for 30 fonts, out of 3000000 for 9000
  841 hyphenation exceptions out of 8191
  27i,10n,43p,527b,320s stack positions out of 5000i,500n,10000p,200000b,50000s
 {C:/Program Files/MiKTeX 2.9/fonts/enc/dvips/cm-sup
-er/cm-super-t1.enc}<C:/Program Files/MiKTeX 2.9/fonts/type1/public/cm-super/sfb
-x1095.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/public/cm-super/sfbx1200.pfb
-><C:/Program Files/MiKTeX 2.9/fonts/type1/public/cm-super/sfbx1440.pfb><C:/Prog
-ram Files/MiKTeX 2.9/fonts/type1/public/cm-super/sfrm1095.pfb><C:/Program Files
-/MiKTeX 2.9/fonts/type1/public/cm-super/sftt1095.pfb>
-Output written on systemskiss_v0.2.pdf (9 pages, 665626 bytes).
+er/cm-super-t1.enc}<C:/Program Files/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/
+cmr8.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/public/cm-super/sfbx1095.pfb>
+<C:/Program Files/MiKTeX 2.9/fonts/type1/public/cm-super/sfbx1200.pfb><C:/Progr
+am Files/MiKTeX 2.9/fonts/type1/public/cm-super/sfbx1440.pfb><C:/Program Files/
+MiKTeX 2.9/fonts/type1/public/cm-super/sfrm1095.pfb><C:/Program Files/MiKTeX 2.
+9/fonts/type1/public/cm-super/sftt1095.pfb>
+Output written on systemskiss_v0.2.pdf (10 pages, 680843 bytes).
 PDF statistics:
- 55 PDF objects out of 1000 (max. 8388607)
+ 62 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)
  11 words of extra memory for PDF output out of 10000 (max. 10000000)
 
