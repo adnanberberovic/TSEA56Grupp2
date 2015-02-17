@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-2.5-1.40.14 (MiKTeX 2.9 64-bit) (preloaded format=pdflatex 2015.1.28)  17 FEB 2015 11:54
+This is pdfTeX, Version 3.1415926-2.5-1.40.14 (MiKTeX 2.9 64-bit) (preloaded format=pdflatex 2015.1.28)  17 FEB 2015 12:16
 entering extended mode
 **projektplan_v0.2.tex
 
@@ -737,7 +737,7 @@ Underfull \vbox (badness 10000) detected at line 557
  []
 
 
-Overfull \hbox (51.55176pt too wide) in alignment at lines 557--652
+Overfull \hbox (51.55176pt too wide) in alignment at lines 557--654
  [] [] [] [] [] 
  []
 
@@ -788,7 +788,7 @@ es/MiKTeX 2.9/fonts/type1/public/cm-super/sfbx1440.pfb><C:/Program Files/MiKTeX
  2.9/fonts/type1/public/cm-super/sfrm1095.pfb><C:/Program Files/MiKTeX 2.9/font
 s/type1/public/cm-super/sfti1095.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/p
 ublic/cm-super/sftt1095.pfb>
-Output written on projektplan_v0.2.pdf (16 pages, 208353 bytes).
+Output written on projektplan_v0.2.pdf (16 pages, 208360 bytes).
 PDF statistics:
  87 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)
