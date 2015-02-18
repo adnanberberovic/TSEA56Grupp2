@@ -206,12 +206,16 @@ PC \\
 \end{table}
 
 
-
 \bigskip
 
 Sensormodulen består av ett antal sensorer som samlar in data om omgivningen och en mikroprocessor som processerar denna data för att sedan skicka information om omgivningen till styrmodulen. Styrmodulen består även den av en mikroprocessor som utför beräkningar och tar beslut. Motorer, gripklo och LCD-display ingår även det i vad som räknas till styrmodulen.
 
-\bigskip
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.3\textwidth]{Robot_moduler}
+\caption{Robot med vissa delmoduler}
+\label{figure:robot}
+\end{figure}
 
 Kommunikationsmodulen och PC:n består båda av bluetoothsändare och mottagare för dataöverföring. Kommunikationsmodulen har även den en mikroprocessor.
 
@@ -237,12 +241,6 @@ Laptop, Bluetooth- sändare/mottagare \\
 \label{tab:Delmoduler}
 \end{table}
 
-\begin{figure}[H]
-\centering
-\includegraphics[width=0.6\textwidth]{Robot_moduler}
-\caption{Robot med vissa delmoduler}
-\label{figure:robot}
-\end{figure}
 
 \subsection{Intermodulär kommunikation}
 Den intermodulära kommunikationen kommer ske seriellt med ett av följande två gränssnitt: I2C eller SPI. Mest troligt I2C på grund av flera faktorer, bland annat på grund av den i teorin stödjer flera "masters" (mikrokontroller). 
@@ -311,7 +309,7 @@ En brytare kommer sitta på ett bra ställe på roboten så den autonoma styrnin
 \section{Delsystem 3 - Kommunikationsmodul}
 Kommunikationsmodulen har två roller beroende på om roboten ligger i autonomt eller manuellt läge. I autonomt läge har den i huvuduppgift att skicka data till PC:n från sensor- och styr-modulen. I manuellt läge har den i uppgift att ta emot data från PC:n som styr roboten via kommunikationsmodulen.
 
-\subsection{Bluetooth}
+\subsection{Bluetooth - Kommunikationsmodul}
 På kommunikationsmodulen sitter det ett Bluetooth-modem som kan skicka och ta emot data från en PC.  
 
 \section{Delsystem 4 - PC}
@@ -320,7 +318,7 @@ PC:n har två roller  beroende på om roboten ligger i autonomt eller manuellt l
 \subsection{Användargränssnitt - Visualisering}
 I användargränssnittet så kommer det dels finnas en visualisering av den karta som roboten ritar upp, dels så kommer mät- och styrdata samt de styrbeslut som roboten tar att presenteras på ett tydligt sätt.
 
-\subsection{Bluetooth}
+\subsection{Bluetooth - PC}
 På PC:n sitter det ett Bluetooth-modem som kan skicka och ta emot data från roboten.  
 
 
