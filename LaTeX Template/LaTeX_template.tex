@@ -2,7 +2,6 @@
 % Made by Adnan Berberovic
 % Contact by:
 %	E-mail: adnbe196@student.liu.se
-%	Phone: 070-49 19 607
 
 \documentclass[11pt]{article}
 \usepackage[margin=3cm]{geometry}
@@ -29,7 +28,7 @@
 
 \pagenumbering{roman} % Set roman page numbering before the actual document begins.
 \chead{TYPE OR TITLE OF REPORT} % Replace argument with the type or title of your report.
-\rhead{DATE} % Set date here.
+\rhead{DATE} % Set date here. \today might be useful here.
 \lhead{} % Put anything here.
 \lfoot{COURSE\\INSTITUTION} % Replace COURSE with the course code, INSTITUTION with respective institution.
 \rfoot{AUTHOR} % Replace AUTHOR with your name. Add more text if you deem it necessary.
@@ -62,7 +61,7 @@
 			
 			\vspace{2\baselineskip}
 			
-			YYYY-MM-DD	% Replace with date.
+			YYYY-MM-DD	% \today might be useful here instead.
 			
 		\end{center}
 	\end{titlepage}
@@ -100,10 +99,10 @@
 	% The block above is a table block. Change the |l|l| to how many columns you desire. l could be something else.
 	% Check LaTeX reference for how to manage a table.
 	
-		\begin{center}	%Example figure, center and import from the images directory.
-			\includegraphics[scale=0.1]{example_pic}\\ % Scale if needed, replace example_pic with name of picture.
-			\textit{Figure\ccounter Short description of this figure.}
-		\end{center}
+	\begin{center}	%Example figure, center and import from the images directory.
+		\includegraphics[scale=0.1]{example_pic}\\ % Scale if needed, replace example_pic with name of picture.
+		\textit{Figure\ccounter Short description of this figure.}
+	\end{center}
 		
 	\subsection{Subsection}
 	
