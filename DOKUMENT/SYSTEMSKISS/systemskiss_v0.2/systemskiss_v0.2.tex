@@ -241,9 +241,14 @@ Laptop, Bluetooth- sändare/mottagare \\
 \label{tab:Delmoduler}
 \end{table}
 
+\subsection{Mikro- kontroller/processor}
+Valet av mikrokontroller kommer hamna på en \textit{ATMega} där typen kommer behöva specificeras när det minne och den snabbhet som krävs specificerats mer.
+
 
 \subsection{Intermodulär kommunikation}
-Den intermodulära kommunikationen kommer ske seriellt med ett av följande två gränssnitt: I2C eller SPI. Mest troligt I2C på grund av flera faktorer, bland annat på grund av den i teorin stödjer flera "masters" (mikrokontroller). 
+Den intermodulära kommunikationen kommer ske seriellt med ett av följande två gränssnitt: I2C eller SPI. Mest troligt I2C på grund av flera faktorer, bland annat på grund av den i teorin stödjer flera "masters" (mikrokontroller). \\
+\bigskip
+Som kan ses i Figur \ref{fig:Intermodulär_Komm} är planen att kommunikationen mellan sensor- och styrmodul ska vara enkelvägs. Detta kan dock komma att ändras, men i nuläget krävs endast enkelvägskommunikation. Mellan styr- och kommunikationsmodulen krävs dock dubbelvägskommunikation.
 
 \begin{comment}
 %Detta ska behandlas
