@@ -1,0 +1,42 @@
+% $ biblatex auxiliary file $
+% $ biblatex version 2.4 $
+% Do not modify the above lines!
+%
+% This is an auxiliary file used by the 'biblatex' package.
+% This file may safely be deleted. It will be recreated as
+% required.
+%
+\begingroup
+\makeatletter
+\@ifundefined{ver@biblatex.sty}
+  {\@latex@error
+     {Missing 'biblatex' package}
+     {The bibliography requires the 'biblatex' package.}
+      \aftergroup\endinput}
+  {}
+\endgroup
+
+\entry{glad-06}{book}{}
+  \name{author}{1}{}{%
+    {{}%
+     {L.~Ljung}{L.~L.}%
+     {T.~Glad}{T.~G.}%
+     {och}{o.}%
+     {}{}}%
+  }
+  \list{publisher}{1}{%
+    {Studentlitteratur}%
+  }
+  \strng{namehash}{LLTGo1}
+  \strng{fullhash}{LLTGo1}
+  \field{chapter}{5, Kompensering (Syntes II)}
+  \field{edition}{4}
+  \field{pages}{104\bibrangedash 107}
+  \field{title}{Reglerteknik Grundläggande teori}
+  \field{year}{2006}
+\endentry
+
+\lossort
+\endlossort
+
+\endinput
