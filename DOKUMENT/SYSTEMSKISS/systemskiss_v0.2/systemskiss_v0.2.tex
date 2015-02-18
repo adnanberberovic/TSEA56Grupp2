@@ -13,6 +13,7 @@
 \usepackage{tabu}
 \usepackage{url}
 \usepackage{float}
+\usepackage{verbatim}
 
 \graphicspath{ {../images/} }
 \newcommand{\subtitle}[1]{%
@@ -166,10 +167,14 @@ Roboten är tänkt att användas i ett grottsystem (läs spelregler) för att hi
 Eventuella definitioner
 
 \section{Systemöversikt}
-\begin{figure}[h!]
+Systemet kan ses i sin tänkta miljö i Figur  \ref{figure:Systemöversikt}.
+Roboten kommunicerar med en PC via blåtandslänk. Positionsdata skickas kontinuerligt från roboten, som styrs autonomt, till PC:n där användaren kan utläsa värden.
+
+\begin{figure}[H]
 \centering
-\caption{Systemet i sin tänkta miljö}
 \includegraphics[width=0.8\textwidth]{system_omgivning}
+\caption{Systemet i sin tänkta miljö}
+\label{figure:Systemöversikt}
 \end{figure}
 
 \subsection{Grov beskrivning av systemet}
@@ -234,12 +239,16 @@ Laptop, Bluetooth- sändare/mottagare \\
 
 \begin{figure}[H]
 \centering
-\caption{Robot med vissa delmoduler}
 \includegraphics[width=0.6\textwidth]{Robot_moduler}
+\caption{Robot med vissa delmoduler}
 \label{figure:robot}
 \end{figure}
 
 \subsection{Intermodulär kommunikation}
+Den intermodulära kommunikationen kommer ske seriellt med ett av följande två gränssnitt: I2C eller SPI. Mest troligt I2C på grund av flera faktorer, bland annat på grund av den i teorin stödjer flera "masters" (mikrokontroller). 
+
+\begin{comment}
+%Detta ska behandlas
 Den intermodulära kommunikationen kommer ske på något av följande sätt:
 \\
 
@@ -253,12 +262,14 @@ Styrmodulen lagrar och sköter all styrlogik samt reglering av styrning. Den kom
 [3] Typ av buss, seriell, I2C-buss (Skicka åt båda håll, 2-vägs), osv
 \\
 
+\end{comment}
 
 
-\begin{figure}
+
+\begin{figure}[H]
 \centering
-\includegraphics[width=0.7\linewidth]{../Images/Intermodular_Komm}
-\caption{}
+\includegraphics[width=0.5\linewidth]{../Images/Intermodular_Komm}
+\caption{Grov skiss av de tre stora modulerna}
 \label{fig:Intermodulär_Komm}
 \end{figure}
 

@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-2.5-1.40.14 (MiKTeX 2.9 64-bit) (preloaded format=pdflatex 2015.1.28)  17 FEB 2015 17:00
+This is pdfTeX, Version 3.1415926-2.5-1.40.14 (MiKTeX 2.9 64-bit) (preloaded format=pdflatex 2015.1.28)  18 FEB 2015 09:34
 entering extended mode
 **systemskiss_v0.2.tex
 
@@ -476,20 +476,26 @@ Package: float 2001/11/08 v1.3d Float enhancements (AL)
 \@float@everytoks=\toks24
 \@floatcapt=\box36
 )
+("C:\Program Files\MiKTeX 2.9\tex\latex\tools\verbatim.sty"
+Package: verbatim 2003/08/22 v1.5q LaTeX2e package for verbatim enhancements
+\every@verbatim=\toks25
+\verbatim@line=\toks26
+\verbatim@in@stream=\read1
+)
 (C:\Users\Måns\Documents\GitHub\TSEA56Grupp2\DOKUMENT\SYSTEMSKISS\systemskiss_
 v0.2\systemskiss_v0.2.aux)
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 44.
-LaTeX Font Info:    ... okay on input line 44.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 44.
-LaTeX Font Info:    ... okay on input line 44.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 44.
-LaTeX Font Info:    ... okay on input line 44.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 44.
-LaTeX Font Info:    ... okay on input line 44.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 44.
-LaTeX Font Info:    ... okay on input line 44.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 44.
-LaTeX Font Info:    ... okay on input line 44.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 45.
+LaTeX Font Info:    ... okay on input line 45.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 45.
+LaTeX Font Info:    ... okay on input line 45.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 45.
+LaTeX Font Info:    ... okay on input line 45.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 45.
+LaTeX Font Info:    ... okay on input line 45.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 45.
+LaTeX Font Info:    ... okay on input line 45.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 45.
+LaTeX Font Info:    ... okay on input line 45.
 
 *geometry* driver: auto-detecting
 *geometry* detected driver: pdftex
@@ -526,7 +532,7 @@ LaTeX Font Info:    ... okay on input line 44.
 * (1in=72.27pt=25.4mm, 1cm=28.453pt)
 
 ABD: EverySelectfont initializing macros
-LaTeX Info: Redefining \selectfont on input line 44.
+LaTeX Info: Redefining \selectfont on input line 45.
 
 ("C:\Program Files\MiKTeX 2.9\tex\context\base\supp-pdf.mkii"
 [Loading MPS to PDF converter (version 2006.09.02).]
@@ -535,46 +541,46 @@ LaTeX Info: Redefining \selectfont on input line 44.
 \scratchbox=\box37
 \nofMPsegments=\count110
 \nofMParguments=\count111
-\everyMPshowfont=\toks25
+\everyMPshowfont=\toks27
 \MPscratchCnt=\count112
 \MPscratchDim=\dimen136
 \MPnumerator=\count113
 \makeMPintoPDFobject=\count114
-\everyMPtoPDFconversion=\toks26
+\everyMPtoPDFconversion=\toks28
 )
-LaTeX Font Info:    Try loading font information for T1+cmtt on input line 56.
+LaTeX Font Info:    Try loading font information for T1+cmtt on input line 57.
  ("C:\Program Files\MiKTeX 2.9\tex\latex\base\t1cmtt.fd"
 File: t1cmtt.fd 1999/05/25 v2.5h Standard LaTeX font definitions
 )
-Underfull \vbox (badness 10000) detected at line 87
+Underfull \vbox (badness 10000) detected at line 88
  []
 
 [1
 
 {C:/ProgramData/MiKTeX/2.9/pdftex/config/pdftex.map}]
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <10.95> on input line 101.
+(Font)              <10.95> on input line 102.
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <8> on input line 101.
+(Font)              <8> on input line 102.
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <6> on input line 101.
+(Font)              <6> on input line 102.
 
-Underfull \hbox (badness 10000) in paragraph at lines 106--106
+Underfull \hbox (badness 10000) in paragraph at lines 107--107
 []|\T1/cmr/m/n/10.95 Designansvarig Sen-sor-mo-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 107--107
+Underfull \hbox (badness 10000) in paragraph at lines 108--108
 []|\T1/cmr/m/n/10.95 Designansvarig Styr-mo-dul
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 108--108
+Underfull \hbox (badness 10000) in paragraph at lines 109--109
 []|\T1/cmr/m/n/10.95 Designansvarig Kom-mu-ni-
  []
 
 
-Overfull \hbox (9.00636pt too wide) in paragraph at lines 101--110
+Overfull \hbox (9.00636pt too wide) in paragraph at lines 102--111
 [][] 
  []
 
@@ -606,7 +612,7 @@ Package Fancyhdr Warning: \headheight is too small (12.0pt):
 File: ../images/system_omgivning.png Graphic file (type png)
 
 <use ../images/system_omgivning.png>
-Package pdftex.def Info: ../images/system_omgivning.png used on input line 172.
+Package pdftex.def Info: ../images/system_omgivning.png used on input line 175.
 
 (pdftex.def)             Requested size: 354.86412pt x 207.53954pt.
 
@@ -622,7 +628,7 @@ stem_omgivning.png>]
 File: ../images/Robot_moduler.png Graphic file (type png)
 
 <use ../images/Robot_moduler.png>
-Package pdftex.def Info: ../images/Robot_moduler.png used on input line 238.
+Package pdftex.def Info: ../images/Robot_moduler.png used on input line 242.
 (pdftex.def)             Requested size: 266.14978pt x 266.14565pt.
 
 
@@ -635,9 +641,9 @@ Package Fancyhdr Warning: \headheight is too small (12.0pt):
 File: ../Images/Intermodular_Komm.png Graphic file (type png)
 
 <use ../Images/Intermodular_Komm.png>
-Package pdftex.def Info: ../Images/Intermodular_Komm.png used on input line 260
+Package pdftex.def Info: ../Images/Intermodular_Komm.png used on input line 271
 .
-(pdftex.def)             Requested size: 310.50357pt x 229.4752pt.
+(pdftex.def)             Requested size: 221.78923pt x 163.90636pt.
 
 
 Package Fancyhdr Warning: \headheight is too small (12.0pt): 
@@ -646,15 +652,15 @@ Package Fancyhdr Warning: \headheight is too small (12.0pt):
  This may cause the page layout to be inconsistent, however.
 
 [3 <C:/Users/Måns/Documents/GitHub/TSEA56Grupp2/DOKUMENT/SYSTEMSKISS/images/Ro
-bot_moduler.png>]
+bot_moduler.png> <C:/Users/Måns/Documents/GitHub/TSEA56Grupp2/DOKUMENT/SYSTEMS
+KISS/Images/Intermodular_Komm.png (PNG copy)>]
 
 Package Fancyhdr Warning: \headheight is too small (12.0pt): 
  Make it at least 13.59999pt.
  We now make it that large for the rest of the document.
  This may cause the page layout to be inconsistent, however.
 
-[4 <C:/Users/Måns/Documents/GitHub/TSEA56Grupp2/DOKUMENT/SYSTEMSKISS/Images/In
-termodular_Komm.png (PNG copy)>]
+[4]
 
 Package Fancyhdr Warning: \headheight is too small (12.0pt): 
  Make it at least 13.59999pt.
@@ -672,13 +678,13 @@ Package Fancyhdr Warning: \headheight is too small (12.0pt):
 (C:\Users\Måns\Documents\GitHub\TSEA56Grupp2\DOKUMENT\SYSTEMSKISS\systemskiss_
 v0.2\systemskiss_v0.2.aux) ) 
 Here is how much of TeX's memory you used:
- 3869 strings out of 493921
- 51310 string characters out of 3147282
- 118584 words of memory out of 3000000
- 7093 multiletter control sequences out of 15000+200000
+ 3901 strings out of 493921
+ 51857 string characters out of 3147282
+ 119223 words of memory out of 3000000
+ 7123 multiletter control sequences out of 15000+200000
  11328 words of font info for 30 fonts, out of 3000000 for 9000
  841 hyphenation exceptions out of 8191
- 27i,10n,43p,527b,320s stack positions out of 5000i,500n,10000p,200000b,50000s
+ 27i,10n,43p,527b,312s stack positions out of 5000i,500n,10000p,200000b,50000s
 {C:/Program Files/MiKTeX 2.9/fonts/enc/dvips/cm-sup
 er/cm-super-t1.enc}<C:/Program Files/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/
 cmr8.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/public/cm-super/sfbx1095.pfb>
@@ -686,7 +692,7 @@ cmr8.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/public/cm-super/sfbx1095.pfb>
 am Files/MiKTeX 2.9/fonts/type1/public/cm-super/sfbx1440.pfb><C:/Program Files/
 MiKTeX 2.9/fonts/type1/public/cm-super/sfrm1095.pfb><C:/Program Files/MiKTeX 2.
 9/fonts/type1/public/cm-super/sftt1095.pfb>
-Output written on systemskiss_v0.2.pdf (10 pages, 723108 bytes).
+Output written on systemskiss_v0.2.pdf (10 pages, 723101 bytes).
 PDF statistics:
  63 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)
