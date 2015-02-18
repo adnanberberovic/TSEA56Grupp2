@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-2.5-1.40.14 (MiKTeX 2.9 64-bit) (preloaded format=pdflatex 2015.1.28)  18 FEB 2015 09:54
+This is pdfTeX, Version 3.1415926-2.5-1.40.14 (MiKTeX 2.9 64-bit) (preloaded format=pdflatex 2015.1.28)  18 FEB 2015 15:58
 entering extended mode
 **systemskiss_v0.2.tex
 
@@ -484,18 +484,18 @@ Package: verbatim 2003/08/22 v1.5q LaTeX2e package for verbatim enhancements
 )
 (C:\Users\Måns\Documents\GitHub\TSEA56Grupp2\DOKUMENT\SYSTEMSKISS\systemskiss_
 v0.2\systemskiss_v0.2.aux)
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 45.
-LaTeX Font Info:    ... okay on input line 45.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 45.
-LaTeX Font Info:    ... okay on input line 45.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 45.
-LaTeX Font Info:    ... okay on input line 45.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 45.
-LaTeX Font Info:    ... okay on input line 45.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 45.
-LaTeX Font Info:    ... okay on input line 45.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 45.
-LaTeX Font Info:    ... okay on input line 45.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 50.
+LaTeX Font Info:    ... okay on input line 50.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 50.
+LaTeX Font Info:    ... okay on input line 50.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 50.
+LaTeX Font Info:    ... okay on input line 50.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 50.
+LaTeX Font Info:    ... okay on input line 50.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 50.
+LaTeX Font Info:    ... okay on input line 50.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 50.
+LaTeX Font Info:    ... okay on input line 50.
 
 *geometry* driver: auto-detecting
 *geometry* detected driver: pdftex
@@ -532,7 +532,7 @@ LaTeX Font Info:    ... okay on input line 45.
 * (1in=72.27pt=25.4mm, 1cm=28.453pt)
 
 ABD: EverySelectfont initializing macros
-LaTeX Info: Redefining \selectfont on input line 45.
+LaTeX Info: Redefining \selectfont on input line 50.
 
 ("C:\Program Files\MiKTeX 2.9\tex\context\base\supp-pdf.mkii"
 [Loading MPS to PDF converter (version 2006.09.02).]
@@ -548,39 +548,39 @@ LaTeX Info: Redefining \selectfont on input line 45.
 \makeMPintoPDFobject=\count114
 \everyMPtoPDFconversion=\toks28
 )
-LaTeX Font Info:    Try loading font information for T1+cmtt on input line 57.
+LaTeX Font Info:    Try loading font information for T1+cmtt on input line 62.
  ("C:\Program Files\MiKTeX 2.9\tex\latex\base\t1cmtt.fd"
 File: t1cmtt.fd 1999/05/25 v2.5h Standard LaTeX font definitions
 )
-Underfull \vbox (badness 10000) detected at line 88
+Underfull \vbox (badness 10000) detected at line 93
  []
 
 [1
 
 {C:/ProgramData/MiKTeX/2.9/pdftex/config/pdftex.map}]
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <10.95> on input line 102.
+(Font)              <10.95> on input line 107.
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <8> on input line 102.
+(Font)              <8> on input line 107.
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <6> on input line 102.
+(Font)              <6> on input line 107.
 
-Underfull \hbox (badness 10000) in paragraph at lines 107--107
+Underfull \hbox (badness 10000) in paragraph at lines 112--112
 []|\T1/cmr/m/n/10.95 Designansvarig Sen-sor-mo-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 108--108
+Underfull \hbox (badness 10000) in paragraph at lines 113--113
 []|\T1/cmr/m/n/10.95 Designansvarig Styr-mo-dul
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 109--109
+Underfull \hbox (badness 10000) in paragraph at lines 114--114
 []|\T1/cmr/m/n/10.95 Designansvarig Kom-mu-ni-
  []
 
 
-Overfull \hbox (9.00636pt too wide) in paragraph at lines 102--111
+Overfull \hbox (9.00636pt too wide) in paragraph at lines 107--116
 [][] 
  []
 
@@ -612,7 +612,7 @@ Package Fancyhdr Warning: \headheight is too small (12.0pt):
 File: ../images/system_omgivning.png Graphic file (type png)
 
 <use ../images/system_omgivning.png>
-Package pdftex.def Info: ../images/system_omgivning.png used on input line 175.
+Package pdftex.def Info: ../images/system_omgivning.png used on input line 186.
 
 (pdftex.def)             Requested size: 354.86412pt x 207.53954pt.
 
@@ -628,7 +628,7 @@ stem_omgivning.png>]
 File: ../images/Robot_moduler.png Graphic file (type png)
 
 <use ../images/Robot_moduler.png>
-Package pdftex.def Info: ../images/Robot_moduler.png used on input line 215.
+Package pdftex.def Info: ../images/Robot_moduler.png used on input line 226.
 (pdftex.def)             Requested size: 133.07489pt x 133.06516pt.
 
 
@@ -643,7 +643,7 @@ bot_moduler.png>]
 File: ../Images/Intermodular_Komm.png Graphic file (type png)
 
 <use ../Images/Intermodular_Komm.png>
-Package pdftex.def Info: ../Images/Intermodular_Komm.png used on input line 274
+Package pdftex.def Info: ../Images/Intermodular_Komm.png used on input line 269
 .
 (pdftex.def)             Requested size: 221.78923pt x 163.90636pt.
 
@@ -685,7 +685,7 @@ Here is how much of TeX's memory you used:
  7124 multiletter control sequences out of 15000+200000
  12017 words of font info for 31 fonts, out of 3000000 for 9000
  841 hyphenation exceptions out of 8191
- 27i,11n,43p,527b,316s stack positions out of 5000i,500n,10000p,200000b,50000s
+ 27i,10n,43p,527b,316s stack positions out of 5000i,500n,10000p,200000b,50000s
 {C:/Program Files/MiKTeX 2.9/fonts/enc/dvips/cm-sup
 er/cm-super-t1.enc}<C:/Program Files/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/
 cmr8.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/public/cm-super/sfbx1095.pfb>
@@ -694,7 +694,7 @@ am Files/MiKTeX 2.9/fonts/type1/public/cm-super/sfbx1440.pfb><C:/Program Files/
 MiKTeX 2.9/fonts/type1/public/cm-super/sfrm1095.pfb><C:/Program Files/MiKTeX 2.
 9/fonts/type1/public/cm-super/sfti1095.pfb><C:/Program Files/MiKTeX 2.9/fonts/t
 ype1/public/cm-super/sftt1095.pfb>
-Output written on systemskiss_v0.2.pdf (10 pages, 740250 bytes).
+Output written on systemskiss_v0.2.pdf (10 pages, 741979 bytes).
 PDF statistics:
  67 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)

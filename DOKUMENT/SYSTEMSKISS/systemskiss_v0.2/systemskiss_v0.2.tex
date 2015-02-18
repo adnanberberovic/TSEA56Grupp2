@@ -15,6 +15,11 @@
 \usepackage{float}
 \usepackage{verbatim}
 
+\begin{comment}
+Lägg till vinkelaccele
+\end{comment}
+
+
 \graphicspath{ {../images/} }
 \newcommand{\subtitle}[1]{%
   \posttitle{%
@@ -140,6 +145,12 @@ Första utkastet &
 Grupp 2 & 
 Robert Oprea \\ \hline
 
+0.2 &
+2015-02-18 & 
+Andra utkastet & 
+Måns Skytt& 
+ \\ \hline
+
 \end{tabular}
 \end{table}
 
@@ -232,7 +243,7 @@ Styrmodul:&
 Microprocessor, LCD-Display, Motorer, Gripklo\\
 
 Kommunikationsmodul:&
-Microporcessor, blutetooth- sändare/mottagare  \\
+Microprocessor, blutetooth- sändare/mottagare  \\
 
 PC:&
 Laptop, Bluetooth- sändare/mottagare \\
@@ -242,30 +253,14 @@ Laptop, Bluetooth- sändare/mottagare \\
 \end{table}
 
 \subsection{Mikro- kontroller/processor}
-Valet av mikrokontroller kommer hamna på en \textit{ATMega} där typen kommer behöva specificeras när det minne och den snabbhet som krävs specificerats mer.
+Valet av mikrokontroller kommer hamna på en \textit{ATMegaXX} där typen kommer behöva specificeras när det minne och den snabbhet som krävs specificerats mer.
 
 
 \subsection{Intermodulär kommunikation}
-Den intermodulära kommunikationen kommer ske seriellt med ett av följande två gränssnitt: I2C eller SPI. Mest troligt I2C på grund av flera faktorer, bland annat på grund av den i teorin stödjer flera "masters" (mikrokontroller). \\
+Den intermodulära kommunikationen kommer ske seriellt med ett av följande två gränssnitt: I2C eller SPI. Mest troligt I2C på grund av flera faktorer, bland annat på grund av den i teorin stödjer flera "masters" (mikrokontroller). Om I2C används kommer alla moduler ha gemensam I2C-buss. \\
 \bigskip
 Som kan ses i Figur \ref{fig:Intermodulär_Komm} är planen att kommunikationen mellan sensor- och styrmodul ska vara enkelvägs. Detta kan dock komma att ändras, men i nuläget krävs endast enkelvägskommunikation. Mellan styr- och kommunikationsmodulen krävs dock dubbelvägskommunikation.
 
-\begin{comment}
-%Detta ska behandlas
-Den intermodulära kommunikationen kommer ske på något av följande sätt:
-\\
-
-[1] Gemensam buss eller ej
-\\
-
-[2] Vilken som lagrar vad var
-Styrmodulen lagrar och sköter all styrlogik samt reglering av styrning. Den kommunicerar med sensormodulen och när sensormodulen säger åt den att svänga gör den det.
-\\
-
-[3] Typ av buss, seriell, I2C-buss (Skicka åt båda håll, 2-vägs), osv
-\\
-
-\end{comment}
 
 
 
@@ -285,9 +280,15 @@ Sensormodulens uppgift är att känna av omgivningen runtomkring roboten och beh
 \subsection{Sensorer}
 Sensorerna består främst av IR- och optiska sensorer men även andra typer kan komma att användas. Sensorerna kopplas till mikroprocessorn i sensormodulen som tar hand om all deras data.
 
-Det kommer finnas 6-7 avståndssensorer på roboten, 2 sensorer på höger- och vänster sida, samt framsidan (i färdriktningen). Eventuellt en avståndssensor bak. På vardera sida kommer det sitta Optisk avståndsmätare för kortare avstånd (4-30 cm) och för längre avstånd (10-80 cm). Eventuellt kommer även ultraljudssensorer att användas och optiska avståndsmätare för större avstånd.
+Det kommer finnas 6-7 avståndssensorer på roboten, 2 sensorer på höger- och vänster sida, samt framsidan (i färdriktningen). Eventuellt en avståndssensor bak. På vardera sida kommer det sitta Optisk avståndsmätare för kortare avstånd (4-30 cm) och för längre avstånd (10-80 cm). Eventuellt kommer även ultraljudssensorer att användas och optiska avståndsmätare för större avstånd. 
 
-På undersidan kommer en reflexsensor/reflexsensormodul sitta för att detektera start och mål. Denna reflexsensor använder infrarött ljus.$^{[1]}$
+\bigskip
+
+På undersidan kommer en reflexsensor/reflexsensormodul sitta för att detektera start och mål. Denna reflexsensor använder infrarött ljus.$^{[1]}$ 
+
+\bigskip
+
+En vinkelhastighetssensor$ ^{[4]} $ kommer vara placerad på roboten och kopplad till sensormodulen för att avgöra vridning.
 
 \subsection{RFID}
 För detektion av RFID-tag kommer en RFID Card Reader, Serial (\#28140) användas. Denna/dessa kommer vara placerad(-e) på sidorna av roboten.
@@ -338,8 +339,8 @@ $^{[2]}$Tävlingsregler för TSEA56 2015, Undsättningsrobot: Tävlingsregler0.4
 
 $^{[3]}$Banspecifikation för TSEA56 2015, Undsättningsrobot: Banspec0.3.pdf \\[0.1in]
 
-$^{[4]}$Vanheden, ISY:s datablad, FBART: \url{https://docs.isy.liu.se/twiki/pub/VanHeden/DataSheets/fbart2010.pdf} \\[0.1in]
-DataSheets/fbart2010.pdf
+$^{[4]}$Vanheden, ISY:s datablad, MLX90609: \url{https://docs.isy.liu.se/twiki/pub/VanHeden/DataSheets/MLX90609_datasheet.pdf} \\[0.1in]
+
 
 \setcounter{secnumdepth}{2}
 

@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-2.5-1.40.14 (MiKTeX 2.9 64-bit) (preloaded format=pdflatex 2015.1.28)  17 FEB 2015 12:16
+This is pdfTeX, Version 3.1415926-2.5-1.40.14 (MiKTeX 2.9 64-bit) (preloaded format=pdflatex 2015.1.28)  18 FEB 2015 16:00
 entering extended mode
 **projektplan_v0.2.tex
 
@@ -605,7 +605,7 @@ Package Fancyhdr Warning: \headheight is too small (12.0pt):
  This may cause the page layout to be inconsistent, however.
 
 [4]
-Underfull \vbox (badness 10000) detected at line 222
+Underfull \vbox (badness 10000) detected at line 228
  []
 
 
@@ -626,7 +626,7 @@ Package Fancyhdr Warning: \headheight is too small (12.0pt):
  This may cause the page layout to be inconsistent, however.
 
 [2]
-Overfull \hbox (22.18027pt too wide) in paragraph at lines 246--261
+Overfull \hbox (22.18027pt too wide) in paragraph at lines 252--267
 []  
  []
 
@@ -637,47 +637,47 @@ Package Fancyhdr Warning: \headheight is too small (12.0pt):
  This may cause the page layout to be inconsistent, however.
 
 [3]
-Overfull \hbox (3.98288pt too wide) in paragraph at lines 274--274
+Overfull \hbox (3.98288pt too wide) in paragraph at lines 280--280
 []|\T1/cmr/bx/n/10.95 Ansvarig| 
  []
 
 
-Underfull \hbox (badness 2237) in paragraph at lines 276--276
+Underfull \hbox (badness 2237) in paragraph at lines 282--282
 []|\T1/cmr/m/n/10.95 Listar al-la krav som
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 279--279
+Underfull \hbox (badness 10000) in paragraph at lines 285--285
 []|\T1/cmr/m/n/10.95 MS,
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 280--280
+Underfull \hbox (badness 10000) in paragraph at lines 286--286
 []|\T1/cmr/m/n/10.95 Analysera huruvi-da
  []
 
 
-Underfull \hbox (badness 7433) in paragraph at lines 280--280
+Underfull \hbox (badness 7433) in paragraph at lines 286--286
 \T1/cmr/m/n/10.95 pro-jek-tet kan dri-vas
  []
 
 
-Underfull \hbox (badness 1448) in paragraph at lines 282--282
+Underfull \hbox (badness 1448) in paragraph at lines 288--288
 \T1/cmr/m/n/10.95 ku-ment som be-stäl-la-
  []
 
 
-Underfull \hbox (badness 2644) in paragraph at lines 285--285
+Underfull \hbox (badness 2644) in paragraph at lines 291--291
 \T1/cmr/m/n/10.95 kun-de man ha gjort
  []
 
 
-Overfull \hbox (49.09312pt too wide) in alignment at lines 273--287
+Overfull \hbox (49.09312pt too wide) in alignment at lines 279--293
  [] [] [] [] [] 
  []
 
 
-Underfull \vbox (badness 10000) detected at line 287
+Underfull \vbox (badness 10000) detected at line 293
  []
 
 
@@ -701,7 +701,7 @@ Package Fancyhdr Warning: \headheight is too small (12.0pt):
  This may cause the page layout to be inconsistent, however.
 
 [6]
-Underfull \hbox (badness 2229) in paragraph at lines 412--412
+Underfull \hbox (badness 2229) in paragraph at lines 418--418
 []|\T1/cmr/m/n/10.95 Godkännande av krav-spe-ci-fi-ka-tion, be-slut att gö-ra p
 ro-jekt-plan,
  []
@@ -713,31 +713,31 @@ Package Fancyhdr Warning: \headheight is too small (12.0pt):
  This may cause the page layout to be inconsistent, however.
 
 [7]
-Overfull \hbox (1.15393pt too wide) in paragraph at lines 442--442
+Overfull \hbox (1.15393pt too wide) in paragraph at lines 448--448
 []|\T1/cmr/m/n/10.95 Beräknad
  []
 
 
-Underfull \hbox (badness 3158) in paragraph at lines 478--478
+Underfull \hbox (badness 3158) in paragraph at lines 484--484
 []|\T1/cmr/m/n/10.95 Optimeringsproblem: Be-räk-na kor-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 542--542
+Underfull \hbox (badness 10000) in paragraph at lines 548--548
 []|\T1/cmr/m/n/10.95 Intermodulär kom-mu-ni-ka-
  []
 
 
-Overfull \hbox (51.55176pt too wide) in alignment at lines 436--557
+Overfull \hbox (51.55176pt too wide) in alignment at lines 442--563
  [] [] [] [] [] 
  []
 
 
-Underfull \vbox (badness 10000) detected at line 557
+Underfull \vbox (badness 10000) detected at line 563
  []
 
 
-Overfull \hbox (51.55176pt too wide) in alignment at lines 557--654
+Overfull \hbox (51.55176pt too wide) in alignment at lines 563--660
  [] [] [] [] [] 
  []
 
@@ -788,7 +788,7 @@ es/MiKTeX 2.9/fonts/type1/public/cm-super/sfbx1440.pfb><C:/Program Files/MiKTeX
  2.9/fonts/type1/public/cm-super/sfrm1095.pfb><C:/Program Files/MiKTeX 2.9/font
 s/type1/public/cm-super/sfti1095.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/p
 ublic/cm-super/sftt1095.pfb>
-Output written on projektplan_v0.2.pdf (16 pages, 208360 bytes).
+Output written on projektplan_v0.2.pdf (16 pages, 208441 bytes).
 PDF statistics:
  87 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)
