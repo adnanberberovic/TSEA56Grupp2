@@ -1,23 +1,23 @@
-This is pdfTeX, Version 3.1415926-2.4-1.40.13 (MiKTeX 2.9) (preloaded format=pdflatex 2013.9.10)  19 FEB 2015 12:07
+This is pdfTeX, Version 3.1415926-2.5-1.40.14 (MiKTeX 2.9 64-bit) (preloaded format=pdflatex 2015.1.28)  19 FEB 2015 19:57
 entering extended mode
 **projektplan_v0.3.tex
 
-("G:\Dokument\Applied Physics and Electrical Engineering\KANDIDATPROJEKT\TSEA56
-\DOKUMENT\PROJEKTPLAN\projektplan v0.3\projektplan_v0.3.tex"
+("C:\Users\MÃ¥ns\Documents\GitHub\TSEA56Grupp2\DOKUMENT\PROJEKTPLAN\projektplan
+ v0.3\projektplan_v0.3.tex"
 LaTeX2e <2011/06/27>
 Babel <v3.8m> and hyphenation patterns for english, afrikaans, ancientgreek, ar
 abic, armenian, assamese, basque, bengali, bokmal, bulgarian, catalan, coptic, 
 croatian, czech, danish, dutch, esperanto, estonian, farsi, finnish, french, ga
-lician, german, german-x-2012-05-30, greek, gujarati, hindi, hungarian, iceland
+lician, german, german-x-2013-05-26, greek, gujarati, hindi, hungarian, iceland
 ic, indonesian, interlingua, irish, italian, kannada, kurmanji, latin, latvian,
  lithuanian, malayalam, marathi, mongolian, mongolianlmc, monogreek, ngerman, n
-german-x-2012-05-30, nynorsk, oriya, panjabi, pinyin, polish, portuguese, roman
+german-x-2013-05-26, nynorsk, oriya, panjabi, pinyin, polish, portuguese, roman
 ian, russian, sanskrit, serbian, slovak, slovenian, spanish, swedish, swissgerm
 an, tamil, telugu, turkish, turkmen, ukenglish, ukrainian, uppersorbian, usengl
 ishmax, welsh, loaded.
-("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\base\article.cls"
+("C:\Program Files\MiKTeX 2.9\tex\latex\base\article.cls"
 Document Class: article 2007/10/19 v1.4h Standard LaTeX document class
-("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\base\size11.clo"
+("C:\Program Files\MiKTeX 2.9\tex\latex\base\size11.clo"
 File: size11.clo 2007/10/19 v1.4h Standard LaTeX file (size option)
 )
 \c@part=\count79
@@ -32,22 +32,22 @@ File: size11.clo 2007/10/19 v1.4h Standard LaTeX file (size option)
 \belowcaptionskip=\skip42
 \bibindent=\dimen102
 )
-("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\geometry\geometry.sty"
+("C:\Program Files\MiKTeX 2.9\tex\latex\geometry\geometry.sty"
 Package: geometry 2010/09/12 v5.6 Page Geometry
 
-("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\graphics\keyval.sty"
+("C:\Program Files\MiKTeX 2.9\tex\latex\graphics\keyval.sty"
 Package: keyval 1999/03/16 v1.13 key=value parser (DPC)
 \KV@toks@=\toks14
 )
-("C:\Program Files (x86)\MiKTeX 2.9\tex\generic\oberdiek\ifpdf.sty"
+("C:\Program Files\MiKTeX 2.9\tex\generic\oberdiek\ifpdf.sty"
 Package: ifpdf 2011/01/30 v2.3 Provides the ifpdf switch (HO)
 Package ifpdf Info: pdfTeX in PDF mode is detected.
 )
-("C:\Program Files (x86)\MiKTeX 2.9\tex\generic\oberdiek\ifvtex.sty"
+("C:\Program Files\MiKTeX 2.9\tex\generic\oberdiek\ifvtex.sty"
 Package: ifvtex 2010/03/01 v1.5 Detect VTeX and its facilities (HO)
 Package ifvtex Info: VTeX not detected.
 )
-("C:\Program Files (x86)\MiKTeX 2.9\tex\generic\ifxetex\ifxetex.sty"
+("C:\Program Files\MiKTeX 2.9\tex\generic\ifxetex\ifxetex.sty"
 Package: ifxetex 2010/09/12 v0.6 Provides ifxetex conditional
 )
 \Gm@cnth=\count87
@@ -63,39 +63,39 @@ Package: ifxetex 2010/09/12 v0.6 Provides ifxetex conditional
 \Gm@layoutvoffset=\dimen110
 \Gm@dimlist=\toks15
 
-("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\geometry\geometry.cfg"))
-("C:\Program Files (x86)\MiKTeX 2.9\tex\generic\babel\babel.sty"
+("C:\Program Files\MiKTeX 2.9\tex\latex\geometry\geometry.cfg"))
+("C:\Program Files\MiKTeX 2.9\tex\generic\babel\babel.sty"
 Package: babel 2008/07/08 v3.8m The Babel package
 
 *************************************
 * Local config file bblopts.cfg used
 *
-("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\00miktex\bblopts.cfg"
+("C:\Program Files\MiKTeX 2.9\tex\latex\00miktex\bblopts.cfg"
 File: bblopts.cfg 2006/07/31 v1.0 MiKTeX 'babel' configuration
 )
-("C:\Program Files (x86)\MiKTeX 2.9\tex\generic\babel\swedish.ldf"
+("C:\Program Files\MiKTeX 2.9\tex\generic\babel\swedish.ldf"
 Language: swedish 2005/03/31 v2.3d Swedish support from the babel system
 
-("C:\Program Files (x86)\MiKTeX 2.9\tex\generic\babel\babel.def"
+("C:\Program Files\MiKTeX 2.9\tex\generic\babel\babel.def"
 File: babel.def 2008/07/08 v3.8m Babel common definitions
 \babel@savecnt=\count90
 \U@D=\dimen111
 )
 Package babel Info: Making " an active character on input line 90.
 ))
-("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\base\inputenc.sty"
+("C:\Program Files\MiKTeX 2.9\tex\latex\base\inputenc.sty"
 Package: inputenc 2008/03/30 v1.1d Input encoding file
 \inpenc@prehook=\toks16
 \inpenc@posthook=\toks17
 
-("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\base\utf8.def"
+("C:\Program Files\MiKTeX 2.9\tex\latex\base\utf8.def"
 File: utf8.def 2008/04/05 v1.1m UTF-8 support for inputenc
 Now handling font encoding OML ...
 ... no UTF-8 mapping file for font encoding OML
 Now handling font encoding T1 ...
 ... processing UTF-8 mapping file for font encoding T1
 
-("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\base\t1enc.dfu"
+("C:\Program Files\MiKTeX 2.9\tex\latex\base\t1enc.dfu"
 File: t1enc.dfu 2008/04/05 v1.1m UTF-8 support for inputenc
    defining Unicode char U+00A1 (decimal 161)
    defining Unicode char U+00A3 (decimal 163)
@@ -245,7 +245,7 @@ File: t1enc.dfu 2008/04/05 v1.1m UTF-8 support for inputenc
 Now handling font encoding OT1 ...
 ... processing UTF-8 mapping file for font encoding OT1
 
-("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\base\ot1enc.dfu"
+("C:\Program Files\MiKTeX 2.9\tex\latex\base\ot1enc.dfu"
 File: ot1enc.dfu 2008/04/05 v1.1m UTF-8 support for inputenc
    defining Unicode char U+00A1 (decimal 161)
    defining Unicode char U+00A3 (decimal 163)
@@ -276,7 +276,7 @@ File: ot1enc.dfu 2008/04/05 v1.1m UTF-8 support for inputenc
 Now handling font encoding OMS ...
 ... processing UTF-8 mapping file for font encoding OMS
 
-("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\base\omsenc.dfu"
+("C:\Program Files\MiKTeX 2.9\tex\latex\base\omsenc.dfu"
 File: omsenc.dfu 2008/04/05 v1.1m UTF-8 support for inputenc
    defining Unicode char U+00A7 (decimal 167)
    defining Unicode char U+00B6 (decimal 182)
@@ -300,14 +300,14 @@ Now handling font encoding U ...
    defining Unicode char U+2122 (decimal 8482)
    defining Unicode char U+2423 (decimal 9251)
 ))
-("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\base\fontenc.sty"
+("C:\Program Files\MiKTeX 2.9\tex\latex\base\fontenc.sty"
 Package: fontenc 2005/09/27 v1.99g Standard LaTeX package
 
-("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\base\t1enc.def"
+("C:\Program Files\MiKTeX 2.9\tex\latex\base\t1enc.def"
 File: t1enc.def 2005/09/27 v1.99g Standard LaTeX file
 LaTeX Font Info:    Redeclaring font encoding T1 on input line 43.
 ))
-("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\fancyhdr\fancyhdr.sty"
+("C:\Program Files\MiKTeX 2.9\tex\latex\fancyhdr\fancyhdr.sty"
 \fancy@headwidth=\skip43
 \f@ncyO@elh=\skip44
 \f@ncyO@erh=\skip45
@@ -318,10 +318,10 @@ LaTeX Font Info:    Redeclaring font encoding T1 on input line 43.
 \f@ncyO@olf=\skip50
 \f@ncyO@orf=\skip51
 )
-("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\ms\ragged2e.sty"
+("C:\Program Files\MiKTeX 2.9\tex\latex\ms\ragged2e.sty"
 Package: ragged2e 2009/05/21 v2.1 ragged2e Package (MS)
 
-("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\ms\everysel.sty"
+("C:\Program Files\MiKTeX 2.9\tex\latex\ms\everysel.sty"
 Package: everysel 2011/10/28 v1.2 EverySelectfont Package (MS)
 )
 \CenteringLeftskip=\skip52
@@ -339,33 +339,33 @@ Package: everysel 2011/10/28 v1.2 EverySelectfont Package (MS)
 \RaggedRightParindent=\skip64
 \JustifyingParindent=\skip65
 )
-("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\titling\titling.sty"
+("C:\Program Files\MiKTeX 2.9\tex\latex\titling\titling.sty"
 Package: titling 2009/09/04 v2.1d maketitle typesetting
 \thanksmarkwidth=\skip66
 \thanksmargin=\skip67
 \droptitle=\skip68
 )
-("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\graphics\graphicx.sty"
+("C:\Program Files\MiKTeX 2.9\tex\latex\graphics\graphicx.sty"
 Package: graphicx 1999/02/16 v1.0f Enhanced LaTeX Graphics (DPC,SPQR)
 
-("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\graphics\graphics.sty"
+("C:\Program Files\MiKTeX 2.9\tex\latex\graphics\graphics.sty"
 Package: graphics 2009/02/05 v1.0o Standard LaTeX Graphics (DPC,SPQR)
 
-("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\graphics\trig.sty"
+("C:\Program Files\MiKTeX 2.9\tex\latex\graphics\trig.sty"
 Package: trig 1999/03/16 v1.09 sin cos tan (DPC)
 )
-("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\00miktex\graphics.cfg"
+("C:\Program Files\MiKTeX 2.9\tex\latex\00miktex\graphics.cfg"
 File: graphics.cfg 2007/01/18 v1.5 graphics configuration of teTeX/TeXLive
 )
 Package graphics Info: Driver file: pdftex.def on input line 91.
 
-("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\pdftex-def\pdftex.def"
+("C:\Program Files\MiKTeX 2.9\tex\latex\pdftex-def\pdftex.def"
 File: pdftex.def 2011/05/27 v0.06d Graphics/color for pdfTeX
 
-("C:\Program Files (x86)\MiKTeX 2.9\tex\generic\oberdiek\infwarerr.sty"
+("C:\Program Files\MiKTeX 2.9\tex\generic\oberdiek\infwarerr.sty"
 Package: infwarerr 2010/04/08 v1.3 Providing info/warning/error messages (HO)
 )
-("C:\Program Files (x86)\MiKTeX 2.9\tex\generic\oberdiek\ltxcmds.sty"
+("C:\Program Files\MiKTeX 2.9\tex\generic\oberdiek\ltxcmds.sty"
 Package: ltxcmds 2011/11/09 v1.22 LaTeX kernel commands for general use (HO)
 )
 \Gread@gobject=\count91
@@ -373,10 +373,10 @@ Package: ltxcmds 2011/11/09 v1.22 LaTeX kernel commands for general use (HO)
 \Gin@req@height=\dimen112
 \Gin@req@width=\dimen113
 )
-("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\pbox\pbox.sty"
+("C:\Program Files\MiKTeX 2.9\tex\latex\pbox\pbox.sty"
 Package: pbox 2011/12/07 v1.2 Dynamic parboxes
 
-("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\tools\calc.sty"
+("C:\Program Files\MiKTeX 2.9\tex\latex\tools\calc.sty"
 Package: calc 2007/08/22 v4.3 Infix arithmetic (KKT,FJ)
 \calc@Acount=\count92
 \calc@Bcount=\count93
@@ -389,15 +389,15 @@ LaTeX Info: Redefining \addtolength on input line 77.
 \calc@Ccount=\count94
 \calc@Cskip=\skip71
 )
-("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\base\ifthen.sty"
+("C:\Program Files\MiKTeX 2.9\tex\latex\base\ifthen.sty"
 Package: ifthen 2001/05/26 v1.1c Standard LaTeX ifthen package (DPC)
 )
 \pb@xlen=\skip72
 )
-("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\tools\tabularx.sty"
+("C:\Program Files\MiKTeX 2.9\tex\latex\tools\tabularx.sty"
 Package: tabularx 1999/01/07 v2.07 `tabularx' package (DPC)
 
-("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\tools\array.sty"
+("C:\Program Files\MiKTeX 2.9\tex\latex\tools\array.sty"
 Package: array 2008/09/09 v2.4c Tabular extension package (FMi)
 \col@sep=\dimen116
 \extrarowheight=\dimen117
@@ -413,7 +413,7 @@ Package: array 2008/09/09 v2.4c Tabular extension package (FMi)
 \TX@cols=\count95
 \TX@ftn=\toks19
 )
-("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\tools\longtable.sty"
+("C:\Program Files\MiKTeX 2.9\tex\latex\tools\longtable.sty"
 Package: longtable 2004/02/01 v4.11 Multi-page Table package (DPC)
 \LTleft=\skip75
 \LTright=\skip76
@@ -431,10 +431,10 @@ Package: longtable 2004/02/01 v4.11 Multi-page Table package (DPC)
 \c@LT@chunks=\count100
 \LT@p@ftn=\toks20
 )
-("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\tabu\tabu.sty"
+("C:\Program Files\MiKTeX 2.9\tex\latex\tabu\tabu.sty"
 Package: tabu 2011/02/26 v2.8 - flexible LaTeX tabulars (FC)
 
-("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\ltxmisc\varwidth.sty"
+("C:\Program Files\MiKTeX 2.9\tex\latex\ltxmisc\varwidth.sty"
 Package: varwidth 2009/03/30 ver 0.92;  Variable-width minipages
 \@vwid@box=\box30
 \sift@deathcycles=\count101
@@ -464,15 +464,15 @@ Package: varwidth 2009/03/30 ver 0.92;  Variable-width minipages
 \tabu@vleads=\box34
 \tabu@cellskip=\skip79
 )
-("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\ltxmisc\url.sty"
+("C:\Program Files\MiKTeX 2.9\tex\latex\url\url.sty"
 \Urlmuskip=\muskip10
-Package: url 2006/04/12  ver 3.3  Verb mode for urls, etc.
+Package: url 2013/09/16  ver 3.4  Verb mode for urls, etc.
 )
 \c@kravc=\count108
 \c@refc=\count109
 
-("G:\Dokument\Applied Physics and Electrical Engineering\KANDIDATPROJEKT\TSEA56
-\DOKUMENT\PROJEKTPLAN\projektplan v0.3\projektplan_v0.3.aux")
+("C:\Users\MÃ¥ns\Documents\GitHub\TSEA56Grupp2\DOKUMENT\PROJEKTPLAN\projektplan
+ v0.3\projektplan_v0.3.aux")
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 54.
 LaTeX Font Info:    ... okay on input line 54.
 LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 54.
@@ -523,7 +523,7 @@ LaTeX Font Info:    ... okay on input line 54.
 ABD: EverySelectfont initializing macros
 LaTeX Info: Redefining \selectfont on input line 54.
 
-("C:\Program Files (x86)\MiKTeX 2.9\tex\context\base\supp-pdf.mkii"
+("C:\Program Files\MiKTeX 2.9\tex\context\base\supp-pdf.mkii"
 [Loading MPS to PDF converter (version 2006.09.02).]
 \scratchcounter=\count110
 \scratchdimen=\dimen135
@@ -538,7 +538,7 @@ LaTeX Info: Redefining \selectfont on input line 54.
 \everyMPtoPDFconversion=\toks24
 )
 LaTeX Font Info:    Try loading font information for T1+cmtt on input line 67.
- ("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\base\t1cmtt.fd"
+ ("C:\Program Files\MiKTeX 2.9\tex\latex\base\t1cmtt.fd"
 File: t1cmtt.fd 1999/05/25 v2.5h Standard LaTeX font definitions
 )
 Underfull \vbox (badness 10000) detected at line 98
@@ -580,8 +580,8 @@ Package Fancyhdr Warning: \headheight is too small (12.0pt):
  This may cause the page layout to be inconsistent, however.
 
 [1]
-("G:\Dokument\Applied Physics and Electrical Engineering\KANDIDATPROJEKT\TSEA56
-\DOKUMENT\PROJEKTPLAN\projektplan v0.3\projektplan_v0.3.toc"
+("C:\Users\MÃ¥ns\Documents\GitHub\TSEA56Grupp2\DOKUMENT\PROJEKTPLAN\projektplan
+ v0.3\projektplan_v0.3.toc"
 
 Package Fancyhdr Warning: \headheight is too small (12.0pt): 
  Make it at least 13.59999pt.
@@ -632,7 +632,7 @@ Overfull \hbox (22.18027pt too wide) in paragraph at lines 259--274
 
 LaTeX Font Info:    Try loading font information for OMS+cmr on input line 278.
 
-("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\base\omscmr.fd"
+("C:\Program Files\MiKTeX 2.9\tex\latex\base\omscmr.fd"
 File: omscmr.fd 1999/05/25 v2.5h Standard LaTeX font definitions
 )
 LaTeX Font Info:    Font shape `OMS/cmr/m/n' in size <10.95> not available
@@ -786,101 +786,181 @@ Underfull \hbox (badness 10000) in paragraph at lines 538--538
  []
 
 
-Underfull \hbox (badness 1052) in paragraph at lines 545--545
-[]|\T1/cmr/m/n/10.95 Reglerproblem: Se till att
+Underfull \hbox (badness 10000) in paragraph at lines 544--544
+[]|\T1/cmr/m/n/10.95 PD-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 557--557
+Underfull \hbox (badness 10000) in paragraph at lines 546--546
+[]|\T1/cmr/m/n/10.95 Regler/programmerings-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 546--546
+\T1/cmr/m/n/10.95 problem: Fun-ge-ran-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 546--546
+\T1/cmr/m/n/10.95 de te-o-ri bakom PD-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 566--566
 []|\T1/cmr/m/n/10.95 Kommunikations-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 559--559
+Underfull \hbox (badness 10000) in paragraph at lines 568--568
 []|\T1/cmr/m/n/10.95 Konstruera kom-mu-ni-ka-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 564--564
+Underfull \hbox (badness 10000) in paragraph at lines 573--573
 []|\T1/cmr/m/n/10.95 Installera blå-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 571--571
+Underfull \hbox (badness 10000) in paragraph at lines 580--580
 []|\T1/cmr/m/n/10.95 Skapa kon-takt
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 573--573
+Underfull \hbox (badness 10000) in paragraph at lines 582--582
 []|\T1/cmr/m/n/10.95 Få igång kom-mun-ka-tion
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 580--580
-[]|\T1/cmr/m/n/10.95 Få kom-mu-ni-ka-tions-mo-
+Underfull \hbox (badness 3323) in paragraph at lines 601--601
+[]|\T1/cmr/m/n/10.95 Seriell över-fö-ring,
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 580--580
-\T1/cmr/m/n/10.95 du-len att vi-da-re-be-fod-ra
+Underfull \hbox (badness 2856) in paragraph at lines 601--601
+\T1/cmr/m/n/10.95 pro-gram-kod mot-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 599--599
-[]|\T1/cmr/m/n/10.95 Montera LCD-
+Underfull \hbox (badness 5091) in paragraph at lines 603--603
+\T1/cmr/m/n/10.95 ta emot da-ta från mo-
  []
 
 
-Underfull \hbox (badness 3009) in paragraph at lines 615--615
-\T1/cmr/m/n/10.95 kan de-tek-te-ra mål en-ligt
+Underfull \hbox (badness 3323) in paragraph at lines 608--608
+[]|\T1/cmr/m/n/10.95 Seriell över-fö-ring,
  []
 
 
-Overfull \hbox (19.59796pt too wide) in alignment at lines 458--617
+Underfull \hbox (badness 1092) in paragraph at lines 608--608
+\T1/cmr/m/n/10.95 pro-gram-kod vi-da-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 610--610
+\T1/cmr/m/n/10.95 vi-da-re-be-ford-ra mot-ta-gen
+ []
+
+
+Underfull \hbox (badness 3323) in paragraph at lines 615--615
+[]|\T1/cmr/m/n/10.95 Seriell över-fö-ring,
+ []
+
+
+Overfull \hbox (19.59796pt too wide) in alignment at lines 458--627
  [] [] [] [] [] [] 
  []
 
 
-Underfull \vbox (badness 10000) detected at line 617
+Underfull \vbox (badness 10000) detected at line 627
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 620--620
-[]|\T1/cmr/m/n/10.95 Måldetektion
+Underfull \hbox (badness 10000) in paragraph at lines 630--630
+[]|\T1/cmr/m/n/10.95 Installera av-
  []
 
 
-Underfull \hbox (badness 3009) in paragraph at lines 622--622
+Underfull \hbox (badness 1226) in paragraph at lines 632--632
+[]|\T1/cmr/m/n/10.95 Få igång av-stånds-sen-so-rer
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 637--637
+[]|\T1/cmr/m/n/10.95 Installera vin-kel-
+ []
+
+
+Underfull \hbox (badness 1147) in paragraph at lines 639--639
+[]|\T1/cmr/m/n/10.95 Få igång vin-kel-has-tig-hets-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 644--644
+[]|\T1/cmr/m/n/10.95 Installera re-flex-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 651--651
+[]|\T1/cmr/m/n/10.95 Montera LCD-
+ []
+
+
+Underfull \hbox (badness 3009) in paragraph at lines 660--660
 \T1/cmr/m/n/10.95 kan de-tek-te-ra mål en-ligt
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 641--641
+Underfull \hbox (badness 10000) in paragraph at lines 665--665
+[]|\T1/cmr/m/n/10.95 Måldetektion
+ []
+
+
+Underfull \hbox (badness 3009) in paragraph at lines 667--667
+\T1/cmr/m/n/10.95 kan de-tek-te-ra mål en-ligt
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 686--686
 []|\T1/cmr/m/n/10.95 Kommunikations-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 657--657
+Underfull \hbox (badness 10000) in paragraph at lines 702--702
 []|\T1/cmr/m/n/10.95 Test av LCD-displayens
  []
 
 
-Underfull \hbox (badness 1152) in paragraph at lines 662--662
+Underfull \hbox (badness 1152) in paragraph at lines 707--707
 []|\T1/cmr/m/n/10.95 Test av kart-lägg-
  []
 
 
-Underfull \hbox (badness 5681) in paragraph at lines 669--669
+Underfull \hbox (badness 5681) in paragraph at lines 714--714
 []|\T1/cmr/m/n/10.95 Test av op-ti-me-
  []
 
 
-Underfull \hbox (badness 1484) in paragraph at lines 692--692
+Overfull \hbox (3.29233pt too wide) in paragraph at lines 728--728
+[]|\T1/cmr/m/n/10.95 Tävlingsoptimering| 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 735--735
+[]|\T1/cmr/m/n/10.95 Användar-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 737--737
+[]|\T1/cmr/m/n/10.95 Skriva an-vän-dar-hand-led-
+ []
+
+
+Underfull \hbox (badness 1484) in paragraph at lines 758--758
 []|\T1/cmr/m/n/10.95 Extra tid för oför-ut-sed-da
  []
 
 
-Overfull \hbox (19.59796pt too wide) in alignment at lines 617--707
+Overfull \hbox (19.59796pt too wide) in alignment at lines 627--767
  [] [] [] [] [] [] 
  []
 
@@ -891,6 +971,10 @@ Package Fancyhdr Warning: \headheight is too small (12.0pt):
  This may cause the page layout to be inconsistent, however.
 
 [8]
+Overfull \hbox (19.59796pt too wide) in alignment at lines 767--773
+ [] [] [] [] [] [] 
+ []
+
 
 Package Fancyhdr Warning: \headheight is too small (12.0pt): 
  Make it at least 13.59999pt.
@@ -912,29 +996,35 @@ Package Fancyhdr Warning: \headheight is too small (12.0pt):
  This may cause the page layout to be inconsistent, however.
 
 [11]
-("G:\Dokument\Applied Physics and Electrical Engineering\KANDIDATPROJEKT\TSEA56
-\DOKUMENT\PROJEKTPLAN\projektplan v0.3\projektplan_v0.3.aux") ) 
+
+Package Fancyhdr Warning: \headheight is too small (12.0pt): 
+ Make it at least 13.59999pt.
+ We now make it that large for the rest of the document.
+ This may cause the page layout to be inconsistent, however.
+
+[12]
+("C:\Users\MÃ¥ns\Documents\GitHub\TSEA56Grupp2\DOKUMENT\PROJEKTPLAN\projektplan
+ v0.3\projektplan_v0.3.aux") ) 
 Here is how much of TeX's memory you used:
  3834 strings out of 493921
- 51362 string characters out of 3144876
- 145497 words of memory out of 3000000
- 7065 multiletter control sequences out of 15000+200000
+ 50507 string characters out of 3147282
+ 148499 words of memory out of 3000000
+ 7064 multiletter control sequences out of 15000+200000
  12017 words of font info for 31 fonts, out of 3000000 for 9000
  841 hyphenation exceptions out of 8191
  27i,13n,43p,574b,425s stack positions out of 5000i,500n,10000p,200000b,50000s
- <C:\Users\Adnan
-\AppData\Local\MiKTeX\2.9\fonts\pk\ljfour\jknappen\ec\dpi600\ecti1095.pk> <C:\U
-sers\Adnan\AppData\Local\MiKTeX\2.9\fonts\pk\ljfour\jknappen\ec\dpi600\ecbx1200
-.pk> <C:\Users\Adnan\AppData\Local\MiKTeX\2.9\fonts\pk\ljfour\jknappen\ec\dpi60
-0\ecbx1095.pk> <C:\Users\Adnan\AppData\Local\MiKTeX\2.9\fonts\pk\ljfour\jknappe
-n\ec\dpi600\ectt1095.pk> <C:\Users\Adnan\AppData\Local\MiKTeX\2.9\fonts\pk\ljfo
-ur\jknappen\ec\dpi600\ecbx1440.pk> <C:\Users\Adnan\AppData\Local\MiKTeX\2.9\fon
-ts\pk\ljfour\jknappen\ec\dpi600\ecrm1095.pk><C:/Program Files (x86)/MiKTeX 2.9/
-fonts/type1/public/amsfonts/cm/cmr8.pfb><C:/Program Files (x86)/MiKTeX 2.9/font
-s/type1/public/amsfonts/cm/cmsy10.pfb>
-Output written on projektplan_v0.3.pdf (16 pages, 147689 bytes).
+{C:/Program Files/MiKTeX 2.9/fonts/enc/dvips/cm-s
+uper/cm-super-t1.enc}<C:/Program Files/MiKTeX 2.9/fonts/type1/public/amsfonts/c
+m/cmr8.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmsy10.p
+fb><C:/Program Files/MiKTeX 2.9/fonts/type1/public/cm-super/sfbx1095.pfb><C:/Pr
+ogram Files/MiKTeX 2.9/fonts/type1/public/cm-super/sfbx1200.pfb><C:/Program Fil
+es/MiKTeX 2.9/fonts/type1/public/cm-super/sfbx1440.pfb><C:/Program Files/MiKTeX
+ 2.9/fonts/type1/public/cm-super/sfrm1095.pfb><C:/Program Files/MiKTeX 2.9/font
+s/type1/public/cm-super/sfti1095.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/p
+ublic/cm-super/sftt1095.pfb>
+Output written on projektplan_v0.3.pdf (17 pages, 212010 bytes).
 PDF statistics:
- 372 PDF objects out of 1000 (max. 8388607)
+ 90 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)
  1 words of extra memory for PDF output out of 10000 (max. 10000000)
 

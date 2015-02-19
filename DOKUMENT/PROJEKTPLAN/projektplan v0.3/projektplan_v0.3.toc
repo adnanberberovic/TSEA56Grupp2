@@ -27,10 +27,10 @@
 \contentsline {subsection}{\numberline {11.1}Milstolpar}{7}
 \contentsline {subsection}{\numberline {11.2}Beslutspunkter}{7}
 \contentsline {section}{\numberline {12}Aktiviteter}{8}
-\contentsline {section}{\numberline {13}Tidplan}{10}
-\contentsline {section}{\numberline {14}Kvalitetsplan}{10}
-\contentsline {subsection}{\numberline {14.1}Granskningar}{10}
-\contentsline {subsection}{\numberline {14.2}Testplan}{10}
-\contentsline {section}{\numberline {15}Prioriteringar}{10}
-\contentsline {section}{\numberline {16}Projektavslut}{10}
-\contentsline {section}{Referenser}{11}
+\contentsline {section}{\numberline {13}Tidplan}{11}
+\contentsline {section}{\numberline {14}Kvalitetsplan}{11}
+\contentsline {subsection}{\numberline {14.1}Granskningar}{11}
+\contentsline {subsection}{\numberline {14.2}Testplan}{11}
+\contentsline {section}{\numberline {15}Prioriteringar}{11}
+\contentsline {section}{\numberline {16}Projektavslut}{11}
+\contentsline {section}{Referenser}{12}

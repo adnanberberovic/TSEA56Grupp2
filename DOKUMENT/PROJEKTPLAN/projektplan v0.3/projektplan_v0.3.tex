@@ -159,7 +159,7 @@ Adnan Berberovic\\ \hline
 0.3 &
 2015-02-18 &
 Tredje utkastet &
-ABe \& ??? &
+ABe \& MS &
  \\ \hline
 
 \end{tabular}
@@ -487,10 +487,10 @@ Beroende av aktivitet \\[0.1in] \hline
 Designspecifikation &
 AB &
 Skriv designspecifikation &
-80 &
+100 &
 - \\ \hline
  
-2-8 &
+2-9 &
 Styrmodul &
 RO &
 Konstruera styrmodulen &
@@ -509,184 +509,250 @@ Kartläggning &
 RO &
 Kartläggning av det avlagda området &
 170 &
- \\ \hline
+-\\ \hline
 
 3 &
 Intern kartläggning &
 RO &
 Konfigurera så att roboten skapar intern uppfattning av avlagt område &
 70 &
-11, \\ \hline
+14 \\ \hline
 
 4 &
 Skicka kartdata &
 MS &
 Skicka meningsfull kartdata till PC&
 30 &
- \\ \hline
+11 \\ \hline
 
 5 &
 Visualisering av karta &
 RO &
 Programmering av program för att visualisera kartläggning &
 70 &
- \\ \hline
+11 \\ \hline
  
 6 &
 Motorstyrning &
 RO &
 Driftproblem: Få roboten att drivas med hjälp av motorerna. Kunna köra fram/back samt svänga. &
 40 &
- \\ \hline
+14 \\ \hline
+ 
  
 7 &
-PD-reglering &
+PD-regleringsalgoritm &
 RO &
-Reglerproblem: Se till att roboten kör i en rak och inte svängig bana &
-80 &
- \\ \hline
- 
+Regler/programmerings-problem: Fungerande teori bakom PD-regleringssystemet &
+40 &
+- \\ \hline
+
 8 &
+PD-reglering, realisering &
+RO &
+Se till att roboten kör i en rak och inte svängig bana i praktiken &
+40 &
+7 \\ \hline
+ 
+ 
+9 &
 Programmering av LCD &
 RO &
 Visa viss data som begärs på en LCD på roboten &
 30 &
- \\ \hline
+- \\ \hline
  
-9-11 &
+10-14 &
 Kommunikations-modul &
 MS &
 Konstruera kommunikationsmodulen &
 170 &
- \\ \hline
+- \\ \hline
 
-9 &
+10 &
 Installera blåtandslänk &
 MS &
 Få igång blåtand på roboten. &
 20 &
- \\ \hline
+- \\ \hline
  
-10 &
+11 &
 Skapa kontakt mellan Robot och PC &
 MS &
 Få igång kommunkation mellan robot och PC &
 50 &
- \\ \hline
+10 \\ \hline
  
-11 &
-Intermodulär kommunikation &
+%12 &
+%Intermodulär kommunikation &
+%MS &
+%Få kommunikationsmodulen att vidarebefodra data mellan PC och andra moduler &
+%100 &
+%11 \\ \hline
+
+12-14 &
+Seriell överföring&
 MS &
-Få kommunikationsmodulen att vidarebefodra data mellan PC och andra moduler &
+Information från sensormodulen ska skickas seriellt till andra moduler&
 100 &
- \\ \hline
+- \\ \hline
+
+12 &
+Seriell överföring, programkod mottagning&
+MS &
+Skriva programkod för att ta emot data från modul/PC&
+40 &
+- \\ \hline
+
+13 &
+Seriell överföring, programkod vidarebefodran&
+MS &
+Skriva programkod för att vidarebefordra mottagen data&
+40 &
+12 \\ \hline
  
-12-16 &
+14 &
+Seriell överföring, funktionell&
+MS &
+Realisering av seriell överföring&
+20 &
+13 \\ \hline
+
+ 
+15-20 &
 Sensormodul &
 FF &
 Konstruera sensormodulen &
-320 &
- \\ \hline
+230 &
+- \\ \hline
  
-12 &
-Installera sensorer&
+15 &
+Installera avståndssensorer&
 FF &
-Få igång sensorer på roboten&
-100 &
- \\ \hline
+Få igång avståndssensorer på roboten&
+50 &
+- \\ \hline
 
-13 &
+16 &
+Installera vinkelhastighetssensor&
+FF &
+Få igång vinkelhastighetssensor på roboten&
+30 &
+- \\ \hline
+
+17 &
+Installera reflexsensor&
+FF &
+Få igång reflexsensor på robotens undersida&
+30 &
+- \\ \hline
+
+18 &
 Montera LCD-skärm&
 FF &
 Få igång LCD-skärm på roboten som visar sensorvärden&
 20 &
- \\ \hline
+9 \\ \hline
 
-14 &
-Seriell överföring&
-FF &
-Information från sensormodulen ska skickas seriellt till andra moduler&
-100 &
- \\ \hline
-
-15 &
+19 &
 Måldetektion markering&
 FF &
 Konfigurera så att roboten kan detektera mål enligt svart markering.&
 50 &
- \\ \hline
+17 \\ \hline
 
-16 &
+20 &
 Måldetektion RFID&
 FF &
 Konfigurera så att roboten kan detektera mål enligt RFID-tag.&
 50 &
- \\ \hline
+- \\ \hline
 
-17-23 &
+21-27 &
 Testning&
 FF,MS,RO &
 Se till att roboten fungerar som den ska.&
 200 &
- \\ \hline
+- \\ \hline
 
-17 &
+21 &
 Styrtest&
 FF &
 Test av robotens styrfunktionalitet.&
 50 &
- \\ \hline
+2-9 \\ \hline
 
-18 &
+22 &
 Kommunikations-test &
 MS &
 Test av intermodulär kommunikation &
 50 &
- \\ \hline
+10-14 \\ \hline
 
-19 &
+23 &
 Sensortest &
 FF &
 Test av sensorfunktioner &
 30 &
- \\ \hline
+15-20 \\ \hline
 
-20 &
+24 &
 Programtestning - LCD &
 RO &
 Test av LCD-displayens funktionalitet &
 25 &
- \\ \hline
+16 \\ \hline
 
-21 &
+25 &
 Test av kartläggning &
 RO,MS &
 Test av kartläggningsfunktionen &
 25 &
- \\ \hline
+3-5 \\ \hline
 
-22 &
+26 &
 Test av optimeringsalgoritm &
 RO &
 Test av optimeringsalgoritmens funktionalitet &
 10 &
- \\ \hline
+2 \\ \hline
 
-23 &
+27 &
 Test av Blåtandslänk &
 RO &
 Test av kommunikation via blåtandslänk &
 10 &
- \\ \hline
-
-24 &
+11 \\ \hline
+ 
+28 &
+Tävlingsoptimering &
+Alla &
+Kalibrering inför tävling &
+10 &
+2-20 \\ \hline 
+ 
+29 &
+Användar-handledning &
+NA &
+Skriva användarhandledning &
+30 &
+- \\ \hline 
+ 
+30 &
+Teknisk dokumentation &
+Alla &
+Skriva teknisk dokumentation &
+30 &
+- \\ \hline  
+ 
+31 &
 Mötestid&
 Alla &
 Tid för möten&
 40 &
 - \\ \hline
 
-25 &
+32 &
 Buffert&
 FF &
 Extra tid för oförutsedda händelser.&
