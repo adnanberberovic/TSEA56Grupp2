@@ -1,9 +1,9 @@
-This is pdfTeX, Version 3.1415926-2.4-1.40.13 (MiKTeX 2.9) (preloaded format=pdflatex 2013.9.10)  19 FEB 2015 12:09
+This is pdfTeX, Version 3.1415926-2.4-1.40.13 (MiKTeX 2.9) (preloaded format=pdflatex 2013.9.10)  19 FEB 2015 12:07
 entering extended mode
-**systemskiss_v1.0.tex
+**projektplan_v0.3.tex
 
 ("G:\Dokument\Applied Physics and Electrical Engineering\KANDIDATPROJEKT\TSEA56
-\GIT\TSEA56Grupp2\DOKUMENT\SYSTEMSKISS\systemskiss_v1.0\systemskiss_v1.0.tex"
+\DOKUMENT\PROJEKTPLAN\projektplan v0.3\projektplan_v0.3.tex"
 LaTeX2e <2011/06/27>
 Babel <v3.8m> and hyphenation patterns for english, afrikaans, ancientgreek, ar
 abic, armenian, assamese, basque, bengali, bokmal, bulgarian, catalan, coptic, 
@@ -468,34 +468,23 @@ Package: varwidth 2009/03/30 ver 0.92;  Variable-width minipages
 \Urlmuskip=\muskip10
 Package: url 2006/04/12  ver 3.3  Verb mode for urls, etc.
 )
-("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\float\float.sty"
-Package: float 2001/11/08 v1.3d Float enhancements (AL)
-\c@float@type=\count108
-\float@exts=\toks23
-\float@box=\box35
-\@float@everytoks=\toks24
-\@floatcapt=\box36
-)
-("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\tools\verbatim.sty"
-Package: verbatim 2003/08/22 v1.5q LaTeX2e package for verbatim enhancements
-\every@verbatim=\toks25
-\verbatim@line=\toks26
-\verbatim@in@stream=\read1
-)
+\c@kravc=\count108
+\c@refc=\count109
+
 ("G:\Dokument\Applied Physics and Electrical Engineering\KANDIDATPROJEKT\TSEA56
-\GIT\TSEA56Grupp2\DOKUMENT\SYSTEMSKISS\systemskiss_v1.0\systemskiss_v1.0.aux")
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 50.
-LaTeX Font Info:    ... okay on input line 50.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 50.
-LaTeX Font Info:    ... okay on input line 50.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 50.
-LaTeX Font Info:    ... okay on input line 50.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 50.
-LaTeX Font Info:    ... okay on input line 50.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 50.
-LaTeX Font Info:    ... okay on input line 50.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 50.
-LaTeX Font Info:    ... okay on input line 50.
+\DOKUMENT\PROJEKTPLAN\projektplan v0.3\projektplan_v0.3.aux")
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 54.
+LaTeX Font Info:    ... okay on input line 54.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 54.
+LaTeX Font Info:    ... okay on input line 54.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 54.
+LaTeX Font Info:    ... okay on input line 54.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 54.
+LaTeX Font Info:    ... okay on input line 54.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 54.
+LaTeX Font Info:    ... okay on input line 54.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 54.
+LaTeX Font Info:    ... okay on input line 54.
 
 *geometry* driver: auto-detecting
 *geometry* detected driver: pdftex
@@ -532,55 +521,55 @@ LaTeX Font Info:    ... okay on input line 50.
 * (1in=72.27pt=25.4mm, 1cm=28.453pt)
 
 ABD: EverySelectfont initializing macros
-LaTeX Info: Redefining \selectfont on input line 50.
+LaTeX Info: Redefining \selectfont on input line 54.
 
 ("C:\Program Files (x86)\MiKTeX 2.9\tex\context\base\supp-pdf.mkii"
 [Loading MPS to PDF converter (version 2006.09.02).]
-\scratchcounter=\count109
+\scratchcounter=\count110
 \scratchdimen=\dimen135
-\scratchbox=\box37
-\nofMPsegments=\count110
-\nofMParguments=\count111
-\everyMPshowfont=\toks27
-\MPscratchCnt=\count112
+\scratchbox=\box35
+\nofMPsegments=\count111
+\nofMParguments=\count112
+\everyMPshowfont=\toks23
+\MPscratchCnt=\count113
 \MPscratchDim=\dimen136
-\MPnumerator=\count113
-\makeMPintoPDFobject=\count114
-\everyMPtoPDFconversion=\toks28
+\MPnumerator=\count114
+\makeMPintoPDFobject=\count115
+\everyMPtoPDFconversion=\toks24
 )
-LaTeX Font Info:    Try loading font information for T1+cmtt on input line 63.
+LaTeX Font Info:    Try loading font information for T1+cmtt on input line 67.
  ("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\base\t1cmtt.fd"
 File: t1cmtt.fd 1999/05/25 v2.5h Standard LaTeX font definitions
 )
-Underfull \vbox (badness 10000) detected at line 94
+Underfull \vbox (badness 10000) detected at line 98
  []
 
 [1
 
 {C:/ProgramData/MiKTeX/2.9/pdftex/config/pdftex.map}]
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <10.95> on input line 108.
+(Font)              <10.95> on input line 112.
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <8> on input line 108.
+(Font)              <8> on input line 112.
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <6> on input line 108.
+(Font)              <6> on input line 112.
 
-Underfull \hbox (badness 10000) in paragraph at lines 113--113
+Underfull \hbox (badness 10000) in paragraph at lines 117--117
 []|\T1/cmr/m/n/10.95 Designansvarig Sen-sor-mo-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 114--114
+Underfull \hbox (badness 10000) in paragraph at lines 118--118
 []|\T1/cmr/m/n/10.95 Designansvarig Styr-mo-dul
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 115--115
+Underfull \hbox (badness 10000) in paragraph at lines 119--119
 []|\T1/cmr/m/n/10.95 Designansvarig Kom-mu-ni-
  []
 
 
-Overfull \hbox (9.00636pt too wide) in paragraph at lines 108--117
+Overfull \hbox (9.00636pt too wide) in paragraph at lines 112--121
 [][] 
  []
 
@@ -592,7 +581,14 @@ Package Fancyhdr Warning: \headheight is too small (12.0pt):
 
 [1]
 ("G:\Dokument\Applied Physics and Electrical Engineering\KANDIDATPROJEKT\TSEA56
-\GIT\TSEA56Grupp2\DOKUMENT\SYSTEMSKISS\systemskiss_v1.0\systemskiss_v1.0.toc")
+\DOKUMENT\PROJEKTPLAN\projektplan v0.3\projektplan_v0.3.toc"
+
+Package Fancyhdr Warning: \headheight is too small (12.0pt): 
+ Make it at least 13.59999pt.
+ We now make it that large for the rest of the document.
+ This may cause the page layout to be inconsistent, however.
+
+[2])
 \tf@toc=\write3
 
 
@@ -601,20 +597,46 @@ Package Fancyhdr Warning: \headheight is too small (12.0pt):
  We now make it that large for the rest of the document.
  This may cause the page layout to be inconsistent, however.
 
+[3]
+
+Package Fancyhdr Warning: \headheight is too small (12.0pt): 
+ Make it at least 13.59999pt.
+ We now make it that large for the rest of the document.
+ This may cause the page layout to be inconsistent, however.
+
+[4]
+Underfull \vbox (badness 10000) detected at line 235
+ []
+
+
+Overfull \vbox (9.31247pt too high) has occurred while \output is active []
+
+
+
+Package Fancyhdr Warning: \headheight is too small (12.0pt): 
+ Make it at least 13.59999pt.
+ We now make it that large for the rest of the document.
+ This may cause the page layout to be inconsistent, however.
+
+[1]
+
+Package Fancyhdr Warning: \headheight is too small (12.0pt): 
+ Make it at least 13.59999pt.
+ We now make it that large for the rest of the document.
+ This may cause the page layout to be inconsistent, however.
+
 [2]
+Overfull \hbox (22.18027pt too wide) in paragraph at lines 259--274
+[]  
+ []
 
-Package Fancyhdr Warning: \headheight is too small (12.0pt): 
- Make it at least 13.59999pt.
- We now make it that large for the rest of the document.
- This may cause the page layout to be inconsistent, however.
+LaTeX Font Info:    Try loading font information for OMS+cmr on input line 278.
 
-[3] <../images/system_omgivning.png, id=18, 662.475pt x 387.4475pt>
-File: ../images/system_omgivning.png Graphic file (type png)
-
-<use ../images/system_omgivning.png>
-Package pdftex.def Info: ../images/system_omgivning.png used on input line 193.
-
-(pdftex.def)             Requested size: 354.86412pt x 207.53954pt.
+("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\base\omscmr.fd"
+File: omscmr.fd 1999/05/25 v2.5h Standard LaTeX font definitions
+)
+LaTeX Font Info:    Font shape `OMS/cmr/m/n' in size <10.95> not available
+(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 278.
 
 
 Package Fancyhdr Warning: \headheight is too small (12.0pt): 
@@ -622,40 +644,55 @@ Package Fancyhdr Warning: \headheight is too small (12.0pt):
  We now make it that large for the rest of the document.
  This may cause the page layout to be inconsistent, however.
 
-[1 <G:/Dokument/Applied Physics and Electrical Engineering/KANDIDATPROJEKT/TSEA
-56/GIT/TSEA56Grupp2/DOKUMENT/SYSTEMSKISS/images/system_omgivning.png>]
-<../images/Robot_moduler.png, id=23, 1003.75pt x 1003.75pt>
-File: ../images/Robot_moduler.png Graphic file (type png)
-
-<use ../images/Robot_moduler.png>
-Package pdftex.def Info: ../images/Robot_moduler.png used on input line 233.
-(pdftex.def)             Requested size: 133.07489pt x 133.06516pt.
+[3]
+Overfull \hbox (3.98288pt too wide) in paragraph at lines 294--294
+[]|\T1/cmr/bx/n/10.95 Ansvarig| 
+ []
 
 
-Package Fancyhdr Warning: \headheight is too small (12.0pt): 
- Make it at least 13.59999pt.
- We now make it that large for the rest of the document.
- This may cause the page layout to be inconsistent, however.
-
-[2 <G:/Dokument/Applied Physics and Electrical Engineering/KANDIDATPROJEKT/TSEA
-56/GIT/TSEA56Grupp2/DOKUMENT/SYSTEMSKISS/images/Robot_moduler.png>]
-<../Images/Intermodular_Komm.png, id=27, 559.3698pt x 413.3844pt>
-File: ../Images/Intermodular_Komm.png Graphic file (type png)
-
-<use ../Images/Intermodular_Komm.png>
-Package pdftex.def Info: ../Images/Intermodular_Komm.png used on input line 276
-.
-(pdftex.def)             Requested size: 221.78923pt x 163.90636pt.
+Underfull \hbox (badness 2237) in paragraph at lines 296--296
+[]|\T1/cmr/m/n/10.95 Listar al-la krav som
+ []
 
 
-Package Fancyhdr Warning: \headheight is too small (12.0pt): 
- Make it at least 13.59999pt.
- We now make it that large for the rest of the document.
- This may cause the page layout to be inconsistent, however.
+Underfull \hbox (badness 10000) in paragraph at lines 299--299
+[]|\T1/cmr/m/n/10.95 MS,
+ []
 
-[3 <G:/Dokument/Applied Physics and Electrical Engineering/KANDIDATPROJEKT/TSEA
-56/GIT/TSEA56Grupp2/DOKUMENT/SYSTEMSKISS/Images/Intermodular_Komm.png (PNG copy
-)>]
+
+Underfull \hbox (badness 10000) in paragraph at lines 300--300
+[]|\T1/cmr/m/n/10.95 Analysera huruvi-da
+ []
+
+
+Underfull \hbox (badness 7433) in paragraph at lines 300--300
+\T1/cmr/m/n/10.95 pro-jek-tet kan dri-vas
+ []
+
+
+Underfull \hbox (badness 1448) in paragraph at lines 302--302
+\T1/cmr/m/n/10.95 ku-ment som be-stäl-la-
+ []
+
+
+Underfull \hbox (badness 2644) in paragraph at lines 305--305
+\T1/cmr/m/n/10.95 kun-de man ha gjort
+ []
+
+
+Underfull \hbox (badness 2426) in paragraph at lines 306--306
+[]|\T1/cmr/m/n/10.95 En de-tal-je-rad sta-tus-
+ []
+
+
+Overfull \hbox (49.09312pt too wide) in alignment at lines 293--308
+ [] [] [] [] [] 
+ []
+
+
+Underfull \vbox (badness 10000) detected at line 308
+ []
+
 
 Package Fancyhdr Warning: \headheight is too small (12.0pt): 
  Make it at least 13.59999pt.
@@ -677,28 +714,227 @@ Package Fancyhdr Warning: \headheight is too small (12.0pt):
  This may cause the page layout to be inconsistent, however.
 
 [6]
+Underfull \hbox (badness 2229) in paragraph at lines 434--434
+[]|\T1/cmr/m/n/10.95 Godkännande av krav-spe-ci-fi-ka-tion, be-slut att gö-ra p
+ro-jekt-plan,
+ []
+
+
+Package Fancyhdr Warning: \headheight is too small (12.0pt): 
+ Make it at least 13.59999pt.
+ We now make it that large for the rest of the document.
+ This may cause the page layout to be inconsistent, however.
+
+[7]
+Overfull \hbox (1.15393pt too wide) in paragraph at lines 464--464
+[]|\T1/cmr/m/n/10.95 Beräknad
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 465--465
+[]|\T1/cmr/m/n/10.95 Beroende
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 465--465
+\T1/cmr/m/n/10.95 av
+ []
+
+
+Overfull \hbox (1.99504pt too wide) in paragraph at lines 487--487
+[]|\T1/cmr/m/n/10.95 Designspecifikation| 
+ []
+
+
+Underfull \hbox (badness 2951) in paragraph at lines 501--501
+[]|\T1/cmr/m/n/10.95 Kortaste väg till
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 503--503
+[]|\T1/cmr/m/n/10.95 Optimeringsproblem: Be-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 503--503
+\T1/cmr/m/n/10.95 räk-na kor-tas-te väg till
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 515--515
+[]|\T1/cmr/m/n/10.95 Intern kart-lägg-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 529--529
+[]|\T1/cmr/m/n/10.95 Visualisering av
+ []
+
+
+Underfull \hbox (badness 3428) in paragraph at lines 538--538
+[]|\T1/cmr/m/n/10.95 Driftproblem: Få ro-bo-ten
+ []
+
+
+Underfull \hbox (badness 2671) in paragraph at lines 538--538
+\T1/cmr/m/n/10.95 att dri-vas med hjälp av
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 538--538
+\T1/cmr/m/n/10.95 mo-to-rer-na. Kun-na kö-ra
+ []
+
+
+Underfull \hbox (badness 1052) in paragraph at lines 545--545
+[]|\T1/cmr/m/n/10.95 Reglerproblem: Se till att
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 557--557
+[]|\T1/cmr/m/n/10.95 Kommunikations-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 559--559
+[]|\T1/cmr/m/n/10.95 Konstruera kom-mu-ni-ka-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 564--564
+[]|\T1/cmr/m/n/10.95 Installera blå-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 571--571
+[]|\T1/cmr/m/n/10.95 Skapa kon-takt
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 573--573
+[]|\T1/cmr/m/n/10.95 Få igång kom-mun-ka-tion
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 580--580
+[]|\T1/cmr/m/n/10.95 Få kom-mu-ni-ka-tions-mo-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 580--580
+\T1/cmr/m/n/10.95 du-len att vi-da-re-be-fod-ra
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 599--599
+[]|\T1/cmr/m/n/10.95 Montera LCD-
+ []
+
+
+Underfull \hbox (badness 3009) in paragraph at lines 615--615
+\T1/cmr/m/n/10.95 kan de-tek-te-ra mål en-ligt
+ []
+
+
+Overfull \hbox (19.59796pt too wide) in alignment at lines 458--617
+ [] [] [] [] [] [] 
+ []
+
+
+Underfull \vbox (badness 10000) detected at line 617
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 620--620
+[]|\T1/cmr/m/n/10.95 Måldetektion
+ []
+
+
+Underfull \hbox (badness 3009) in paragraph at lines 622--622
+\T1/cmr/m/n/10.95 kan de-tek-te-ra mål en-ligt
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 641--641
+[]|\T1/cmr/m/n/10.95 Kommunikations-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 657--657
+[]|\T1/cmr/m/n/10.95 Test av LCD-displayens
+ []
+
+
+Underfull \hbox (badness 1152) in paragraph at lines 662--662
+[]|\T1/cmr/m/n/10.95 Test av kart-lägg-
+ []
+
+
+Underfull \hbox (badness 5681) in paragraph at lines 669--669
+[]|\T1/cmr/m/n/10.95 Test av op-ti-me-
+ []
+
+
+Underfull \hbox (badness 1484) in paragraph at lines 692--692
+[]|\T1/cmr/m/n/10.95 Extra tid för oför-ut-sed-da
+ []
+
+
+Overfull \hbox (19.59796pt too wide) in alignment at lines 617--707
+ [] [] [] [] [] [] 
+ []
+
+
+Package Fancyhdr Warning: \headheight is too small (12.0pt): 
+ Make it at least 13.59999pt.
+ We now make it that large for the rest of the document.
+ This may cause the page layout to be inconsistent, however.
+
+[8]
+
+Package Fancyhdr Warning: \headheight is too small (12.0pt): 
+ Make it at least 13.59999pt.
+ We now make it that large for the rest of the document.
+ This may cause the page layout to be inconsistent, however.
+
+[9]
+
+Package Fancyhdr Warning: \headheight is too small (12.0pt): 
+ Make it at least 13.59999pt.
+ We now make it that large for the rest of the document.
+ This may cause the page layout to be inconsistent, however.
+
+[10]
+
+Package Fancyhdr Warning: \headheight is too small (12.0pt): 
+ Make it at least 13.59999pt.
+ We now make it that large for the rest of the document.
+ This may cause the page layout to be inconsistent, however.
+
+[11]
 ("G:\Dokument\Applied Physics and Electrical Engineering\KANDIDATPROJEKT\TSEA56
-\GIT\TSEA56Grupp2\DOKUMENT\SYSTEMSKISS\systemskiss_v1.0\systemskiss_v1.0.aux") 
-) 
+\DOKUMENT\PROJEKTPLAN\projektplan v0.3\projektplan_v0.3.aux") ) 
 Here is how much of TeX's memory you used:
- 3903 strings out of 493921
- 52908 string characters out of 3144876
- 119222 words of memory out of 3000000
- 7125 multiletter control sequences out of 15000+200000
+ 3834 strings out of 493921
+ 51362 string characters out of 3144876
+ 145497 words of memory out of 3000000
+ 7065 multiletter control sequences out of 15000+200000
  12017 words of font info for 31 fonts, out of 3000000 for 9000
  841 hyphenation exceptions out of 8191
- 27i,10n,43p,527b,316s stack positions out of 5000i,500n,10000p,200000b,50000s
- <C:\Users\Adnan\AppData\Local\MiKTeX\2.9\fonts\pk\ljfour\jknappen\ec\dpi600\e
-cti1095.pk> <C:\Users\Adnan\AppData\Local\MiKTeX\2.9\fonts\pk\ljfour\jknappen\e
-c\dpi600\ecbx1200.pk> <C:\Users\Adnan\AppData\Local\MiKTeX\2.9\fonts\pk\ljfour\
-jknappen\ec\dpi600\ecbx1095.pk> <C:\Users\Adnan\AppData\Local\MiKTeX\2.9\fonts\
-pk\ljfour\jknappen\ec\dpi600\ectt1095.pk> <C:\Users\Adnan\AppData\Local\MiKTeX\
-2.9\fonts\pk\ljfour\jknappen\ec\dpi600\ecbx1440.pk> <C:\Users\Adnan\AppData\Loc
-al\MiKTeX\2.9\fonts\pk\ljfour\jknappen\ec\dpi600\ecrm1095.pk><C:/Program Files 
-(x86)/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmr8.pfb>
-Output written on systemskiss_v1.0.pdf (10 pages, 678122 bytes).
+ 27i,13n,43p,574b,425s stack positions out of 5000i,500n,10000p,200000b,50000s
+ <C:\Users\Adnan
+\AppData\Local\MiKTeX\2.9\fonts\pk\ljfour\jknappen\ec\dpi600\ecti1095.pk> <C:\U
+sers\Adnan\AppData\Local\MiKTeX\2.9\fonts\pk\ljfour\jknappen\ec\dpi600\ecbx1200
+.pk> <C:\Users\Adnan\AppData\Local\MiKTeX\2.9\fonts\pk\ljfour\jknappen\ec\dpi60
+0\ecbx1095.pk> <C:\Users\Adnan\AppData\Local\MiKTeX\2.9\fonts\pk\ljfour\jknappe
+n\ec\dpi600\ectt1095.pk> <C:\Users\Adnan\AppData\Local\MiKTeX\2.9\fonts\pk\ljfo
+ur\jknappen\ec\dpi600\ecbx1440.pk> <C:\Users\Adnan\AppData\Local\MiKTeX\2.9\fon
+ts\pk\ljfour\jknappen\ec\dpi600\ecrm1095.pk><C:/Program Files (x86)/MiKTeX 2.9/
+fonts/type1/public/amsfonts/cm/cmr8.pfb><C:/Program Files (x86)/MiKTeX 2.9/font
+s/type1/public/amsfonts/cm/cmsy10.pfb>
+Output written on projektplan_v0.3.pdf (16 pages, 147689 bytes).
 PDF statistics:
- 301 PDF objects out of 1000 (max. 8388607)
+ 372 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)
- 16 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 1 words of extra memory for PDF output out of 10000 (max. 10000000)
 
