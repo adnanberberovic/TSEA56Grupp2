@@ -1,0 +1,869 @@
+\documentclass[11pt]{article}
+\usepackage[margin=3cm]{geometry}
+\usepackage[swedish]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{fancyhdr}
+\usepackage{ragged2e}
+\usepackage{titling}
+\usepackage{graphicx}
+\usepackage{pbox}
+\usepackage{tabularx}
+\usepackage{longtable}
+\usepackage{tabu}
+\usepackage{url}
+
+\graphicspath{ {images/} }
+\newcommand{\subtitle}[1]{%
+  \posttitle{%
+    \par\end{center}
+    \begin{center}\large#1\end{center}
+    \vskip0.5em}%
+}
+\newcounter{kravc}
+\setcounter{kravc}{1}
+\newcommand{\kravcc}{
+	\thekravc
+	\stepcounter{kravc}
+}
+\newcounter{refc}
+\setcounter{refc}{1}
+\newcommand{\reff}{
+	\therefc
+	\stepcounter{refc}
+}
+\pagestyle{fancy}
+
+
+\date{}
+\pagenumbering{roman}
+\chead{Undsättningsrobot}
+\rhead{2015-02-22}
+\lhead{}
+\lfoot{
+	TSEA56 
+	\\
+	Projektplan
+}
+\rfoot{
+	Projektgrupp 2
+	\\
+	e-post: adnbe196@student.liu.se
+}
+
+\begin{document}
+\begin{titlepage}
+\begin{center}
+TSEA56 - Kandidatprojekt i elektronik \\[0.5in]
+{\Large\bfseries Projektplan}\\
+%
+\vspace{4\baselineskip}
+%
+Version 1.0\\
+\vspace{2\baselineskip}
+%
+Grupp 2 \\
+Agafonov, Nikolaj, 
+\texttt{nikag669}
+\\
+Berberovic, Adnan, 
+\texttt{adnbe196}
+\\
+Brorsson, Andreas, 
+\texttt{andbr981}
+\\
+Fridborn, Fredrik, 
+\texttt{frefr166}
+\\
+Oprea, Robert, 
+\texttt{robop806}
+\\
+Skytt, Måns, 
+\texttt{mansk700}
+
+\vspace{2\baselineskip}
+2015-02-22
+
+\vspace{19\baselineskip}
+Status
+\begin{longtable}{|l|l|l|} \hline
+
+Granskad &
+Fredrik Fridborn & 
+2015-02-22 \\ \hline
+Godkänd &
+Kent Palmkvist &
+2015-02-23 \\ \hline
+ 
+\end{longtable}
+
+\end{center}
+\end{titlepage}
+
+\pagebreak
+\begin{center}
+
+\section*{PROJEKTIDENTITET}
+2015/VT, Undsättningsrobot Gr. 2
+\\
+Linköpings tekniska högskola, ISY
+\\[0.5in]
+\begin{table}[h]
+\begin{tabular}{|l|p{0.3\linewidth}|l|l|} \hline
+Namn & Ansvar & Telefon & E-post \\[0.1in] \hline
+Nikolaj Agafonov & Dokumentansvarig (DA) & 072-276 99 46 & nikag669@student.liu.se \\ \hline
+Adnan Berberovic & Projektledare (PL) & 070-491 96 07 & adnbe196@student.liu.se \\ \hline
+Andreas Brorsson & Testansvarig (TA) & 073-524 44 60 & andbr981@student.liu.se \\ \hline
+Fredrik Fridborn & Designansvarig Sensormodul (DSE) & 073-585 52 01 & frefr166@student.liu.se \\ \hline
+Robert Oprea & Designansvarig Styrmodul (DST) & 070-022 10 18 & robop806@student.liu.se \\ \hline
+Måns Skytt & Designansvarig Kommunikationsenhet (DK) & 070-354 28 84 & mansk700@student.liu.se \\ \hline
+\end{tabular}
+\end{table}
+
+E-postlista för hela gruppen: adnbe196@student.liu.se
+\\[1in]
+Kund: Kent Palmkvist, 581 83 Linköping,
+Kundtelefon: 013-28 13 47, kentp@isy.liu.se
+\\[1in]
+Kursansvarig: Tomas Svensson, 013-28 13 68, tomass@isy.liu.se
+\\
+Handledare: Olov Andersson, 013-28 26 58, Olov.Andersson@liu.se
+\end{center}
+\pagebreak
+
+\tableofcontents
+
+\pagebreak
+
+\section*{Dokumenthistorik}
+\begin{table}[h]
+\begin{tabular}{|l|l|l|l|l|} \hline
+
+Version & 
+Datum & 
+Utförda förändringar & 
+Utförda av & 
+Granskad \\[0.1in] \hline
+0.1 &
+2015-02-11 & 
+Första utkastet & 
+Grupp 2 & 
+\\ \hline
+
+0.2 &
+2015-02-17 & 
+Andra utkastet & 
+Måns Skytt & 
+Adnan Berberovic\\ \hline
+
+0.3 &
+2015-02-18 &
+Tredje utkastet &
+ABe \& MS &
+Adnan Berberovic \\ \hline
+
+0.4 &
+2015-02-22 &
+Fjärde utkastet &
+RO \& FF &
+Fredrik Fridborn \\ \hline
+
+1.0 &
+2015-02-22 &
+Första versionen &
+Grupp 2 &
+Grupp 2 \\ \hline
+
+\end{tabular}
+\end{table}
+
+
+\pagebreak
+
+\pagenumbering{arabic}
+
+\begin{flushleft}
+\section{Beställare}
+Projektets beställare är Kent Palmkvist som representerar ISY.
+
+\section{Översiktlig beskrivning av projektet}
+Nedan ges en beskrivning av syftet med projektet samt en lista med alla leveranser.
+
+\subsection{Syfte och mål}
+Mål är att leverera en produkt, en robot, som kan köra autonomt och via fjärrstyrning i okända, möjligtvis farliga, miljöer. Denna ska kunna kartlägga sin omgivning samt, via den kortaste vägen, leverera ett objekt från en punkt till en annan. Dessutom ska projektet visa hur man tillämpar kunskap från de kurser man läst, samt ge erfarenhet i projektarbete och förståelse för hur hårdvara och mjukvara interagerar.
+
+\subsection{Leveranser} %Lägga till aktiviteter?
+Leveranser skall göras senast på nedan nämnda tider och datum om inte annat är överenskommet mellan beställare och projektgrupp.
+
+%Tabell med leveranser
+\begin{center}
+\begin{longtable}{|l |p{.8\linewidth}|} \hline
+
+3 feb: & 
+kl 16.00: Kravspecifikationen ska vara klar. (BP1) \\ \hline
+
+16 feb: & 
+kl 16.00: Första versionen av projektplan, tidplan och systemskiss ska vara inlämnade till beställaren. \\ \hline
+
+20 feb: & 
+kl 16.00: Slutgiltig version av projektplan, tidplan och systemskiss ska vara inlämnade till beställaren. \\ \hline
+
+5 mars: &
+kl 16.00: första version av förstudien (minst 5 sidor) ska skickas till respektive handledare och till er beställare. \\ \hline
+
+11 mars: & 
+kl 16.00: Första versionen av designspecifikationen ska vara inlämnad till handledaren. \\ \hline
+
+24 mars: &
+Designspecifikationen ska vara godkänd av handledaren vid ett beslutsmöte BP3. \\ \hline
+
+1 april: &
+kl 16:00 Version 1.0 av förstudien ska skickas till respektive handledare och till beställare. \\ \hline
+
+17 april: & 
+Nuvarande design ska vara presenterad för och godkänd av handledaren vid ett beslutsmöte BP4. \\ \hline
+
+25 maj: &
+Verifiering av kraven (BP5) bör ske i god tid innan redovisningen. Utan detta beslut får ni inte leverera! \\ \hline
+
+21 maj: &
+Kappan, version 1.0, (exklusive appendix) ska levereras. Se nedan. \\ \hline
+
+27 maj: &
+Teknisk dokumentation och användarhandledning (båda version 1.0) ska vara inlämnade. Slutversion av skrivarbete skall också skickas med vid detta tillfälle. \\ \hline
+
+Vecka 23: &
+Redovisning och demonstration.\\ \hline
+
+2 juni: &
+(preliminärt) 8.15-17 muntliga presentationer och opposition. Tider se nedan. \\ \hline
+
+3 juni: &
+(preliminärt) 9.15-17 tävlingar utanför café Java. \\ \hline
+
+5 juni: &
+Efterstudien ska vara inlämnad. Vid denna tidpunkt ska även källkod skickas in i en zip-fil. \\ \hline
+
+12 juni: &
+Bärbar dator och övrig utrustning ska vara återlämnade. \\ \hline
+\end{longtable}
+\end{center}
+
+En tidrapport ska lämnas senast kl 16.00 vid följande datum: 4 febr, 23 febr, 9 mars, 23 mars, 30 mars, 13 april, 20 april, 27 april, 4 maj, 11 maj, 18 maj, 25 maj, 1 juni och 8 juni.
+
+\subsection{Begränsningar} %Vad behöver vi inte göra?
+Roboten anses vara en prototyp. Detta innebär att den kommer vara designad på sådant sätt att den kommer kunna klara av en bana av fördefinierad storlek med plan mark, och inte en miljö av godtyckligt väglag och storlek. 
+
+\section{Fasplan}
+Nedan ges en grov beskrivning av aktiviteterna i varje fas.
+\subsection{Under projektet}
+Initialt kommer en stor del av arbetet bestå av att lära sig de verktyg som behövs för att kunna genomföra projektet: AVR, VDHL, dataöverföring via bluetooth, mätteknik etc. Det sker dels genom läsning men även laboratoriskt. Därefter kommer hårdvaran konstrueras och testning kommer ske kontinuerligt. Efter varje modul skapats kommer större tester genomföras. Slutligen kommer mjukvaran kodas med kontinuerlig testning.
+
+\subsection{Efter projektet}
+En färdig produkt ska levereras. Efter projektet kommer efterstudie genomföras, labbplatsen städas och materiel återlämnas varpå projektgruppen upplöses och gruppkontraktet hävs. Gruppen kommer även att reflektera över ett utfört projektarbete och kunna föreslå förbättringar.
+\pagebreak
+
+\section{Organisationsplan för hela projektet}
+Nedan beskrivs vilka personer som utgör projektgruppen och hur den är organiserad.
+
+\subsection{Villkor för samarbetet inom projektgruppen}
+Samarbetet inom projektgruppen sker i enlighet med gruppkontraktet (se appendix).
+
+\subsection{Definition av arbetsinnehåll och ansvar}
+I följande tabell beskrivs de olika roller som projektmedlemmarna har.
+
+\begin{tabu} to 1.05\textwidth { | X[c] | X[c] | X[c] | }
+\hline
+Projektledare & Adnan Berberovic & Samlar in och rapporterar tidsåtgång. Ser till att gruppen fungerar. Bestämmer möten. \\
+\hline
+Dokumentansvarig & Nikolaj Agafonov & Ansvarar för alla dokument inom projektet.\\
+\hline
+Testansvarig & Andreas Brorsson & Har ansvaret att bestämma när varje testomgång bör och ska ske, och hur detta ska gå till. \\ 
+\hline
+Designansvarig Sensormodul & Fredrik Fridborn  & Ser till att robotens sensorer fungerar både hårdvaru- och mjukvarumässigt.\\
+\hline
+Designansvarig Styrmodul & Robert Oprea & Håller koll på regleringen och kartläggningen av robot respektive labyrint.\\
+\hline
+Designansvarig Kommunikationsmodul & Måns Skytt & Ser till att kommunikation mellan robot och användare går rätt till. \\
+\hline
+ \end{tabu}
+ 
+\subsection{Inblandade personer}
+Utöver projektgruppen ingår även följande personer i projektet:
+\begin{itemize}
+	\item Olov Andersson - Handledare
+	\item Kent Palmkvist - Beställare
+\end{itemize}
+
+%Ange alla inblandade personer och deras ansvarsområden.
+%Definiera arbetsinnehållet för projektets roller.
+
+\pagebreak
+
+\section{Dokumentplan}
+%Lista alla dokument som ska produceras i tabellen.
+%Ange ansvarig, vem som godkänner, syftet, vem de
+%ska distribueras till och när dokumentet ska vara klart. 
+Följande tabell räknar upp de dokument som kommer att skapas under projektets gång, syftet, vem som är ansvarig, vem som godkänner, vem de ska distribueras till samt när dokumentet ska vara klart.
+\begin{center}
+\begin{longtable}{|p{.28\linewidth}|p{.1\linewidth}|p{.25\linewidth}|p{.19\linewidth}|p{.15\linewidth}|}\hline
+\textbf{Dokument} & \textbf{Ansvarig} & \textbf{Syfte} & \textbf{Målgrupp} & \textbf{Godkännare} \\ \hline
+
+Kravspecifikation & Alla & Listar alla krav som slutprodukten ska uppfylla. & Projektgrupp och beställare & Beställare \\ \hline
+Projektplan & ABe, FF, NA & Beskriver hur projektet ska utföras & Projektgrupp & Beställare \\ \hline
+Tidplan & ABe, FF, NA & Beskriver när aktiviteter ska utföras och av vem & Projektgrupp & Beställare \\ \hline
+Systemskiss & MS, ABr, RO & Beskriver hur produkten ska konstrueras& Projektgrupp och beställare & Beställare \\ \hline
+Förstudie & Alla & Analysera huruvida projektet kan drivas framåt eller inte & Projektgrupp & Beställare \\ \hline
+Design-specifikation & AB & Beskriver mer detaljerat hur produkten ska konstrueras & Projektgrupp & Handledare \\ \hline
+Kappa & RO & Sammanfattar alla dokument som beställaren kan vara intresserad av & Beställare & Beställare \\ \hline
+Teknisk dokumentation & MS, ABr & Beskriver hur produkten fungerar & Beställare & Beställare \\ \hline
+Användar-handledning & FF & Beskriver hur man använder produkten& Beställare & Beställare \\ \hline
+Efterstudie & NA & En reflektion kring hur projektet bedrevs. Vad kunde man ha gjort bättre, etc.& Projektgrupp & Beställare\\ \hline
+Statusrapport & ABe & En detaljerad statusrapport som skickas in på begäran av beställaren. & Beställare & Beställare\\ \hline
+
+\end{longtable}
+\end{center}
+\pagebreak
+
+\section{Utvecklingsmetodik}
+Arbetet kommer att delas upp mellan gruppmedlemmarna på så sätt att projektgrupp kommer att bestå av mindre grupper (exempelvis grupper om två eller tre personer). Uppdelningen beror på uppgiftens svårighet och tidsåtgång. En sådan uppdelning är tänkt att förbättra och snabba upp utförandet av projektet. Projektets delar som implementeras var för sig måste kunna fungera tillsammans med de andra delar, därför ska de mindre projektgrupper komma överens om olika delars detaljer och veta hur det hela systemet ska fungera.
+
+
+%Tänker ni använda er av någon speciell metodik?
+%Alltid jobba i par? Använda ett visst
+%programspråk?
+
+
+\section{Utbildningsplan}
+I detta avsnitt beskrivs vilken utbildning som projektgruppen respektive kunden kommer att ta del av.
+
+\subsection{Egen utbildning}
+För att kunna implementera och testa systemets olika komponenter, både mjukvara och hårdvara, behöver gruppen att inhämta kunskap om de program och mätverktyg, som är relevanta för projektet. Exempelvis kommer gruppen att kunna använda utvecklingssystemet AVR-Studio och debugverktyget JTAGICE för att programmera de AVR-processorer som kommer att finnas i varje delmodul. Projektgruppen kommer att lära sig att programmera kretsar med VHDL-programmeringsspråk samt utföra mätningar med en logikanalysator.
+
+\subsection{Kundens utbildning}
+En demonstration av roboten och överlämning av bruksanvisning kommer att ske i samband med slutleveransen.
+
+\pagebreak
+
+\section{Rapporteringsplan}
+Vid bestämda datum, ungefär varje vecka, kommer projektledaren att rapportera den tid som gruppen har spenderat fram till rapporteringen. Tidsrapporten uppdateras löpande av alla gruppmedlemmar. Till tidrapporteringen kommer även en statusrapport att skickas med, som beskriver:\\
+\begin{itemize}
+	\item \textit{Vilka framsteg har gjorts sedan förra tidrapporteringen?}
+	\item \textit{Finns det några problem?}
+	\item \textit{Vad ska göras under kommande veckan?}
+\end{itemize}
+
+\section{Mötesplan}
+Projektgruppen kommer att träffas löpande under projektet för avstämningar mot tidplanen, samt planera kommande dagar. Möten kommer att ske 1 gång i veckan. Extra möten kan tillkomma, exempelvis möte med handledare och beställare.
+
+
+\section{Resursplan}
+Nedan beskrivs vilka resursen som projektgruppen kommer ha tillgång till.
+
+\subsection{Personer}
+Till projektgruppens förfogande kommer det att finnas en handledare tillgänglig som hjälp om det så behövs. Gruppen kan även vända sig till experter inom olika projektrelaterade sammanhang, såsom analog elektronik, reglerteknik och mekanik.
+
+\subsection{Material}
+Projektgruppen har till förfogande ett robotchassi och ett antal sensorer som finns beskrivna på Vanheden$^{[\reff]}$, ISY:s datablad.
+
+\subsection{Lokaler}
+Projektgruppen kommer att ha tillgång till laborationssalen MUXEN, där större delen av projektets tid kommer att spenderas. Projektgruppen kommer även att vid gruppmöten och/eller dokumentering att utnyttja till exempel ISYtan:s grupprum.
+
+\subsection{Ekonomi}
+Projektgruppen har tillgång till 1380 timmar totalt arbete och labutrustning i laborationssal MUXEN. Projektgruppen har inga finansiella tillgångar.
+
+\pagebreak
+
+\section{Milstolpar och beslutspunkter}
+I detta avsnitt listas projektets milstolpar och beslutspunkter.
+
+\subsection{Milstolpar}
+Tabell över projektets milstolpar och vilken vecka de skall uppnås:
+
+\begin{table}[h]
+\begin{tabular}{|l|p{.75\linewidth}|l|} \hline
+
+Nr &
+Beskrivning &
+Vecka \\ \hline
+
+1 &
+Designspecifikationen är klar &
+13\\ \hline
+
+2 &
+Roboten kan mäta sin position &
+13 \\ \hline
+
+3 &
+Data kan skickas från sensor till dator&
+14\\ \hline
+
+4 &
+Fungerande sensorsystem &
+14 \\ \hline
+
+
+5 &
+Roboten kan skicka och ta emot data från användaren&
+17\\ \hline
+
+6 &
+Roboten kan styras manuellt &
+18\\ \hline
+
+7 &
+Roboten kan köra autonomt &
+19\\ \hline
+
+8 &
+Fungerande reglersystem  &
+19 \\ \hline
+
+9 &
+Fungerande kommunikationssystem &
+19\\ \hline
+
+10 &
+Fungerande kartläggningsalgoritm &
+21\\ \hline
+
+11 &
+Fungerande optimeringsalgoritm för kortast väg &
+21\\ \hline
+
+12 &
+Färdig robot &
+22\\ \hline
+ 
+\end{tabular}
+\end{table}
+
+\subsection{Beslutspunkter}
+Tabell över projektets beslutspunkter samt det datum de ska tas:
+
+\begin{table}[h]
+\begin{tabular}{|l|p{.75\linewidth}|l|} \hline
+
+Nr &
+Beskrivning &
+Datum \\ \hline
+
+0 &
+Godkännande av uppdrag, beslut att skriva kravspecifikation &
+2015-01-23 \\ \hline
+1 &
+Godkännande av kravspecifikation, beslut att göra projektplan, systemskiss &
+2015-02-03 \\ \hline
+2 &
+Godkännande av projektplan och systemskiss, beslut att påbörja under-fasen &
+2015-02-20 \\ \hline
+3 &
+Godkännande av designspecifikation, beslut att påbörja konstruktion &
+2015-03-24 \\ \hline
+4 &
+Godkännande av nuvarande design &
+2015-04-17 \\ \hline
+5 &
+Verifiering av kravspecifikationen, beslut att leverera och påbörja efterfasen &
+2015-05-25 \\ \hline
+6 &
+Godkännande av slutrapport, beslut att upplösa projektgruppen &
+2015-06-05 \\ \hline
+ 
+\end{tabular}
+\end{table}
+
+\pagebreak
+
+\section{Aktiviteter}
+I följande tabell listas alla projektets aktiviteter, vem som ansvarar för varje aktivitet, hur lång tid de beräknas ta samt deras beroenden av andra aktiviteter:
+
+\begin{longtable}{|l|p{.20\linewidth}|l|p{.30\linewidth}|p{.10\linewidth}|p{.10\linewidth}|} \hline
+
+Nr & 
+Aktivitet & 
+Ansvar & 
+Beskrivning & 
+Beräknad total tid &
+Beroende av aktivitet \\[0.1in] \hline
+
+
+%1 &
+%Projektplan &
+%AB &
+%Skriva projektplan &
+%30 \\ \hline
+%
+%2 &
+%Tidplan &
+%AB &
+%Skriva tidplan &
+%5 \\ \hline
+% 
+%3 &
+%Systemskiss&
+%AB &
+%Skriv systemskiss&
+%15 \\ \hline 
+ 
+1 &
+Designspecifikation &
+ABe &
+Skriv designspecifikation &
+100 &
+- \\ \hline
+ 
+2-9 &
+Styrmodul &
+RO &
+Konstruera styrmodulen &
+370 &
+ \\ \hline
+
+2 &
+Kortaste väg till målet &
+RO &
+Optimeringsproblem: Beräkna kortaste väg till målet, och kör denna &
+50 &
+3 \\ \hline
+ 
+3-5 &
+Kartläggning &
+RO &
+Kartläggning av det avlagda området &
+170 &
+-\\ \hline
+
+3 &
+Intern kartläggning &
+RO &
+Konfigurera så att roboten skapar intern uppfattning av avlagt område &
+70 &
+14 \\ \hline
+
+4 &
+Skicka kartdata &
+MS &
+Skicka meningsfull kartdata till PC&
+30 &
+11 \\ \hline
+
+5 &
+Visualisering av karta &
+RO &
+Programmering av program för att visualisera kartläggning &
+70 &
+11 \\ \hline
+ 
+6 &
+Motorstyrning &
+RO &
+Driftproblem: Få roboten att drivas med hjälp av motorerna. Kunna köra fram/back samt svänga. &
+40 &
+14 \\ \hline
+ 
+ 
+7 &
+PD-regleringsalgoritm &
+RO &
+Regler/programmerings-problem: Fungerande teori bakom PD-regleringssystemet &
+40 &
+- \\ \hline
+
+8 &
+PD-reglering, realisering &
+RO &
+Se till att roboten kör i en rak och inte svängig bana i praktiken &
+40 &
+7, 14, 24 \\ \hline
+ 
+ 
+9 &
+Programmering av LCD &
+RO &
+Visa viss data som begärs på en LCD på roboten &
+30 &
+18 \\ \hline
+ 
+10-14 &
+Kommunikations-modul &
+MS &
+Konstruera kommunikationsmodulen &
+170 &
+- \\ \hline
+
+10 &
+Installera blåtandslänk &
+MS &
+Få igång blåtand på roboten. &
+20 &
+- \\ \hline
+ 
+11 &
+Skapa kontakt mellan Robot och PC &
+MS &
+Få igång kommunkation mellan robot och PC &
+50 &
+10 \\ \hline
+ 
+%12 &
+%Intermodulär kommunikation &
+%MS &
+%Få kommunikationsmodulen att vidarebefodra data mellan PC och andra moduler &
+%100 &
+%11 \\ \hline
+
+12-14 &
+Seriell överföring&
+MS &
+Information från sensormodulen ska skickas seriellt till andra moduler&
+100 &
+- \\ \hline
+
+12 &
+Seriell överföring, programkod mottagning&
+MS &
+Skriva programkod för att ta emot data från modul/PC&
+40 &
+- \\ \hline
+
+13 &
+Seriell överföring, programkod vidarebefodran&
+MS &
+Skriva programkod för att vidarebefordra mottagen data&
+40 &
+12 \\ \hline
+ 
+14 &
+Seriell överföring, funktionell&
+MS &
+Realisering av seriell överföring&
+20 &
+13 \\ \hline
+
+ 
+15-20 &
+Sensormodul &
+FF &
+Konstruera sensormodulen &
+230 &
+- \\ \hline
+ 
+15 &
+Installera avståndssensorer&
+FF &
+Få igång avståndssensorer på roboten&
+50 &
+- \\ \hline
+
+16 &
+Installera vinkelhastighetssensor&
+FF &
+Få igång vinkelhastighetssensor på roboten&
+30 &
+- \\ \hline
+
+17 &
+Installera reflexsensor&
+FF &
+Få igång reflexsensor på robotens undersida&
+30 &
+- \\ \hline
+
+18 &
+Montera LCD-skärm&
+FF &
+Få igång LCD-skärm på roboten som visar sensorvärden&
+20 &
+- \\ \hline
+
+19 &
+Måldetektion markering&
+FF &
+Konfigurera så att roboten kan detektera mål enligt svart markering.&
+50 &
+17 \\ \hline
+
+20 &
+Måldetektion RFID&
+FF &
+Konfigurera så att roboten kan detektera mål enligt RFID-tag.&
+50 &
+- \\ \hline
+
+21 &
+Programmera gripklo&
+ABe &
+Skriva programkod för gripklons beteende.&
+10 &
+- \\ \hline
+
+22-31 &
+Testning&
+ABr, FF, MS, RO &
+Se till att roboten fungerar som den ska.&
+200 &
+- \\ \hline
+
+22 &
+Styrtest 1 &
+ABr, FF &
+Test av robotens manuella styrfunktionalitet.&
+20 &
+2, 4, 5, 6, 8, 9 \\ \hline
+
+23 &
+Styrtest 2 &
+ABr, FF &
+Test av robotens autonoma styrfunktionalitet.&
+30 &
+6,  \\ \hline
+
+24 &
+Kommunikationstest 1 &
+ABr, MS &
+Test av att skicka data till PC &
+25 &
+11, 14 \\ \hline
+
+25 &
+Kommunikationstest 2 &
+ABr, MS &
+Test av att ta emot data från användare &
+25 &
+24 \\ \hline
+
+26 &
+Sensortest 1 &
+ABr, FF &
+Test av avstånds- och vinkelaccelerationssensorer &
+15 &
+9, 15, 16 \\ \hline
+
+27 &
+Sensortest 2 &
+ABr, FF &
+Test av måldetektionssensorer &
+15 &
+9, 19, 20 \\ \hline
+
+28 &
+Programtestning - LCD &
+ABr, RO &
+Test av LCD-displayens funktionalitet &
+15 &
+9 \\ \hline
+
+29 &
+Test av kartläggning &
+ABr, RO, MS &
+Test av kartläggningsfunktionen &
+25 &
+3-5 \\ \hline
+
+30 &
+Test av optimeringsalgoritm &
+ABr, RO &
+Test av optimeringsalgoritmens funktionalitet &
+10 &
+2 \\ \hline
+
+31 &
+Test av Blåtandslänk &
+ABr, MS &
+Test av kommunikation via blåtandslänk &
+10 &
+11 \\ \hline
+ 
+32 &
+Tävlingsoptimering &
+Alla &
+Kalibrering inför tävling &
+10 &
+2, 4, 5, 6, 8, 9, 15, 16, 19, 20 \\ \hline 
+ 
+33 &
+Användar-handledning &
+NA &
+Skriva användarhandledning &
+15 &
+- \\ \hline 
+ 
+34 &
+Teknisk dokumentation &
+Alla &
+Skriva teknisk dokumentation &
+45 &
+- \\ \hline  
+ 
+35 &
+Mötestid&
+Alla &
+Tid för möten&
+40 &
+- \\ \hline
+
+36 &
+Buffert&
+FF &
+Extra tid för oförutsedda händelser.&
+200 &
+- \\ \hline
+
+- &
+- &
+- &
+Total &
+1380 &
+- \\ \hline
+
+
+%SE TILL ATT ALLA TIDER ÖVERRENSSTÄMMER MED VARANDRA!!!
+ 
+ 
+\end{longtable}
+\pagebreak
+
+\section{Tidplan}
+Se bifogat dokument \textit{tidplan\_v0.3}$^{[\reff]}$.
+
+\section{Kvalitetsplan}
+För att se till att minska på problematiska händelser under projektets gång kommer vi att vidta åtgärder som kodgranskning och hårdvarutester. Dessa förklaras närmare i de kommande delsektionerna.
+
+\subsection{Granskningar}
+Kod ska granskas på så sätt att de följer en kodkonvention som gruppen har kommit överens om.\\
+Dokument granskas så tekniska och språkliga begrepp används korrekt och att formateringar på dokumentens innehåll inte är fel.
+
+\subsection{Testplan}
+Tester kommer att utföras löpande under projektets gång. Varje delkomponent kommer att testas för sig. När en funktion är färdig testas den och arbetet går vidare till nästa problem.
+
+
+\section{Prioriteringar}
+Det absolut viktigaste är att se till att allt fungerar enligt alla grundkrav (se Kravspecifikation$^{\reff}$), annars kommer projektet inte att fungera. Så länge detta är uppfyllt kommer gruppens arbete att kunna drivas framåt utan större komplikationer.
+
+\section{Projektavslut}
+Projektet kommer att avslutas med en avstämning mot alla krav och dokumentationer. Dessutom kommer en redovisning och demonstration av projektet att ske vecka 23. När allt är godkänt upphör gruppkontraktet och projektgruppen upplöses.
+\\[0.1in]
+
+
+
+\setcounter{secnumdepth}{0}
+\pagebreak
+\section{Referenser}
+
+
+$^{[1]}$Vanheden, ISY:s datablad: \url{https://docs.isy.liu.se/twiki/bin/view/VanHeden} \\[0.1in]
+
+$^{[2]}$Tidplan för TSEA56 2015, grupp 2: tidplan\_v0.1.pdf \\[0.1in]
+
+$^{[3]}$Kravspecifikation för TSEA56 2015, grupp 2: kravspec\_v1.0.pdf \\[0.1in]
+
+\setcounter{secnumdepth}{2}
+
+
+\end{flushleft}
+
+
+
+\end{document}
