@@ -1,0 +1,69 @@
+% $ biblatex auxiliary file $
+% $ biblatex version 2.4 $
+% Do not modify the above lines!
+%
+% This is an auxiliary file used by the 'biblatex' package.
+% This file may safely be deleted. It will be recreated as
+% required.
+%
+\begingroup
+\makeatletter
+\@ifundefined{ver@biblatex.sty}
+  {\@latex@error
+     {Missing 'biblatex' package}
+     {The bibliography requires the 'biblatex' package.}
+      \aftergroup\endinput}
+  {}
+\endgroup
+
+\entry{lund-03}{book}{}
+  \name{author}{1}{}{%
+    {{}%
+     {al.}{a.}%
+     {Jan~Lundgren}{J.~L.}%
+     {et}{e.}%
+     {}{}}%
+  }
+  \list{publisher}{1}{%
+    {Studentlitteratur}%
+  }
+  \strng{namehash}{aJLe1}
+  \strng{fullhash}{aJLe1}
+  \field{chapter}{8.4, Billigaste väg-problem}
+  \field{edition}{3}
+  \field{isbn}{978-91-44-05314-1}
+  \field{pages}{190\bibrangedash 202}
+  \field{title}{Optimeringslära}
+  \list{location}{1}{%
+    {Linköping}%
+  }
+  \field{year}{2003}
+\endentry
+
+\entry{gris-07}{article}{}
+  \name{author}{1}{}{%
+    {{}%
+     {al.}{a.}%
+     {Giorgio~Grisetti}{G.~G.}%
+     {et}{e.}%
+     {}{}}%
+  }
+  \strng{namehash}{aGGe1}
+  \strng{fullhash}{aGGe1}
+  \verb{doi}
+  \verb 10.1109/TRO.2006.889486
+  \endverb
+  \field{issn}{15523098}
+  \field{title}{Improved Techniques for Grid Mapping with Rao-Blackwellized
+  Particle Filters}
+  \verb{url}
+  \verb http://www.informatik.uni-freiburg.de/
+  \endverb
+  \field{journaltitle}{IEEE Transactions on Robotics}
+  \field{year}{2007}
+\endentry
+
+\lossort
+\endlossort
+
+\endinput

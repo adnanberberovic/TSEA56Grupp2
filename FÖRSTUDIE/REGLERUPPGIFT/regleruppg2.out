@@ -1,0 +1,17 @@
+\BOOKMARK [1][-]{section.1}{Inledning}{}% 1
+\BOOKMARK [1][-]{section.2}{Problemformulering}{}% 2
+\BOOKMARK [1][-]{section.3}{Kunskapsbas}{}% 3
+\BOOKMARK [1][-]{section.4}{Avs\366kning och kartl\344ggning av en omgivning}{}% 4
+\BOOKMARK [2][-]{subsection.4.1}{Problemformulering}{section.4}% 5
+\BOOKMARK [2][-]{subsection.4.2}{Kartl\344ggningsalgoritm}{section.4}% 6
+\BOOKMARK [3][-]{subsubsection.4.2.1}{Ber\344kning av robotens position}{subsection.4.2}% 7
+\BOOKMARK [1][-]{section.5}{Ber\344kning av optimal v\344g}{}% 8
+\BOOKMARK [2][-]{subsection.5.1}{Definitioner}{section.5}% 9
+\BOOKMARK [2][-]{subsection.5.2}{Egenskaper hos billigaste v\344g-problem}{section.5}% 10
+\BOOKMARK [2][-]{subsection.5.3}{Bellmans ekvationer}{section.5}% 11
+\BOOKMARK [2][-]{subsection.5.4}{Dijkstras algoritm}{section.5}% 12
+\BOOKMARK [3][-]{subsubsection.5.4.1}{Komplexitet}{subsection.5.4}% 13
+\BOOKMARK [1][-]{section.6}{Slutsats}{}% 14
+\BOOKMARK [2][-]{subsection.6.1}{Avs\366kning och kartl\344ggning av en omgivning}{section.6}% 15
+\BOOKMARK [2][-]{subsection.6.2}{Ber\344kning av optimal v\344g}{section.6}% 16
+\BOOKMARK [1][-]{subsection.6.2}{Referenser}{}% 17
