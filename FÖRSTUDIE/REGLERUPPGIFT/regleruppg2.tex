@@ -3,7 +3,7 @@
 % Contact:
 %	E-mail: adnbe196@student.liu.se
 
-\documentclass[12pt]{article}
+\documentclass[11pt]{article}
 \usepackage[margin=3cm]{geometry}
 \usepackage[swedish]{babel}
 \usepackage[utf8]{inputenc}
@@ -53,7 +53,7 @@
 \begin{document}
 	\begin{titlepage}
 		\begin{center}
-			
+			TSEA56 - Kandidatprojekt i elektronik \\[0.5in]
 			{\Large\bfseries Förstudie} \\ % Replace "NAME OF DOCUMENT" with... you know.
 			\vspace{0.5\baselineskip}
 			Regleruppgift 2\\
@@ -66,17 +66,59 @@
 		    Robert Oprea, \texttt{robop806}, 930508-9618 \\ % Replace AUTHOR with your name and autho123 with your ID.
 		    
 		    \vspace{4\baselineskip}
-		    Beställare: Kent Palmkvist\\
-		    Handledare ISY: Johan Löfberg\\
-		    Handledare TEMA: Birgitte Saxstrup\\
+		    Beställare: Kent Palmkvist, \texttt{kentp@isy.liu.se}\\
+		    Handledare ISY: Johan Löfberg, \texttt{johanl@isy.liu.se}\\
+		    Handledare TEMA: Birgitte Saxstrup, \texttt{birgitte.saxtrup@liu.se}\\
 			
 			\vspace{3\baselineskip}
 			
 			\today	% Replace with date.
-			
+			\vspace{17\baselineskip}
+
+			Status			
+			\begin{longtable}{|l|l|l|} \hline
+				
+				Granskad &
+				 & 
+				 \\ \hline
+				Godkänd &
+				 &
+				 \\ \hline
+				
+			\end{longtable}
 		\end{center}
 	\end{titlepage}
 	
+	\pagebreak
+	\begin{center}
+		
+		\section*{PROJEKTIDENTITET}
+		2015/VT, Undsättningsrobot Gr. 2
+		\\
+		Linköpings tekniska högskola, ISY
+		\\[0.5in]
+		\begin{table}[h]
+			\begin{tabular}{|l|p{0.3\linewidth}|l|l|} \hline
+				Namn & Ansvar & Telefon & E-post \\[0.1in] \hline
+				Nikolaj Agafonov & Dokumentansvarig (DA) & 072-276 99 46 & nikag669@student.liu.se \\ \hline
+				Adnan Berberovic & Projektledare (PL) & 070-491 96 07 & adnbe196@student.liu.se \\ \hline
+				Andreas Brorsson & Testansvarig (TA) & 073-524 44 60 & andbr981@student.liu.se \\ \hline
+				Fredrik Fridborn & Designansvarig Sensormodul (DSE) & 073-585 52 01 & frefr166@student.liu.se \\ \hline
+				Robert Oprea & Designansvarig Styrmodul (DST) & 070-022 10 18 & robop806@student.liu.se \\ \hline
+				Måns Skytt & Designansvarig Kommunikationsenhet (DK) & 070-354 28 84 & mansk700@student.liu.se \\ \hline
+			\end{tabular}
+		\end{table}
+		
+		E-postlista för hela gruppen: adnbe196@student.liu.se
+		\\[1in]
+		Kund: Kent Palmkvist, 581 83 Linköping,
+		Kundtelefon: 013-28 13 47, kentp@isy.liu.se
+		\\[1in]
+		Kursansvarig: Tomas Svensson, 013-28 13 68, tomass@isy.liu.se
+		\\
+		Handledare: Olov Andersson, 013-28 26 58, Olov.Andersson@liu.se
+	\end{center}
+	\pagebreak
 	\setcounter{secnumdepth}{0} % Prevent section numbering of the following sections.
 	\section*{Sammanfattning}
 	Denna förstudie behandlar frågor som rör kartläggning, lokalisering och optimeringsproblem för kortaste väg och kopplas till kandidatprojektet i elektronik där svaren på problemen kommer att vara av ytterst relevans.\\[0.1in]
@@ -91,11 +133,32 @@
 	
 	\pagebreak
 	
+	\section*{Dokumenthistorik}
+	\begin{table}[h]
+		\begin{tabular}{|l|l|l|l|l|} \hline
+			
+			Version & 
+			Datum & 
+			Utförda förändringar & 
+			Utförda av & 
+			Granskad \\[0.1in] \hline
+			
+			0.1 &
+			2015-03-04 &
+			Första utkastet &
+			ABe \& RO &
+			- \\ \hline
+			
+		\end{tabular}
+	\end{table}
+	
+	
+	\pagebreak
 	
 	\pagenumbering{arabic}	% Start page numbering with arabic numbers, for the rest of the document.
 	
 	\section{Inledning}
-	Denna förstudie ämnar ge fördjupad kunskap inom några av de delar som ska implementeras i den robot som ska framtas i kandidatprojektet i elektronik. Roboten i fråga ska effektivt kunna avsöka och kartlägga en okänd omgivning, hitta ett bestämt mål, och sedan via den kortaste vägen navigera tillbaka till ursprungspositionen. Detta ställer många krav på robotens funktionalitet, och den ska klara av många olika moment. För att projektet ska kunna genomföras på bästa sätt utförs tre olika förstudier som ämnar fördjupa projektgruppens kunskaper inom olika områden, så att de har en god kunskapsgrund att stå på när val roboten ska byggas.\\[0.1in]
+	Denna förstudie ämnar ge fördjupad kunskap inom några av de delar som ska implementeras i den robot som ska framtas i kandidatprojektet i elektronik. Roboten i fråga ska effektivt kunna avsöka och kartlägga en okänd omgivning, hitta ett bestämt mål, och sedan via den kortaste vägen navigera tillbaka till ursprungspositionen. Detta ställer många krav på robotens funktionalitet, och den ska klara av många olika moment. För att projektet ska kunna genomföras på bästa sätt utförs tre olika förstudier som ämnar fördjupa projektgruppens kunskaper inom olika områden, så att de har en god kunskapsgrund att stå på när väl roboten ska byggas.\\[0.1in]
 	
 	\section{Problemformulering}
 	\label{sec:problemform}
