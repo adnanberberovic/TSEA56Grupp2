@@ -1,0 +1,16 @@
+ANSVAR:
+
+Styrmodul:			1) Robert Oprea
+				2) Adnan Berberovic
+
+Komm.modul:			1) Måns Skytt
+				2) Adnan Berberovic
+
+Sensormodul:			1) Fredrik Fridborn
+				2) Andreas Brorsson & Nikolaj Agafonov
+
+Kommunikation mellan moduler:	1) Adnan Berberovic
+
+Implementeringsstrategi:	1) Nikolaj Agafonov
+
+Inledning & Sammanfattning: 	1) Andreas Brorsson
