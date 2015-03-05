@@ -3,7 +3,7 @@
 % Contact:
 %	E-mail: adnbe196@student.liu.se
 
-\documentclass[11pt]{article}
+\documentclass[12pt]{article}
 \usepackage[margin=3cm]{geometry}
 \usepackage[swedish]{babel}
 \usepackage[utf8]{inputenc}
@@ -63,27 +63,27 @@
 			\vspace{2\baselineskip}
 			
 			Adnan Berberovic, \texttt{adnbe196}, 931229-5570 \\
-		    Robert Oprea, \texttt{robop806}, 930508-9618 \\ % Replace AUTHOR with your name and autho123 with your ID.
-		    
-		    \vspace{4\baselineskip}
-		    Beställare: Kent Palmkvist, \texttt{kentp@isy.liu.se}\\
-		    Handledare ISY: Johan Löfberg, \texttt{johanl@isy.liu.se}\\
-		    Handledare TEMA: Birgitte Saxstrup, \texttt{birgitte.saxtrup@liu.se}\\
+			Robert Oprea, \texttt{robop806}, 930508-9618 \\ % Replace AUTHOR with your name and autho123 with your ID.
+			
+			\vspace{4\baselineskip}
+			Beställare: Kent Palmkvist, \texttt{kentp@isy.liu.se}\\
+			Handledare ISY: Johan Löfberg, \texttt{johanl@isy.liu.se}\\
+			Handledare TEMA: Birgitte Saxstrup, \texttt{birgitte.saxtrup@liu.se}\\
 			
 			\vspace{3\baselineskip}
 			
 			\today	% Replace with date.
 			\vspace{17\baselineskip}
-
+			
 			Status			
 			\begin{longtable}{|l|l|l|} \hline
 				
 				Granskad &
-				 & 
-				 \\ \hline
+				Nikolaj Agafonov& 
+				2015-03-05\\ \hline
 				Godkänd &
-				 &
-				 \\ \hline
+				&
+				\\ \hline
 				
 			\end{longtable}
 		\end{center}
@@ -147,7 +147,7 @@
 			2015-03-04 &
 			Första utkastet &
 			ABe \& RO &
-			- \\ \hline
+			Nikolaj Agafonov \\ \hline
 			
 		\end{tabular}
 	\end{table}
@@ -164,8 +164,8 @@
 	\label{sec:problemform}
 	De problem som behandlas i denna studie är följande:
 	\begin{description}
-	     \item[Problem 1:] Avsökning och kartläggning av en omgivning
-	     \item[Problem 2:] Beräkning av optimal väg
+		\item[Problem 1:] Avsökning och kartläggning av en omgivning
+		\item[Problem 2:] Beräkning av optimal väg
 	\end{description}
 	I samband med att dessa problem studeras kommer vissa metoder som löser dessa att beskrivas något ingående, tillräckligt för att kunna dra nytta av detta till kandidatprojektet i fråga.\\[0.1in]
 	%Hur kan man söka av ett rum/labyrint/omgivning på ett effektivt sätt? Beskriv olika kartläggningsalgoritmer. Hur beräknas den kortaste vägen till en punkt?
@@ -184,40 +184,40 @@
 	\subsection{Problemformulering}
 	Generellt kan SLAM-problemet beskrivas på följande sätt:
 	\begin{equation}
-	p(m_{t},x_{t}|o_{1:t})
+		p(m_{t},x_{t}|o_{1:t})
 	\end{equation}
 	där målet är att beräkna positionen $x_{t}$ samt kartan $m_{t}$ givet sensorobservationerna $o_{t}$ under diskreta tidssteg $t$. Med hjälp av Bayes sats fås följande:
 	\begin{equation}
-	\left\{\begin{matrix}
-        p(x_{t}|o_{1:t},m_{t})\\
-        p(m_{t}|x_{t},o_{1:t}).
-        \end{matrix}\right.
+		\left\{\begin{matrix}
+			p(x_{t}|o_{1:t},m_{t})\\
+			p(m_{t}|x_{t},o_{1:t}).
+		\end{matrix}\right.
 	\end{equation}
 	I (2) uppstår en algebraisk loop där robotens position samt kartan beror av varandra. För att lösa detta problem används olika statistiska metoder, t.ex. kalmanfilter eller partikelfilter. Metoden som här kommer beskrivas använder sig av \textit{Rao-Blackwellized partikelfilter} (RBPF). Den utgår från följande problem:
 	\begin{equation}
-	p(x_{1:t},m|z_{1:t},u_{1:t-1})
+		p(x_{1:t},m|z_{1:t},u_{1:t-1})
 	\end{equation}
-där $m$ är kartan, $x_{1:t}=x_{1},...,x_{t}$ är robotens rörelsebana,  $z_{1:t}=z_{1},...,z_{t}$ är sensorobservationer och $u_{1:t-1}=u_{1},...,u_{t-1}$ är distansmätningarna utförda av roboten.
-
-    \subsection{Kartläggningsalgoritm}
-    För att beräkna kartan skrivs (3) om som
-        \begin{equation}
-	    p(m|x_{1:t},z_{1:t})\cdot p(x_{1:t}|z_{1:t},u_{1:t-1})
-	    \end{equation}
-    vilket tillåter att robotens bana beräknas först, och sedan beräknas kartan med hjälp av denna.
-    
-    \subsubsection{Beräkning av robotens position}
-    För att beräkna robotens position kan ett partikelfilter appliceras. Varje partikel representerar en möjlig bana, och en karta associeras till varje partikel. Varje karta är framtagen utifrån mätdata samt den associerade banan. Den partikelfilteralgoritm som används är Rao-Blackwellized \textit{sampling importance resampling} (SIR). Denna algoritm kan sammanfattas i följande steg:
-    \begin{description}
-    \item[1. Sampling:] Nästa mängd partiklar $\{x_{t}^{(i)}\}$ fås genom sampling ur den föreslagna distributionen (eng. proposal distribution) $\pi$.
-    \item[2. Viktning:] Varje partikel tilldelas en vikt $w_{t}^{(i)}$ enligt
-        \begin{equation}
-        w_{t}^{(i)}=\frac{p(x_{1:t}^{(i)}|z_{1:t},u_{1:t-1})}{\pi(x_{1:t}^{(i)}|z_{1:t},u_{1:t-1})}.
-        \end{equation}
-    \item[3. Omsampling:] Nya partiklar väljs ut med sannolikhet proportionell mot deras vikt. Efter omsampling har alla partiklar samma vikt.
-    \item[4. Kartskattning:] För varje partikel beräknas en skattning av motsvarande karta $p(m^{(i)}|x_{1:t}^{(i)},z_{1:t})$ givet banan $x_{1:t}^{(i)}$ och tidigare sensorobservationer $z_{1:t}$.
+	där $m$ är kartan, $x_{1:t}=x_{1},...,x_{t}$ är robotens rörelsebana,  $z_{1:t}=z_{1},...,z_{t}$ är sensorobservationer och $u_{1:t-1}=u_{1},...,u_{t-1}$ är distansmätningarna utförda av roboten.
+	
+	\subsection{Kartläggningsalgoritm}
+	För att beräkna kartan skrivs (3) om som
+	\begin{equation}
+		p(m|x_{1:t},z_{1:t})\cdot p(x_{1:t}|z_{1:t},u_{1:t-1})
+	\end{equation}
+	vilket tillåter att robotens bana beräknas först, och sedan beräknas kartan med hjälp av denna.
+	
+	\subsubsection{Beräkning av robotens position}
+	För att beräkna robotens position kan ett partikelfilter appliceras. Varje partikel representerar en möjlig bana, och en karta associeras till varje partikel. Varje karta är framtagen utifrån mätdata samt den associerade banan. Den partikelfilteralgoritm som används är Rao-Blackwellized \textit{sampling importance resampling} (SIR). Denna algoritm kan sammanfattas i följande steg:
+	\begin{description}
+		\item[1. Sampling:] Nästa mängd partiklar $\{x_{t}^{(i)}\}$ fås genom sampling ur den föreslagna distributionen (eng. proposal distribution) $\pi$.
+		\item[2. Viktning:] Varje partikel tilldelas en vikt $w_{t}^{(i)}$ enligt
+		\begin{equation}
+			w_{t}^{(i)}=\frac{p(x_{1:t}^{(i)}|z_{1:t},u_{1:t-1})}{\pi(x_{1:t}^{(i)}|z_{1:t},u_{1:t-1})}.
+		\end{equation}
+		\item[3. Omsampling:] Nya partiklar väljs ut med sannolikhet proportionell mot deras vikt. Efter omsampling har alla partiklar samma vikt.
+		\item[4. Kartskattning:] För varje partikel beräknas en skattning av motsvarande karta $p(m^{(i)}|x_{1:t}^{(i)},z_{1:t})$ givet banan $x_{1:t}^{(i)}$ och tidigare sensorobservationer $z_{1:t}$.
 	\end{description}	
-		
+	
 	\pagebreak
 	
 	\section{Beräkning av optimal väg}
@@ -237,9 +237,9 @@ där $m$ är kartan, $x_{1:t}=x_{1},...,x_{t}$ är robotens rörelsebana,  $z_{1
 	\subsection{Egenskaper hos billigaste väg-problem}
 	I nätverksoptimering där en lösning av billigaste väg-problemet är önskat krävs att vissa förutsättningar uppfylls på nätverket. \autocite{lund-03}
 	\begin{itemize}
-	    \item Endast riktade bågar förekommer.
-	    \item Nod $n_{t}$ är uppnåelig från nod $n_{s}$.
-	    \item Inga cykler med \textit{negativ kostnad} förekommer.
+		\item Endast riktade bågar förekommer.
+		\item Nod $n_{t}$ är uppnåelig från nod $n_{s}$.
+		\item Inga cykler med \textit{negativ kostnad} förekommer.
 	\end{itemize}
 	Om en oriktad båge skulle förekomma ersätts den med två riktade bågar mellan noderna med samma kostnad.\\
 	Om nod $n_{t}$ inte är uppnåelig från nod $n_{s}$ saknar problemet lösning.\\
@@ -249,10 +249,10 @@ där $m$ är kartan, $x_{1:t}=x_{1},...,x_{t}$ är robotens rörelsebana,  $z_{1
 	\subsection{Bellmans ekvationer}
 	Ett billigaste väg-problem kan formuleras med hjälp utav \textit{Bellmans ekvationer}. När vi har ett känt antal, $n$, noder i nätverket kan ekvationerna skrivas:
 	\begin{equation}
-	    \left\{\begin{matrix}
-        y_{s} = 0\\
-        y_{j} = \min\limits_{i:(i,j) \in B} y_{i} + c_{ij}, \quad j = 2, .., n
-        \end{matrix}\right.
+		\left\{\begin{matrix}
+			y_{s} = 0\\
+			y_{j} = \min\limits_{i:(i,j) \in B} y_{i} + c_{ij}, \quad j = 2, .., n
+		\end{matrix}\right.
 	\end{equation}
 	där $B$ är mängden av alla bågar i nätverket, $c_{ij}$ är kostnaden på båge $(i,j)$ och $y_{j}$ är den billigaste vägen från startnoden $n_{s}$ till nod $n_{j}$. \autocite{lund-03}\\
 	Alla algoritmer som löser ett billigaste väg-problem försöker att systematiskt uppfylla Bellmans ekvationer.
@@ -260,19 +260,19 @@ där $m$ är kartan, $x_{1:t}=x_{1},...,x_{t}$ är robotens rörelsebana,  $z_{1
 	%\pagebreak
 	
 	\subsection{Dijkstras algoritm}
-    Dijkstras algoritm är en algoritm som löser just det beskrivna problemet. Denna algoritm bestämmer alltså en billigaste väg från en nod, $n_{s}$ till en annan nod $n_{t}$, i ett nätverk med nodmängden N och bågmängden B. \\
-    Algoritmen kan sammanfattas enligt följande: \autocite{lund-03}
-    \begin{description}
-        \item[Steg 0] Dela upp nodmängden i två mängder, Avsökta noder, $A = \emptyset$, och ej avsökta noder, $D = N$. Initiera startnoden med pris $y_{s} = 0$ och alla övriga noder med initialt nodpris $y_{j} = \infty$\\
-        Märk startnoden med $(p_{s}, y_{s}) = (-, 0)$ och övriga noder med $(-, \infty)$.
-        \item[Steg 1] Sök efter den billigaste noden $n_{i} \in D$.
-        \item[Steg 2] Avsök nod $n_{i}$, det vill säga undersök alla bågar $(i,j) \in B$ utgående från nod $n_{i}$. Om totalkostnaden fram till nuvarande nod $n_{i}$ och bågkostnaden till nod $n_{j}$ tillsammans blir mindre än nodpriset $y_{j}$ så finns en billigare väg från $n_{s}$ till $n_{j}$ som går igenom $n_{i}$ hittats. Märk $n_{j}$ med nya värden, $(p_{j}, y_{j}) = (i, y_{i} + c_{ij})$.
-        \item[Steg 3] Flytta över den avsöka noden $n_{i}$ från mängden D till A.
-        \item[Steg 4] Om alla noder har avsökts har en billigaste väg funnits. Annars gå till Steg 1 och repetera.
-    \end{description}
-    
-    \subsubsection{Komplexitet}
-    I dijkstras algoritm kommer avsökningen av en nod att, i värsta fall, innebära att n-1 bågar undersöks, på totalt n noder. Detta innebär att komplexiteten uppskattas till att vara proportionell mot $n^{2}$. \autocite{lund-03}
+	Dijkstras algoritm är en algoritm som löser just det beskrivna problemet. Denna algoritm bestämmer alltså en billigaste väg från en nod, $n_{s}$ till en annan nod $n_{t}$, i ett nätverk med nodmängden N och bågmängden B. \\
+	Algoritmen kan sammanfattas enligt följande: \autocite{lund-03}
+	\begin{description}
+		\item[Steg 0] Dela upp nodmängden i två mängder, Avsökta noder, $A = \emptyset$, och ej avsökta noder, $D = N$. Initiera startnoden med pris $y_{s} = 0$ och alla övriga noder med initialt nodpris $y_{j} = \infty$\\
+		Märk startnoden med $(p_{s}, y_{s}) = (-, 0)$ och övriga noder med $(-, \infty)$.
+		\item[Steg 1] Sök efter den billigaste noden $n_{i} \in D$.
+		\item[Steg 2] Avsök nod $n_{i}$, det vill säga undersök alla bågar $(i,j) \in B$ utgående från nod $n_{i}$. Om totalkostnaden fram till nuvarande nod $n_{i}$ och bågkostnaden till nod $n_{j}$ tillsammans blir mindre än nodpriset $y_{j}$ så finns en billigare väg från $n_{s}$ till $n_{j}$ som går igenom $n_{i}$ hittats. Märk $n_{j}$ med nya värden, $(p_{j}, y_{j}) = (i, y_{i} + c_{ij})$.
+		\item[Steg 3] Flytta över den avsöka noden $n_{i}$ från mängden D till A.
+		\item[Steg 4] Om alla noder har avsökts har en billigaste väg funnits. Annars gå till Steg 1 och repetera.
+	\end{description}
+	
+	\subsubsection{Komplexitet}
+	I dijkstras algoritm kommer avsökningen av en nod att, i värsta fall, innebära att n-1 bågar undersöks, på totalt n noder. Detta innebär att komplexiteten uppskattas till att vara proportionell mot $n^{2}$. \autocite{lund-03}
 	
 	\section{Slutsats}
 	De problem som beskrevs i kapitel \ref{sec:problemform}~Problemformulering och metoder till att lösa dessa problem har diskuterats i den utsträckning att lösningarna är tillämpningsbara till det kandidatprojekt denna studie är avsedd för.
@@ -284,12 +284,11 @@ där $m$ är kartan, $x_{1:t}=x_{1},...,x_{t}$ är robotens rörelsebana,  $z_{1
 	Den optimeringsalgoritm som har valts är tillräcklig för att lösa det optimeringsproblem som uppkommer i kandidatprojektet. Den väg som ska optimeras är inte tillräckligt stor för att komplexiteten ska medföra någon märkbar skillnad i tidsåtgång, dessutom kommer man alltid fram till kortaste vägen. Denna metod är också till synes inte allt för komplicerad att implementera, varför denna metod har valts som lösning till optimeringsproblemet i fråga.
 	
 	\pagebreak
-		
+	
 	\setcounter{secnumdepth}{0} % Prevent page numbering yet again. 
 	\addcontentsline{toc}{section}{Referenser} % Add reference to ToC. Might have to compile TWICE.
 	
 	\printbibliography % Prints bibliography. Look at refs.bib file in the same directory and make sure you have all
 	% references at hand when autociting them.
 \end{document}
-	
-	
+
