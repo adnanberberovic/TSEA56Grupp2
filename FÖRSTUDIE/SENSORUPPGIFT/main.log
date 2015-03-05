@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.15 (TeX Live 2014) (preloaded format=pdflatex 2015.2.13)  5 MAR 2015 15:40
+This is pdfTeX, Version 3.14159265-2.6-1.40.15 (TeX Live 2014) (preloaded format=pdflatex 2015.2.13)  5 MAR 2015 15:46
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -823,7 +823,7 @@ Package csquotes Info: ... found 'babel' package.
 Package csquotes Info: Adjusting default style.
 Package csquotes Info: Redefining alias 'default' -> 'swedish'.
 
-No file main.aux.
+(./main.aux)
 \openout1 = `main.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 56.
@@ -840,6 +840,7 @@ LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 56.
 LaTeX Font Info:    ... okay on input line 56.
 LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 56.
 LaTeX Font Info:    ... okay on input line 56.
+
 *geometry* driver: auto-detecting
 *geometry* detected driver: pdftex
 *geometry* verbose mode - [ preamble ] result:
@@ -919,6 +920,8 @@ Package: gettitlestring 2010/12/03 v1.4 Cleanup title references (HO)
 LaTeX Info: Redefining \ref on input line 56.
 LaTeX Info: Redefining \pageref on input line 56.
 LaTeX Info: Redefining \nameref on input line 56.
+
+(./main.out) (./main.out)
 \@outlinefile=\write4
 \openout4 = `main.out'.
 
@@ -992,7 +995,7 @@ been already used, duplicate ignored
 <to be read again> 
                    \relax 
 l.127 
-       [1]
+       [1] (./main.toc)
 \tf@toc=\write5
 \openout5 = `main.toc'.
 
@@ -1106,11 +1109,7 @@ Package babel Info: Redefining swedish shorthand "|
 (babel)             in language  on input line 248.
 Package babel Info: Redefining swedish shorthand "~
 (babel)             in language  on input line 248.
-
-
-LaTeX Warning: Reference `fig:reflect' on page 3 undefined on input line 249.
-
-<reflect.jpg, id=44, 363.60844pt x 85.82062pt>
+ <reflect.jpg, id=215, 363.60844pt x 85.82062pt>
 File: reflect.jpg Graphic file (type jpg)
  <use reflect.jpg>
 Package pdftex.def Info: reflect.jpg used on input line 253.
@@ -1139,13 +1138,10 @@ Package babel Info: Redefining swedish shorthand "|
 (babel)             in language  on input line 261.
 Package babel Info: Redefining swedish shorthand "~
 (babel)             in language  on input line 261.
-
-
-LaTeX Warning: Reference `fig:diagram' on page 4 undefined on input line 266.
-
-<diagram.png, id=55, 678.535pt x 863.225pt>
+ <diagram.png, id=223, 678.535pt x 863.225pt>
 File: diagram.png Graphic file (type png)
- <use diagram.png>
+
+<use diagram.png>
 Package pdftex.def Info: diagram.png used on input line 271.
 (pdftex.def)             Requested size: 189.9885pt x 241.70135pt.
 
@@ -1179,7 +1175,7 @@ Package babel Info: Redefining swedish shorthand "|
 (babel)             in language  on input line 290.
 Package babel Info: Redefining swedish shorthand "~
 (babel)             in language  on input line 290.
- <sonar.png, id=65, 1003.75pt x 538.01pt>
+ <sonar.png, id=231, 1003.75pt x 538.01pt>
 File: sonar.png Graphic file (type png)
  <use sonar.png>
 Package pdftex.def Info: sonar.png used on input line 295.
@@ -1215,13 +1211,10 @@ Package babel Info: Redefining swedish shorthand "|
 (babel)             in language  on input line 309.
 Package babel Info: Redefining swedish shorthand "~
 (babel)             in language  on input line 309.
-
-
-LaTeX Warning: Reference `fig:ultra' on page 6 undefined on input line 310.
-
-<ultra.pdf, id=78, 185.45285pt x 137.68037pt>
+ <ultra.pdf, id=241, 185.45285pt x 137.68037pt>
 File: ultra.pdf Graphic file (type pdf)
- <use ultra.pdf>
+
+<use ultra.pdf>
 Package pdftex.def Info: ultra.pdf used on input line 314.
 (pdftex.def)             Requested size: 129.8161pt x 96.3756pt.
 
@@ -1251,7 +1244,7 @@ Package babel Info: Redefining swedish shorthand "|
 (babel)             in language  on input line 325.
 Package babel Info: Redefining swedish shorthand "~
 (babel)             in language  on input line 325.
- <gyro.png, id=153, 358.33875pt x 231.11343pt>
+ <gyro.png, id=313, 358.33875pt x 231.11343pt>
 File: gyro.png Graphic file (type png)
  <use gyro.png>
 Package pdftex.def Info: gyro.png used on input line 330.
@@ -1361,20 +1354,11 @@ Package atveryend Info: Empty hook `AfterLastShipout' on input line 410.
 (./main.aux)
 Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 410.
 Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 410.
+Package rerunfilecheck Info: File `main.out' has not changed.
+(rerunfilecheck)             Checksum: 28FCEC3BD0C7A038429C8244B193412F;2332.
 
-
-Package rerunfilecheck Warning: File `main.out' has changed.
-(rerunfilecheck)                Rerun to get outlines right
-(rerunfilecheck)                or use package `bookmark'.
-
-Package rerunfilecheck Info: Checksums for `main.out':
-(rerunfilecheck)             Before: <no file>
-(rerunfilecheck)             After:  28FCEC3BD0C7A038429C8244B193412F;2332.
 
 LaTeX Warning: There were undefined references.
-
-
-LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
 
 
 Package biblatex Warning: Please (re)run Biber on the file:
@@ -1387,13 +1371,13 @@ Package logreq Info: Writing requests to 'main.run.xml'.
 Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 410.
  ) 
 Here is how much of TeX's memory you used:
- 13464 strings out of 493117
- 211600 string characters out of 6135433
- 640917 words of memory out of 5000000
- 16688 multiletter control sequences out of 15000+600000
+ 13508 strings out of 493117
+ 212234 string characters out of 6135433
+ 644437 words of memory out of 5000000
+ 16724 multiletter control sequences out of 15000+600000
  12017 words of font info for 31 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 40i,10n,43p,1149b,1494s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 40i,10n,43p,1149b,1495s stack positions out of 5000i,500n,10000p,200000b,80000s
 {/usr/local/texlive/2014/texmf-dist/fonts/enc/dvips/cm-super/cm-super-t1.enc}
 </usr/local/texlive/2014/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb><
 /usr/local/texlive/2014/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></u
@@ -1404,10 +1388,10 @@ cal/texlive/2014/texmf-dist/fonts/type1/public/cm-super/sfbx1440.pfb></usr/loca
 l/texlive/2014/texmf-dist/fonts/type1/public/cm-super/sfrm1095.pfb></usr/local/
 texlive/2014/texmf-dist/fonts/type1/public/cm-super/sfti1095.pfb></usr/local/te
 xlive/2014/texmf-dist/fonts/type1/public/cm-super/sftt1095.pfb>
-Output written on main.pdf (12 pages, 920010 bytes).
+Output written on main.pdf (12 pages, 927184 bytes).
 PDF statistics:
- 225 PDF objects out of 1000 (max. 8388607)
- 141 compressed objects within 2 object streams
+ 370 PDF objects out of 1000 (max. 8388607)
+ 285 compressed objects within 3 object streams
  55 named destinations out of 1000 (max. 500000)
- 26 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 306 words of extra memory for PDF output out of 10000 (max. 10000000)
 
