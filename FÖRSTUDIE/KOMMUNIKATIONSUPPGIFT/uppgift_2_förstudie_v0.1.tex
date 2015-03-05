@@ -1,0 +1,456 @@
+\documentclass[11pt]{article}
+\usepackage[margin=3cm]{geometry}
+\usepackage[swedish]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{fancyhdr}
+\usepackage{ragged2e}
+\usepackage{titling} % Make custom titles.
+\usepackage{graphicx} % Allow graphics.
+\usepackage{pbox} % Used for margins in tables.
+\usepackage{tabularx} % Used for tables.
+\usepackage{longtable} % Used for tables.
+\usepackage{tabu} % Used for tables.
+\usepackage{url} % Allow urls.
+\usepackage{amsmath} % Allow math \begin{equation}, end
+\usepackage[backend=biber,style=ieee]{biblatex} % Bibliography package. Bibtex/Biber
+\usepackage{csquotes} % Spawns an error if not included. Not sure why.
+\usepackage[hidelinks]{hyperref} % To include urls, hyper links and clickable references
+\usepackage[nottoc]{tocbibind} % To include bibliography in ToC
+\usepackage{comment}
+\usepackage{capt-of}
+\usepackage{cases}
+\usepackage{listings}
+\usepackage{color}
+\usepackage[normalem]{ulem}
+\usepackage{tikz}
+\usepackage{PTSansNarrow}
+\usepackage{subcaption}
+\usepackage{float}
+
+
+\pagestyle{fancy}
+\date{\today} % Sets date to blank.
+
+\pagenumbering{roman} 
+\chead{Säkerhet i kommunikationen}
+\rhead{\today} 
+\lhead{} % Put anything here.
+\lfoot{TSEA56\\ISY}
+\rfoot{Måns Skytt, \texttt{mansk700}\\
+        Fredrik Fridborn, \texttt{frefr166}}
+
+\graphicspath{ {images/} } % Set graphics path if images are to be used in document
+
+\addbibresource{refs.bib} % Import reference bibliography
+
+% Use this command, and make more if you need, to keep some kind of numbering order,
+% without the need to replace numbers if something in your list needs to be removed/added.
+% To make more, just copy and paste the following 6 lines and replace "cter" with the counter
+% name, ccounter with the command name you wish to use. (Remember to replace \thecter with
+% \the"newname").
+\newcounter{cter}
+\setcounter{cter}{1}
+\newcommand{\ccounter}{
+	\thecter.
+	\stepcounter{cter}
+}
+
+\begin{document}
+	\begin{titlepage}
+		\begin{center}
+		TSEA56 - Kandidatprojekt i elektronik \\[0.1in]
+    {\Large\begin{bfseries} Säkerhet i kommunikationen\end{bfseries}\\
+    \footnotesize Förstudie, uppgift 2}\\\bigskip 
+			Version 0.1\\
+\vspace{\baselineskip}
+			\vspace{\baselineskip}
+Fridborn, Fredrik, 
+\texttt{frefr166}
+\\
+Skytt, Måns, 
+\texttt{mansk700}
+\\\bigskip
+Birgitte Saxstrup, TEMA-handledare
+\\
+Jan-Åke Larsson, ISY-Handledare
+\\
+Kent Palmkvist, Beställare
+
+\vspace{2\baselineskip}
+2015-03-03
+
+\vspace{19\baselineskip}
+Status
+\begin{longtable}{|l|l|l|} \hline
+
+Granskad &
+??? & 
+2015-??-?? \\ \hline
+Godkänd &
+??? &
+2015-??-?? \\ \hline
+ 
+\end{longtable}
+			
+		\end{center}
+	\end{titlepage}
+	
+	\setcounter{secnumdepth}{0} % Prevent numbering of the following sections.
+	\pagebreak
+\begin{center}
+
+%***************************** PROJEKTIDENTITET ******************************
+\section*{PROJEKTIDENTITET}
+\label{sec:projektindentitet}
+2015/VT, Undsättningsrobot Gr. 2
+\\
+Linköpings tekniska högskola, ISY
+\\[0.5in]
+\begin{table}[h]
+\begin{tabular}{|l|p{0.3\linewidth}|l|l|} \hline
+Namn & Ansvar & Telefon & E-post \\[0.1in] \hline
+Nikolaj Agafonov & Dokumentansvarig (DA) & 072-276 99 46 & nikag669@student.liu.se \\ \hline
+Adnan Berberovic & Projektledare (PL) & 070-491 96 07 & adnbe196@student.liu.se \\ \hline
+Andreas Brorsson & Testansvarig (TA) & 073-524 44 60 & andbr981@student.liu.se \\ \hline
+Fredrik Fridborn & Designansvarig Sensormodul (DSE) & 073-585 52 01 & frefr166@student.liu.se \\ \hline
+Robert Oprea & Designansvarig Styrmodul (DST) & 070-022 10 18 & robop806@student.liu.se \\ \hline
+Måns Skytt & Designansvarig Kommunikationsmodul (DK) & 070-354 28 84 & mansk700@student.liu.se \\ \hline
+
+\end{tabular}
+\end{table}
+
+E-postlista för hela gruppen: adnbe196@student.liu.se
+\\[1in]
+Kund: Kent Palmkvist, 581 83 Linköping,
+Kundtelefon: 013-28 13 47, kentp@isy.liu.se
+\\[1in]
+Kursansvarig: Tomas Svensson, 013-28 13 68, tomass@isy.liu.se
+\\
+Handledare: Olov Andersson, 013-28 26 58, Olov.Andersson@liu.se
+\end{center}
+\pagebreak
+
+\section*{Dokumenthistorik}
+\begin{table}[h]
+\begin{tabular}{|l|l|l|l|l|} \hline
+
+Version & 
+Datum & 
+Utförda förändringar & 
+Utförda av & 
+Granskad \\[0.1in] \hline
+
+0.1 &
+2015-03-05 & 
+Första utkastet & 
+FF \& MS & 
+\\ \hline
+\end{tabular}
+\end{table}
+
+
+
+\pagebreak
+	
+\setcounter{secnumdepth}{3} % Resume numbering of the following sections.
+	
+	
+\tableofcontents	% Make a ToC.
+	
+\pagebreak
+	
+	
+\pagenumbering{arabic}	
+
+	
+\begin{comment}
+\section{Gott och blandat}
+
+2. Säkerhet i kommunikationen. Utvärdera olika kommunikationslösningar och jämföra dem. Hur säker är kanalen? Vilken lösning är bäst för er, och varför? Kan den avlyssnas enkelt? Kan en angripare skicka falska styrkommandon? Hur störkänslig är kanalen?\bigskip
+
+Baker [6] studied their strengths and
+weaknesses for industrial applications, and claimed that
+ZigBee over 802.15.4 protocol can meet a wider variety of real
+industrial needs than Bluetooth due to its long-term battery
+operation, greater useful range, flexibility in a number of
+dimensions, and reliability of the mesh networking architecture.
+
+
+\end{comment}
+
+\begin{flushleft}
+\section{Inledning} %************ INLEDNNG ************
+För att skicka information finns många olika metoder och standarder som lämpar sig olika bra för olika tillämpningar. Denna rapport behandlar ett antal av de vanligaste, trådlösa, seriella, kommunikationsprotokollen. Främst de som överensstämmer med Institute of Electrical and Electronics Engineers (IEEE) 802.15 standarder (standard för Wireless Personal Area Network - WPAN). En jämförelse mellan dessa görs ur ett perspektiv där information ska skickas mellan en autonomt styrd robot och en dator. Aspekter som tas in i jämförelsen är bland annat \textit{säkerhet}, \textit{kostnad} och \textit{komplexitet}.\\\bigskip
+
+I avsnitt \ref{sec:Teori} ges först en kort introduktion till begreppet \textit{Radiokommunikation}. Därefter förgrenas teorin i avsnitt som behandlar de olika kommunikationsprotokollen. I dessa avsnitt behandlas teknikerna bakom de olika kommunikationsprotokollen samt uttryck, som förekommer frekvent, reds ut för att ge en bra kunskapsbas att stå på inför jämförelsen, avsnitt \ref{sec:Jämförelser}. \\\bigskip
+
+När den mest essentiella teorin bakom de olika protokollen avhandlats påbörjas en jämförelse mellan de olika protokollen (avsnitt \ref{sec:Jämförelser}). Denna är upplagd på så sätt att fördelar och nackdelar för behandlade kommunikationsstandarder identifieras individuellt för att sedan jämföras mot varandra i en avslutande sammanfattning. Till sist, för att besvara frågeställningar och redovisa uppnådda mål, görs en diskussion som analyserar vilken kommunikationsstandard som bäst tillämpas i fallet med en autonomstyrd undsättningsrobot.
+
+\subsection{Syfte och Mål}
+Syftet med denna förstudie är att ge en bred kunskapsbas inom trådlös kommunikation och en spets inom vissa typer av trådlösa tekniker för dataöverföring. Detta för att kunna göra en jämförelse mellan de olika överföringsstandarderna och utvärdera vilken standard som passar bäst för vilken tillämpning. I just detta fall för en undsättningsrobot i projektkursen TSEA56 (Kandidatprojekt i elektronik). Detta innebär informationsutbyte mellan dator och kommunikationsenhet på roboten.
+\footnote{Kurshemsida för TSEA56, \url{http://www.isy.liu.se/edu/kurs/TSEA56/}} \\\bigskip
+
+Målen med denna förstudie kan konkretiseras i de punkter som följer nedan:
+\begin{itemize}
+  \item \textit{Att beskriva och utvärdera berörda kommunikationstekniker}
+  \item \textit{Att jämföra berörda kommunikationstekniker och deras fördelar samt nackdelar}
+  \item \textit{Att utifrån jämförelsen välja den bäst lämpande metoden i en specifik situation}
+  \item \textit{Att ta ställning till kända samt möjliga säkerhetsbrister}
+\end{itemize}
+
+\subsection{Definitioner}
+\begin{itemize}
+\item IEEE - Institute of Electrical and Electronics Engineers
+\item WPAN - Wireless Personal Area Network
+\item WLAN - Wireless local area network
+\item UWB - Ultra-wideband
+\item UHF - Ultra high frequency (0.3-3 GHz)
+\item SHF - Super high frequency (3-30 GHz)
+\item MAC - Media Adress Control
+\item OSI - Open Systems Interconnection
+\end{itemize}
+
+
+\subsection{Kommunikation}
+I denna förstudie behandlas trådlösa, seriella, kommunikationslösningar. Detta för att för hela studien syftar till att komma fram till bästa kommunikationslösningen för en autonomt styrd robot. Kommunikationen behöver därför vara trådlös för att inte dess funktionalitet skall hämmas för mycket även om en trådad kommunikation mest troligt skulle öka överföringens säkerhet och stabilitet. 
+
+\subsection{Säkerhet}
+En viktig aspekt när det kommer till trådlös kommunikation är säkerhet. I och med att kommunikationen sker trådlöst så måste man ha insikt i hur man skyddar kommunikationen från störningar. Det kan röra sig om störningar från annan strålning eller rent fysiska hinder som en vägg men även från angripare som vill störa telekommunikationen eller rentutav avlyssna den och skicka iväg egna meddelanden.
+
+\subsection{Parter}
+Utöver projektgruppen på sida \ref{sec:projektindentitet} i är följande personer involverade i förstudien:
+\begin{itemize}
+\item Birgitte Saxstrup - TEMA-handledare. \textit{Svarar för språkgranskning av förstudien.}
+\item Jan-Åke Larsson - ISY-Handledare. \textit{Svarar för teorigranskning av förstudien.}
+\item Kent Palmkvist - Beställare. \textit{Svarar för slutgiltigt godkännande av förstudien.}
+\end{itemize}
+
+\subsection{IEEE standarder}
+De i studien behandlade kommunikationsprotokoll är alla i enlighet med IEEE's standarder för dessa, se Tabell \ref{tab:IEEE-standarder} \\\bigskip
+
+IEEE standarderna definerar de 
+\\\bigskip
+
+\begin{table}[h]
+\centering
+\begin{tabular}{lcl}
+ Bluetooth &
+ -&
+ IEEE 802.15.\\
+ 
+ UWB &
+ -&
+ IEEE 802.15.\\
+ 
+ ZigBee &
+ -&
+ IEEE 802.15.\\
+ 
+ Wi-Fi &
+ -&
+ IEEE 802.11.\\
+ 
+
+\end{tabular}
+\caption{Behandlade kommunikationsprotokoll samt korresponderande IEEE-standarder}
+\label{tab:IEEE-standarder}
+\end{table}
+
+
+\subsection{Avgränsning}
+\label{sec:Avgränsning}
+För att förstudien inte ska ta för många timmar i anspråk har den avgränsats till att bara undersöka fyra stycken olika kommunikationsmetoder - Bluetooth, UWB, Wi-Fi och ZigBee. De kommer att analyseras och jämföras med avseende på deras säkerhet, kryptering, komplexitet, kostnad och lämplighet för projektet.
+
+\section{Problemformulering}
+\label{sec:Problemformulering}
+Förstudien ska beskriva fyra olika kommunikationsmetoder - Bluetooth, UWB, Wi-Fi och ZigBee. Detta för att kunna besvara frågan
+\vspace{0.1 cm}
+
+\begin{center}
+\textit{\textbf{Vilken av beskrivna kommunikationsmetoder är lämpligast för projektet?}} 
+\end{center}
+
+\subsection{Metod}
+\label{sec:Metod}
+För att besvara problemformulering kommer akademisk forskning bedrivas genom litteraturgranskning. Först hittas relevanta artiklar, därefter sammanställs informationen och materialet analyseras.
+
+
+\section{Teori}
+\label{sec:Teori}
+Detta avsnitt syftar till att sammanställa nödvändig bakgrundskunskap så att de olika kommunikationsmetoderna kan analyseras. Inledningsvis beskrivs radiokommunikation generellt och sen presenteras de faktorer som metoderna ska analyseras med avseende på.
+
+\subsection{Radiokommunikation}
+Radiokommunikation är ett sätt att trådlöst överföra information som till exempel ljud, bild eller data. Man kan förmedla information i elektromagnetiska vågor (radiovågor) genom modulering på olika sätt, exempelvis att ändra amplitud, frekvens eller att fasförskjuta signalen. Frekvensen för vågorna varierar beroende på ändamål men kan vara allt från $10^0$\cite{modulation_eb} - $10^{12}$\cite{microwave_eb} Hz. Signalerna skickas från och tas emot av en antenn. Våglängden som antennen ska ta emot påverkar hur stor antennen ska vara - sändning som sker kring 500-1500 kHz gör att våglängden blir hundratals meter lång.
+
+
+In the United States, amplitude modulation (AM) radio broadcasting, for instance, is done at frequencies between 535 and 1,605 kilohertz (kHz); at these frequencies, a wavelength is hundreds of metres or yards long, and the size of the antenna is therefore not critical. Frequency modulation (FM) broadcasting, on the other hand, is carried out at a range from 88 to 108 megahertz (MHz). At these frequencies a typical wavelength is about 3 metres (10 feet) long
+
+\cite{antenn_eb}
+
+
+\subsection{IT-Säkerhet}
+\begin{itemize}
+\item Beskrivning av IT-säkerhet
+\item Vanliga problem
+\item Vanliga åtgärder
+\end{itemize}
+
+\subsection{Trådlös kryptering}
+\begin{itemize}
+\item Beskrivning av kryptering
+\item Vanliga krypteringssätt
+\item Vanliga dekrypteringssätt
+\end{itemize}
+
+\subsection{Komplexitet}
+\begin{itemize}
+\item Beskrivning av komplexitet i dessa fall
+\item Vad bidrar till hög/låg komplexitet?
+\end{itemize}
+
+\subsection{Kostnad} 
+\begin{itemize}
+\item Vad bidrar till kostnad?
+\item Vad kostar hårdvaran? Strömförbrukning, effektkrav och dylikt.
+\end{itemize}
+
+\subsection{Bluetooth}
+Bluetooth (eller Blåtand) är en teknikstandard som utvecklades under sent 90-tal och produkter med Bluetooth togs i bruk runt millenieskiftet. Det har blivit en vida använd standard och används främst vid kortare dataöverföring mellan exempelvis datorer, skrivare, mobiltelefoner och andra enheter som tidigare kopplades samman via kabel. Numera är Bluetooth ett av de dominerande protokollen för trådlös dataöverföring över kortare avstånd. \autocite{bluetooth_eb}\autocite{bluetooth_ne} \\\bigskip
+
+\subsubsection{Scatternet/Piconet}
+När Bluetoothenheter upprättar kontakt med varandra görs detta med en typ av anslutningstopologi som kallas \textit{Scatternet} som är en utvidgning av anslutningstopologin \textit{Piconet}. Scatternet består av flera Piconet.\autocite{4460126}\\\bigskip
+
+Ett Piconet består av en enhet som är \textit{master} (d.v.s. enheten i kontroll) samt minst en enhet som tjänar som \textit{slav} under masterenheten. Alla slavar som är anslutna till en master är synkade efter dess klocka och slavarna kan bara kommunicera med sin master. Antalet enheter i ett piconet är begränsat till 8 av dess 3-bitars adressrymd ($2^3=8$). Slavar kan även vara i ett stand-by-läge, \textit{parkerade}, då de inte är aktiva och har en kraftigt reducerad strömförbrukning.  I Figur \ref{fig:piconet} visualiseras olika Piconet-topologier med både aktiva och parkerade slavar. \\\bigskip
+
+Scatternet är en stor mängd ihopkopplade Piconet. Detta möjliggörs genom att en enhet kan angera som master- och slavenhet, dock inte inom samma Piconet. En enheten kan delta i upp till tre piconet men endast vara master i ett av dessa. I Figur \ref{fig:scatternet} kan ett mer komplext Scatternet ses. Varje ljusare område med streckad gräns motsvarar ett Piconet.
+
+\begin{figure}[h!]
+\begin{minipage}{0.5\textwidth}
+\centering
+\includegraphics[width=.9\linewidth]{Piconet.png}
+\captionof{figure}{Olika varianter av Piconet illustreras\protect\footnotemark }
+\label{fig:piconet}
+\end{minipage}
+\begin{minipage}{0.5\textwidth}
+\centering
+\includegraphics[width=.9\linewidth]{Scatternet.png}
+\captionof{figure}{Ett mer komplext Scatternet}
+\label{fig:scatternet}
+\end{minipage}
+\end{figure}
+
+\footnotetext{Figur \ref{fig:piconet} och Figur \ref{fig:scatternet} tagna från \textit{Bluetooth and Wi-Fi wireless protocols: A survey and comparison} \autocite{1404569}}
+
+
+
+
+\subsection{UWB}
+\begin{itemize}
+\item Vad är UWB? 
+\item När uppfanns UWB?
+\item Hur fungerar UWB?
+\item När brukar UWB användas?
+\end{itemize}
+
+\subsection{ZigBee}
+\begin{itemize}
+\item Vad är ZigBee? 
+\item När uppfanns ZigBee?
+\item Hur fungerar ZigBee?
+\item När brukar ZigBee användas?
+\end{itemize}
+
+\subsection{Wi-Fi}
+Wi-Fi är en WLAN-teknologi som baseras på radiosignaler nätverkande med hjälp av radioband på UHF (2.4 GHz) och SHF (5 GHz). Tekniken har sina rötter i sent 80-tal men IEEE-standarden (IEEE 802.11) togs fram först 1997 och namnet uppkom först 1999. IEEE-standarden har tilldelat Wi-Fi flera frekvensband och Wi-Fi-tekniken bygger på att dela upp informationen i bitar och dela upp dem på olika frekvenser. På detta sätt blir överföringen inte lika krävande och flera enheter kan använda samma Wi-Fi-sändare. Eftersom att Wi-Fi ofta används för att sända inomhus uppstår problemet att signalen studsar och anländer till routern vid olika tidpunkter. \autocite{wifi_eb} För att åtgärda detta används en metod som...? (Orthogonal frequency-division multiplexing - OFDM -  verkar användas!)\\\bigskip
+
+Eftersom att flera användare kan använda samma Wi-Fi-sändare är det populärt att använda Wi-Fi som WLAN i hemmamiljöer för att koppla ihop diverse enheter - mobiltelefoner, tablets, laptops och PC utan sladdar. Om man kopplar ihop Wi-Fi-sändaren med internet kommer även alla användare ut på internet. Det är numera vanligt att det finns så kallade hot spots på allmäna platser - områden där Wi-Fi-enheter kan koppla upp mot internet, ofta kostnadsfritt.\autocite{wifi_eb}
+
+\section{Jämförelser} %****** Resultat och slutsatser ******
+\label{sec:Jämförelser}
+I detta avsnitt jämför vi de olika kommunikationssätten vi valt med avseende på de faktorer vi tagit fram tidigare.
+
+\begin{comment}
+For
+ZigBee and Bluetooth, Baker [6] studied their strengths and
+weaknesses for industrial applications, and claimed that
+ZigBee over 802.15.4 protocol can meet a wider variety of real
+industrial needs than Bluetooth due to its long-term battery
+operation, greater useful range, flexibility in a number of
+dimensions, and reliability of the mesh networking architecture.
+\end{comment}
+
+\subsection{Analys av Bluetooth}
+\subsection{Analys av UWB}
+\subsection{Analys av ZigBee}
+\subsection{Analys av Wi-Fi}
+\subsection{Sammanfattning}
+Som synes så är de olika kommunikationsmetoderna bra på olika sätt. Detta illustreras nedan.
+\usetikzlibrary{matrix}
+\begin{tikzpicture}
+\clip node (m) [matrix,matrix of nodes,
+fill=black!20,inner sep=0pt,
+nodes in empty cells,
+nodes={minimum height=1cm,minimum width=2.6cm,anchor=center,outer sep=0,font=\sffamily},
+row 1/.style={nodes={fill=black,text=white}},
+column 1/.style={nodes={fill=gray,text=white,align=center,text width=2.5cm,text depth=0.5ex}},
+column 2/.style={text width=4cm,align=center,every even row/.style={nodes={fill=white}}},
+column 3/.style={text width=3cm,align=center,every even row/.style={nodes={fill=white}},},
+column 4/.style={text width=4cm,align=center,every even row/.style={nodes={fill=white}}},
+column 5/.style={text width=3cm,align=center,every even row/.style={nodes={fill=white}},},
+row 1 column 1/.style={nodes={fill=gray}},
+prefix after command={[rounded corners=4mm] (m.north east) rectangle (m.south west)}
+] {
+            & Bluetooth & UWB         & Wi-Fi     & Zigbee \\
+Säkerhet    & Resultat  & Resultat    & Resultat  & Resultat\\
+Komplexitet & Resultat  & Resultat    & Resultat  & Resultat\\
+Kostnad     & Resultat  & Resultat    & Resultat  & Resultat\\
+Lämplighet  & Resultat  & Resultat    & Resultat  & Resultat\\
+};
+\end{tikzpicture}
+\captionof{figure}{Jämförelse av kommunikationsmetoder}
+
+
+\section{Diskussion}
+\label{sec:Diskussion}
+Här diskuterar vi varför det är lämpligt att använda det ena eller det andra i vår robot.
+\pagebreak
+		
+\setcounter{secnumdepth}{0} % Prevent page numbering yet again. 
+\addcontentsline{toc}{section}{Referenser} % Add reference to ToC. Might have to compile TWICE.
+	
+\printbibliography % Prints bibliography. Check refs.bib file in same directory and make sure you have all
+	% references at hand when autociting them.
+
+\pagebreak
+	
+\section{Appendix}
+\subsection{Appendix A} % Appendix if needed. Comment or delete this section if not useful for your document.
+Appendix A contents.
+
+\end{flushleft}
+\end{document}
+\begin{comment}
+litteratur, datablad, dokumentation, bakgrundsteori, etc.
+
+Förstudieinfo - http://www.isy.liu.se/edu/kurs/TSEA56/Dokument/OH\_skrivuppgift.pdf
+
+Multiplexing - parallell infoöverföring
+http://global.britannica.com/EBchecked/topic/397189/multiplexing
+
+Piconet - när flera 2-fler kommunicerar via bluetooth
+
+Firefly - https://docs.isy.liu.se/twiki/pub/VanHeden/DataSheets/firefly.pdf
+
+Bluetooth - https://docs.isy.liu.se/twiki/bin/view/VanHeden/BlueTooth
+
+bluejacking -
+http://en.wikipedia.org/wiki/Bluejacking
+
+bluesnarfing - http://en.wikipedia.org/wiki/Bluesnarfing
+
+bluebugging - endast klass 2 BT-enheter 
+http://en.wikipedia.org/wiki/Bluebugging
+
+RS232 https://docs.isy.liu.se/twiki/bin/view/VanHeden/RS232
+\end{comment}
