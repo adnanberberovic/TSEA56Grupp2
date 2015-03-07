@@ -1,0 +1,24 @@
+\select@language {swedish}
+\contentsline {section}{\numberline {1}Inledning}{1}{section.1}
+\contentsline {subsection}{\numberline {1.1}Syfte och m\IeC {\r a}l}{1}{subsection.1.1}
+\contentsline {subsection}{\numberline {1.2}Anv\IeC {\"a}ndning}{1}{subsection.1.2}
+\contentsline {section}{\numberline {2}System\IeC {\"o}versikt}{1}{section.2}
+\contentsline {subsection}{\numberline {2.1}Grov beskrivning av systemet}{2}{subsection.2.1}
+\contentsline {subsection}{\numberline {2.2}Ing\IeC {\r a}ende delsystem}{2}{subsection.2.2}
+\contentsline {subsection}{\numberline {2.3}Mikro- kontroller/processor}{3}{subsection.2.3}
+\contentsline {subsection}{\numberline {2.4}Intermodul\IeC {\"a}r kommunikation}{3}{subsection.2.4}
+\contentsline {section}{\numberline {3}Delsystem 1 - Sensormodul}{3}{section.3}
+\contentsline {subsection}{\numberline {3.1}Sensorer}{4}{subsection.3.1}
+\contentsline {subsection}{\numberline {3.2}RFID}{4}{subsection.3.2}
+\contentsline {section}{\numberline {4}Delsystem 2 - Styrmodul}{4}{section.4}
+\contentsline {subsection}{\numberline {4.1}LCD-Display}{4}{subsection.4.1}
+\contentsline {subsection}{\numberline {4.2}Motorer}{4}{subsection.4.2}
+\contentsline {subsection}{\numberline {4.3}Gripklo}{4}{subsection.4.3}
+\contentsline {subsection}{\numberline {4.4}Gr\IeC {\"a}nssnitt - Display}{5}{subsection.4.4}
+\contentsline {subsection}{\numberline {4.5}Brytare f\IeC {\"o}r val av autonom eller manuell styrning}{5}{subsection.4.5}
+\contentsline {section}{\numberline {5}Delsystem 3 - Kommunikationsmodul}{5}{section.5}
+\contentsline {subsection}{\numberline {5.1}Bluetooth - Kommunikationsmodul}{5}{subsection.5.1}
+\contentsline {section}{\numberline {6}Delsystem 4 - PC}{5}{section.6}
+\contentsline {subsection}{\numberline {6.1}Anv\IeC {\"a}ndargr\IeC {\"a}nssnitt - Visualisering}{5}{subsection.6.1}
+\contentsline {subsection}{\numberline {6.2}Bluetooth - PC}{5}{subsection.6.2}
+\contentsline {section}{Referenser}{6}{section*.4}

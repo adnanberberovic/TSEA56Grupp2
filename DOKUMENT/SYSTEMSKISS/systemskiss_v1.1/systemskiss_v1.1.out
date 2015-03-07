@@ -1,0 +1,23 @@
+\BOOKMARK [1][-]{section.1}{Inledning}{}% 1
+\BOOKMARK [2][-]{subsection.1.1}{Syfte och m\345l}{section.1}% 2
+\BOOKMARK [2][-]{subsection.1.2}{Anv\344ndning}{section.1}% 3
+\BOOKMARK [1][-]{section.2}{System\366versikt}{}% 4
+\BOOKMARK [2][-]{subsection.2.1}{Grov beskrivning av systemet}{section.2}% 5
+\BOOKMARK [2][-]{subsection.2.2}{Ing\345ende delsystem}{section.2}% 6
+\BOOKMARK [2][-]{subsection.2.3}{Mikro- kontroller/processor}{section.2}% 7
+\BOOKMARK [2][-]{subsection.2.4}{Intermodul\344r kommunikation}{section.2}% 8
+\BOOKMARK [1][-]{section.3}{Delsystem 1 - Sensormodul}{}% 9
+\BOOKMARK [2][-]{subsection.3.1}{Sensorer}{section.3}% 10
+\BOOKMARK [2][-]{subsection.3.2}{RFID}{section.3}% 11
+\BOOKMARK [1][-]{section.4}{Delsystem 2 - Styrmodul}{}% 12
+\BOOKMARK [2][-]{subsection.4.1}{LCD-Display}{section.4}% 13
+\BOOKMARK [2][-]{subsection.4.2}{Motorer}{section.4}% 14
+\BOOKMARK [2][-]{subsection.4.3}{Gripklo}{section.4}% 15
+\BOOKMARK [2][-]{subsection.4.4}{Gr\344nssnitt - Display}{section.4}% 16
+\BOOKMARK [2][-]{subsection.4.5}{Brytare f\366r val av autonom eller manuell styrning}{section.4}% 17
+\BOOKMARK [1][-]{section.5}{Delsystem 3 - Kommunikationsmodul}{}% 18
+\BOOKMARK [2][-]{subsection.5.1}{Bluetooth - Kommunikationsmodul}{section.5}% 19
+\BOOKMARK [1][-]{section.6}{Delsystem 4 - PC}{}% 20
+\BOOKMARK [2][-]{subsection.6.1}{Anv\344ndargr\344nssnitt - Visualisering}{section.6}% 21
+\BOOKMARK [2][-]{subsection.6.2}{Bluetooth - PC}{section.6}% 22
+\BOOKMARK [1][-]{section*.4}{Referenser}{}% 23
