@@ -7,6 +7,9 @@
 #include <avr/interrupt.h>
 #include <avr/sleep.h>
 
+unsigned char outSPDR;
+unsigned char inSPDR;
+	
 //Setup data direction registers @ ports for out/inputs.
 void Komm_InitPortDirections(void)
 {
@@ -35,27 +38,28 @@ void SPI_SlaveInit(void)
 	
 }
 
+
+//Bus transmission. Send and receive data from styrmodulen.
+void SPI_SlaveTransmit(unsigned char cData)
+{
+	inSPDR = SPDR;
+	//Load data into SPI data register
+	SPDR = cData; 
+	
+
+}
+
 //Interrupt method runs when SPI transmission/reception is completed.
 ISR(SPI_STC_vect)
 {
+	SPI_SlaveTransmit(outSPDR);
 	
-}
-
-//Bus transmission. Send and receive data from styrmodulen.
-unsigned char SPI_SlaveTransmit(unsigned char cData)
-{
-	//Load data into SPI data register.
-	SPDR = cData;
-	
-	//wait until transmission completes.
-	while(!(SPSR & (1<<SPIF)));
-	
-	//return retrieved data.
-	return(SPDR);
 }
 
 int main(void)
 {
+	outSPDR = 0x01;
+	inSPDR = 0x00;
 	sei();
 	sleep_enable();
 	Komm_InitPortDirections();
