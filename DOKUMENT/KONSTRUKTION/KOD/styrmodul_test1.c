@@ -1,7 +1,7 @@
 /*
  *  styrmodul_test1.c
  *	Styrmodul
- *  Author: adnbe196
+ *  Author: adnbe196, mansk700
  */ 
 
 
@@ -17,14 +17,15 @@ void Styr_InitPortDirections(void)
 	DDRD = 1<<DDD0 | 1<<DDD1 | 1<<DDD2 | 1<<DDD3 | 1<<DDD4 | 1<<DDD5 | 1<<DDD6 | 1<<DDD7;
 } 
 
+//Setups port values, more specifically puts SS on high.
 void Styr_InitPortValues(void)
 {
 	PORTB = 1<<PORTB3 | 1<<PORTB4;
 }
 
+//Configures device as spi master.
 void SPI_MasterInit(void)
 {
-	//configures device as spi master.
 	SPSR = 0<<SPI2X;
 	SPCR = 1<<SPIE | 1<<SPE | 1<<DORD | 1<<MSTR | 0<<CPOL | 0<<CPHA | 1<<SPR1 | 1<<SPR0;
 	//SPIE: SPI interrupt enable. Set to 1 to allow interrupts
@@ -37,7 +38,8 @@ void SPI_MasterInit(void)
 	
 }
 
-void SPI_MasterTransmit(char cData, std::string target)
+//Initiates commiunication with other modules.
+unsigned char SPI_MasterTransmit(unsigned char cData, std::string target)
 {
 	if (target == "komm")
 	{
@@ -60,6 +62,12 @@ void SPI_MasterTransmit(char cData, std::string target)
 	return(SPDR);
 }
 
+//Interrupt method runs when SPI transmission/reception is completed.
+ISR(SPI_STC_vect)
+{
+	
+}
+
 int main(void)
 {
 	sei();
@@ -67,7 +75,7 @@ int main(void)
 	Styr_InitPortDirections();
 	Styr_InitPortValues();
 	SPI_MasterInit();
-	//SPI_MasterTransmit();
+	unsigned char inSPDR = SPI_MasterTransmit(0xF, "komm");
     while(1)
     {
 		

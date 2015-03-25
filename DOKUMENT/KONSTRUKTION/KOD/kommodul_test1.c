@@ -1,27 +1,28 @@
 /*
  *  kommodul_test1.c
  *	Kommunikationsmodul
- *  Author: adnbe196
+ *  Author: adnbe196, mansk700
  */ 
 #include <avr/io.h>
 #include <avr/interrupt.h>
 #include <avr/sleep.h>
 
 //Setup data direction registers @ ports for out/inputs.
-void Styr_InitPortDirections(void)
+void Komm_InitPortDirections(void)
 {
-	DDRA = 1<<DDD1;
-	DDRD = 1<<DDD6;
+	DDRB = 1<<DDB6;
+	DDRD = 1<<DDD1;
 }
 
-void Styr_InitPortValues(void)
+//Initiate port values.
+void Komm_InitPortValues(void)
 {
 	PORTB = 1<<PORTB4;
 }
 
-void SPI_MasterInit(void)
+//Configures device as spi slave.
+void SPI_SlaveInit(void)
 {
-	//configures device as spi master.
 	SPSR = 0<<SPI2X;
 	SPCR = 1<<SPIE | 1<<SPE | 1<<DORD | 0<<MSTR | 0<<CPOL | 0<<CPHA | 1<<SPR1 | 1<<SPR0;
 	//SPIE: SPI interrupt enable. Set to 1 to allow interrupts
@@ -34,7 +35,14 @@ void SPI_MasterInit(void)
 	
 }
 
-void SPI_SlaveTransmit(char cData)
+//Interrupt method runs when SPI transmission/reception is completed.
+ISR(SPI_STC_vect)
+{
+	
+}
+
+//Bus transmission. Send and receive data from styrmodulen.
+unsigned char SPI_SlaveTransmit(unsigned char cData)
 {
 	//Load data into SPI data register.
 	SPDR = cData;
@@ -50,8 +58,8 @@ int main(void)
 {
 	sei();
 	sleep_enable();
-	Styr_InitPortDirections();
-	Styr_InitPortValues();
+	Komm_InitPortDirections();
+	Komm_InitPortValues();
 	SPI_SlaveInit();
 	//SPI_SlaveTransmit();
 	while(1)
