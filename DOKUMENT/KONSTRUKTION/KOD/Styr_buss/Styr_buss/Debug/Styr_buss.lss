@@ -1,0 +1,301 @@
+
+Styr_buss.elf:     file format elf32-avr
+
+Sections:
+Idx Name          Size      VMA       LMA       File off  Algn
+  0 .data         0000000a  00800100  0000016e  000001e2  2**0
+                  CONTENTS, ALLOC, LOAD, DATA
+  1 .text         0000016e  00000000  00000000  00000074  2**1
+                  CONTENTS, ALLOC, LOAD, READONLY, CODE
+  2 .comment      00000030  00000000  00000000  000001ec  2**0
+                  CONTENTS, READONLY
+  3 .debug_aranges 00000048  00000000  00000000  0000021c  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  4 .debug_info   00000238  00000000  00000000  00000264  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  5 .debug_abbrev 0000014a  00000000  00000000  0000049c  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  6 .debug_line   00000220  00000000  00000000  000005e6  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  7 .debug_frame  00000090  00000000  00000000  00000808  2**2
+                  CONTENTS, READONLY, DEBUGGING
+  8 .debug_str    000001ce  00000000  00000000  00000898  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  9 .debug_loc    000000e1  00000000  00000000  00000a66  2**0
+                  CONTENTS, READONLY, DEBUGGING
+ 10 .debug_ranges 00000038  00000000  00000000  00000b47  2**0
+                  CONTENTS, READONLY, DEBUGGING
+
+Disassembly of section .text:
+
+00000000 <__vectors>:
+   0:	45 c0       	rjmp	.+138    	; 0x8c <__ctors_end>
+   2:	00 00       	nop
+   4:	58 c0       	rjmp	.+176    	; 0xb6 <__bad_interrupt>
+   6:	00 00       	nop
+   8:	56 c0       	rjmp	.+172    	; 0xb6 <__bad_interrupt>
+   a:	00 00       	nop
+   c:	54 c0       	rjmp	.+168    	; 0xb6 <__bad_interrupt>
+   e:	00 00       	nop
+  10:	52 c0       	rjmp	.+164    	; 0xb6 <__bad_interrupt>
+  12:	00 00       	nop
+  14:	50 c0       	rjmp	.+160    	; 0xb6 <__bad_interrupt>
+  16:	00 00       	nop
+  18:	4e c0       	rjmp	.+156    	; 0xb6 <__bad_interrupt>
+  1a:	00 00       	nop
+  1c:	4c c0       	rjmp	.+152    	; 0xb6 <__bad_interrupt>
+  1e:	00 00       	nop
+  20:	4a c0       	rjmp	.+148    	; 0xb6 <__bad_interrupt>
+  22:	00 00       	nop
+  24:	48 c0       	rjmp	.+144    	; 0xb6 <__bad_interrupt>
+  26:	00 00       	nop
+  28:	46 c0       	rjmp	.+140    	; 0xb6 <__bad_interrupt>
+  2a:	00 00       	nop
+  2c:	44 c0       	rjmp	.+136    	; 0xb6 <__bad_interrupt>
+  2e:	00 00       	nop
+  30:	42 c0       	rjmp	.+132    	; 0xb6 <__bad_interrupt>
+  32:	00 00       	nop
+  34:	40 c0       	rjmp	.+128    	; 0xb6 <__bad_interrupt>
+  36:	00 00       	nop
+  38:	3e c0       	rjmp	.+124    	; 0xb6 <__bad_interrupt>
+  3a:	00 00       	nop
+  3c:	3c c0       	rjmp	.+120    	; 0xb6 <__bad_interrupt>
+  3e:	00 00       	nop
+  40:	3a c0       	rjmp	.+116    	; 0xb6 <__bad_interrupt>
+  42:	00 00       	nop
+  44:	38 c0       	rjmp	.+112    	; 0xb6 <__bad_interrupt>
+  46:	00 00       	nop
+  48:	36 c0       	rjmp	.+108    	; 0xb6 <__bad_interrupt>
+  4a:	00 00       	nop
+  4c:	63 c0       	rjmp	.+198    	; 0x114 <__vector_19>
+  4e:	00 00       	nop
+  50:	32 c0       	rjmp	.+100    	; 0xb6 <__bad_interrupt>
+  52:	00 00       	nop
+  54:	30 c0       	rjmp	.+96     	; 0xb6 <__bad_interrupt>
+  56:	00 00       	nop
+  58:	2e c0       	rjmp	.+92     	; 0xb6 <__bad_interrupt>
+  5a:	00 00       	nop
+  5c:	2c c0       	rjmp	.+88     	; 0xb6 <__bad_interrupt>
+  5e:	00 00       	nop
+  60:	2a c0       	rjmp	.+84     	; 0xb6 <__bad_interrupt>
+  62:	00 00       	nop
+  64:	28 c0       	rjmp	.+80     	; 0xb6 <__bad_interrupt>
+  66:	00 00       	nop
+  68:	26 c0       	rjmp	.+76     	; 0xb6 <__bad_interrupt>
+  6a:	00 00       	nop
+  6c:	24 c0       	rjmp	.+72     	; 0xb6 <__bad_interrupt>
+  6e:	00 00       	nop
+  70:	22 c0       	rjmp	.+68     	; 0xb6 <__bad_interrupt>
+  72:	00 00       	nop
+  74:	20 c0       	rjmp	.+64     	; 0xb6 <__bad_interrupt>
+  76:	00 00       	nop
+  78:	1e c0       	rjmp	.+60     	; 0xb6 <__bad_interrupt>
+  7a:	00 00       	nop
+  7c:	1c c0       	rjmp	.+56     	; 0xb6 <__bad_interrupt>
+  7e:	00 00       	nop
+  80:	1a c0       	rjmp	.+52     	; 0xb6 <__bad_interrupt>
+  82:	00 00       	nop
+  84:	18 c0       	rjmp	.+48     	; 0xb6 <__bad_interrupt>
+  86:	00 00       	nop
+  88:	16 c0       	rjmp	.+44     	; 0xb6 <__bad_interrupt>
+	...
+
+0000008c <__ctors_end>:
+  8c:	11 24       	eor	r1, r1
+  8e:	1f be       	out	0x3f, r1	; 63
+  90:	cf ef       	ldi	r28, 0xFF	; 255
+  92:	d0 e4       	ldi	r29, 0x40	; 64
+  94:	de bf       	out	0x3e, r29	; 62
+  96:	cd bf       	out	0x3d, r28	; 61
+
+00000098 <__do_copy_data>:
+  98:	11 e0       	ldi	r17, 0x01	; 1
+  9a:	a0 e0       	ldi	r26, 0x00	; 0
+  9c:	b1 e0       	ldi	r27, 0x01	; 1
+  9e:	ee e6       	ldi	r30, 0x6E	; 110
+  a0:	f1 e0       	ldi	r31, 0x01	; 1
+  a2:	00 e0       	ldi	r16, 0x00	; 0
+  a4:	0b bf       	out	0x3b, r16	; 59
+  a6:	02 c0       	rjmp	.+4      	; 0xac <__do_copy_data+0x14>
+  a8:	07 90       	elpm	r0, Z+
+  aa:	0d 92       	st	X+, r0
+  ac:	aa 30       	cpi	r26, 0x0A	; 10
+  ae:	b1 07       	cpc	r27, r17
+  b0:	d9 f7       	brne	.-10     	; 0xa8 <__do_copy_data+0x10>
+  b2:	3a d0       	rcall	.+116    	; 0x128 <main>
+  b4:	5a c0       	rjmp	.+180    	; 0x16a <_exit>
+
+000000b6 <__bad_interrupt>:
+  b6:	a4 cf       	rjmp	.-184    	; 0x0 <__vectors>
+
+000000b8 <Styr_InitPortDirections>:
+} 
+
+//Setups port values, more specifically puts SS on high.
+void Styr_InitPortValues(void)
+{
+	PORTB = 1<<PORTB3 | 1<<PORTB4;
+  b8:	8f e4       	ldi	r24, 0x4F	; 79
+  ba:	81 b9       	out	0x01, r24	; 1
+  bc:	8f eb       	ldi	r24, 0xBF	; 191
+  be:	84 b9       	out	0x04, r24	; 4
+  c0:	8f ef       	ldi	r24, 0xFF	; 255
+  c2:	8a b9       	out	0x0a, r24	; 10
+  c4:	08 95       	ret
+
+000000c6 <SPI_MasterInit>:
+}
+
+//Configures device as spi master.
+void SPI_MasterInit(void)
+{
+	SPSR = 0<<SPI2X;
+  c6:	1d bc       	out	0x2d, r1	; 45
+	SPCR = 1<<SPIE | 1<<SPE | 1<<DORD | 1<<MSTR | 0<<CPOL | 0<<CPHA | 1<<SPR1 | 1<<SPR0;
+  c8:	83 ef       	ldi	r24, 0xF3	; 243
+  ca:	8c bd       	out	0x2c, r24	; 44
+  cc:	08 95       	ret
+
+000000ce <SPI_MasterTransmit>:
+	
+}
+
+//Initiates commiunication with other modules.
+unsigned char SPI_MasterTransmit(unsigned char cData, char *target)
+{
+  ce:	1f 93       	push	r17
+  d0:	cf 93       	push	r28
+  d2:	df 93       	push	r29
+  d4:	18 2f       	mov	r17, r24
+  d6:	eb 01       	movw	r28, r22
+	if (!strncmp(target, "komm", 4))
+  d8:	44 e0       	ldi	r20, 0x04	; 4
+  da:	50 e0       	ldi	r21, 0x00	; 0
+  dc:	60 e0       	ldi	r22, 0x00	; 0
+  de:	71 e0       	ldi	r23, 0x01	; 1
+  e0:	ce 01       	movw	r24, r28
+  e2:	35 d0       	rcall	.+106    	; 0x14e <strncmp>
+  e4:	89 2b       	or	r24, r25
+  e6:	11 f4       	brne	.+4      	; 0xec <SPI_MasterTransmit+0x1e>
+	{
+		PORTB = 0<<PORTB4;
+  e8:	15 b8       	out	0x05, r1	; 5
+  ea:	09 c0       	rjmp	.+18     	; 0xfe <SPI_MasterTransmit+0x30>
+	}
+	else if (!strncmp(target, "sens", 4))
+  ec:	44 e0       	ldi	r20, 0x04	; 4
+  ee:	50 e0       	ldi	r21, 0x00	; 0
+  f0:	65 e0       	ldi	r22, 0x05	; 5
+  f2:	71 e0       	ldi	r23, 0x01	; 1
+  f4:	ce 01       	movw	r24, r28
+  f6:	2b d0       	rcall	.+86     	; 0x14e <strncmp>
+  f8:	89 2b       	or	r24, r25
+  fa:	09 f4       	brne	.+2      	; 0xfe <SPI_MasterTransmit+0x30>
+	{
+		PORTB = 0<<PORTB5;
+  fc:	15 b8       	out	0x05, r1	; 5
+	}
+	//Load data into SPI data register.
+	SPDR = cData; 
+  fe:	1e bd       	out	0x2e, r17	; 46
+	
+	//wait until transmission completes.
+	while(!(SPSR & (1<<SPIF)));
+ 100:	0d b4       	in	r0, 0x2d	; 45
+ 102:	07 fe       	sbrs	r0, 7
+ 104:	fd cf       	rjmp	.-6      	; 0x100 <SPI_MasterTransmit+0x32>
+	
+	PORTB = 1<<PORTB4 | 1<<PORTB5;
+ 106:	80 e3       	ldi	r24, 0x30	; 48
+ 108:	85 b9       	out	0x05, r24	; 5
+	
+	return SPDR;
+ 10a:	8e b5       	in	r24, 0x2e	; 46
+}
+ 10c:	df 91       	pop	r29
+ 10e:	cf 91       	pop	r28
+ 110:	1f 91       	pop	r17
+ 112:	08 95       	ret
+
+00000114 <__vector_19>:
+
+//Interrupt method runs when SPI transmission/reception is completed.
+ISR(SPI_STC_vect)
+{
+ 114:	1f 92       	push	r1
+ 116:	0f 92       	push	r0
+ 118:	0f b6       	in	r0, 0x3f	; 63
+ 11a:	0f 92       	push	r0
+ 11c:	11 24       	eor	r1, r1
+	
+}
+ 11e:	0f 90       	pop	r0
+ 120:	0f be       	out	0x3f, r0	; 63
+ 122:	0f 90       	pop	r0
+ 124:	1f 90       	pop	r1
+ 126:	18 95       	reti
+
+00000128 <main>:
+
+int main(void)
+{
+	unsigned char SPDRrec_ = 0;
+	sei();
+ 128:	78 94       	sei
+	sleep_enable();
+ 12a:	83 b7       	in	r24, 0x33	; 51
+ 12c:	81 60       	ori	r24, 0x01	; 1
+ 12e:	83 bf       	out	0x33, r24	; 51
+	Styr_InitPortDirections();
+ 130:	c3 df       	rcall	.-122    	; 0xb8 <Styr_InitPortDirections>
+} 
+
+//Setups port values, more specifically puts SS on high.
+void Styr_InitPortValues(void)
+{
+	PORTB = 1<<PORTB3 | 1<<PORTB4;
+ 132:	88 e1       	ldi	r24, 0x18	; 24
+ 134:	85 b9       	out	0x05, r24	; 5
+	unsigned char SPDRrec_ = 0;
+	sei();
+	sleep_enable();
+	Styr_InitPortDirections();
+	Styr_InitPortValues();
+	SPI_MasterInit();
+ 136:	c7 df       	rcall	.-114    	; 0xc6 <SPI_MasterInit>
+	SPDR = 0xFE;
+ 138:	8e ef       	ldi	r24, 0xFE	; 254
+ 13a:	8e bd       	out	0x2e, r24	; 46
+	SPDRrec_ = SPI_MasterTransmit(0x0F, "komm");
+ 13c:	60 e0       	ldi	r22, 0x00	; 0
+ 13e:	71 e0       	ldi	r23, 0x01	; 1
+ 140:	8f e0       	ldi	r24, 0x0F	; 15
+ 142:	c5 df       	rcall	.-118    	; 0xce <SPI_MasterTransmit>
+	SPDRrec_ = SPI_MasterTransmit(0x0F, "komm");
+ 144:	60 e0       	ldi	r22, 0x00	; 0
+ 146:	71 e0       	ldi	r23, 0x01	; 1
+ 148:	8f e0       	ldi	r24, 0x0F	; 15
+ 14a:	c1 df       	rcall	.-126    	; 0xce <SPI_MasterTransmit>
+ 14c:	ff cf       	rjmp	.-2      	; 0x14c <main+0x24>
+
+0000014e <strncmp>:
+ 14e:	fb 01       	movw	r30, r22
+ 150:	dc 01       	movw	r26, r24
+ 152:	41 50       	subi	r20, 0x01	; 1
+ 154:	50 40       	sbci	r21, 0x00	; 0
+ 156:	30 f0       	brcs	.+12     	; 0x164 <strncmp+0x16>
+ 158:	8d 91       	ld	r24, X+
+ 15a:	01 90       	ld	r0, Z+
+ 15c:	80 19       	sub	r24, r0
+ 15e:	19 f4       	brne	.+6      	; 0x166 <strncmp+0x18>
+ 160:	00 20       	and	r0, r0
+ 162:	b9 f7       	brne	.-18     	; 0x152 <strncmp+0x4>
+ 164:	88 1b       	sub	r24, r24
+ 166:	99 0b       	sbc	r25, r25
+ 168:	08 95       	ret
+
+0000016a <_exit>:
+ 16a:	f8 94       	cli
+
+0000016c <__stop_program>:
+ 16c:	ff cf       	rjmp	.-2      	; 0x16c <__stop_program>
