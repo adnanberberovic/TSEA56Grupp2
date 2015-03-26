@@ -132,6 +132,14 @@ void LCD_SendSmallLetter(uint8_t number)
 {
 	PORTD = number | 0b0110000 // number is a numbner between 1 and 26, for each letter in the alphabet in order.
 }
+
+// OR DO THIS
+
+void LCD_SendAnyCharacter(char symbol)
+{
+	uint8_t tempNum = (int)symbol;
+	PORTD = tempNum;
+}
 //Sends a letter or symbol to the LCD display
 void LCD_SendChar(char symbol)
 {	
