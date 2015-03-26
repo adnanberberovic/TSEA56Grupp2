@@ -36,7 +36,7 @@ void SPI_SlaveInit(void)
 	//CPOL and CPHA: set to 0 to sample on rising edge and setup on falling edge.
 	//SPI2X, SPR1, SPR0, set to 0,1,1 to scale clock with f_osc/128.
 	//Bus config similar to comm and sensor module, though set 0<<MSTR
-	sei();
+	
 }
 
 
@@ -52,7 +52,7 @@ void SPI_SlaveTransmit(unsigned char cData)
 ISR(SPI_STC_vect)
 {
 	inSPDR = SPDR;
-	
+	SPDR = inSPDR -1;
 }
 
 int main(void)
@@ -63,6 +63,7 @@ int main(void)
 	Komm_InitPortDirections();
 	Komm_InitPortValues();
 	SPI_SlaveInit();
+	sei();
 	while(1)
 	{
 		

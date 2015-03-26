@@ -43,13 +43,13 @@ void SPI_MasterInit(void)
 }
 
 //Initiates commiunication with other modules.
-unsigned char SPI_MasterTransmit(unsigned char cData, char *target)
+unsigned char SPI_MasterTransmit(unsigned char cData, char target)
 {
-	if (!strncmp(target, "komm", 4))
+	if (target == 'k') //k as in kommunikation
 	{
 		PORTB = 0<<PORTB4;
 	}
-	else if (!strncmp(target, "sens", 4))
+	else if (target == 's')	//s as in sensor
 	{
 		PORTB = 0<<PORTB5;
 	}
@@ -64,6 +64,11 @@ unsigned char SPI_MasterTransmit(unsigned char cData, char *target)
 	return SPDR;
 }
 
+ISR(SPI_STC_vect)
+{
+	
+}
+
 int main(void)
 {
 	unsigned char SPDRrec_ = 0;
@@ -72,13 +77,29 @@ int main(void)
 	Styr_InitPortDirections();
 	Styr_InitPortValues();
 	SPI_MasterInit();
-	SPDRrec_ = SPI_MasterTransmit(0x0F, "komm");
+	SPDRrec_ = SPI_MasterTransmit(0x01, 'k');
+	_delay_us(10);
+	SPDRrec_ = SPI_MasterTransmit(0x1F, 'k');
 	if (SPDRrec_ == 0x0F)
 	{
 		PORTC = (1<<PORTC0);
 	}
-	_delay_us(100);
-	SPDRrec_ = SPI_MasterTransmit(0x0F, "komm");
+	if (SPDRrec_ == 0x00)
+	{
+		PORTC = (1<<PORTC0);
+	}
+	_delay_us(10);
+	SPDRrec_ = SPI_MasterTransmit(0x0F, 'k');
+	if (SPDRrec_ == 0x1E)
+	{
+		PORTC = (1<<PORTC0);
+	}
+	_delay_us(10);
+	SPDRrec_ = SPI_MasterTransmit(0x1F, 'k');
+	if (SPDRrec_ == 0x0E)
+	{
+		PORTC = (1<<PORTC0);
+	}
 	if (SPDRrec_ == 0x0F)
 	{
 		PORTC = (1<<PORTC0);

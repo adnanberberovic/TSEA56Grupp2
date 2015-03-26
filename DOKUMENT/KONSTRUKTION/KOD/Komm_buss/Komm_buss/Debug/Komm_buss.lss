@@ -3,27 +3,27 @@ Komm_buss.elf:     file format elf32-avr
 
 Sections:
 Idx Name          Size      VMA       LMA       File off  Algn
-  0 .text         0000013c  00000000  00000000  00000074  2**1
+  0 .text         00000102  00000000  00000000  00000074  2**1
                   CONTENTS, ALLOC, LOAD, READONLY, CODE
-  1 .bss          00000002  00800100  00800100  000001b0  2**0
+  1 .bss          00000002  00800100  00800100  00000176  2**0
                   ALLOC
-  2 .comment      00000030  00000000  00000000  000001b0  2**0
+  2 .comment      00000030  00000000  00000000  00000176  2**0
                   CONTENTS, READONLY
-  3 .debug_aranges 00000048  00000000  00000000  000001e0  2**0
+  3 .debug_aranges 00000048  00000000  00000000  000001a6  2**0
                   CONTENTS, READONLY, DEBUGGING
-  4 .debug_info   00000165  00000000  00000000  00000228  2**0
+  4 .debug_info   00000157  00000000  00000000  000001ee  2**0
                   CONTENTS, READONLY, DEBUGGING
-  5 .debug_abbrev 000000fc  00000000  00000000  0000038d  2**0
+  5 .debug_abbrev 000000fa  00000000  00000000  00000345  2**0
                   CONTENTS, READONLY, DEBUGGING
-  6 .debug_line   0000015f  00000000  00000000  00000489  2**0
+  6 .debug_line   00000165  00000000  00000000  0000043f  2**0
                   CONTENTS, READONLY, DEBUGGING
-  7 .debug_frame  000000bc  00000000  00000000  000005e8  2**2
+  7 .debug_frame  00000084  00000000  00000000  000005a4  2**2
                   CONTENTS, READONLY, DEBUGGING
-  8 .debug_str    000001bc  00000000  00000000  000006a4  2**0
+  8 .debug_str    000001b7  00000000  00000000  00000628  2**0
                   CONTENTS, READONLY, DEBUGGING
-  9 .debug_loc    000000cb  00000000  00000000  00000860  2**0
+  9 .debug_loc    0000003c  00000000  00000000  000007df  2**0
                   CONTENTS, READONLY, DEBUGGING
- 10 .debug_ranges 00000038  00000000  00000000  0000092b  2**0
+ 10 .debug_ranges 00000038  00000000  00000000  0000081b  2**0
                   CONTENTS, READONLY, DEBUGGING
 
 Disassembly of section .text:
@@ -67,7 +67,7 @@ Disassembly of section .text:
   46:	00 00       	nop
   48:	31 c0       	rjmp	.+98     	; 0xac <__bad_interrupt>
   4a:	00 00       	nop
-  4c:	3e c0       	rjmp	.+124    	; 0xca <__vector_19>
+  4c:	39 c0       	rjmp	.+114    	; 0xc0 <__vector_19>
   4e:	00 00       	nop
   50:	2d c0       	rjmp	.+90     	; 0xac <__bad_interrupt>
   52:	00 00       	nop
@@ -121,19 +121,19 @@ Disassembly of section .text:
   a2:	a2 30       	cpi	r26, 0x02	; 2
   a4:	b2 07       	cpc	r27, r18
   a6:	e1 f7       	brne	.-8      	; 0xa0 <.do_clear_bss_loop>
-  a8:	39 d0       	rcall	.+114    	; 0x11c <main>
-  aa:	46 c0       	rjmp	.+140    	; 0x138 <_exit>
+  a8:	1c d0       	rcall	.+56     	; 0xe2 <main>
+  aa:	29 c0       	rjmp	.+82     	; 0xfe <_exit>
 
 000000ac <__bad_interrupt>:
   ac:	a9 cf       	rjmp	.-174    	; 0x0 <__vectors>
 
 000000ae <Komm_InitPortDirections>:
-}
-
-//Initiate port values.
-void Komm_InitPortValues(void)
+//Bus transmission. Send and receive data from styrmodulen.
+void SPI_SlaveTransmit(unsigned char cData)
 {
-	PORTB = 1<<PORTB4;
+	inSPDR = SPDR;
+	//Load data into SPI data register
+	SPDR = cData; 
   ae:	80 e4       	ldi	r24, 0x40	; 64
   b0:	84 b9       	out	0x04, r24	; 4
   b2:	82 e0       	ldi	r24, 0x02	; 2
@@ -141,119 +141,73 @@ void Komm_InitPortValues(void)
   b6:	08 95       	ret
 
 000000b8 <SPI_SlaveInit>:
-}
-
-//Configures device as spi slave.
-void SPI_SlaveInit(void)
-{
-	SPSR = 0<<SPI2X;
   b8:	1d bc       	out	0x2d, r1	; 45
-	SPCR = 1<<SPIE | 1<<SPE | 1<<DORD | 0<<MSTR | 0<<CPOL | 0<<CPHA | 
   ba:	83 ee       	ldi	r24, 0xE3	; 227
   bc:	8c bd       	out	0x2c, r24	; 44
   be:	08 95       	ret
 
-000000c0 <SPI_SlaveTransmit>:
-
-
-//Bus transmission. Send and receive data from styrmodulen.
-void SPI_SlaveTransmit(unsigned char cData)
-{
-	inSPDR = SPDR;
-  c0:	9e b5       	in	r25, 0x2e	; 46
-  c2:	90 93 00 01 	sts	0x0100, r25
-	//Load data into SPI data register
-	SPDR = cData; 
-  c6:	8e bd       	out	0x2e, r24	; 46
-  c8:	08 95       	ret
-
-000000ca <__vector_19>:
-
+000000c0 <__vector_19>:
 }
 
 //Interrupt method runs when SPI transmission/reception is completed.
 ISR(SPI_STC_vect)
 {
-  ca:	1f 92       	push	r1
-  cc:	0f 92       	push	r0
-  ce:	0f b6       	in	r0, 0x3f	; 63
-  d0:	0f 92       	push	r0
-  d2:	11 24       	eor	r1, r1
-  d4:	0b b6       	in	r0, 0x3b	; 59
-  d6:	0f 92       	push	r0
-  d8:	2f 93       	push	r18
-  da:	3f 93       	push	r19
-  dc:	4f 93       	push	r20
-  de:	5f 93       	push	r21
-  e0:	6f 93       	push	r22
-  e2:	7f 93       	push	r23
-  e4:	8f 93       	push	r24
-  e6:	9f 93       	push	r25
-  e8:	af 93       	push	r26
-  ea:	bf 93       	push	r27
-  ec:	ef 93       	push	r30
-  ee:	ff 93       	push	r31
-	SPI_SlaveTransmit(outSPDR);
-  f0:	80 91 01 01 	lds	r24, 0x0101
-  f4:	e5 df       	rcall	.-54     	; 0xc0 <SPI_SlaveTransmit>
-	
+  c0:	1f 92       	push	r1
+  c2:	0f 92       	push	r0
+  c4:	0f b6       	in	r0, 0x3f	; 63
+  c6:	0f 92       	push	r0
+  c8:	11 24       	eor	r1, r1
+  ca:	8f 93       	push	r24
+	inSPDR = SPDR;
+  cc:	8e b5       	in	r24, 0x2e	; 46
+  ce:	80 93 00 01 	sts	0x0100, r24
+	SPDR = inSPDR -1;
+  d2:	81 50       	subi	r24, 0x01	; 1
+  d4:	8e bd       	out	0x2e, r24	; 46
 }
-  f6:	ff 91       	pop	r31
-  f8:	ef 91       	pop	r30
-  fa:	bf 91       	pop	r27
-  fc:	af 91       	pop	r26
-  fe:	9f 91       	pop	r25
- 100:	8f 91       	pop	r24
- 102:	7f 91       	pop	r23
- 104:	6f 91       	pop	r22
- 106:	5f 91       	pop	r21
- 108:	4f 91       	pop	r20
- 10a:	3f 91       	pop	r19
- 10c:	2f 91       	pop	r18
- 10e:	0f 90       	pop	r0
- 110:	0b be       	out	0x3b, r0	; 59
- 112:	0f 90       	pop	r0
- 114:	0f be       	out	0x3f, r0	; 63
- 116:	0f 90       	pop	r0
- 118:	1f 90       	pop	r1
- 11a:	18 95       	reti
+  d6:	8f 91       	pop	r24
+  d8:	0f 90       	pop	r0
+  da:	0f be       	out	0x3f, r0	; 63
+  dc:	0f 90       	pop	r0
+  de:	1f 90       	pop	r1
+  e0:	18 95       	reti
 
-0000011c <main>:
+000000e2 <main>:
 
 int main(void)
 {
 	outSPDR = 0x01;
- 11c:	81 e0       	ldi	r24, 0x01	; 1
- 11e:	80 93 01 01 	sts	0x0101, r24
+  e2:	81 e0       	ldi	r24, 0x01	; 1
+  e4:	80 93 01 01 	sts	0x0101, r24
 	inSPDR = 0x00;
- 122:	10 92 00 01 	sts	0x0100, r1
-	sei();
- 126:	78 94       	sei
+  e8:	10 92 00 01 	sts	0x0100, r1
 	sleep_enable();
- 128:	83 b7       	in	r24, 0x33	; 51
- 12a:	81 60       	ori	r24, 0x01	; 1
- 12c:	83 bf       	out	0x33, r24	; 51
+  ec:	83 b7       	in	r24, 0x33	; 51
+  ee:	81 60       	ori	r24, 0x01	; 1
+  f0:	83 bf       	out	0x33, r24	; 51
 	Komm_InitPortDirections();
- 12e:	bf df       	rcall	.-130    	; 0xae <Komm_InitPortDirections>
+  f2:	dd df       	rcall	.-70     	; 0xae <Komm_InitPortDirections>
 }
 
 //Initiate port values.
 void Komm_InitPortValues(void)
 {
 	PORTB = 1<<PORTB4;
- 130:	80 e1       	ldi	r24, 0x10	; 16
- 132:	85 b9       	out	0x05, r24	; 5
+  f4:	80 e1       	ldi	r24, 0x10	; 16
+  f6:	85 b9       	out	0x05, r24	; 5
+	outSPDR = 0x01;
 	inSPDR = 0x00;
-	sei();
 	sleep_enable();
 	Komm_InitPortDirections();
 	Komm_InitPortValues();
 	SPI_SlaveInit();
- 134:	c1 df       	rcall	.-126    	; 0xb8 <SPI_SlaveInit>
- 136:	ff cf       	rjmp	.-2      	; 0x136 <main+0x1a>
+  f8:	df df       	rcall	.-66     	; 0xb8 <SPI_SlaveInit>
+	sei();
+  fa:	78 94       	sei
+  fc:	ff cf       	rjmp	.-2      	; 0xfc <main+0x1a>
 
-00000138 <_exit>:
- 138:	f8 94       	cli
+000000fe <_exit>:
+  fe:	f8 94       	cli
 
-0000013a <__stop_program>:
- 13a:	ff cf       	rjmp	.-2      	; 0x13a <__stop_program>
+00000100 <__stop_program>:
+ 100:	ff cf       	rjmp	.-2      	; 0x100 <__stop_program>
