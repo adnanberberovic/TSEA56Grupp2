@@ -284,6 +284,9 @@ int main(void)
 		//PORTC = (1<<PORTC0);
 	//}
 	send_char_to_LCD('S');
+	send_char_to_LCD('T');
+	send_char_to_LCD('D');
+	
 	while(1)
     {		
 	}
