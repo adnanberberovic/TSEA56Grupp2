@@ -1,13 +1,5 @@
 Archive member included because of file (symbol)
 
-c:/program files (x86)/atmel/atmel toolchain/avr8 gcc/native/3.4.1061/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.8.1/../../../../avr/lib/avr51\libm.a(fixunssfsi.o)
-                              Sensormodul_test.o (__fixunssfsi)
-c:/program files (x86)/atmel/atmel toolchain/avr8 gcc/native/3.4.1061/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.8.1/../../../../avr/lib/avr51\libm.a(floatsisf.o)
-                              Sensormodul_test.o (__floatunsisf)
-c:/program files (x86)/atmel/atmel toolchain/avr8 gcc/native/3.4.1061/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.8.1/../../../../avr/lib/avr51\libm.a(fp_split3.o)
-                              c:/program files (x86)/atmel/atmel toolchain/avr8 gcc/native/3.4.1061/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.8.1/../../../../avr/lib/avr51\libm.a(fixunssfsi.o) (__fp_splitA)
-c:/program files (x86)/atmel/atmel toolchain/avr8 gcc/native/3.4.1061/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.8.1/../../../../avr/lib/avr51\libm.a(fp_zero.o)
-                              c:/program files (x86)/atmel/atmel toolchain/avr8 gcc/native/3.4.1061/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.8.1/../../../../avr/lib/avr51\libm.a(fixunssfsi.o) (__fp_zero)
 c:/program files (x86)/atmel/atmel toolchain/avr8 gcc/native/3.4.1061/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.8.1/avr51\libgcc.a(_exit.o)
                               c:/program files (x86)/atmel/atmel toolchain/avr8 gcc/native/3.4.1061/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.8.1/../../../../avr/lib/avr51/crtm1284p.o (exit)
 c:/program files (x86)/atmel/atmel toolchain/avr8 gcc/native/3.4.1061/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.8.1/avr51\libgcc.a(_clear_bss.o)
@@ -16,7 +8,8 @@ c:/program files (x86)/atmel/atmel toolchain/avr8 gcc/native/3.4.1061/avr8-gnu-t
 Allocating common symbols
 Common symbol       size              file
 
-sensor_data         0x20              Sensormodul_test.o
+sensor_data         0x10              Sensormodul_test.o
+distance_table      0x1fe             Sensormodul_test.o
 
 Discarded input sections
 
@@ -25,18 +18,6 @@ Discarded input sections
  .text          0x00000000        0x0 Sensormodul_test.o
  .data          0x00000000        0x0 Sensormodul_test.o
  .bss           0x00000000        0x0 Sensormodul_test.o
- .text          0x00000000        0x0 c:/program files (x86)/atmel/atmel toolchain/avr8 gcc/native/3.4.1061/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.8.1/../../../../avr/lib/avr51\libm.a(fixunssfsi.o)
- .data          0x00000000        0x0 c:/program files (x86)/atmel/atmel toolchain/avr8 gcc/native/3.4.1061/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.8.1/../../../../avr/lib/avr51\libm.a(fixunssfsi.o)
- .bss           0x00000000        0x0 c:/program files (x86)/atmel/atmel toolchain/avr8 gcc/native/3.4.1061/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.8.1/../../../../avr/lib/avr51\libm.a(fixunssfsi.o)
- .text          0x00000000        0x0 c:/program files (x86)/atmel/atmel toolchain/avr8 gcc/native/3.4.1061/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.8.1/../../../../avr/lib/avr51\libm.a(floatsisf.o)
- .data          0x00000000        0x0 c:/program files (x86)/atmel/atmel toolchain/avr8 gcc/native/3.4.1061/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.8.1/../../../../avr/lib/avr51\libm.a(floatsisf.o)
- .bss           0x00000000        0x0 c:/program files (x86)/atmel/atmel toolchain/avr8 gcc/native/3.4.1061/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.8.1/../../../../avr/lib/avr51\libm.a(floatsisf.o)
- .text          0x00000000        0x0 c:/program files (x86)/atmel/atmel toolchain/avr8 gcc/native/3.4.1061/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.8.1/../../../../avr/lib/avr51\libm.a(fp_split3.o)
- .data          0x00000000        0x0 c:/program files (x86)/atmel/atmel toolchain/avr8 gcc/native/3.4.1061/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.8.1/../../../../avr/lib/avr51\libm.a(fp_split3.o)
- .bss           0x00000000        0x0 c:/program files (x86)/atmel/atmel toolchain/avr8 gcc/native/3.4.1061/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.8.1/../../../../avr/lib/avr51\libm.a(fp_split3.o)
- .text          0x00000000        0x0 c:/program files (x86)/atmel/atmel toolchain/avr8 gcc/native/3.4.1061/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.8.1/../../../../avr/lib/avr51\libm.a(fp_zero.o)
- .data          0x00000000        0x0 c:/program files (x86)/atmel/atmel toolchain/avr8 gcc/native/3.4.1061/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.8.1/../../../../avr/lib/avr51\libm.a(fp_zero.o)
- .bss           0x00000000        0x0 c:/program files (x86)/atmel/atmel toolchain/avr8 gcc/native/3.4.1061/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.8.1/../../../../avr/lib/avr51\libm.a(fp_zero.o)
  .text          0x00000000        0x0 c:/program files (x86)/atmel/atmel toolchain/avr8 gcc/native/3.4.1061/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.8.1/avr51\libgcc.a(_exit.o)
  .data          0x00000000        0x0 c:/program files (x86)/atmel/atmel toolchain/avr8 gcc/native/3.4.1061/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.8.1/avr51\libgcc.a(_exit.o)
  .bss           0x00000000        0x0 c:/program files (x86)/atmel/atmel toolchain/avr8 gcc/native/3.4.1061/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.8.1/avr51\libgcc.a(_exit.o)
@@ -186,7 +167,7 @@ END GROUP
 .rela.plt
  *(.rela.plt)
 
-.text           0x00000000      0x362
+.text           0x00000000      0x232
  *(.vectors)
  .vectors       0x00000000       0x8c c:/program files (x86)/atmel/atmel toolchain/avr8 gcc/native/3.4.1061/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.8.1/../../../../avr/lib/avr51/crtm1284p.o
                 0x00000000                __vector_default
@@ -277,31 +258,19 @@ END GROUP
                 0x000000ac                __vector_20
                 0x000000ae                . = ALIGN (0x2)
  *(.text.*)
- .text.main     0x000000ae       0xce Sensormodul_test.o
-                0x000000ae                main
+ .text.converter
+                0x000000ae       0xf2 Sensormodul_test.o
+                0x000000ae                converter
+ .text.main     0x000001a0       0x30 Sensormodul_test.o
+                0x000001a0                main
  .text.__vector_24
-                0x0000017c       0xbe Sensormodul_test.o
-                0x0000017c                __vector_24
- .text.avr-libc.fplib
-                0x0000023a       0x58 c:/program files (x86)/atmel/atmel toolchain/avr8 gcc/native/3.4.1061/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.8.1/../../../../avr/lib/avr51\libm.a(fixunssfsi.o)
-                0x0000023a                __fixunssfsi
- .text.avr-libc.fplib
-                0x00000292       0x7a c:/program files (x86)/atmel/atmel toolchain/avr8 gcc/native/3.4.1061/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.8.1/../../../../avr/lib/avr51\libm.a(floatsisf.o)
-                0x00000292                __floatunsisf
-                0x00000296                __floatsisf
- .text.avr-libc.fplib
-                0x0000030c       0x44 c:/program files (x86)/atmel/atmel toolchain/avr8 gcc/native/3.4.1061/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.8.1/../../../../avr/lib/avr51\libm.a(fp_split3.o)
-                0x0000030c                __fp_split3
-                0x0000031c                __fp_splitA
- .text.avr-libc.fplib
-                0x00000350        0xe c:/program files (x86)/atmel/atmel toolchain/avr8 gcc/native/3.4.1061/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.8.1/../../../../avr/lib/avr51\libm.a(fp_zero.o)
-                0x00000350                __fp_zero
-                0x00000352                __fp_szero
-                0x0000035e                . = ALIGN (0x2)
+                0x000001d0       0x5e Sensormodul_test.o
+                0x000001d0                __vector_24
+                0x0000022e                . = ALIGN (0x2)
  *(.fini9)
- .fini9         0x0000035e        0x0 c:/program files (x86)/atmel/atmel toolchain/avr8 gcc/native/3.4.1061/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.8.1/avr51\libgcc.a(_exit.o)
-                0x0000035e                _exit
-                0x0000035e                exit
+ .fini9         0x0000022e        0x0 c:/program files (x86)/atmel/atmel toolchain/avr8 gcc/native/3.4.1061/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.8.1/avr51\libgcc.a(_exit.o)
+                0x0000022e                _exit
+                0x0000022e                exit
  *(.fini9)
  *(.fini8)
  *(.fini8)
@@ -320,11 +289,11 @@ END GROUP
  *(.fini1)
  *(.fini1)
  *(.fini0)
- .fini0         0x0000035e        0x4 c:/program files (x86)/atmel/atmel toolchain/avr8 gcc/native/3.4.1061/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.8.1/avr51\libgcc.a(_exit.o)
+ .fini0         0x0000022e        0x4 c:/program files (x86)/atmel/atmel toolchain/avr8 gcc/native/3.4.1061/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.8.1/avr51\libgcc.a(_exit.o)
  *(.fini0)
-                0x00000362                _etext = .
+                0x00000232                _etext = .
 
-.data           0x00800100        0x0 load address 0x00000362
+.data           0x00800100        0x0 load address 0x00000232
                 0x00800100                PROVIDE (__data_start, .)
  *(.data)
  *(.data*)
@@ -335,23 +304,24 @@ END GROUP
                 0x00800100                _edata = .
                 0x00800100                PROVIDE (__data_end, .)
 
-.bss            0x00800100       0x20
+.bss            0x00800100      0x20e
                 0x00800100                PROVIDE (__bss_start, .)
  *(.bss)
  *(.bss*)
  *(COMMON)
- COMMON         0x00800100       0x20 Sensormodul_test.o
+ COMMON         0x00800100      0x20e Sensormodul_test.o
                 0x00800100                sensor_data
-                0x00800120                PROVIDE (__bss_end, .)
-                0x00000362                __data_load_start = LOADADDR (.data)
-                0x00000362                __data_load_end = (__data_load_start + SIZEOF (.data))
+                0x00800110                distance_table
+                0x0080030e                PROVIDE (__bss_end, .)
+                0x00000232                __data_load_start = LOADADDR (.data)
+                0x00000232                __data_load_end = (__data_load_start + SIZEOF (.data))
 
-.noinit         0x00800120        0x0
-                0x00800120                PROVIDE (__noinit_start, .)
+.noinit         0x0080030e        0x0
+                0x0080030e                PROVIDE (__noinit_start, .)
  *(.noinit*)
-                0x00800120                PROVIDE (__noinit_end, .)
-                0x00800120                _end = .
-                0x00800120                PROVIDE (__heap_start, .)
+                0x0080030e                PROVIDE (__noinit_end, .)
+                0x0080030e                _end = .
+                0x0080030e                PROVIDE (__heap_start, .)
 
 .eeprom         0x00810000        0x0
  *(.eeprom*)
@@ -410,38 +380,38 @@ END GROUP
 .debug_sfnames
  *(.debug_sfnames)
 
-.debug_aranges  0x00000000       0x28
+.debug_aranges  0x00000000       0x30
  *(.debug_aranges)
  .debug_aranges
-                0x00000000       0x28 Sensormodul_test.o
+                0x00000000       0x30 Sensormodul_test.o
 
 .debug_pubnames
  *(.debug_pubnames)
 
-.debug_info     0x00000000      0x16b
+.debug_info     0x00000000      0x226
  *(.debug_info .gnu.linkonce.wi.*)
- .debug_info    0x00000000      0x16b Sensormodul_test.o
+ .debug_info    0x00000000      0x226 Sensormodul_test.o
 
-.debug_abbrev   0x00000000      0x10e
+.debug_abbrev   0x00000000      0x154
  *(.debug_abbrev)
- .debug_abbrev  0x00000000      0x10e Sensormodul_test.o
+ .debug_abbrev  0x00000000      0x154 Sensormodul_test.o
 
-.debug_line     0x00000000      0x1f6
+.debug_line     0x00000000      0x263
  *(.debug_line .debug_line.* .debug_line_end)
- .debug_line    0x00000000      0x1f6 Sensormodul_test.o
+ .debug_line    0x00000000      0x263 Sensormodul_test.o
 
-.debug_frame    0x00000000       0x98
+.debug_frame    0x00000000       0x68
  *(.debug_frame)
- .debug_frame   0x00000000       0x98 Sensormodul_test.o
+ .debug_frame   0x00000000       0x68 Sensormodul_test.o
 
-.debug_str      0x00000000      0x1b7
+.debug_str      0x00000000      0x1d0
  *(.debug_str)
- .debug_str     0x00000000      0x1b7 Sensormodul_test.o
-                                0x1f0 (size before relaxing)
+ .debug_str     0x00000000      0x1d0 Sensormodul_test.o
+                                0x209 (size before relaxing)
 
-.debug_loc      0x00000000      0x12d
+.debug_loc      0x00000000      0x19c
  *(.debug_loc)
- .debug_loc     0x00000000      0x12d Sensormodul_test.o
+ .debug_loc     0x00000000      0x19c Sensormodul_test.o
 
 .debug_macinfo
  *(.debug_macinfo)
@@ -461,9 +431,9 @@ END GROUP
 .debug_pubtypes
  *(.debug_pubtypes)
 
-.debug_ranges   0x00000000       0x18
+.debug_ranges   0x00000000       0x38
  *(.debug_ranges)
- .debug_ranges  0x00000000       0x18 Sensormodul_test.o
+ .debug_ranges  0x00000000       0x38 Sensormodul_test.o
 
 .debug_macro
  *(.debug_macro)
