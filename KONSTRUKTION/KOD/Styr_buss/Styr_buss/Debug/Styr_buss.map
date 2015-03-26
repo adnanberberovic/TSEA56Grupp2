@@ -12,6 +12,8 @@ Discarded input sections
  .bss           0x00000000        0x0 Styr_buss.o
  .text.Styr_InitPortValues
                 0x00000000        0x6 Styr_buss.o
+ .text.SPI_MasterTransmit
+                0x00000000       0x1e Styr_buss.o
  .text          0x00000000        0x0 c:/program files (x86)/atmel/atmel toolchain/avr8 gcc/native/3.4.1061/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.8.1/avr51\libgcc.a(_exit.o)
  .data          0x00000000        0x0 c:/program files (x86)/atmel/atmel toolchain/avr8 gcc/native/3.4.1061/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.8.1/avr51\libgcc.a(_exit.o)
  .bss           0x00000000        0x0 c:/program files (x86)/atmel/atmel toolchain/avr8 gcc/native/3.4.1061/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.8.1/avr51\libgcc.a(_exit.o)
@@ -145,7 +147,7 @@ END GROUP
 .rela.plt
  *(.rela.plt)
 
-.text           0x00000000      0x160
+.text           0x00000000      0x446
  *(.vectors)
  .vectors       0x00000000       0x8c c:/program files (x86)/atmel/atmel toolchain/avr8 gcc/native/3.4.1061/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.8.1/../../../../avr/lib/avr51/crtm1284p.o
                 0x00000000                __vector_default
@@ -240,19 +242,28 @@ END GROUP
  .text.SPI_MasterInit
                 0x000000b0        0x8 Styr_buss.o
                 0x000000b0                SPI_MasterInit
- .text.SPI_MasterTransmit
-                0x000000b8       0x1e Styr_buss.o
-                0x000000b8                SPI_MasterTransmit
  .text.__vector_19
-                0x000000d6       0x14 Styr_buss.o
-                0x000000d6                __vector_19
- .text.main     0x000000ea       0x72 Styr_buss.o
-                0x000000ea                main
-                0x0000015c                . = ALIGN (0x2)
+                0x000000b8       0x14 Styr_buss.o
+                0x000000b8                __vector_19
+ .text.LCD_busy
+                0x000000cc       0x22 Styr_buss.o
+                0x000000cc                LCD_busy
+ .text.send_command_to_LCD
+                0x000000ee       0x42 Styr_buss.o
+                0x000000ee                send_command_to_LCD
+ .text.send_char_to_LCD
+                0x00000130      0x2be Styr_buss.o
+                0x00000130                send_char_to_LCD
+ .text.LCD_init
+                0x000003ee       0x3c Styr_buss.o
+                0x000003ee                LCD_init
+ .text.main     0x0000042a       0x18 Styr_buss.o
+                0x0000042a                main
+                0x00000442                . = ALIGN (0x2)
  *(.fini9)
- .fini9         0x0000015c        0x0 c:/program files (x86)/atmel/atmel toolchain/avr8 gcc/native/3.4.1061/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.8.1/avr51\libgcc.a(_exit.o)
-                0x0000015c                _exit
-                0x0000015c                exit
+ .fini9         0x00000442        0x0 c:/program files (x86)/atmel/atmel toolchain/avr8 gcc/native/3.4.1061/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.8.1/avr51\libgcc.a(_exit.o)
+                0x00000442                _exit
+                0x00000442                exit
  *(.fini9)
  *(.fini8)
  *(.fini8)
@@ -271,11 +282,11 @@ END GROUP
  *(.fini1)
  *(.fini1)
  *(.fini0)
- .fini0         0x0000015c        0x4 c:/program files (x86)/atmel/atmel toolchain/avr8 gcc/native/3.4.1061/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.8.1/avr51\libgcc.a(_exit.o)
+ .fini0         0x00000442        0x4 c:/program files (x86)/atmel/atmel toolchain/avr8 gcc/native/3.4.1061/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.8.1/avr51\libgcc.a(_exit.o)
  *(.fini0)
-                0x00000160                _etext = .
+                0x00000446                _etext = .
 
-.data           0x00800100        0x0 load address 0x00000160
+.data           0x00800100        0x0 load address 0x00000446
                 0x00800100                PROVIDE (__data_start, .)
  *(.data)
  *(.data*)
@@ -292,8 +303,8 @@ END GROUP
  *(.bss*)
  *(COMMON)
                 0x00800100                PROVIDE (__bss_end, .)
-                0x00000160                __data_load_start = LOADADDR (.data)
-                0x00000160                __data_load_end = (__data_load_start + SIZEOF (.data))
+                0x00000446                __data_load_start = LOADADDR (.data)
+                0x00000446                __data_load_end = (__data_load_start + SIZEOF (.data))
 
 .noinit         0x00800100        0x0
                 0x00800100                PROVIDE (__noinit_start, .)
@@ -359,38 +370,38 @@ END GROUP
 .debug_sfnames
  *(.debug_sfnames)
 
-.debug_aranges  0x00000000       0x48
+.debug_aranges  0x00000000       0x68
  *(.debug_aranges)
  .debug_aranges
-                0x00000000       0x48 Styr_buss.o
+                0x00000000       0x68 Styr_buss.o
 
 .debug_pubnames
  *(.debug_pubnames)
 
-.debug_info     0x00000000      0x2ab
+.debug_info     0x00000000      0x4a8
  *(.debug_info .gnu.linkonce.wi.*)
- .debug_info    0x00000000      0x2ab Styr_buss.o
+ .debug_info    0x00000000      0x4a8 Styr_buss.o
 
-.debug_abbrev   0x00000000      0x18b
+.debug_abbrev   0x00000000      0x22a
  *(.debug_abbrev)
- .debug_abbrev  0x00000000      0x18b Styr_buss.o
+ .debug_abbrev  0x00000000      0x22a Styr_buss.o
 
-.debug_line     0x00000000      0x276
+.debug_line     0x00000000      0x95d
  *(.debug_line .debug_line.* .debug_line_end)
- .debug_line    0x00000000      0x276 Styr_buss.o
+ .debug_line    0x00000000      0x95d Styr_buss.o
 
-.debug_frame    0x00000000       0x80
+.debug_frame    0x00000000       0xc8
  *(.debug_frame)
- .debug_frame   0x00000000       0x80 Styr_buss.o
+ .debug_frame   0x00000000       0xc8 Styr_buss.o
 
-.debug_str      0x00000000      0x205
+.debug_str      0x00000000      0x246
  *(.debug_str)
- .debug_str     0x00000000      0x205 Styr_buss.o
-                                0x23e (size before relaxing)
+ .debug_str     0x00000000      0x246 Styr_buss.o
+                                0x27f (size before relaxing)
 
-.debug_loc      0x00000000       0xb2
+.debug_loc      0x00000000      0x1a4
  *(.debug_loc)
- .debug_loc     0x00000000       0xb2 Styr_buss.o
+ .debug_loc     0x00000000      0x1a4 Styr_buss.o
 
 .debug_macinfo
  *(.debug_macinfo)
@@ -410,9 +421,9 @@ END GROUP
 .debug_pubtypes
  *(.debug_pubtypes)
 
-.debug_ranges   0x00000000       0x38
+.debug_ranges   0x00000000       0x58
  *(.debug_ranges)
- .debug_ranges  0x00000000       0x38 Styr_buss.o
+ .debug_ranges  0x00000000       0x58 Styr_buss.o
 
 .debug_macro
  *(.debug_macro)
