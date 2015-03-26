@@ -9,6 +9,7 @@
 #include <avr/interrupt.h>
 #include <avr/sleep.h>
 
+
 unsigned char outSPDR;
 unsigned char inSPDR;
 
@@ -29,8 +30,7 @@ void Komm_InitPortValues(void)
 void SPI_SlaveInit(void)
 {
 	SPSR = 0<<SPI2X;
-	SPCR = 1<<SPIE | 1<<SPE | 1<<DORD | 0<<MSTR | 0<<CPOL | 0<<CPHA |
-	1<<SPR1 | 1<<SPR0;
+	SPCR = 1<<SPIE | 1<<SPE | 1<<DORD | 0<<MSTR | 0<<CPOL | 0<<CPHA | 1<<SPR1 | 1<<SPR0;
 	//SPIE: SPI interrupt enable. Set to 1 to allow interrupts
 	//SPE: SPI Enable. Set to 1 to allow SPI communication
 	//DORD: Data order. Set to 1 to transmit LSB first, MSB last.
@@ -55,6 +55,26 @@ ISR(SPI_STC_vect)
 {
 	inSPDR = SPDR;
 	SPDR = inSPDR -1;
+}
+
+// Set up and enable Bluetooth
+void BT_init(unsigned int ubrr) //
+{
+	UBRR0H = 0x00; //correct value to change baud rate
+	UBRR0L = 0x07;//^^ same ^^ with a 14.7 mhz, scale with 1111 (7)
+	
+	UCSR0B = (1<<TXEN0) | (1<<RXEN0) | (0<<UCSZ02) | (1<<RXCIE0) | (1<<TXCIE0);
+	/* RXCI, TXCI Complete transmission and complete interrupt is enabled
+	 * UDRIE0 not set, disabled interrupts due to UDRE0 flag. Data register empty
+	 * TXEN, TXEN, transmission and receiver enable 
+	 * UCSZ02 sets the third bit, defining framesize
+	*/
+	UCSR0C = (1<<UCSZ01) | (1<<UCSZ00);
+	/* UMSEL0 = 0 setting Asynchronous operation
+	 * UPM01:0 = 0, Pairty disabled
+	 * USBS0 = 0, 1 stop bit
+	 * UCSZ01:0 = 1, char size = 8
+	 */
 }
 
 int main(void)
