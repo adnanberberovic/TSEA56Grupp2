@@ -10,12 +10,14 @@
 #include <avr/sleep.h>
 #include <string.h>
 #include <stdio.h>
+#include <util/delay.h>
 
 //Setup data direction registers @ ports for out/inputs.
 void Styr_InitPortDirections(void)
 {
 	DDRA = 1<<DDA0 | 1<<DDA1 | 1<<DDA2 | 1<<DDA3 | 1<<DDA6;
 	DDRB = 1<<DDB0 | 1<<DDB1 | 1<<DDB2 | 1<<DDB3 | 1<<DDB4 | 1<<DDB5 | 1<<DDB7;
+	DDRC = 1<<DDC0;
 	DDRD = 1<<DDD0 | 1<<DDD1 | 1<<DDD2 | 1<<DDD3 | 1<<DDD4 | 1<<DDD5 | 1<<DDD6 | 1<<DDD7;
 } 
 
@@ -62,12 +64,6 @@ unsigned char SPI_MasterTransmit(unsigned char cData, char *target)
 	return SPDR;
 }
 
-//Interrupt method runs when SPI transmission/reception is completed.
-ISR(SPI_STC_vect)
-{
-	
-}
-
 int main(void)
 {
 	unsigned char SPDRrec_ = 0;
@@ -76,11 +72,18 @@ int main(void)
 	Styr_InitPortDirections();
 	Styr_InitPortValues();
 	SPI_MasterInit();
-	SPDR = 0xFE;
 	SPDRrec_ = SPI_MasterTransmit(0x0F, "komm");
+	if (SPDrec_ == 0x0F)
+	{
+		PORTC = (1<<PORTC0);
+	}
+	_delay_us(100);
 	SPDRrec_ = SPI_MasterTransmit(0x0F, "komm");
+	if (SPDrec_ == 0x0F)
+	{
+		PORTC = (1<<PORTC0);
+	}
 	while(1)
-    {
-		
+    {		
 	}
 }
