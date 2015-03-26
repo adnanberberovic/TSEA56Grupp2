@@ -411,10 +411,10 @@ END GROUP
  *(.debug_frame)
  .debug_frame   0x00000000       0x84 Komm_buss.o
 
-.debug_str      0x00000000      0x1b7
+.debug_str      0x00000000      0x1ae
  *(.debug_str)
- .debug_str     0x00000000      0x1b7 Komm_buss.o
-                                0x1eb (size before relaxing)
+ .debug_str     0x00000000      0x1ae Komm_buss.o
+                                0x1e2 (size before relaxing)
 
 .debug_loc      0x00000000       0x3c
  *(.debug_loc)

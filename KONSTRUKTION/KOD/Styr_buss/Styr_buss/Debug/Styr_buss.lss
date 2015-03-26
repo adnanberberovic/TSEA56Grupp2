@@ -3,25 +3,25 @@ Styr_buss.elf:     file format elf32-avr
 
 Sections:
 Idx Name          Size      VMA       LMA       File off  Algn
-  0 .text         00000160  00000000  00000000  00000054  2**1
+  0 .text         0000044e  00000000  00000000  00000054  2**1
                   CONTENTS, ALLOC, LOAD, READONLY, CODE
-  1 .comment      00000030  00000000  00000000  000001b4  2**0
+  1 .comment      00000030  00000000  00000000  000004a2  2**0
                   CONTENTS, READONLY
-  2 .debug_aranges 00000048  00000000  00000000  000001e4  2**0
+  2 .debug_aranges 00000068  00000000  00000000  000004d2  2**0
                   CONTENTS, READONLY, DEBUGGING
-  3 .debug_info   000002ab  00000000  00000000  0000022c  2**0
+  3 .debug_info   000004d0  00000000  00000000  0000053a  2**0
                   CONTENTS, READONLY, DEBUGGING
-  4 .debug_abbrev 0000018b  00000000  00000000  000004d7  2**0
+  4 .debug_abbrev 0000022a  00000000  00000000  00000a0a  2**0
                   CONTENTS, READONLY, DEBUGGING
-  5 .debug_line   00000276  00000000  00000000  00000662  2**0
+  5 .debug_line   00000969  00000000  00000000  00000c34  2**0
                   CONTENTS, READONLY, DEBUGGING
-  6 .debug_frame  00000080  00000000  00000000  000008d8  2**2
+  6 .debug_frame  000000c8  00000000  00000000  000015a0  2**2
                   CONTENTS, READONLY, DEBUGGING
-  7 .debug_str    00000205  00000000  00000000  00000958  2**0
+  7 .debug_str    00000246  00000000  00000000  00001668  2**0
                   CONTENTS, READONLY, DEBUGGING
-  8 .debug_loc    000000b2  00000000  00000000  00000b5d  2**0
+  8 .debug_loc    000001a4  00000000  00000000  000018ae  2**0
                   CONTENTS, READONLY, DEBUGGING
-  9 .debug_ranges 00000038  00000000  00000000  00000c0f  2**0
+  9 .debug_ranges 00000058  00000000  00000000  00001a52  2**0
                   CONTENTS, READONLY, DEBUGGING
 
 Disassembly of section .text:
@@ -65,7 +65,7 @@ Disassembly of section .text:
   46:	00 00       	nop
   48:	29 c0       	rjmp	.+82     	; 0x9c <__bad_interrupt>
   4a:	00 00       	nop
-  4c:	44 c0       	rjmp	.+136    	; 0xd6 <__vector_19>
+  4c:	35 c0       	rjmp	.+106    	; 0xb8 <__vector_19>
   4e:	00 00       	nop
   50:	25 c0       	rjmp	.+74     	; 0x9c <__bad_interrupt>
   52:	00 00       	nop
@@ -105,19 +105,19 @@ Disassembly of section .text:
   92:	d0 e4       	ldi	r29, 0x40	; 64
   94:	de bf       	out	0x3e, r29	; 62
   96:	cd bf       	out	0x3d, r28	; 61
-  98:	28 d0       	rcall	.+80     	; 0xea <main>
-  9a:	60 c0       	rjmp	.+192    	; 0x15c <_exit>
+  98:	c8 d1       	rcall	.+912    	; 0x42a <main>
+  9a:	d7 c1       	rjmp	.+942    	; 0x44a <_exit>
 
 0000009c <__bad_interrupt>:
   9c:	b1 cf       	rjmp	.-158    	; 0x0 <__vectors>
 
 0000009e <Styr_InitPortDirections>:
-} 
-
-//Setups port values, more specifically puts SS on high.
-void Styr_InitPortValues(void)
-{
-	PORTB = 1<<PORTB3 | 1<<PORTB4;
+	while(!(SPSR & (1<<SPIF)));
+	
+	PORTB = 1<<PORTB4 | 1<<PORTB5;
+	
+	return SPDR;
+}
   9e:	8f e4       	ldi	r24, 0x4F	; 79
   a0:	81 b9       	out	0x01, r24	; 1
   a2:	8f eb       	ldi	r24, 0xBF	; 191
@@ -129,187 +129,717 @@ void Styr_InitPortValues(void)
   ae:	08 95       	ret
 
 000000b0 <SPI_MasterInit>:
-}
-
-//Configures device as spi master.
-void SPI_MasterInit(void)
-{
-	SPSR = 0<<SPI2X;
   b0:	1d bc       	out	0x2d, r1	; 45
-	SPCR = 1<<SPIE | 1<<SPE | 1<<DORD | 1<<MSTR | 0<<CPOL | 0<<CPHA | 1<<SPR1 | 1<<SPR0;
   b2:	83 ef       	ldi	r24, 0xF3	; 243
   b4:	8c bd       	out	0x2c, r24	; 44
   b6:	08 95       	ret
 
-000000b8 <SPI_MasterTransmit>:
-}
-
-//Initiates commiunication with other modules.
-unsigned char SPI_MasterTransmit(unsigned char cData, char target)
-{
-	if (target == 'k') //k as in kommunikation
-  b8:	6b 36       	cpi	r22, 0x6B	; 107
-  ba:	11 f4       	brne	.+4      	; 0xc0 <SPI_MasterTransmit+0x8>
-	{
-		PORTB = 0<<PORTB4;
-  bc:	15 b8       	out	0x05, r1	; 5
-  be:	03 c0       	rjmp	.+6      	; 0xc6 <SPI_MasterTransmit+0xe>
-	}
-	else if (target == 's')	//s as in sensor
-  c0:	63 37       	cpi	r22, 0x73	; 115
-  c2:	09 f4       	brne	.+2      	; 0xc6 <SPI_MasterTransmit+0xe>
-	{
-		PORTB = 0<<PORTB5;
-  c4:	15 b8       	out	0x05, r1	; 5
-	}
-	//Load data into SPI data register.
-	SPDR = cData; 
-  c6:	8e bd       	out	0x2e, r24	; 46
-	
-	//wait until transmission completes.
-	while(!(SPSR & (1<<SPIF)));
-  c8:	0d b4       	in	r0, 0x2d	; 45
-  ca:	07 fe       	sbrs	r0, 7
-  cc:	fd cf       	rjmp	.-6      	; 0xc8 <SPI_MasterTransmit+0x10>
-	
-	PORTB = 1<<PORTB4 | 1<<PORTB5;
-  ce:	80 e3       	ldi	r24, 0x30	; 48
-  d0:	85 b9       	out	0x05, r24	; 5
-	
-	return SPDR;
-  d2:	8e b5       	in	r24, 0x2e	; 46
-}
-  d4:	08 95       	ret
-
-000000d6 <__vector_19>:
+000000b8 <__vector_19>:
 
 ISR(SPI_STC_vect)
 {
-  d6:	1f 92       	push	r1
-  d8:	0f 92       	push	r0
-  da:	0f b6       	in	r0, 0x3f	; 63
-  dc:	0f 92       	push	r0
-  de:	11 24       	eor	r1, r1
+  b8:	1f 92       	push	r1
+  ba:	0f 92       	push	r0
+  bc:	0f b6       	in	r0, 0x3f	; 63
+  be:	0f 92       	push	r0
+  c0:	11 24       	eor	r1, r1
 	
 }
-  e0:	0f 90       	pop	r0
-  e2:	0f be       	out	0x3f, r0	; 63
-  e4:	0f 90       	pop	r0
-  e6:	1f 90       	pop	r1
-  e8:	18 95       	reti
+  c2:	0f 90       	pop	r0
+  c4:	0f be       	out	0x3f, r0	; 63
+  c6:	0f 90       	pop	r0
+  c8:	1f 90       	pop	r1
+  ca:	18 95       	reti
 
-000000ea <main>:
+000000cc <LCD_busy>:
+// void send_command_to_LCD(char cmd);
+//
 
-int main(void)
+int LCD_busy()
 {
-	unsigned char SPDRrec_ = 0;
-	sei();
-  ea:	78 94       	sei
-	sleep_enable();
-  ec:	83 b7       	in	r24, 0x33	; 51
-  ee:	81 60       	ori	r24, 0x01	; 1
-  f0:	83 bf       	out	0x33, r24	; 51
-	Styr_InitPortDirections();
-  f2:	d5 df       	rcall	.-86     	; 0x9e <Styr_InitPortDirections>
-} 
-
-//Setups port values, more specifically puts SS on high.
-void Styr_InitPortValues(void)
-{
-	PORTB = 1<<PORTB3 | 1<<PORTB4;
-  f4:	88 e1       	ldi	r24, 0x18	; 24
-  f6:	85 b9       	out	0x05, r24	; 5
-	unsigned char SPDRrec_ = 0;
-	sei();
-	sleep_enable();
-	Styr_InitPortDirections();
-	Styr_InitPortValues();
-	SPI_MasterInit();
-  f8:	db df       	rcall	.-74     	; 0xb0 <SPI_MasterInit>
-	SPDRrec_ = SPI_MasterTransmit(0x01, 'k');
-  fa:	6b e6       	ldi	r22, 0x6B	; 107
-  fc:	81 e0       	ldi	r24, 0x01	; 1
-  fe:	dc df       	rcall	.-72     	; 0xb8 <SPI_MasterTransmit>
+	DDRD = 0; //sätter port D till ingång
+  cc:	1a b8       	out	0x0a, r1	; 10
+	PORTB = 1 << 1; //read busy flag
+  ce:	82 e0       	ldi	r24, 0x02	; 2
+  d0:	85 b9       	out	0x05, r24	; 5
+	PORTB &= ~(1 << 0); // clear bit 0 in PORTB to 0 (sätter register select instruction "RS=0")
+  d2:	28 98       	cbi	0x05, 0	; 5
+	PORTB = (1 << 2); // aktiverar LCD:en (enable pinne på LCD)
+  d4:	84 e0       	ldi	r24, 0x04	; 4
+  d6:	85 b9       	out	0x05, r24	; 5
 	#else
 		//round up by default
 		__ticks_dc = (uint32_t)(ceil(fabs(__tmp)));
 	#endif
 
 	__builtin_avr_delay_cycles(__ticks_dc);
- 100:	83 e0       	ldi	r24, 0x03	; 3
- 102:	8a 95       	dec	r24
- 104:	f1 f7       	brne	.-4      	; 0x102 <main+0x18>
- 106:	00 00       	nop
-	_delay_us(10);
-	SPDRrec_ = SPI_MasterTransmit(0x1F, 'k');
- 108:	6b e6       	ldi	r22, 0x6B	; 107
- 10a:	8f e1       	ldi	r24, 0x1F	; 31
- 10c:	d5 df       	rcall	.-86     	; 0xb8 <SPI_MasterTransmit>
-	if (SPDRrec_ == 0x0F)
- 10e:	8f 30       	cpi	r24, 0x0F	; 15
- 110:	19 f4       	brne	.+6      	; 0x118 <main+0x2e>
-	{
-		PORTC = (1<<PORTC0);
- 112:	81 e0       	ldi	r24, 0x01	; 1
- 114:	88 b9       	out	0x08, r24	; 8
- 116:	04 c0       	rjmp	.+8      	; 0x120 <main+0x36>
-	}
-	if (SPDRrec_ == 0x00)
- 118:	81 11       	cpse	r24, r1
- 11a:	02 c0       	rjmp	.+4      	; 0x120 <main+0x36>
-	{
-		PORTC = (1<<PORTC0);
- 11c:	81 e0       	ldi	r24, 0x01	; 1
- 11e:	88 b9       	out	0x08, r24	; 8
- 120:	83 e0       	ldi	r24, 0x03	; 3
- 122:	8a 95       	dec	r24
- 124:	f1 f7       	brne	.-4      	; 0x122 <main+0x38>
- 126:	00 00       	nop
-	}
-	_delay_us(10);
-	SPDRrec_ = SPI_MasterTransmit(0x0F, 'k');
- 128:	6b e6       	ldi	r22, 0x6B	; 107
- 12a:	8f e0       	ldi	r24, 0x0F	; 15
- 12c:	c5 df       	rcall	.-118    	; 0xb8 <SPI_MasterTransmit>
-	if (SPDRrec_ == 0x1E)
- 12e:	8e 31       	cpi	r24, 0x1E	; 30
- 130:	11 f4       	brne	.+4      	; 0x136 <main+0x4c>
-	{
-		PORTC = (1<<PORTC0);
- 132:	81 e0       	ldi	r24, 0x01	; 1
- 134:	88 b9       	out	0x08, r24	; 8
- 136:	83 e0       	ldi	r24, 0x03	; 3
- 138:	8a 95       	dec	r24
- 13a:	f1 f7       	brne	.-4      	; 0x138 <main+0x4e>
- 13c:	00 00       	nop
-	}
-	_delay_us(10);
-	SPDRrec_ = SPI_MasterTransmit(0x1F, 'k');
- 13e:	6b e6       	ldi	r22, 0x6B	; 107
- 140:	8f e1       	ldi	r24, 0x1F	; 31
- 142:	ba df       	rcall	.-140    	; 0xb8 <SPI_MasterTransmit>
-	if (SPDRrec_ == 0x0E)
- 144:	8e 30       	cpi	r24, 0x0E	; 14
- 146:	19 f4       	brne	.+6      	; 0x14e <main+0x64>
-	{
-		PORTC = (1<<PORTC0);
- 148:	81 e0       	ldi	r24, 0x01	; 1
- 14a:	88 b9       	out	0x08, r24	; 8
- 14c:	02 c0       	rjmp	.+4      	; 0x152 <main+0x68>
-	}
-	if (SPDRrec_ == 0x0F)
- 14e:	8f 30       	cpi	r24, 0x0F	; 15
- 150:	09 f0       	breq	.+2      	; 0x154 <main+0x6a>
- 152:	03 c0       	rjmp	.+6      	; 0x15a <main+0x70>
-	{
-		PORTC = (1<<PORTC0);
- 154:	81 e0       	ldi	r24, 0x01	; 1
- 156:	88 b9       	out	0x08, r24	; 8
- 158:	fc cf       	rjmp	.-8      	; 0x152 <main+0x68>
- 15a:	ff cf       	rjmp	.-2      	; 0x15a <main+0x70>
+  d8:	00 c0       	rjmp	.+0      	; 0xda <LCD_busy+0xe>
+	_delay_us(2);
+	char instr = PIND;
+  da:	89 b1       	in	r24, 0x09	; 9
+	PORTB &= ~(1 << 2); // clear bit 2 in PORTB to 0
+  dc:	2a 98       	cbi	0x05, 2	; 5
+	PORTB &= ~(1 << 1); // clear bit 1 in PORTB to 0
+  de:	29 98       	cbi	0x05, 1	; 5
+	DDRD = 0xff; //sätter port D till utgång
+  e0:	9f ef       	ldi	r25, 0xFF	; 255
+  e2:	9a b9       	out	0x0a, r25	; 10
+	return instr >> 7; // MSB is the busy flag
+  e4:	88 1f       	adc	r24, r24
+  e6:	88 27       	eor	r24, r24
+  e8:	88 1f       	adc	r24, r24
+}
+  ea:	90 e0       	ldi	r25, 0x00	; 0
+  ec:	08 95       	ret
 
-0000015c <_exit>:
- 15c:	f8 94       	cli
+000000ee <send_command_to_LCD>:
 
-0000015e <__stop_program>:
- 15e:	ff cf       	rjmp	.-2      	; 0x15e <__stop_program>
+void send_command_to_LCD(char cmd) {
+  ee:	cf 93       	push	r28
+  f0:	c8 2f       	mov	r28, r24
+	while (LCD_busy())
+  f2:	06 c0       	rjmp	.+12     	; 0x100 <send_command_to_LCD+0x12>
+	#else
+		//round up by default
+		__ticks_dc = (uint32_t)(ceil(fabs(__tmp)));
+	#endif
+
+	__builtin_avr_delay_cycles(__ticks_dc);
+  f4:	89 ef       	ldi	r24, 0xF9	; 249
+  f6:	90 e0       	ldi	r25, 0x00	; 0
+  f8:	01 97       	sbiw	r24, 0x01	; 1
+  fa:	f1 f7       	brne	.-4      	; 0xf8 <send_command_to_LCD+0xa>
+  fc:	00 c0       	rjmp	.+0      	; 0xfe <send_command_to_LCD+0x10>
+  fe:	00 00       	nop
+ 100:	e5 df       	rcall	.-54     	; 0xcc <LCD_busy>
+ 102:	89 2b       	or	r24, r25
+ 104:	b9 f7       	brne	.-18     	; 0xf4 <send_command_to_LCD+0x6>
+	{
+		_delay_ms(1);
+		
+	}
+		PORTB &= ~(1 << 0); // clear bit 0 in PORTB to 0 (sätter Register Select till instruction "RS=0")
+ 106:	28 98       	cbi	0x05, 0	; 5
+		PORTD = cmd;
+ 108:	cb b9       	out	0x0b, r28	; 11
+	
+	
+	PORTB = 1 << 2;
+ 10a:	84 e0       	ldi	r24, 0x04	; 4
+ 10c:	85 b9       	out	0x05, r24	; 5
+	
+	if (cmd == 0b01 || cmd == 0b10) // if clear or return home instruction
+ 10e:	c1 50       	subi	r28, 0x01	; 1
+ 110:	c2 30       	cpi	r28, 0x02	; 2
+ 112:	38 f4       	brcc	.+14     	; 0x122 <send_command_to_LCD+0x34>
+ 114:	86 e7       	ldi	r24, 0x76	; 118
+ 116:	91 e0       	ldi	r25, 0x01	; 1
+ 118:	01 97       	sbiw	r24, 0x01	; 1
+ 11a:	f1 f7       	brne	.-4      	; 0x118 <send_command_to_LCD+0x2a>
+ 11c:	00 c0       	rjmp	.+0      	; 0x11e <send_command_to_LCD+0x30>
+ 11e:	00 00       	nop
+ 120:	04 c0       	rjmp	.+8      	; 0x12a <send_command_to_LCD+0x3c>
+	#else
+		//round up by default
+		__ticks_dc = (uint32_t)(ceil(fabs(__tmp)));
+	#endif
+
+	__builtin_avr_delay_cycles(__ticks_dc);
+ 122:	90 e1       	ldi	r25, 0x10	; 16
+ 124:	9a 95       	dec	r25
+ 126:	f1 f7       	brne	.-4      	; 0x124 <send_command_to_LCD+0x36>
+ 128:	00 c0       	rjmp	.+0      	; 0x12a <send_command_to_LCD+0x3c>
+	else
+	{
+		_delay_us(50);
+	}
+
+	PORTB &= ~(1 << 2);
+ 12a:	2a 98       	cbi	0x05, 2	; 5
+}
+ 12c:	cf 91       	pop	r28
+ 12e:	08 95       	ret
+
+00000130 <send_char_to_LCD>:
+
+void send_char_to_LCD(char tecken)
+{
+	// siffror
+	if(tecken == '0') PORTD = (0 << 7)|(0 << 6)|(1 << 5)|(1 << 4)|(0 << 3)|(0 << 2)|(0 << 1)|(0 << 0);//00110000
+ 130:	80 33       	cpi	r24, 0x30	; 48
+ 132:	11 f4       	brne	.+4      	; 0x138 <send_char_to_LCD+0x8>
+ 134:	8b b9       	out	0x0b, r24	; 11
+ 136:	08 95       	ret
+	else if (tecken == '1') PORTD = (0 << 7)|(0 << 6)|(1 << 5)|(1 << 4)|(0 << 3)|(0 << 2)|(0 << 1)|(1 << 0);//00110001
+ 138:	81 33       	cpi	r24, 0x31	; 49
+ 13a:	11 f4       	brne	.+4      	; 0x140 <send_char_to_LCD+0x10>
+ 13c:	8b b9       	out	0x0b, r24	; 11
+ 13e:	08 95       	ret
+	else if (tecken == '2') PORTD = (0 << 7)|(0 << 6)|(1 << 5)|(1 << 4)|(0 << 3)|(0 << 2)|(1 << 1)|(0 << 0);//00110010
+ 140:	82 33       	cpi	r24, 0x32	; 50
+ 142:	11 f4       	brne	.+4      	; 0x148 <send_char_to_LCD+0x18>
+ 144:	8b b9       	out	0x0b, r24	; 11
+ 146:	08 95       	ret
+	else if (tecken == '3') PORTD = (0 << 7)|(0 << 6)|(1 << 5)|(1 << 4)|(0 << 3)|(0 << 2)|(1 << 1)|(1 << 0);//00110011
+ 148:	83 33       	cpi	r24, 0x33	; 51
+ 14a:	11 f4       	brne	.+4      	; 0x150 <send_char_to_LCD+0x20>
+ 14c:	8b b9       	out	0x0b, r24	; 11
+ 14e:	08 95       	ret
+	else if (tecken == '4') PORTD = (0 << 7)|(0 << 6)|(1 << 5)|(1 << 4)|(0 << 3)|(1 << 2)|(0 << 1)|(0 << 0);//00110100
+ 150:	84 33       	cpi	r24, 0x34	; 52
+ 152:	11 f4       	brne	.+4      	; 0x158 <send_char_to_LCD+0x28>
+ 154:	8b b9       	out	0x0b, r24	; 11
+ 156:	08 95       	ret
+	else if (tecken == '5') PORTD = (0 << 7)|(0 << 6)|(1 << 5)|(1 << 4)|(0 << 3)|(1 << 2)|(0 << 1)|(1 << 0);//00110101
+ 158:	85 33       	cpi	r24, 0x35	; 53
+ 15a:	11 f4       	brne	.+4      	; 0x160 <send_char_to_LCD+0x30>
+ 15c:	8b b9       	out	0x0b, r24	; 11
+ 15e:	08 95       	ret
+	else if (tecken == '6') PORTD = (0 << 7)|(0 << 6)|(1 << 5)|(1 << 4)|(0 << 3)|(1 << 2)|(1 << 1)|(0 << 0);//00110110
+ 160:	86 33       	cpi	r24, 0x36	; 54
+ 162:	11 f4       	brne	.+4      	; 0x168 <send_char_to_LCD+0x38>
+ 164:	8b b9       	out	0x0b, r24	; 11
+ 166:	08 95       	ret
+	else if (tecken == '7') PORTD = (0 << 7)|(0 << 6)|(1 << 5)|(1 << 4)|(0 << 3)|(1 << 2)|(1 << 1)|(1 << 0);//00110111
+ 168:	87 33       	cpi	r24, 0x37	; 55
+ 16a:	11 f4       	brne	.+4      	; 0x170 <send_char_to_LCD+0x40>
+ 16c:	8b b9       	out	0x0b, r24	; 11
+ 16e:	08 95       	ret
+	else if (tecken == '8') PORTD = (0 << 7)|(0 << 6)|(1 << 5)|(1 << 4)|(1 << 3)|(0 << 2)|(0 << 1)|(0 << 0);//00111000
+ 170:	88 33       	cpi	r24, 0x38	; 56
+ 172:	11 f4       	brne	.+4      	; 0x178 <send_char_to_LCD+0x48>
+ 174:	8b b9       	out	0x0b, r24	; 11
+ 176:	08 95       	ret
+	else if (tecken == '9') PORTD = (0 << 7)|(0 << 6)|(1 << 5)|(1 << 4)|(1 << 3)|(0 << 2)|(0 << 1)|(1 << 0);//00111001
+ 178:	89 33       	cpi	r24, 0x39	; 57
+ 17a:	11 f4       	brne	.+4      	; 0x180 <send_char_to_LCD+0x50>
+ 17c:	8b b9       	out	0x0b, r24	; 11
+ 17e:	08 95       	ret
+	// stora bokstäver
+	else if (tecken == 'A') PORTD = (0 << 7)|(1 << 6)|(0 << 5)|(0 << 4)|(0 << 3)|(0 << 2)|(0 << 1)|(1 << 0);//01000001
+ 180:	81 34       	cpi	r24, 0x41	; 65
+ 182:	11 f4       	brne	.+4      	; 0x188 <send_char_to_LCD+0x58>
+ 184:	8b b9       	out	0x0b, r24	; 11
+ 186:	08 95       	ret
+	else if (tecken == 'B') PORTD = (0 << 7)|(1 << 6)|(0 << 5)|(0 << 4)|(0 << 3)|(0 << 2)|(1 << 1)|(0 << 0);//01000010
+ 188:	82 34       	cpi	r24, 0x42	; 66
+ 18a:	11 f4       	brne	.+4      	; 0x190 <send_char_to_LCD+0x60>
+ 18c:	8b b9       	out	0x0b, r24	; 11
+ 18e:	08 95       	ret
+	else if (tecken == 'C') PORTD = (0 << 7)|(1 << 6)|(0 << 5)|(0 << 4)|(0 << 3)|(0 << 2)|(1 << 1)|(1 << 0);//01000011
+ 190:	83 34       	cpi	r24, 0x43	; 67
+ 192:	11 f4       	brne	.+4      	; 0x198 <send_char_to_LCD+0x68>
+ 194:	8b b9       	out	0x0b, r24	; 11
+ 196:	08 95       	ret
+	else if (tecken == 'D') PORTD = (0 << 7)|(1 << 6)|(0 << 5)|(0 << 4)|(0 << 3)|(1 << 2)|(0 << 1)|(0 << 0);//01000100
+ 198:	84 34       	cpi	r24, 0x44	; 68
+ 19a:	11 f4       	brne	.+4      	; 0x1a0 <send_char_to_LCD+0x70>
+ 19c:	8b b9       	out	0x0b, r24	; 11
+ 19e:	08 95       	ret
+	else if (tecken == 'E') PORTD = (0 << 7)|(1 << 6)|(0 << 5)|(0 << 4)|(0 << 3)|(1 << 2)|(0 << 1)|(1 << 0);//01000101
+ 1a0:	85 34       	cpi	r24, 0x45	; 69
+ 1a2:	11 f4       	brne	.+4      	; 0x1a8 <send_char_to_LCD+0x78>
+ 1a4:	8b b9       	out	0x0b, r24	; 11
+ 1a6:	08 95       	ret
+	else if (tecken == 'F') PORTD = (0 << 7)|(1 << 6)|(0 << 5)|(0 << 4)|(0 << 3)|(1 << 2)|(1 << 1)|(0 << 0);//01000110
+ 1a8:	86 34       	cpi	r24, 0x46	; 70
+ 1aa:	11 f4       	brne	.+4      	; 0x1b0 <send_char_to_LCD+0x80>
+ 1ac:	8b b9       	out	0x0b, r24	; 11
+ 1ae:	08 95       	ret
+	else if (tecken == 'G') PORTD = (0 << 7)|(1 << 6)|(0 << 5)|(0 << 4)|(0 << 3)|(1 << 2)|(1 << 1)|(1 << 0);//01000111
+ 1b0:	87 34       	cpi	r24, 0x47	; 71
+ 1b2:	11 f4       	brne	.+4      	; 0x1b8 <send_char_to_LCD+0x88>
+ 1b4:	8b b9       	out	0x0b, r24	; 11
+ 1b6:	08 95       	ret
+	else if (tecken == 'H') PORTD = (0 << 7)|(1 << 6)|(0 << 5)|(0 << 4)|(1 << 3)|(0 << 2)|(0 << 1)|(0 << 0);//01001000
+ 1b8:	88 34       	cpi	r24, 0x48	; 72
+ 1ba:	11 f4       	brne	.+4      	; 0x1c0 <send_char_to_LCD+0x90>
+ 1bc:	8b b9       	out	0x0b, r24	; 11
+ 1be:	08 95       	ret
+	else if (tecken == 'I') PORTD = (0 << 7)|(1 << 6)|(0 << 5)|(0 << 4)|(1 << 3)|(0 << 2)|(0 << 1)|(1 << 0);//01001001
+ 1c0:	89 34       	cpi	r24, 0x49	; 73
+ 1c2:	11 f4       	brne	.+4      	; 0x1c8 <send_char_to_LCD+0x98>
+ 1c4:	8b b9       	out	0x0b, r24	; 11
+ 1c6:	08 95       	ret
+	else if (tecken == 'J') PORTD = (0 << 7)|(1 << 6)|(0 << 5)|(0 << 4)|(1 << 3)|(0 << 2)|(1 << 1)|(0 << 0);//01001010
+ 1c8:	8a 34       	cpi	r24, 0x4A	; 74
+ 1ca:	11 f4       	brne	.+4      	; 0x1d0 <send_char_to_LCD+0xa0>
+ 1cc:	8b b9       	out	0x0b, r24	; 11
+ 1ce:	08 95       	ret
+	else if (tecken == 'K') PORTD = (0 << 7)|(1 << 6)|(0 << 5)|(0 << 4)|(1 << 3)|(0 << 2)|(1 << 1)|(1 << 0);//01001011
+ 1d0:	8b 34       	cpi	r24, 0x4B	; 75
+ 1d2:	11 f4       	brne	.+4      	; 0x1d8 <send_char_to_LCD+0xa8>
+ 1d4:	8b b9       	out	0x0b, r24	; 11
+ 1d6:	08 95       	ret
+	else if (tecken == 'L') PORTD = (0 << 7)|(1 << 6)|(0 << 5)|(0 << 4)|(1 << 3)|(1 << 2)|(0 << 1)|(0 << 0);//01001100
+ 1d8:	8c 34       	cpi	r24, 0x4C	; 76
+ 1da:	11 f4       	brne	.+4      	; 0x1e0 <send_char_to_LCD+0xb0>
+ 1dc:	8b b9       	out	0x0b, r24	; 11
+ 1de:	08 95       	ret
+	else if (tecken == 'M') PORTD = (0 << 7)|(1 << 6)|(0 << 5)|(0 << 4)|(1 << 3)|(1 << 2)|(0 << 1)|(1 << 0);//01001101
+ 1e0:	8d 34       	cpi	r24, 0x4D	; 77
+ 1e2:	11 f4       	brne	.+4      	; 0x1e8 <send_char_to_LCD+0xb8>
+ 1e4:	8b b9       	out	0x0b, r24	; 11
+ 1e6:	08 95       	ret
+	else if (tecken == 'N') PORTD = (0 << 7)|(1 << 6)|(0 << 5)|(0 << 4)|(1 << 3)|(1 << 2)|(1 << 1)|(0 << 0);//01001110
+ 1e8:	8e 34       	cpi	r24, 0x4E	; 78
+ 1ea:	11 f4       	brne	.+4      	; 0x1f0 <send_char_to_LCD+0xc0>
+ 1ec:	8b b9       	out	0x0b, r24	; 11
+ 1ee:	08 95       	ret
+	else if (tecken == 'O') PORTD = (0 << 7)|(1 << 6)|(0 << 5)|(0 << 4)|(1 << 3)|(1 << 2)|(1 << 1)|(1 << 0);//01001111
+ 1f0:	8f 34       	cpi	r24, 0x4F	; 79
+ 1f2:	11 f4       	brne	.+4      	; 0x1f8 <send_char_to_LCD+0xc8>
+ 1f4:	8b b9       	out	0x0b, r24	; 11
+ 1f6:	08 95       	ret
+	// andra stora bokstäver
+	else if (tecken == 'P') PORTD = (0 << 7)|(1 << 6)|(0 << 5)|(1 << 4)|(0 << 3)|(0 << 2)|(0 << 1)|(0 << 0);//01010000
+ 1f8:	80 35       	cpi	r24, 0x50	; 80
+ 1fa:	11 f4       	brne	.+4      	; 0x200 <send_char_to_LCD+0xd0>
+ 1fc:	8b b9       	out	0x0b, r24	; 11
+ 1fe:	08 95       	ret
+	else if (tecken == 'Q') PORTD = (0 << 7)|(1 << 6)|(0 << 5)|(1 << 4)|(0 << 3)|(0 << 2)|(0 << 1)|(1 << 0);//01010001
+ 200:	81 35       	cpi	r24, 0x51	; 81
+ 202:	11 f4       	brne	.+4      	; 0x208 <send_char_to_LCD+0xd8>
+ 204:	8b b9       	out	0x0b, r24	; 11
+ 206:	08 95       	ret
+	else if (tecken == 'R') PORTD = (0 << 7)|(1 << 6)|(0 << 5)|(1 << 4)|(0 << 3)|(0 << 2)|(1 << 1)|(0 << 0);//01010010
+ 208:	82 35       	cpi	r24, 0x52	; 82
+ 20a:	11 f4       	brne	.+4      	; 0x210 <send_char_to_LCD+0xe0>
+ 20c:	8b b9       	out	0x0b, r24	; 11
+ 20e:	08 95       	ret
+	else if (tecken == 'S') PORTD = (0 << 7)|(1 << 6)|(0 << 5)|(1 << 4)|(0 << 3)|(0 << 2)|(1 << 1)|(1 << 0);//01010011
+ 210:	83 35       	cpi	r24, 0x53	; 83
+ 212:	11 f4       	brne	.+4      	; 0x218 <send_char_to_LCD+0xe8>
+ 214:	8b b9       	out	0x0b, r24	; 11
+ 216:	08 95       	ret
+	else if (tecken == 'T') PORTD = (0 << 7)|(1 << 6)|(0 << 5)|(1 << 4)|(0 << 3)|(1 << 2)|(0 << 1)|(0 << 0);//01010100
+ 218:	84 35       	cpi	r24, 0x54	; 84
+ 21a:	11 f4       	brne	.+4      	; 0x220 <send_char_to_LCD+0xf0>
+ 21c:	8b b9       	out	0x0b, r24	; 11
+ 21e:	08 95       	ret
+	else if (tecken == 'U') PORTD = (0 << 7)|(1 << 6)|(0 << 5)|(1 << 4)|(0 << 3)|(1 << 2)|(0 << 1)|(1 << 0);//01010101
+ 220:	85 35       	cpi	r24, 0x55	; 85
+ 222:	11 f4       	brne	.+4      	; 0x228 <send_char_to_LCD+0xf8>
+ 224:	8b b9       	out	0x0b, r24	; 11
+ 226:	08 95       	ret
+	else if (tecken == 'V') PORTD = (0 << 7)|(1 << 6)|(0 << 5)|(1 << 4)|(0 << 3)|(1 << 2)|(1 << 1)|(0 << 0);//01010110
+ 228:	86 35       	cpi	r24, 0x56	; 86
+ 22a:	11 f4       	brne	.+4      	; 0x230 <send_char_to_LCD+0x100>
+ 22c:	8b b9       	out	0x0b, r24	; 11
+ 22e:	08 95       	ret
+	else if (tecken == 'W') PORTD = (0 << 7)|(1 << 6)|(0 << 5)|(1 << 4)|(0 << 3)|(1 << 2)|(1 << 1)|(1 << 0);//01010111
+ 230:	87 35       	cpi	r24, 0x57	; 87
+ 232:	11 f4       	brne	.+4      	; 0x238 <send_char_to_LCD+0x108>
+ 234:	8b b9       	out	0x0b, r24	; 11
+ 236:	08 95       	ret
+	else if (tecken == 'X') PORTD = (0 << 7)|(1 << 6)|(0 << 5)|(1 << 4)|(1 << 3)|(0 << 2)|(0 << 1)|(0 << 0);//01011000
+ 238:	88 35       	cpi	r24, 0x58	; 88
+ 23a:	11 f4       	brne	.+4      	; 0x240 <send_char_to_LCD+0x110>
+ 23c:	8b b9       	out	0x0b, r24	; 11
+ 23e:	08 95       	ret
+	else if (tecken == 'Y') PORTD = (0 << 7)|(1 << 6)|(0 << 5)|(1 << 4)|(1 << 3)|(0 << 2)|(0 << 1)|(1 << 0);//01011001
+ 240:	89 35       	cpi	r24, 0x59	; 89
+ 242:	11 f4       	brne	.+4      	; 0x248 <send_char_to_LCD+0x118>
+ 244:	8b b9       	out	0x0b, r24	; 11
+ 246:	08 95       	ret
+	else if (tecken == 'Z') PORTD = (0 << 7)|(1 << 6)|(0 << 5)|(1 << 4)|(1 << 3)|(0 << 2)|(1 << 1)|(0 << 0);//01011010
+ 248:	8a 35       	cpi	r24, 0x5A	; 90
+ 24a:	11 f4       	brne	.+4      	; 0x250 <send_char_to_LCD+0x120>
+ 24c:	8b b9       	out	0x0b, r24	; 11
+ 24e:	08 95       	ret
+	// små bokstäver
+	else if (tecken == 'a') PORTD = (0 << 7)|(1 << 6)|(1 << 5)|(0 << 4)|(0 << 3)|(0 << 2)|(0 << 1)|(1 << 0);//01100001
+ 250:	81 36       	cpi	r24, 0x61	; 97
+ 252:	11 f4       	brne	.+4      	; 0x258 <send_char_to_LCD+0x128>
+ 254:	8b b9       	out	0x0b, r24	; 11
+ 256:	08 95       	ret
+	else if (tecken == 'b') PORTD = (0 << 7)|(1 << 6)|(1 << 5)|(0 << 4)|(0 << 3)|(0 << 2)|(1 << 1)|(0 << 0);//01100010
+ 258:	82 36       	cpi	r24, 0x62	; 98
+ 25a:	11 f4       	brne	.+4      	; 0x260 <send_char_to_LCD+0x130>
+ 25c:	8b b9       	out	0x0b, r24	; 11
+ 25e:	08 95       	ret
+	else if (tecken == 'c') PORTD = (0 << 7)|(1 << 6)|(1 << 5)|(0 << 4)|(0 << 3)|(0 << 2)|(1 << 1)|(1 << 0);//01100011
+ 260:	83 36       	cpi	r24, 0x63	; 99
+ 262:	11 f4       	brne	.+4      	; 0x268 <send_char_to_LCD+0x138>
+ 264:	8b b9       	out	0x0b, r24	; 11
+ 266:	08 95       	ret
+	else if (tecken == 'd') PORTD = (0 << 7)|(1 << 6)|(1 << 5)|(0 << 4)|(0 << 3)|(1 << 2)|(0 << 1)|(0 << 0);//01100100
+ 268:	84 36       	cpi	r24, 0x64	; 100
+ 26a:	11 f4       	brne	.+4      	; 0x270 <send_char_to_LCD+0x140>
+ 26c:	8b b9       	out	0x0b, r24	; 11
+ 26e:	08 95       	ret
+	else if (tecken == 'e') PORTD = (0 << 7)|(1 << 6)|(1 << 5)|(0 << 4)|(0 << 3)|(1 << 2)|(0 << 1)|(1 << 0);//01100101
+ 270:	85 36       	cpi	r24, 0x65	; 101
+ 272:	11 f4       	brne	.+4      	; 0x278 <send_char_to_LCD+0x148>
+ 274:	8b b9       	out	0x0b, r24	; 11
+ 276:	08 95       	ret
+	else if (tecken == 'f') PORTD = (0 << 7)|(1 << 6)|(1 << 5)|(0 << 4)|(0 << 3)|(1 << 2)|(1 << 1)|(0 << 0);//01100110
+ 278:	86 36       	cpi	r24, 0x66	; 102
+ 27a:	11 f4       	brne	.+4      	; 0x280 <send_char_to_LCD+0x150>
+ 27c:	8b b9       	out	0x0b, r24	; 11
+ 27e:	08 95       	ret
+	else if (tecken == 'g') PORTD = (0 << 7)|(1 << 6)|(1 << 5)|(0 << 4)|(0 << 3)|(1 << 2)|(1 << 1)|(1 << 0);//01100111
+ 280:	87 36       	cpi	r24, 0x67	; 103
+ 282:	11 f4       	brne	.+4      	; 0x288 <send_char_to_LCD+0x158>
+ 284:	8b b9       	out	0x0b, r24	; 11
+ 286:	08 95       	ret
+	else if (tecken == 'h') PORTD = (0 << 7)|(1 << 6)|(1 << 5)|(0 << 4)|(1 << 3)|(0 << 2)|(0 << 1)|(0 << 0);//01101000
+ 288:	88 36       	cpi	r24, 0x68	; 104
+ 28a:	11 f4       	brne	.+4      	; 0x290 <send_char_to_LCD+0x160>
+ 28c:	8b b9       	out	0x0b, r24	; 11
+ 28e:	08 95       	ret
+	else if (tecken == 'i') PORTD = (0 << 7)|(1 << 6)|(1 << 5)|(0 << 4)|(1 << 3)|(0 << 2)|(0 << 1)|(1 << 0);//01101001
+ 290:	89 36       	cpi	r24, 0x69	; 105
+ 292:	11 f4       	brne	.+4      	; 0x298 <send_char_to_LCD+0x168>
+ 294:	8b b9       	out	0x0b, r24	; 11
+ 296:	08 95       	ret
+	else if (tecken == 'j') PORTD = (0 << 7)|(1 << 6)|(1 << 5)|(0 << 4)|(1 << 3)|(0 << 2)|(1 << 1)|(0 << 0);//01101010
+ 298:	8a 36       	cpi	r24, 0x6A	; 106
+ 29a:	11 f4       	brne	.+4      	; 0x2a0 <send_char_to_LCD+0x170>
+ 29c:	8b b9       	out	0x0b, r24	; 11
+ 29e:	08 95       	ret
+	else if (tecken == 'k') PORTD = (0 << 7)|(1 << 6)|(1 << 5)|(0 << 4)|(1 << 3)|(0 << 2)|(1 << 1)|(1 << 0);//01101011
+ 2a0:	8b 36       	cpi	r24, 0x6B	; 107
+ 2a2:	11 f4       	brne	.+4      	; 0x2a8 <send_char_to_LCD+0x178>
+ 2a4:	8b b9       	out	0x0b, r24	; 11
+ 2a6:	08 95       	ret
+	else if (tecken == 'l') PORTD = (0 << 7)|(1 << 6)|(1 << 5)|(0 << 4)|(1 << 3)|(1 << 2)|(0 << 1)|(0 << 0);//01101100
+ 2a8:	8c 36       	cpi	r24, 0x6C	; 108
+ 2aa:	11 f4       	brne	.+4      	; 0x2b0 <send_char_to_LCD+0x180>
+ 2ac:	8b b9       	out	0x0b, r24	; 11
+ 2ae:	08 95       	ret
+	else if (tecken == 'm') PORTD = (0 << 7)|(1 << 6)|(1 << 5)|(0 << 4)|(1 << 3)|(1 << 2)|(0 << 1)|(1 << 0);//01101101
+ 2b0:	8d 36       	cpi	r24, 0x6D	; 109
+ 2b2:	11 f4       	brne	.+4      	; 0x2b8 <send_char_to_LCD+0x188>
+ 2b4:	8b b9       	out	0x0b, r24	; 11
+ 2b6:	08 95       	ret
+	else if (tecken == 'n') PORTD = (0 << 7)|(1 << 6)|(1 << 5)|(0 << 4)|(1 << 3)|(1 << 2)|(1 << 1)|(0 << 0);//01101110
+ 2b8:	8e 36       	cpi	r24, 0x6E	; 110
+ 2ba:	11 f4       	brne	.+4      	; 0x2c0 <send_char_to_LCD+0x190>
+ 2bc:	8b b9       	out	0x0b, r24	; 11
+ 2be:	08 95       	ret
+	else if (tecken == 'o') PORTD = (0 << 7)|(1 << 6)|(1 << 5)|(0 << 4)|(1 << 3)|(1 << 2)|(1 << 1)|(1 << 0);//01101111
+ 2c0:	8f 36       	cpi	r24, 0x6F	; 111
+ 2c2:	11 f4       	brne	.+4      	; 0x2c8 <send_char_to_LCD+0x198>
+ 2c4:	8b b9       	out	0x0b, r24	; 11
+ 2c6:	08 95       	ret
+	// andra små bokstäver
+	else if (tecken == 'p') PORTD = (0 << 7)|(1 << 6)|(1 << 5)|(1 << 4)|(0 << 3)|(0 << 2)|(0 << 1)|(0 << 0);//01110000
+ 2c8:	80 37       	cpi	r24, 0x70	; 112
+ 2ca:	11 f4       	brne	.+4      	; 0x2d0 <send_char_to_LCD+0x1a0>
+ 2cc:	8b b9       	out	0x0b, r24	; 11
+ 2ce:	08 95       	ret
+	else if (tecken == 'q') PORTD = (0 << 7)|(1 << 6)|(1 << 5)|(1 << 4)|(0 << 3)|(0 << 2)|(0 << 1)|(1 << 0);//01110001
+ 2d0:	81 37       	cpi	r24, 0x71	; 113
+ 2d2:	11 f4       	brne	.+4      	; 0x2d8 <send_char_to_LCD+0x1a8>
+ 2d4:	8b b9       	out	0x0b, r24	; 11
+ 2d6:	08 95       	ret
+	else if (tecken == 'r') PORTD = (0 << 7)|(1 << 6)|(1 << 5)|(1 << 4)|(0 << 3)|(0 << 2)|(1 << 1)|(0 << 0);//01110010
+ 2d8:	82 37       	cpi	r24, 0x72	; 114
+ 2da:	11 f4       	brne	.+4      	; 0x2e0 <send_char_to_LCD+0x1b0>
+ 2dc:	8b b9       	out	0x0b, r24	; 11
+ 2de:	08 95       	ret
+	else if (tecken == 's') PORTD = (0 << 7)|(1 << 6)|(1 << 5)|(1 << 4)|(0 << 3)|(0 << 2)|(1 << 1)|(1 << 0);//01110011
+ 2e0:	83 37       	cpi	r24, 0x73	; 115
+ 2e2:	11 f4       	brne	.+4      	; 0x2e8 <send_char_to_LCD+0x1b8>
+ 2e4:	8b b9       	out	0x0b, r24	; 11
+ 2e6:	08 95       	ret
+	else if (tecken == 't') PORTD = (0 << 7)|(1 << 6)|(1 << 5)|(1 << 4)|(0 << 3)|(1 << 2)|(0 << 1)|(0 << 0);//01110100
+ 2e8:	84 37       	cpi	r24, 0x74	; 116
+ 2ea:	11 f4       	brne	.+4      	; 0x2f0 <send_char_to_LCD+0x1c0>
+ 2ec:	8b b9       	out	0x0b, r24	; 11
+ 2ee:	08 95       	ret
+	else if (tecken == 'u') PORTD = (0 << 7)|(1 << 6)|(1 << 5)|(1 << 4)|(0 << 3)|(1 << 2)|(0 << 1)|(1 << 0);//01110101
+ 2f0:	85 37       	cpi	r24, 0x75	; 117
+ 2f2:	11 f4       	brne	.+4      	; 0x2f8 <send_char_to_LCD+0x1c8>
+ 2f4:	8b b9       	out	0x0b, r24	; 11
+ 2f6:	08 95       	ret
+	else if (tecken == 'v') /*01110110*/ PORTD = (0 << 7)|(1 << 6)|(1 << 5)|(1 << 4)|(0 << 3)|(1 << 2)|(1 << 1)|(0 << 0);
+ 2f8:	86 37       	cpi	r24, 0x76	; 118
+ 2fa:	11 f4       	brne	.+4      	; 0x300 <send_char_to_LCD+0x1d0>
+ 2fc:	8b b9       	out	0x0b, r24	; 11
+ 2fe:	08 95       	ret
+	else if (tecken == 'w') /*01110111*/ PORTD = (0 << 7)|(1 << 6)|(1 << 5)|(1 << 4)|(0 << 3)|(1 << 2)|(1 << 1)|(1 << 0);
+ 300:	87 37       	cpi	r24, 0x77	; 119
+ 302:	11 f4       	brne	.+4      	; 0x308 <send_char_to_LCD+0x1d8>
+ 304:	8b b9       	out	0x0b, r24	; 11
+ 306:	08 95       	ret
+	else if (tecken == 'x') /*01111000*/ PORTD = (0 << 7)|(1 << 6)|(1 << 5)|(1 << 4)|(1 << 3)|(0 << 2)|(0 << 1)|(0 << 0);
+ 308:	88 37       	cpi	r24, 0x78	; 120
+ 30a:	11 f4       	brne	.+4      	; 0x310 <send_char_to_LCD+0x1e0>
+ 30c:	8b b9       	out	0x0b, r24	; 11
+ 30e:	08 95       	ret
+	else if (tecken == 'y') /*01111001*/ PORTD = (0 << 7)|(1 << 6)|(1 << 5)|(1 << 4)|(1 << 3)|(0 << 2)|(0 << 1)|(1 << 0);
+ 310:	89 37       	cpi	r24, 0x79	; 121
+ 312:	11 f4       	brne	.+4      	; 0x318 <send_char_to_LCD+0x1e8>
+ 314:	8b b9       	out	0x0b, r24	; 11
+ 316:	08 95       	ret
+	else if (tecken == 'z') /*01111010*/ PORTD = (0 << 7)|(1 << 6)|(1 << 5)|(1 << 4)|(1 << 3)|(0 << 2)|(1 << 1)|(0 << 0);
+ 318:	8a 37       	cpi	r24, 0x7A	; 122
+ 31a:	11 f4       	brne	.+4      	; 0x320 <send_char_to_LCD+0x1f0>
+ 31c:	8b b9       	out	0x0b, r24	; 11
+ 31e:	08 95       	ret
+	// övriga tecken
+	//else if (tecken == '/n') /*00100000*/ PORTD = (0 << 7)|(0 << 6)|(1 << 5)|(0 << 4)|(0 << 3)|(0 << 2)|(0 << 1)|(0 << 0);
+	else if (tecken == '!') /*00100001*/ PORTD = (0 << 7)|(0 << 6)|(1 << 5)|(0 << 4)|(0 << 3)|(0 << 2)|(0 << 1)|(1 << 0);
+ 320:	81 32       	cpi	r24, 0x21	; 33
+ 322:	11 f4       	brne	.+4      	; 0x328 <send_char_to_LCD+0x1f8>
+ 324:	8b b9       	out	0x0b, r24	; 11
+ 326:	08 95       	ret
+	else if (tecken == '"') /*00100010*/ PORTD = (0 << 7)|(0 << 6)|(1 << 5)|(0 << 4)|(0 << 3)|(0 << 2)|(1 << 1)|(0 << 0);
+ 328:	82 32       	cpi	r24, 0x22	; 34
+ 32a:	11 f4       	brne	.+4      	; 0x330 <send_char_to_LCD+0x200>
+ 32c:	8b b9       	out	0x0b, r24	; 11
+ 32e:	08 95       	ret
+	else if (tecken == '#') /*00100011*/ PORTD = (0 << 7)|(0 << 6)|(1 << 5)|(0 << 4)|(0 << 3)|(0 << 2)|(1 << 1)|(1 << 0);
+ 330:	83 32       	cpi	r24, 0x23	; 35
+ 332:	11 f4       	brne	.+4      	; 0x338 <send_char_to_LCD+0x208>
+ 334:	8b b9       	out	0x0b, r24	; 11
+ 336:	08 95       	ret
+	else if (tecken == '$') /*00100100*/ PORTD = (0 << 7)|(0 << 6)|(1 << 5)|(0 << 4)|(0 << 3)|(1 << 2)|(0 << 1)|(0 << 0);
+ 338:	84 32       	cpi	r24, 0x24	; 36
+ 33a:	11 f4       	brne	.+4      	; 0x340 <send_char_to_LCD+0x210>
+ 33c:	8b b9       	out	0x0b, r24	; 11
+ 33e:	08 95       	ret
+	else if (tecken == '%') /*00100101*/ PORTD = (0 << 7)|(0 << 6)|(1 << 5)|(0 << 4)|(0 << 3)|(1 << 2)|(0 << 1)|(1 << 0);
+ 340:	85 32       	cpi	r24, 0x25	; 37
+ 342:	11 f4       	brne	.+4      	; 0x348 <send_char_to_LCD+0x218>
+ 344:	8b b9       	out	0x0b, r24	; 11
+ 346:	08 95       	ret
+	else if (tecken == '&') /*00100110*/ PORTD = (0 << 7)|(0 << 6)|(1 << 5)|(0 << 4)|(0 << 3)|(1 << 2)|(1 << 1)|(0 << 0);
+ 348:	86 32       	cpi	r24, 0x26	; 38
+ 34a:	11 f4       	brne	.+4      	; 0x350 <send_char_to_LCD+0x220>
+ 34c:	8b b9       	out	0x0b, r24	; 11
+ 34e:	08 95       	ret
+	//else if (tecken == ''') /*00100111*/ PORTD = (0 << 7)|(0 << 6)|(1 << 5)|(0 << 4)|(0 << 3)|(1 << 2)|(1 << 1)|(1 << 0);
+	else if (tecken == '(') /*00101000*/ PORTD = (0 << 7)|(0 << 6)|(1 << 5)|(0 << 4)|(1 << 3)|(0 << 2)|(0 << 1)|(0 << 0);
+ 350:	88 32       	cpi	r24, 0x28	; 40
+ 352:	11 f4       	brne	.+4      	; 0x358 <send_char_to_LCD+0x228>
+ 354:	8b b9       	out	0x0b, r24	; 11
+ 356:	08 95       	ret
+	else if (tecken == ')') /*00101001*/ PORTD = (0 << 7)|(0 << 6)|(1 << 5)|(0 << 4)|(1 << 3)|(0 << 2)|(0 << 1)|(1 << 0);
+ 358:	89 32       	cpi	r24, 0x29	; 41
+ 35a:	11 f4       	brne	.+4      	; 0x360 <send_char_to_LCD+0x230>
+ 35c:	8b b9       	out	0x0b, r24	; 11
+ 35e:	08 95       	ret
+	else if (tecken == '*') /*00101010*/ PORTD = (0 << 7)|(0 << 6)|(1 << 5)|(0 << 4)|(1 << 3)|(0 << 2)|(1 << 1)|(0 << 0);
+ 360:	8a 32       	cpi	r24, 0x2A	; 42
+ 362:	11 f4       	brne	.+4      	; 0x368 <send_char_to_LCD+0x238>
+ 364:	8b b9       	out	0x0b, r24	; 11
+ 366:	08 95       	ret
+	else if (tecken == '+') /*00101011*/ PORTD = (0 << 7)|(0 << 6)|(1 << 5)|(0 << 4)|(1 << 3)|(0 << 2)|(1 << 1)|(1 << 0);
+ 368:	8b 32       	cpi	r24, 0x2B	; 43
+ 36a:	11 f4       	brne	.+4      	; 0x370 <send_char_to_LCD+0x240>
+ 36c:	8b b9       	out	0x0b, r24	; 11
+ 36e:	08 95       	ret
+	else if (tecken == ',') /*00101100*/ PORTD = (0 << 7)|(0 << 6)|(1 << 5)|(0 << 4)|(1 << 3)|(1 << 2)|(0 << 1)|(0 << 0);
+ 370:	8c 32       	cpi	r24, 0x2C	; 44
+ 372:	11 f4       	brne	.+4      	; 0x378 <send_char_to_LCD+0x248>
+ 374:	8b b9       	out	0x0b, r24	; 11
+ 376:	08 95       	ret
+	else if (tecken == '-') /*00101101*/ PORTD = (0 << 7)|(0 << 6)|(1 << 5)|(0 << 4)|(1 << 3)|(1 << 2)|(0 << 1)|(1 << 0);
+ 378:	8d 32       	cpi	r24, 0x2D	; 45
+ 37a:	11 f4       	brne	.+4      	; 0x380 <send_char_to_LCD+0x250>
+ 37c:	8b b9       	out	0x0b, r24	; 11
+ 37e:	08 95       	ret
+	else if (tecken == '.') /*00101110*/ PORTD = (0 << 7)|(0 << 6)|(1 << 5)|(0 << 4)|(1 << 3)|(1 << 2)|(1 << 1)|(0 << 0);
+ 380:	8e 32       	cpi	r24, 0x2E	; 46
+ 382:	11 f4       	brne	.+4      	; 0x388 <send_char_to_LCD+0x258>
+ 384:	8b b9       	out	0x0b, r24	; 11
+ 386:	08 95       	ret
+	else if (tecken == '/') /*00101111*/ PORTD = (0 << 7)|(0 << 6)|(1 << 5)|(0 << 4)|(1 << 3)|(1 << 2)|(1 << 1)|(1 << 0);
+ 388:	8f 32       	cpi	r24, 0x2F	; 47
+ 38a:	11 f4       	brne	.+4      	; 0x390 <send_char_to_LCD+0x260>
+ 38c:	8b b9       	out	0x0b, r24	; 11
+ 38e:	08 95       	ret
+	//
+	else if (tecken == ':') /*00111010*/ PORTD = (0 << 7)|(0 << 6)|(1 << 5)|(1 << 4)|(1 << 3)|(0 << 2)|(1 << 1)|(0 << 0);
+ 390:	8a 33       	cpi	r24, 0x3A	; 58
+ 392:	11 f4       	brne	.+4      	; 0x398 <send_char_to_LCD+0x268>
+ 394:	8b b9       	out	0x0b, r24	; 11
+ 396:	08 95       	ret
+	else if (tecken == ';') /*00111011*/ PORTD = (0 << 7)|(0 << 6)|(1 << 5)|(1 << 4)|(1 << 3)|(0 << 2)|(1 << 1)|(1 << 0);
+ 398:	8b 33       	cpi	r24, 0x3B	; 59
+ 39a:	11 f4       	brne	.+4      	; 0x3a0 <send_char_to_LCD+0x270>
+ 39c:	8b b9       	out	0x0b, r24	; 11
+ 39e:	08 95       	ret
+	else if (tecken == '<') /*00111100*/ PORTD = (0 << 7)|(0 << 6)|(1 << 5)|(1 << 4)|(1 << 3)|(1 << 2)|(0 << 1)|(0 << 0);
+ 3a0:	8c 33       	cpi	r24, 0x3C	; 60
+ 3a2:	11 f4       	brne	.+4      	; 0x3a8 <send_char_to_LCD+0x278>
+ 3a4:	8b b9       	out	0x0b, r24	; 11
+ 3a6:	08 95       	ret
+	else if (tecken == '=') /*00111101*/ PORTD = (0 << 7)|(0 << 6)|(1 << 5)|(1 << 4)|(1 << 3)|(1 << 2)|(0 << 1)|(1 << 0);
+ 3a8:	8d 33       	cpi	r24, 0x3D	; 61
+ 3aa:	11 f4       	brne	.+4      	; 0x3b0 <send_char_to_LCD+0x280>
+ 3ac:	8b b9       	out	0x0b, r24	; 11
+ 3ae:	08 95       	ret
+	else if (tecken == '>') /*00111110*/ PORTD = (0 << 7)|(0 << 6)|(1 << 5)|(1 << 4)|(1 << 3)|(1 << 2)|(1 << 1)|(0 << 0);
+ 3b0:	8e 33       	cpi	r24, 0x3E	; 62
+ 3b2:	11 f4       	brne	.+4      	; 0x3b8 <send_char_to_LCD+0x288>
+ 3b4:	8b b9       	out	0x0b, r24	; 11
+ 3b6:	08 95       	ret
+	else if (tecken == '?') /*00111111*/ PORTD = (0 << 7)|(0 << 6)|(1 << 5)|(1 << 4)|(1 << 3)|(1 << 2)|(1 << 1)|(1 << 0);
+ 3b8:	8f 33       	cpi	r24, 0x3F	; 63
+ 3ba:	11 f4       	brne	.+4      	; 0x3c0 <send_char_to_LCD+0x290>
+ 3bc:	8b b9       	out	0x0b, r24	; 11
+ 3be:	08 95       	ret
+	//
+	else if (tecken == '{') /*01111011*/ PORTD = (0 << 7)|(1 << 6)|(1 << 5)|(1 << 4)|(1 << 3)|(0 << 2)|(1 << 1)|(1 << 0);
+ 3c0:	8b 37       	cpi	r24, 0x7B	; 123
+ 3c2:	11 f4       	brne	.+4      	; 0x3c8 <send_char_to_LCD+0x298>
+ 3c4:	8b b9       	out	0x0b, r24	; 11
+ 3c6:	08 95       	ret
+	else if (tecken == '|') /*01111100*/ PORTD = (0 << 7)|(1 << 6)|(1 << 5)|(1 << 4)|(1 << 3)|(1 << 2)|(0 << 1)|(0 << 0);
+ 3c8:	8c 37       	cpi	r24, 0x7C	; 124
+ 3ca:	11 f4       	brne	.+4      	; 0x3d0 <send_char_to_LCD+0x2a0>
+ 3cc:	8b b9       	out	0x0b, r24	; 11
+ 3ce:	08 95       	ret
+	else if (tecken == '}') /*01111101*/ PORTD = (0 << 7)|(1 << 6)|(1 << 5)|(1 << 4)|(1 << 3)|(1 << 2)|(0 << 1)|(1 << 0);
+ 3d0:	8d 37       	cpi	r24, 0x7D	; 125
+ 3d2:	11 f4       	brne	.+4      	; 0x3d8 <send_char_to_LCD+0x2a8>
+ 3d4:	8b b9       	out	0x0b, r24	; 11
+ 3d6:	08 95       	ret
+	//else if (tecken == '->') /*01111110*/ PORTD = (0 << 7)|(1 << 6)|(1 << 5)|(1 << 4)|(1 << 3)|(1 << 2)|(1 << 1)|(0 << 0);
+	//else if (tecken == '<-') /*01111111*/ PORTD = (0 << 7)|(1 << 6)|(1 << 5)|(1 << 4)|(1 << 3)|(1 << 2)|(1 << 1)|(1 << 0);
+	//
+	else if (tecken == '^') /*01011110*/ PORTD = (0 << 7)|(1 << 6)|(0 << 5)|(1 << 4)|(1 << 3)|(1 << 2)|(1 << 1)|(0 << 0);
+ 3d8:	8e 35       	cpi	r24, 0x5E	; 94
+ 3da:	11 f4       	brne	.+4      	; 0x3e0 <send_char_to_LCD+0x2b0>
+ 3dc:	8b b9       	out	0x0b, r24	; 11
+ 3de:	08 95       	ret
+	else if (tecken == '_') /*01011111*/ PORTD = (0 << 7)|(1 << 6)|(0 << 5)|(1 << 4)|(1 << 3)|(1 << 2)|(1 << 1)|(1 << 0);
+ 3e0:	8f 35       	cpi	r24, 0x5F	; 95
+ 3e2:	11 f4       	brne	.+4      	; 0x3e8 <send_char_to_LCD+0x2b8>
+ 3e4:	8b b9       	out	0x0b, r24	; 11
+ 3e6:	08 95       	ret
+	else PORTD = (1 << 7)|(1 << 6)|(1 << 5)|(1 << 4)|(1 << 3)|(1 << 2)|(1 << 1)|(1 << 0); //svart ruta
+ 3e8:	8f ef       	ldi	r24, 0xFF	; 255
+ 3ea:	8b b9       	out	0x0b, r24	; 11
+ 3ec:	08 95       	ret
+
+000003ee <LCD_init>:
+	#else
+		//round up by default
+		__ticks_dc = (uint32_t)(ceil(fabs(__tmp)));
+	#endif
+
+	__builtin_avr_delay_cycles(__ticks_dc);
+ 3ee:	8b e4       	ldi	r24, 0x4B	; 75
+ 3f0:	9d e1       	ldi	r25, 0x1D	; 29
+ 3f2:	01 97       	sbiw	r24, 0x01	; 1
+ 3f4:	f1 f7       	brne	.-4      	; 0x3f2 <LCD_init+0x4>
+ 3f6:	00 c0       	rjmp	.+0      	; 0x3f8 <LCD_init+0xa>
+ 3f8:	00 00       	nop
+// initieringen av LCD kontrollern, enligt Initializing Flowchart(Condition fosc=270KHz) i databladet
+void LCD_init()
+{
+	_delay_ms(30);
+	// konfigurera LCD:en för 8 bitar, 2 linjer, 5x8 pixlar (dots) dvs LCD:en får instruktion 00 0011 1000
+	send_command_to_LCD(0b00111000);
+ 3fa:	88 e3       	ldi	r24, 0x38	; 56
+ 3fc:	78 de       	rcall	.-784    	; 0xee <send_command_to_LCD>
+	#else
+		//round up by default
+		__ticks_dc = (uint32_t)(ceil(fabs(__tmp)));
+	#endif
+
+	__builtin_avr_delay_cycles(__ticks_dc);
+ 3fe:	9d e0       	ldi	r25, 0x0D	; 13
+ 400:	9a 95       	dec	r25
+ 402:	f1 f7       	brne	.-4      	; 0x400 <LCD_init+0x12>
+	_delay_us(39);
+
+	// display,cursor and blinking off, instruktion 00 0000 1000
+	send_command_to_LCD(0b00001000);
+ 404:	88 e0       	ldi	r24, 0x08	; 8
+ 406:	73 de       	rcall	.-794    	; 0xee <send_command_to_LCD>
+ 408:	8d e0       	ldi	r24, 0x0D	; 13
+ 40a:	8a 95       	dec	r24
+ 40c:	f1 f7       	brne	.-4      	; 0x40a <LCD_init+0x1c>
+	_delay_us(39);
+
+	// Clear display, instruktion 00 0000 0001
+	send_command_to_LCD(0b00000001);
+ 40e:	81 e0       	ldi	r24, 0x01	; 1
+ 410:	6e de       	rcall	.-804    	; 0xee <send_command_to_LCD>
+	#else
+		//round up by default
+		__ticks_dc = (uint32_t)(ceil(fabs(__tmp)));
+	#endif
+
+	__builtin_avr_delay_cycles(__ticks_dc);
+ 412:	8e e7       	ldi	r24, 0x7E	; 126
+ 414:	91 e0       	ldi	r25, 0x01	; 1
+ 416:	01 97       	sbiw	r24, 0x01	; 1
+ 418:	f1 f7       	brne	.-4      	; 0x416 <LCD_init+0x28>
+ 41a:	00 00       	nop
+	_delay_ms(1.53);
+
+	// cursor moving direction: left-to-right, skifta ej displayen (dvs shift disabled), instruktion 00 0000 0110
+	send_command_to_LCD(0b00000110);
+ 41c:	86 e0       	ldi	r24, 0x06	; 6
+ 41e:	67 de       	rcall	.-818    	; 0xee <send_command_to_LCD>
+
+	// display on, cursor and blinking still off, instruktion 00 0000 1100
+	send_command_to_LCD(0b00001100);
+ 420:	8c e0       	ldi	r24, 0x0C	; 12
+ 422:	65 de       	rcall	.-822    	; 0xee <send_command_to_LCD>
+		
+		
+	PORTB = (1 << 0)|(0 << 1); // för att börja skicka data
+ 424:	81 e0       	ldi	r24, 0x01	; 1
+ 426:	85 b9       	out	0x05, r24	; 5
+ 428:	08 95       	ret
+
+0000042a <main>:
+}
+
+int main(void)
+{
+	//unsigned char SPDRrec_ = 0;
+	sei();
+ 42a:	78 94       	sei
+	sleep_enable();
+ 42c:	83 b7       	in	r24, 0x33	; 51
+ 42e:	81 60       	ori	r24, 0x01	; 1
+ 430:	83 bf       	out	0x33, r24	; 51
+	Styr_InitPortDirections();
+ 432:	35 de       	rcall	.-918    	; 0x9e <Styr_InitPortDirections>
+} 
+
+//Setups port values, more specifically puts SS on high.
+void Styr_InitPortValues(void)
+{
+	PORTB = 1<<PORTB3 | 1<<PORTB4;
+ 434:	88 e1       	ldi	r24, 0x18	; 24
+ 436:	85 b9       	out	0x05, r24	; 5
+	//unsigned char SPDRrec_ = 0;
+	sei();
+	sleep_enable();
+	Styr_InitPortDirections();
+	Styr_InitPortValues();
+	SPI_MasterInit();
+ 438:	3b de       	rcall	.-906    	; 0xb0 <SPI_MasterInit>
+	LCD_init();
+ 43a:	d9 df       	rcall	.-78     	; 0x3ee <LCD_init>
+	//}
+	//if (SPDRrec_ == 0x0F)
+	//{
+		//PORTC = (1<<PORTC0);
+	//}
+	send_char_to_LCD('S');
+ 43c:	83 e5       	ldi	r24, 0x53	; 83
+ 43e:	78 de       	rcall	.-784    	; 0x130 <send_char_to_LCD>
+	send_char_to_LCD('T');
+ 440:	84 e5       	ldi	r24, 0x54	; 84
+ 442:	76 de       	rcall	.-788    	; 0x130 <send_char_to_LCD>
+	send_char_to_LCD('D');
+ 444:	84 e4       	ldi	r24, 0x44	; 68
+ 446:	74 de       	rcall	.-792    	; 0x130 <send_char_to_LCD>
+ 448:	ff cf       	rjmp	.-2      	; 0x448 <main+0x1e>
+
+0000044a <_exit>:
+ 44a:	f8 94       	cli
+
+0000044c <__stop_program>:
+ 44c:	ff cf       	rjmp	.-2      	; 0x44c <__stop_program>
