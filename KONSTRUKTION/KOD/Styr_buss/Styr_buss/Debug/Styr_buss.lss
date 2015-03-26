@@ -3,25 +3,25 @@ Styr_buss.elf:     file format elf32-avr
 
 Sections:
 Idx Name          Size      VMA       LMA       File off  Algn
-  0 .text         00000446  00000000  00000000  00000054  2**1
+  0 .text         0000044e  00000000  00000000  00000054  2**1
                   CONTENTS, ALLOC, LOAD, READONLY, CODE
-  1 .comment      00000030  00000000  00000000  0000049a  2**0
+  1 .comment      00000030  00000000  00000000  000004a2  2**0
                   CONTENTS, READONLY
-  2 .debug_aranges 00000068  00000000  00000000  000004ca  2**0
+  2 .debug_aranges 00000068  00000000  00000000  000004d2  2**0
                   CONTENTS, READONLY, DEBUGGING
-  3 .debug_info   000004a8  00000000  00000000  00000532  2**0
+  3 .debug_info   000004d0  00000000  00000000  0000053a  2**0
                   CONTENTS, READONLY, DEBUGGING
-  4 .debug_abbrev 0000022a  00000000  00000000  000009da  2**0
+  4 .debug_abbrev 0000022a  00000000  00000000  00000a0a  2**0
                   CONTENTS, READONLY, DEBUGGING
-  5 .debug_line   0000095d  00000000  00000000  00000c04  2**0
+  5 .debug_line   00000969  00000000  00000000  00000c34  2**0
                   CONTENTS, READONLY, DEBUGGING
-  6 .debug_frame  000000c8  00000000  00000000  00001564  2**2
+  6 .debug_frame  000000c8  00000000  00000000  000015a0  2**2
                   CONTENTS, READONLY, DEBUGGING
-  7 .debug_str    00000246  00000000  00000000  0000162c  2**0
+  7 .debug_str    00000246  00000000  00000000  00001668  2**0
                   CONTENTS, READONLY, DEBUGGING
-  8 .debug_loc    000001a4  00000000  00000000  00001872  2**0
+  8 .debug_loc    000001a4  00000000  00000000  000018ae  2**0
                   CONTENTS, READONLY, DEBUGGING
-  9 .debug_ranges 00000058  00000000  00000000  00001a16  2**0
+  9 .debug_ranges 00000058  00000000  00000000  00001a52  2**0
                   CONTENTS, READONLY, DEBUGGING
 
 Disassembly of section .text:
@@ -106,7 +106,7 @@ Disassembly of section .text:
   94:	de bf       	out	0x3e, r29	; 62
   96:	cd bf       	out	0x3d, r28	; 61
   98:	c8 d1       	rcall	.+912    	; 0x42a <main>
-  9a:	d3 c1       	rjmp	.+934    	; 0x442 <_exit>
+  9a:	d7 c1       	rjmp	.+942    	; 0x44a <_exit>
 
 0000009c <__bad_interrupt>:
   9c:	b1 cf       	rjmp	.-158    	; 0x0 <__vectors>
@@ -830,10 +830,16 @@ void Styr_InitPortValues(void)
 	send_char_to_LCD('S');
  43c:	83 e5       	ldi	r24, 0x53	; 83
  43e:	78 de       	rcall	.-784    	; 0x130 <send_char_to_LCD>
- 440:	ff cf       	rjmp	.-2      	; 0x440 <main+0x16>
+	send_char_to_LCD('T');
+ 440:	84 e5       	ldi	r24, 0x54	; 84
+ 442:	76 de       	rcall	.-788    	; 0x130 <send_char_to_LCD>
+	send_char_to_LCD('D');
+ 444:	84 e4       	ldi	r24, 0x44	; 68
+ 446:	74 de       	rcall	.-792    	; 0x130 <send_char_to_LCD>
+ 448:	ff cf       	rjmp	.-2      	; 0x448 <main+0x1e>
 
-00000442 <_exit>:
- 442:	f8 94       	cli
+0000044a <_exit>:
+ 44a:	f8 94       	cli
 
-00000444 <__stop_program>:
- 444:	ff cf       	rjmp	.-2      	; 0x444 <__stop_program>
+0000044c <__stop_program>:
+ 44c:	ff cf       	rjmp	.-2      	; 0x44c <__stop_program>

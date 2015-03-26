@@ -147,7 +147,7 @@ END GROUP
 .rela.plt
  *(.rela.plt)
 
-.text           0x00000000      0x446
+.text           0x00000000      0x44e
  *(.vectors)
  .vectors       0x00000000       0x8c c:/program files (x86)/atmel/atmel toolchain/avr8 gcc/native/3.4.1061/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.8.1/../../../../avr/lib/avr51/crtm1284p.o
                 0x00000000                __vector_default
@@ -257,13 +257,13 @@ END GROUP
  .text.LCD_init
                 0x000003ee       0x3c Styr_buss.o
                 0x000003ee                LCD_init
- .text.main     0x0000042a       0x18 Styr_buss.o
+ .text.main     0x0000042a       0x20 Styr_buss.o
                 0x0000042a                main
-                0x00000442                . = ALIGN (0x2)
+                0x0000044a                . = ALIGN (0x2)
  *(.fini9)
- .fini9         0x00000442        0x0 c:/program files (x86)/atmel/atmel toolchain/avr8 gcc/native/3.4.1061/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.8.1/avr51\libgcc.a(_exit.o)
-                0x00000442                _exit
-                0x00000442                exit
+ .fini9         0x0000044a        0x0 c:/program files (x86)/atmel/atmel toolchain/avr8 gcc/native/3.4.1061/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.8.1/avr51\libgcc.a(_exit.o)
+                0x0000044a                _exit
+                0x0000044a                exit
  *(.fini9)
  *(.fini8)
  *(.fini8)
@@ -282,11 +282,11 @@ END GROUP
  *(.fini1)
  *(.fini1)
  *(.fini0)
- .fini0         0x00000442        0x4 c:/program files (x86)/atmel/atmel toolchain/avr8 gcc/native/3.4.1061/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.8.1/avr51\libgcc.a(_exit.o)
+ .fini0         0x0000044a        0x4 c:/program files (x86)/atmel/atmel toolchain/avr8 gcc/native/3.4.1061/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.8.1/avr51\libgcc.a(_exit.o)
  *(.fini0)
-                0x00000446                _etext = .
+                0x0000044e                _etext = .
 
-.data           0x00800100        0x0 load address 0x00000446
+.data           0x00800100        0x0 load address 0x0000044e
                 0x00800100                PROVIDE (__data_start, .)
  *(.data)
  *(.data*)
@@ -303,8 +303,8 @@ END GROUP
  *(.bss*)
  *(COMMON)
                 0x00800100                PROVIDE (__bss_end, .)
-                0x00000446                __data_load_start = LOADADDR (.data)
-                0x00000446                __data_load_end = (__data_load_start + SIZEOF (.data))
+                0x0000044e                __data_load_start = LOADADDR (.data)
+                0x0000044e                __data_load_end = (__data_load_start + SIZEOF (.data))
 
 .noinit         0x00800100        0x0
                 0x00800100                PROVIDE (__noinit_start, .)
@@ -378,17 +378,17 @@ END GROUP
 .debug_pubnames
  *(.debug_pubnames)
 
-.debug_info     0x00000000      0x4a8
+.debug_info     0x00000000      0x4d0
  *(.debug_info .gnu.linkonce.wi.*)
- .debug_info    0x00000000      0x4a8 Styr_buss.o
+ .debug_info    0x00000000      0x4d0 Styr_buss.o
 
 .debug_abbrev   0x00000000      0x22a
  *(.debug_abbrev)
  .debug_abbrev  0x00000000      0x22a Styr_buss.o
 
-.debug_line     0x00000000      0x95d
+.debug_line     0x00000000      0x969
  *(.debug_line .debug_line.* .debug_line_end)
- .debug_line    0x00000000      0x95d Styr_buss.o
+ .debug_line    0x00000000      0x969 Styr_buss.o
 
 .debug_frame    0x00000000       0xc8
  *(.debug_frame)
