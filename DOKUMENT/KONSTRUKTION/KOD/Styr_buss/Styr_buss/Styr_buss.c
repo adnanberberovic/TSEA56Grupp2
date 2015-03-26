@@ -73,13 +73,13 @@ int main(void)
 	Styr_InitPortValues();
 	SPI_MasterInit();
 	SPDRrec_ = SPI_MasterTransmit(0x0F, "komm");
-	if (SPDrec_ == 0x0F)
+	if (SPDRrec_ == 0x0F)
 	{
 		PORTC = (1<<PORTC0);
 	}
 	_delay_us(100);
 	SPDRrec_ = SPI_MasterTransmit(0x0F, "komm");
-	if (SPDrec_ == 0x0F)
+	if (SPDRrec_ == 0x0F)
 	{
 		PORTC = (1<<PORTC0);
 	}
