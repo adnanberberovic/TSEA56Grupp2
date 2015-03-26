@@ -140,6 +140,7 @@ void LCD_SendAnyCharacter(char symbol)
 	uint8_t tempNum = (int)symbol;
 	PORTD = tempNum;
 }
+
 //Sends a letter or symbol to the LCD display
 void LCD_SendChar(char symbol)
 {	
