@@ -3,27 +3,27 @@ Sensormodul_test.elf:     file format elf32-avr
 
 Sections:
 Idx Name          Size      VMA       LMA       File off  Algn
-  0 .text         00000232  00000000  00000000  00000074  2**1
+  0 .text         00000288  00000000  00000000  00000074  2**1
                   CONTENTS, ALLOC, LOAD, READONLY, CODE
-  1 .bss          0000020e  00800100  00800100  000002a6  2**0
+  1 .bss          00000210  00800100  00800100  000002fc  2**0
                   ALLOC
-  2 .comment      00000030  00000000  00000000  000002a6  2**0
+  2 .comment      00000030  00000000  00000000  000002fc  2**0
                   CONTENTS, READONLY
-  3 .debug_aranges 00000030  00000000  00000000  000002d6  2**0
+  3 .debug_aranges 00000030  00000000  00000000  0000032c  2**0
                   CONTENTS, READONLY, DEBUGGING
-  4 .debug_info   00000226  00000000  00000000  00000306  2**0
+  4 .debug_info   000001b1  00000000  00000000  0000035c  2**0
                   CONTENTS, READONLY, DEBUGGING
-  5 .debug_abbrev 00000154  00000000  00000000  0000052c  2**0
+  5 .debug_abbrev 000000ec  00000000  00000000  0000050d  2**0
                   CONTENTS, READONLY, DEBUGGING
-  6 .debug_line   00000263  00000000  00000000  00000680  2**0
+  6 .debug_line   0000021a  00000000  00000000  000005f9  2**0
                   CONTENTS, READONLY, DEBUGGING
-  7 .debug_frame  00000068  00000000  00000000  000008e4  2**2
+  7 .debug_frame  00000078  00000000  00000000  00000814  2**2
                   CONTENTS, READONLY, DEBUGGING
-  8 .debug_str    000001d0  00000000  00000000  0000094c  2**0
+  8 .debug_str    000001a1  00000000  00000000  0000088c  2**0
                   CONTENTS, READONLY, DEBUGGING
-  9 .debug_loc    0000019c  00000000  00000000  00000b1c  2**0
+  9 .debug_loc    000001c3  00000000  00000000  00000a2d  2**0
                   CONTENTS, READONLY, DEBUGGING
- 10 .debug_ranges 00000038  00000000  00000000  00000cb8  2**0
+ 10 .debug_ranges 00000038  00000000  00000000  00000bf0  2**0
                   CONTENTS, READONLY, DEBUGGING
 
 Disassembly of section .text:
@@ -77,7 +77,7 @@ Disassembly of section .text:
   5a:	00 00       	nop
   5c:	27 c0       	rjmp	.+78     	; 0xac <__bad_interrupt>
   5e:	00 00       	nop
-  60:	b7 c0       	rjmp	.+366    	; 0x1d0 <__vector_24>
+  60:	b8 c0       	rjmp	.+368    	; 0x1d2 <__vector_24>
   62:	00 00       	nop
   64:	23 c0       	rjmp	.+70     	; 0xac <__bad_interrupt>
   66:	00 00       	nop
@@ -118,25 +118,25 @@ Disassembly of section .text:
   a0:	1d 92       	st	X+, r1
 
 000000a2 <.do_clear_bss_start>:
-  a2:	ae 30       	cpi	r26, 0x0E	; 14
+  a2:	a0 31       	cpi	r26, 0x10	; 16
   a4:	b2 07       	cpc	r27, r18
   a6:	e1 f7       	brne	.-8      	; 0xa0 <.do_clear_bss_loop>
   a8:	7b d0       	rcall	.+246    	; 0x1a0 <main>
-  aa:	c1 c0       	rjmp	.+386    	; 0x22e <_exit>
+  aa:	ec c0       	rjmp	.+472    	; 0x284 <_exit>
 
 000000ac <__bad_interrupt>:
   ac:	a9 cf       	rjmp	.-174    	; 0x0 <__vectors>
 
-000000ae <converter>:
+000000ae <distance_table_generator>:
 
 int sensor_data[8]; //Skapa en array med 8 element.
-int distance_table[255];
+int distance_table[255]; //Hur får vi ut den till c eller h-filen?
 
-void converter()
+void distance_table_generator()
 {
-  ae:	e0 e1       	ldi	r30, 0x10	; 16
+  ae:	e2 e1       	ldi	r30, 0x12	; 18
   b0:	f1 e0       	ldi	r31, 0x01	; 1
-  b2:	2c e5       	ldi	r18, 0x5C	; 92
+  b2:	2e e5       	ldi	r18, 0x5E	; 94
   b4:	31 e0       	ldi	r19, 0x01	; 1
 	for (int i = 0; i < 38; i++)
 	{
@@ -146,14 +146,14 @@ void converter()
   ba:	81 93       	st	Z+, r24
   bc:	91 93       	st	Z+, r25
 int sensor_data[8]; //Skapa en array med 8 element.
-int distance_table[255];
+int distance_table[255]; //Hur får vi ut den till c eller h-filen?
 
-void converter()
+void distance_table_generator()
 {
 	for (int i = 0; i < 38; i++)
   be:	e2 17       	cp	r30, r18
   c0:	f3 07       	cpc	r31, r19
-  c2:	d9 f7       	brne	.-10     	; 0xba <converter+0xc>
+  c2:	d9 f7       	brne	.-10     	; 0xba <distance_table_generator+0xc>
 	{
 		distance_table[i] = 255;
 	}
@@ -161,41 +161,41 @@ void converter()
 	distance_table[38] = 170;
   c4:	8a ea       	ldi	r24, 0xAA	; 170
   c6:	90 e0       	ldi	r25, 0x00	; 0
-  c8:	90 93 5d 01 	sts	0x015D, r25
-  cc:	80 93 5c 01 	sts	0x015C, r24
+  c8:	90 93 5f 01 	sts	0x015F, r25
+  cc:	80 93 5e 01 	sts	0x015E, r24
 	distance_table[39] = 168;
   d0:	88 ea       	ldi	r24, 0xA8	; 168
   d2:	90 e0       	ldi	r25, 0x00	; 0
-  d4:	90 93 5f 01 	sts	0x015F, r25
-  d8:	80 93 5e 01 	sts	0x015E, r24
+  d4:	90 93 61 01 	sts	0x0161, r25
+  d8:	80 93 60 01 	sts	0x0160, r24
 	distance_table[40] = 164;
   dc:	84 ea       	ldi	r24, 0xA4	; 164
   de:	90 e0       	ldi	r25, 0x00	; 0
-  e0:	90 93 61 01 	sts	0x0161, r25
-  e4:	80 93 60 01 	sts	0x0160, r24
+  e0:	90 93 63 01 	sts	0x0163, r25
+  e4:	80 93 62 01 	sts	0x0162, r24
 	distance_table[41] = 160;
   e8:	80 ea       	ldi	r24, 0xA0	; 160
   ea:	90 e0       	ldi	r25, 0x00	; 0
-  ec:	90 93 63 01 	sts	0x0163, r25
-  f0:	80 93 62 01 	sts	0x0162, r24
+  ec:	90 93 65 01 	sts	0x0165, r25
+  f0:	80 93 64 01 	sts	0x0164, r24
 	distance_table[42] = 156;
   f4:	8c e9       	ldi	r24, 0x9C	; 156
   f6:	90 e0       	ldi	r25, 0x00	; 0
-  f8:	90 93 65 01 	sts	0x0165, r25
-  fc:	80 93 64 01 	sts	0x0164, r24
+  f8:	90 93 67 01 	sts	0x0167, r25
+  fc:	80 93 66 01 	sts	0x0166, r24
 	distance_table[43] = 150;
  100:	86 e9       	ldi	r24, 0x96	; 150
  102:	90 e0       	ldi	r25, 0x00	; 0
- 104:	90 93 67 01 	sts	0x0167, r25
- 108:	80 93 66 01 	sts	0x0166, r24
+ 104:	90 93 69 01 	sts	0x0169, r25
+ 108:	80 93 68 01 	sts	0x0168, r24
 	distance_table[44] = 144;
  10c:	80 e9       	ldi	r24, 0x90	; 144
  10e:	90 e0       	ldi	r25, 0x00	; 0
- 110:	90 93 69 01 	sts	0x0169, r25
- 114:	80 93 68 01 	sts	0x0168, r24
- 118:	ea e6       	ldi	r30, 0x6A	; 106
+ 110:	90 93 6b 01 	sts	0x016B, r25
+ 114:	80 93 6a 01 	sts	0x016A, r24
+ 118:	ec e6       	ldi	r30, 0x6C	; 108
  11a:	f1 e0       	ldi	r31, 0x01	; 1
- 11c:	22 e9       	ldi	r18, 0x92	; 146
+ 11c:	24 e9       	ldi	r18, 0x94	; 148
  11e:	31 e0       	ldi	r19, 0x01	; 1
  120:	8c e8       	ldi	r24, 0x8C	; 140
  122:	90 e0       	ldi	r25, 0x00	; 0
@@ -216,8 +216,8 @@ void converter()
 	for (int i = 45; i < 65; i++)
  12a:	e2 17       	cp	r30, r18
  12c:	f3 07       	cpc	r31, r19
- 12e:	d1 f7       	brne	.-12     	; 0x124 <converter+0x76>
- 130:	e2 e9       	ldi	r30, 0x92	; 146
+ 12e:	d1 f7       	brne	.-12     	; 0x124 <distance_table_generator+0x76>
+ 130:	e4 e9       	ldi	r30, 0x94	; 148
  132:	f1 e0       	ldi	r31, 0x01	; 1
  134:	84 e6       	ldi	r24, 0x64	; 100
  136:	90 e0       	ldi	r25, 0x00	; 0
@@ -238,8 +238,8 @@ void converter()
 	for(int i = 65; i < 105; i++)
  13e:	8c 33       	cpi	r24, 0x3C	; 60
  140:	91 05       	cpc	r25, r1
- 142:	d1 f7       	brne	.-12     	; 0x138 <converter+0x8a>
- 144:	1e c0       	rjmp	.+60     	; 0x182 <converter+0xd4>
+ 142:	d1 f7       	brne	.-12     	; 0x138 <distance_table_generator+0x8a>
+ 144:	1e c0       	rjmp	.+60     	; 0x182 <distance_table_generator+0xd4>
 	
 	k = 0;
 	
@@ -255,13 +255,13 @@ void converter()
 		if ((i/2)*2 == i){
  150:	9c 01       	movw	r18, r24
  152:	99 23       	and	r25, r25
- 154:	14 f4       	brge	.+4      	; 0x15a <converter+0xac>
+ 154:	14 f4       	brge	.+4      	; 0x15a <distance_table_generator+0xac>
  156:	2f 5f       	subi	r18, 0xFF	; 255
  158:	3f 4f       	sbci	r19, 0xFF	; 255
  15a:	2e 7f       	andi	r18, 0xFE	; 254
  15c:	28 17       	cp	r18, r24
  15e:	39 07       	cpc	r19, r25
- 160:	11 f4       	brne	.+4      	; 0x166 <converter+0xb8>
+ 160:	11 f4       	brne	.+4      	; 0x166 <distance_table_generator+0xb8>
 			k = k + 1;
  162:	4f 5f       	subi	r20, 0xFF	; 255
  164:	5f 4f       	sbci	r21, 0xFF	; 255
@@ -274,10 +274,10 @@ void converter()
  166:	01 96       	adiw	r24, 0x01	; 1
  168:	86 39       	cpi	r24, 0x96	; 150
  16a:	91 05       	cpc	r25, r1
- 16c:	61 f7       	brne	.-40     	; 0x146 <converter+0x98>
- 16e:	ec e3       	ldi	r30, 0x3C	; 60
+ 16c:	61 f7       	brne	.-40     	; 0x146 <distance_table_generator+0x98>
+ 16e:	ee e3       	ldi	r30, 0x3E	; 62
  170:	f2 e0       	ldi	r31, 0x02	; 2
- 172:	8e e0       	ldi	r24, 0x0E	; 14
+ 172:	80 e1       	ldi	r24, 0x10	; 16
  174:	93 e0       	ldi	r25, 0x03	; 3
 		}
 	}
@@ -295,7 +295,7 @@ void converter()
 	for (int i = 150; i < 255; i++)
  17a:	e8 17       	cp	r30, r24
  17c:	f9 07       	cpc	r31, r25
- 17e:	d9 f7       	brne	.-10     	; 0x176 <converter+0xc8>
+ 17e:	d9 f7       	brne	.-10     	; 0x176 <distance_table_generator+0xc8>
  180:	08 95       	ret
 	
 	k = 0;
@@ -305,9 +305,9 @@ void converter()
 		distance_table[i] = 60 - k;
  182:	8c e3       	ldi	r24, 0x3C	; 60
  184:	90 e0       	ldi	r25, 0x00	; 0
- 186:	90 93 e3 01 	sts	0x01E3, r25
- 18a:	80 93 e2 01 	sts	0x01E2, r24
- 18e:	e4 ee       	ldi	r30, 0xE4	; 228
+ 186:	90 93 e5 01 	sts	0x01E5, r25
+ 18a:	80 93 e4 01 	sts	0x01E4, r24
+ 18e:	e6 ee       	ldi	r30, 0xE6	; 230
  190:	f1 e0       	ldi	r31, 0x01	; 1
  192:	89 e6       	ldi	r24, 0x69	; 105
  194:	90 e0       	ldi	r25, 0x00	; 0
@@ -315,123 +315,176 @@ void converter()
  198:	50 e0       	ldi	r21, 0x00	; 0
  19a:	6c e3       	ldi	r22, 0x3C	; 60
  19c:	70 e0       	ldi	r23, 0x00	; 0
- 19e:	e3 cf       	rjmp	.-58     	; 0x166 <converter+0xb8>
+ 19e:	e3 cf       	rjmp	.-58     	; 0x166 <distance_table_generator+0xb8>
 
 000001a0 <main>:
-	
-}
+int admuxcounter = 0; 
+//int value_converter(int meter)
+
 int main(void)
 { 
+	distance_table_generator();
+ 1a0:	86 df       	rcall	.-244    	; 0xae <distance_table_generator>
 	
-	converter();
- 1a0:	86 df       	rcall	.-244    	; 0xae <converter>
 	DDRB = 255;//Sätt Port B till utgång
  1a2:	8f ef       	ldi	r24, 0xFF	; 255
  1a4:	84 b9       	out	0x04, r24	; 4
 	DDRA = 0; //Sätt Port A till ingång (default)
  1a6:	11 b8       	out	0x01, r1	; 1
-	
 	sei(); //Aktiverar globala avbrott
  1a8:	78 94       	sei
-	ADCSRA |= (1<<7); //Aktivera ADC
- 1aa:	ea e7       	ldi	r30, 0x7A	; 122
- 1ac:	f0 e0       	ldi	r31, 0x00	; 0
- 1ae:	80 81       	ld	r24, Z
- 1b0:	80 68       	ori	r24, 0x80	; 128
- 1b2:	80 83       	st	Z, r24
-	ADCSRA |= (1<<3); //Aktivera ADC-interrupt
- 1b4:	80 81       	ld	r24, Z
- 1b6:	88 60       	ori	r24, 0x08	; 8
- 1b8:	80 83       	st	Z, r24
-	ADCSRA |= (1<<0)|(1<<1)|(1<<2); //Sätt division factor till 128. 20 MHz/128 = 156,25 kHz
- 1ba:	80 81       	ld	r24, Z
- 1bc:	87 60       	ori	r24, 0x07	; 7
- 1be:	80 83       	st	Z, r24
-	
-	//OBS voltage reference may be externally decoupled for better noise performance.		
-		
-		while(1)
-		{
-			ADMUX = 7 + 32;
- 1c0:	ac e7       	ldi	r26, 0x7C	; 124
- 1c2:	b0 e0       	ldi	r27, 0x00	; 0
- 1c4:	97 e2       	ldi	r25, 0x27	; 39
- 1c6:	9c 93       	st	X, r25
-			ADCSRA |= (1<<6);
- 1c8:	80 81       	ld	r24, Z
- 1ca:	80 64       	ori	r24, 0x40	; 64
- 1cc:	80 83       	st	Z, r24
- 1ce:	fb cf       	rjmp	.-10     	; 0x1c6 <main+0x26>
+	ADCSRA = 143; //Aktivera ADC, ADC-interrupt, Sätt division factor till 128. 20 MHz/128 = 156,25 kHz
+ 1aa:	8f e8       	ldi	r24, 0x8F	; 143
+ 1ac:	80 93 7a 00 	sts	0x007A, r24
+	ADMUX = 32; //Sätt ADLAR - vänsterjustera resultatet.
+ 1b0:	80 e2       	ldi	r24, 0x20	; 32
+ 1b2:	80 93 7c 00 	sts	0x007C, r24
+			
+	while(1)
+	{
+		ADCSRA |= (1<<6); //Börja ADC
+ 1b6:	ea e7       	ldi	r30, 0x7A	; 122
+ 1b8:	f0 e0       	ldi	r31, 0x00	; 0
+		}
+		//Delay så att ADC hinner genomföras.
+		//Borde ta 13 * CC. CK = 150 kHz... 
+		//OBS voltage reference may be externally decoupled for better noise performance.
+		//(sensor_data[admuxcounter])
+		PORTB = 2;
+ 1ba:	22 e0       	ldi	r18, 0x02	; 2
+		PORTB = 1;
+ 1bc:	91 e0       	ldi	r25, 0x01	; 1
+	ADCSRA = 143; //Aktivera ADC, ADC-interrupt, Sätt division factor till 128. 20 MHz/128 = 156,25 kHz
+	ADMUX = 32; //Sätt ADLAR - vänsterjustera resultatet.
+			
+	while(1)
+	{
+		ADCSRA |= (1<<6); //Börja ADC
+ 1be:	80 81       	ld	r24, Z
+ 1c0:	80 64       	ori	r24, 0x40	; 64
+ 1c2:	80 83       	st	Z, r24
+		while(ADCSRA & 1<<ADSC)
+ 1c4:	80 81       	ld	r24, Z
+ 1c6:	86 fd       	sbrc	r24, 6
+ 1c8:	fd cf       	rjmp	.-6      	; 0x1c4 <main+0x24>
+		}
+		//Delay så att ADC hinner genomföras.
+		//Borde ta 13 * CC. CK = 150 kHz... 
+		//OBS voltage reference may be externally decoupled for better noise performance.
+		//(sensor_data[admuxcounter])
+		PORTB = 2;
+ 1ca:	25 b9       	out	0x05, r18	; 5
+		PORTB = 1;
+ 1cc:	95 b9       	out	0x05, r25	; 5
+		PORTB = 0;
+ 1ce:	15 b8       	out	0x05, r1	; 5
+	}
+ 1d0:	f6 cf       	rjmp	.-20     	; 0x1be <main+0x1e>
 
-000001d0 <__vector_24>:
-		//This ensures that the channels and reference selection only takes place at a safe point during the conversion	
+000001d2 <__vector_24>:
+			
 }
 
 
 ISR(ADC_vect)
 {
- 1d0:	1f 92       	push	r1
- 1d2:	0f 92       	push	r0
- 1d4:	0f b6       	in	r0, 0x3f	; 63
- 1d6:	0f 92       	push	r0
- 1d8:	11 24       	eor	r1, r1
- 1da:	0b b6       	in	r0, 0x3b	; 59
- 1dc:	0f 92       	push	r0
- 1de:	2f 93       	push	r18
+ 1d2:	1f 92       	push	r1
+ 1d4:	0f 92       	push	r0
+ 1d6:	0f b6       	in	r0, 0x3f	; 63
+ 1d8:	0f 92       	push	r0
+ 1da:	11 24       	eor	r1, r1
+ 1dc:	0b b6       	in	r0, 0x3b	; 59
+ 1de:	0f 92       	push	r0
  1e0:	8f 93       	push	r24
  1e2:	9f 93       	push	r25
- 1e4:	ef 93       	push	r30
- 1e6:	ff 93       	push	r31
-	//Vilken läsning har skett? Använd ADMUX för att bestämma!	
-	//sensor_data[ADMUX-32] = ADCH;
-	PORTB = ADCH; //Skickar alla 8 bitar till PortB som kopplas till dioder
- 1e8:	80 91 79 00 	lds	r24, 0x0079
- 1ec:	85 b9       	out	0x05, r24	; 5
-	#else
-		//round up by default
-		__ticks_dc = (uint32_t)(ceil(fabs(__tmp)));
-	#endif
-
-	__builtin_avr_delay_cycles(__ticks_dc);
- 1ee:	2f ed       	ldi	r18, 0xDF	; 223
- 1f0:	83 e9       	ldi	r24, 0x93	; 147
- 1f2:	94 e0       	ldi	r25, 0x04	; 4
- 1f4:	21 50       	subi	r18, 0x01	; 1
- 1f6:	80 40       	sbci	r24, 0x00	; 0
- 1f8:	90 40       	sbci	r25, 0x00	; 0
- 1fa:	e1 f7       	brne	.-8      	; 0x1f4 <__vector_24+0x24>
- 1fc:	00 c0       	rjmp	.+0      	; 0x1fe <__vector_24+0x2e>
- 1fe:	00 00       	nop
-	_delay_ms(1500);
+ 1e4:	af 93       	push	r26
+ 1e6:	bf 93       	push	r27
+ 1e8:	cf 93       	push	r28
+ 1ea:	df 93       	push	r29
+ 1ec:	ef 93       	push	r30
+ 1ee:	ff 93       	push	r31
+	PORTB = ADCH;
+ 1f0:	e9 e7       	ldi	r30, 0x79	; 121
+ 1f2:	f0 e0       	ldi	r31, 0x00	; 0
+ 1f4:	80 81       	ld	r24, Z
+ 1f6:	85 b9       	out	0x05, r24	; 5
 	PORTB = 0;
- 200:	15 b8       	out	0x05, r1	; 5
+ 1f8:	15 b8       	out	0x05, r1	; 5
+	sensor_data[admuxcounter]= distance_table[ADCH];
+ 1fa:	c0 81       	ld	r28, Z
+ 1fc:	a0 91 00 01 	lds	r26, 0x0100
+ 200:	b0 91 01 01 	lds	r27, 0x0101
+ 204:	aa 0f       	add	r26, r26
+ 206:	bb 1f       	adc	r27, r27
+ 208:	ae 5f       	subi	r26, 0xFE	; 254
+ 20a:	be 4f       	sbci	r27, 0xFE	; 254
+ 20c:	d0 e0       	ldi	r29, 0x00	; 0
+ 20e:	cc 0f       	add	r28, r28
+ 210:	dd 1f       	adc	r29, r29
+ 212:	ce 5e       	subi	r28, 0xEE	; 238
+ 214:	de 4f       	sbci	r29, 0xFE	; 254
+ 216:	88 81       	ld	r24, Y
+ 218:	99 81       	ldd	r25, Y+1	; 0x01
+ 21a:	8d 93       	st	X+, r24
+ 21c:	9c 93       	st	X, r25
 	PORTB = distance_table[ADCH];
- 202:	e0 91 79 00 	lds	r30, 0x0079
- 206:	f0 e0       	ldi	r31, 0x00	; 0
- 208:	ee 0f       	add	r30, r30
- 20a:	ff 1f       	adc	r31, r31
- 20c:	e0 5f       	subi	r30, 0xF0	; 240
- 20e:	fe 4f       	sbci	r31, 0xFE	; 254
- 210:	80 81       	ld	r24, Z
- 212:	85 b9       	out	0x05, r24	; 5
-	PORTB = 0;
- 214:	15 b8       	out	0x05, r1	; 5
+ 21e:	e0 81       	ld	r30, Z
+ 220:	f0 e0       	ldi	r31, 0x00	; 0
+ 222:	ee 0f       	add	r30, r30
+ 224:	ff 1f       	adc	r31, r31
+ 226:	ee 5e       	subi	r30, 0xEE	; 238
+ 228:	fe 4f       	sbci	r31, 0xFE	; 254
+ 22a:	80 81       	ld	r24, Z
+ 22c:	85 b9       	out	0x05, r24	; 5
+	
+	if (admuxcounter < 7)
+ 22e:	80 91 00 01 	lds	r24, 0x0100
+ 232:	90 91 01 01 	lds	r25, 0x0101
+ 236:	07 97       	sbiw	r24, 0x07	; 7
+ 238:	7c f4       	brge	.+30     	; 0x258 <__vector_24+0x86>
+		{
+			ADMUX += 1;
+ 23a:	ec e7       	ldi	r30, 0x7C	; 124
+ 23c:	f0 e0       	ldi	r31, 0x00	; 0
+ 23e:	80 81       	ld	r24, Z
+ 240:	8f 5f       	subi	r24, 0xFF	; 255
+ 242:	80 83       	st	Z, r24
+			admuxcounter += 1;
+ 244:	80 91 00 01 	lds	r24, 0x0100
+ 248:	90 91 01 01 	lds	r25, 0x0101
+ 24c:	01 96       	adiw	r24, 0x01	; 1
+ 24e:	90 93 01 01 	sts	0x0101, r25
+ 252:	80 93 00 01 	sts	0x0100, r24
+ 256:	07 c0       	rjmp	.+14     	; 0x266 <__vector_24+0x94>
+		}
+	else
+		{
+			ADMUX = 32;
+ 258:	80 e2       	ldi	r24, 0x20	; 32
+ 25a:	80 93 7c 00 	sts	0x007C, r24
+			admuxcounter = 0;
+ 25e:	10 92 01 01 	sts	0x0101, r1
+ 262:	10 92 00 01 	sts	0x0100, r1
+		}
 }
- 216:	ff 91       	pop	r31
- 218:	ef 91       	pop	r30
- 21a:	9f 91       	pop	r25
- 21c:	8f 91       	pop	r24
- 21e:	2f 91       	pop	r18
- 220:	0f 90       	pop	r0
- 222:	0b be       	out	0x3b, r0	; 59
- 224:	0f 90       	pop	r0
- 226:	0f be       	out	0x3f, r0	; 63
- 228:	0f 90       	pop	r0
- 22a:	1f 90       	pop	r1
- 22c:	18 95       	reti
+ 266:	ff 91       	pop	r31
+ 268:	ef 91       	pop	r30
+ 26a:	df 91       	pop	r29
+ 26c:	cf 91       	pop	r28
+ 26e:	bf 91       	pop	r27
+ 270:	af 91       	pop	r26
+ 272:	9f 91       	pop	r25
+ 274:	8f 91       	pop	r24
+ 276:	0f 90       	pop	r0
+ 278:	0b be       	out	0x3b, r0	; 59
+ 27a:	0f 90       	pop	r0
+ 27c:	0f be       	out	0x3f, r0	; 63
+ 27e:	0f 90       	pop	r0
+ 280:	1f 90       	pop	r1
+ 282:	18 95       	reti
 
-0000022e <_exit>:
- 22e:	f8 94       	cli
+00000284 <_exit>:
+ 284:	f8 94       	cli
 
-00000230 <__stop_program>:
- 230:	ff cf       	rjmp	.-2      	; 0x230 <__stop_program>
+00000286 <__stop_program>:
+ 286:	ff cf       	rjmp	.-2      	; 0x286 <__stop_program>
