@@ -114,28 +114,38 @@ void LCD_SetRow(int row)
 		_delay_ms(1);
 	}
 	
-	PORTB |= (0 << 0)|(0 << 1); // Set RS and R/W to 0 so that the following commands can be run
+	PORTB &= ~(1 << 0); // Clear RS and
+	PORTB &= ~(1 << 1); // clear R/W bits so that the following commands can be run
 	
 	if (row == 1)
 	{
-		LCD_SendCommand(0b00000010); // Set the cursor on the first of rows
+		LCD_SendCommand(0b10000000); // Set the cursor on the first row, first char
 	}
 	else if (row == 2)
 	{
-		LCD_SendCommand(0b11000000); // Set the cursor on the second of rows
+		LCD_SendCommand(0b11000000); // Set the cursor on the second row, first char
 	}
 }
 
-// IS NOT COMPLETED!
-void LCD_SetPosition(int pos)
+// Sets position for cursor on LCD. Argument should be a number in the range of 0-31.
+void LCD_SetPosition(uint8_t pos)
 {
 	while(LCD_Busy())
 	{
 		_delay_ms(1);
 	}
+	PORTB &= ~(1 << 0); // Clear RS and
+	PORTB &= ~(1 << 1); // clear R/W bits so that the following commands can be run
 	
-	PORTB |= (0 << 0)|(0<<1); //Set RS and R/W to 0 so that the following commands can be executed
-	
+	if (pos < 16)
+	{
+		LCD_SendCommand(128+pos);
+	}
+	else if (pos < 32)
+	{
+		LCD_SendCommand(128+64-16+pos);
+	}
+	else LCD_SendCommand(0b10000000);
 	
 }
 void LCD_SendCharacter(char symbol)
@@ -191,7 +201,7 @@ void LCD_Init()
 	LCD_SendCommand(0b00000110);
 
 	// Display on, cursor ON, blinking on, instruction 00 0000 1110
-	LCD_SendCommand(0b00001100);
+	LCD_SendCommand(0b00001110);
 }
 
 int main(void)
@@ -217,6 +227,10 @@ int main(void)
 	SPDRrec_ = SPI_MasterTransmit(2, 'k');
 	LCD_SendCharacter(SPDRrec_);
 	
+	//LCD_SetPosition(31);
+	//_delay_ms(15000);
+	//LCD_SendCharacter('T');
+	//_delay_ms(15000);
 	
 	//LCD_SendCharacter(SPDRrec_);
 	
@@ -243,6 +257,6 @@ int main(void)
 		SPDRrec_ = SPI_MasterTransmit(5,'k');
 		LCD_SendCharacter(SPDRrec_);
 		_delay_ms(15000);
-		LCD_SetRow(1);
+		//LCD_SetRow(1);
 	}
 }
