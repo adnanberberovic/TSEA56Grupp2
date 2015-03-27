@@ -108,6 +108,7 @@ void LCD_SendCommand(char cmd) {
 	PORTB &= ~(1 << 2);
 }
 
+// Sets row on the LCD.
 void LCD_SetRow(int row)
 {
 	while(LCD_Busy())
@@ -127,6 +128,18 @@ void LCD_SetRow(int row)
 	}
 }
 
+// IS NOT COMPLETED!
+void LCD_SetPosition(int pos)
+{
+	while(LCD_Busy())
+	{
+		_delay_ms(1);
+	}
+	
+	PORTB |= (0 << 0)|(0<<1); //Set RS and R/W to 0 so that the following commands can be executed
+	
+	
+}
 void LCD_SendCharacter(char symbol)
 {
 	while(LCD_Busy())
@@ -211,18 +224,35 @@ void LCD_Init()
 
 int main(void)
 {
-	//unsigned char SPDRrec_ = 0;
+	unsigned char SPDRrec_ = 0;
 	sei();	// Enable global interrupts
 	sleep_enable();	// Enable sleep instruction
 	Styr_InitPortDirections();	// Initiate Port directions for the styrmodul.
 	Styr_InitPortValues();	// Initiate Port Values for the styrmodul.
 	SPI_MasterInit();	// Initiate the styrmodul as the SPI master.
 	LCD_Init(); // Initiate the LCD.
+	
 	LCD_WelcomeScreen(); // Welcomes the user with a nice message ;-)
 	
+	SPDRrec_ = SPI_MasterTransmit(0x01, 'k');
+	
+	_delay_ms(500);
+	
+	LCD_SetRow(1);
+	LCD_SendCharacter(SPDRrec_);
 	
 	
 	while(1)
     {		
+		
+		_delay_ms(500);
+		LCD_SetRow(1);
+		SPDRrec_ = SPI_MasterTransmit(0x1F,'k');
+		LCD_SendCharacter(SPDRrec_);
+		
+		_delay_ms(500);
+		LCD_SetRow(1);
+		SPDRrec_ = SPI_MasterTransmit(0x0F,'k');
+		LCD_SendCharacter(SPDRrec_);
 	}
 }
