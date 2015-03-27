@@ -6,10 +6,14 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 #include <avr/sleep.h>
+#include <util/delay.h>
 
 char outSPDR[] = "ABCDEFGHIJKLMNOP";
 char inSPDR;
 int i = 0;
+unsigned char outBT;
+unsigned char inBT;
+
 // Setup data direction registers @ ports for out/inputs.
 void Komm_InitPortDirections(void)
 {
@@ -55,6 +59,53 @@ ISR(SPI_STC_vect)
 	
 }
 
+// Set up and enable Bluetooth
+void BT_init(void)
+{
+	UBRR0H = 0x00; //correct value to change baud rate
+	UBRR0L = 0x07;//^^ same ^^ with a 14.7 mhz, scale with 1111 (7)
+	
+	UCSR0B = (1<<TXEN0) | (1<<RXEN0) | (0<<UCSZ02) | (1<<RXCIE0) | (1<<TXCIE0);
+	/* RXCI, TXCI Complete transmission and complete interrupt is enabled
+	 * UDRIE0 not set, disabled interrupts due to UDRE0 flag. Data register empty
+	 * TXEN, TXEN, transmission and receiver enable 
+	 * UCSZ02 sets the third bit, defining framesize
+	*/
+	UCSR0C = (1<<UCSZ01) | (1<<UCSZ00);
+	/* UMSEL0 = 0 setting Asynchronous operation
+	 * UPM01:0 = 0, Pairty disabled
+	 * USBS0 = 0, 1 stop bit
+	 * UCSZ01:0 = 1, char size = 8
+	 */
+}
+
+// Receive data via BT.
+unsigned char BT_receive(void)
+{
+	while (!( UCSR0A & (1<<RXC0) ));
+	return UDR0;
+}
+
+// Transmit data via BT.
+void BT_transmit(char data)
+{
+	while(!( UCSR0A & (1<<TXC0)));
+	UDR0 = data;
+}
+
+// Receive complete
+ISR(USART0_RX_vect) 
+{
+	inBT = BT_receive();
+	BT_transmit(inBT); // Send back incoming
+}
+
+// Transmission complete
+ISR(USART0_TX_vect) 
+{
+
+}
+
 int main(void)
 {
 	inSPDR = 0x00;
@@ -62,6 +113,7 @@ int main(void)
 	Komm_InitPortDirections();
 	Komm_InitPortValues();
 	SPI_SlaveInit();
+	BT_init();
 	sei();
 	while(1)
 	{

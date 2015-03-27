@@ -11,6 +11,8 @@ Allocating common symbols
 Common symbol       size              file
 
 inSPDR              0x1               Kommodul_vA0.1.o
+outBT               0x1               Kommodul_vA0.1.o
+inBT                0x1               Kommodul_vA0.1.o
 
 Discarded input sections
 
@@ -188,7 +190,7 @@ END GROUP
 .rela.plt
  *(.rela.plt)
 
-.text           0x00000000      0x136
+.text           0x00000000      0x1d8
  *(.vectors)
  .vectors       0x00000000       0x8c c:/program files (x86)/atmel/atmel toolchain/avr8 gcc/native/3.4.1061/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.8.1/../../../../avr/lib/avr51/crtm1284p.o
                 0x00000000                __vector_default
@@ -245,7 +247,6 @@ END GROUP
  *(.init9)
  *(.text)
  .text          0x000000c6        0x2 c:/program files (x86)/atmel/atmel toolchain/avr8 gcc/native/3.4.1061/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.8.1/../../../../avr/lib/avr51/crtm1284p.o
-                0x000000c6                __vector_22
                 0x000000c6                __vector_28
                 0x000000c6                __vector_1
                 0x000000c6                __vector_32
@@ -278,7 +279,6 @@ END GROUP
                 0x000000c6                __vector_10
                 0x000000c6                __vector_16
                 0x000000c6                __vector_18
-                0x000000c6                __vector_20
                 0x000000c8                . = ALIGN (0x2)
  *(.text.*)
  .text.Komm_InitPortDirections
@@ -290,13 +290,27 @@ END GROUP
  .text.__vector_19
                 0x000000da       0x42 Kommodul_vA0.1.o
                 0x000000da                __vector_19
- .text.main     0x0000011c       0x16 Kommodul_vA0.1.o
-                0x0000011c                main
-                0x00000132                . = ALIGN (0x2)
+ .text.BT_init  0x0000011c       0x18 Kommodul_vA0.1.o
+                0x0000011c                BT_init
+ .text.BT_receive
+                0x00000134       0x10 Kommodul_vA0.1.o
+                0x00000134                BT_receive
+ .text.BT_transmit
+                0x00000144       0x10 Kommodul_vA0.1.o
+                0x00000144                BT_transmit
+ .text.__vector_20
+                0x00000154       0x54 Kommodul_vA0.1.o
+                0x00000154                __vector_20
+ .text.__vector_22
+                0x000001a8       0x14 Kommodul_vA0.1.o
+                0x000001a8                __vector_22
+ .text.main     0x000001bc       0x18 Kommodul_vA0.1.o
+                0x000001bc                main
+                0x000001d4                . = ALIGN (0x2)
  *(.fini9)
- .fini9         0x00000132        0x0 c:/program files (x86)/atmel/atmel toolchain/avr8 gcc/native/3.4.1061/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.8.1/avr51\libgcc.a(_exit.o)
-                0x00000132                _exit
-                0x00000132                exit
+ .fini9         0x000001d4        0x0 c:/program files (x86)/atmel/atmel toolchain/avr8 gcc/native/3.4.1061/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.8.1/avr51\libgcc.a(_exit.o)
+                0x000001d4                _exit
+                0x000001d4                exit
  *(.fini9)
  *(.fini8)
  *(.fini8)
@@ -315,11 +329,11 @@ END GROUP
  *(.fini1)
  *(.fini1)
  *(.fini0)
- .fini0         0x00000132        0x4 c:/program files (x86)/atmel/atmel toolchain/avr8 gcc/native/3.4.1061/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.8.1/avr51\libgcc.a(_exit.o)
+ .fini0         0x000001d4        0x4 c:/program files (x86)/atmel/atmel toolchain/avr8 gcc/native/3.4.1061/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.8.1/avr51\libgcc.a(_exit.o)
  *(.fini0)
-                0x00000136                _etext = .
+                0x000001d8                _etext = .
 
-.data           0x00800100       0x12 load address 0x00000136
+.data           0x00800100       0x12 load address 0x000001d8
                 0x00800100                PROVIDE (__data_start, .)
  *(.data)
  *(.data*)
@@ -333,25 +347,27 @@ END GROUP
                 0x00800112                _edata = .
                 0x00800112                PROVIDE (__data_end, .)
 
-.bss            0x00800112        0x3
+.bss            0x00800112        0x5
                 0x00800112                PROVIDE (__bss_start, .)
  *(.bss)
  *(.bss*)
  .bss.i         0x00800112        0x2 Kommodul_vA0.1.o
                 0x00800112                i
  *(COMMON)
- COMMON         0x00800114        0x1 Kommodul_vA0.1.o
+ COMMON         0x00800114        0x3 Kommodul_vA0.1.o
                 0x00800114                inSPDR
-                0x00800115                PROVIDE (__bss_end, .)
-                0x00000136                __data_load_start = LOADADDR (.data)
-                0x00000148                __data_load_end = (__data_load_start + SIZEOF (.data))
+                0x00800115                outBT
+                0x00800116                inBT
+                0x00800117                PROVIDE (__bss_end, .)
+                0x000001d8                __data_load_start = LOADADDR (.data)
+                0x000001ea                __data_load_end = (__data_load_start + SIZEOF (.data))
 
-.noinit         0x00800115        0x0
-                0x00800115                PROVIDE (__noinit_start, .)
+.noinit         0x00800117        0x0
+                0x00800117                PROVIDE (__noinit_start, .)
  *(.noinit*)
-                0x00800115                PROVIDE (__noinit_end, .)
-                0x00800115                _end = .
-                0x00800115                PROVIDE (__heap_start, .)
+                0x00800117                PROVIDE (__noinit_end, .)
+                0x00800117                _end = .
+                0x00800117                PROVIDE (__heap_start, .)
 
 .eeprom         0x00810000        0x0
  *(.eeprom*)
@@ -410,38 +426,38 @@ END GROUP
 .debug_sfnames
  *(.debug_sfnames)
 
-.debug_aranges  0x00000000       0x48
+.debug_aranges  0x00000000       0x70
  *(.debug_aranges)
  .debug_aranges
-                0x00000000       0x48 Kommodul_vA0.1.o
+                0x00000000       0x70 Kommodul_vA0.1.o
 
 .debug_pubnames
  *(.debug_pubnames)
 
-.debug_info     0x00000000      0x185
+.debug_info     0x00000000      0x24d
  *(.debug_info .gnu.linkonce.wi.*)
- .debug_info    0x00000000      0x185 Kommodul_vA0.1.o
+ .debug_info    0x00000000      0x24d Kommodul_vA0.1.o
 
-.debug_abbrev   0x00000000      0x11d
+.debug_abbrev   0x00000000      0x151
  *(.debug_abbrev)
- .debug_abbrev  0x00000000      0x11d Kommodul_vA0.1.o
+ .debug_abbrev  0x00000000      0x151 Kommodul_vA0.1.o
 
-.debug_line     0x00000000      0x164
+.debug_line     0x00000000      0x227
  *(.debug_line .debug_line.* .debug_line_end)
- .debug_line    0x00000000      0x164 Kommodul_vA0.1.o
+ .debug_line    0x00000000      0x227 Kommodul_vA0.1.o
 
-.debug_frame    0x00000000       0x94
+.debug_frame    0x00000000      0x138
  *(.debug_frame)
- .debug_frame   0x00000000       0x94 Kommodul_vA0.1.o
+ .debug_frame   0x00000000      0x138 Kommodul_vA0.1.o
 
-.debug_str      0x00000000      0x1c6
+.debug_str      0x00000000      0x20d
  *(.debug_str)
- .debug_str     0x00000000      0x1c6 Kommodul_vA0.1.o
-                                0x1ff (size before relaxing)
+ .debug_str     0x00000000      0x20d Kommodul_vA0.1.o
+                                0x246 (size before relaxing)
 
-.debug_loc      0x00000000       0x63
+.debug_loc      0x00000000      0x15d
  *(.debug_loc)
- .debug_loc     0x00000000       0x63 Kommodul_vA0.1.o
+ .debug_loc     0x00000000      0x15d Kommodul_vA0.1.o
 
 .debug_macinfo
  *(.debug_macinfo)
@@ -461,9 +477,9 @@ END GROUP
 .debug_pubtypes
  *(.debug_pubtypes)
 
-.debug_ranges   0x00000000       0x38
+.debug_ranges   0x00000000       0x60
  *(.debug_ranges)
- .debug_ranges  0x00000000       0x38 Kommodul_vA0.1.o
+ .debug_ranges  0x00000000       0x60 Kommodul_vA0.1.o
 
 .debug_macro
  *(.debug_macro)
