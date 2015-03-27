@@ -110,7 +110,7 @@ void LCD_SendCommand(char cmd) {
 	PORTB &= ~(1 << 2);
 }
 
-// Sets row on the LCD.
+// Sets row on the LCD. Do not use this yourself, rather use LCD_SetPosition instead.
 void LCD_SetRow(int row)
 {
 	while(LCD_Busy())
@@ -124,12 +124,10 @@ void LCD_SetRow(int row)
 	if (row == 1)
 	{
 		LCD_SendCommand(0b10000000); // Set the cursor on the first row, first char
-		LCD_Counter = 0;
 	}
 	else if (row == 2)
 	{
 		LCD_SendCommand(0b11000000); // Set the cursor on the second row, first char
-		LCD_Counter = 16;
 	}
 }
 
@@ -261,7 +259,7 @@ int main(void)
     {		
 		SPDRrec_ = SPI_MasterTransmit(0,'k');
 		LCD_SendCharacter(SPDRrec_);
-		_delay_ms(20000);
+		_delay_ms(5000);
 		
 		//
 		//SPDRrec_ = SPI_MasterTransmit(0,'k');

@@ -561,9 +561,9 @@ void Styr_InitPortValues(void)
  2b6:	15 df       	rcall	.-470    	; 0xe2 <SPI_MasterTransmit>
 		LCD_SendCharacter(SPDRrec_);
  2b8:	7b df       	rcall	.-266    	; 0x1b0 <LCD_SendCharacter>
- 2ba:	2f ef       	ldi	r18, 0xFF	; 255
- 2bc:	88 e0       	ldi	r24, 0x08	; 8
- 2be:	9d e3       	ldi	r25, 0x3D	; 61
+ 2ba:	2f e3       	ldi	r18, 0x3F	; 63
+ 2bc:	82 e4       	ldi	r24, 0x42	; 66
+ 2be:	9f e0       	ldi	r25, 0x0F	; 15
  2c0:	21 50       	subi	r18, 0x01	; 1
  2c2:	80 40       	sbci	r24, 0x00	; 0
  2c4:	90 40       	sbci	r25, 0x00	; 0
