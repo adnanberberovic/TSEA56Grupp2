@@ -3,29 +3,27 @@ Kommodul_vA0.1.elf:     file format elf32-avr
 
 Sections:
 Idx Name          Size      VMA       LMA       File off  Algn
-  0 .data         00000012  00800100  000001ca  0000025e  2**0
-                  CONTENTS, ALLOC, LOAD, DATA
-  1 .text         000001ca  00000000  00000000  00000094  2**1
+  0 .text         000001a8  00000000  00000000  00000074  2**1
                   CONTENTS, ALLOC, LOAD, READONLY, CODE
-  2 .bss          00000005  00800112  00800112  00000270  2**0
+  1 .bss          00000003  00800100  00800100  0000021c  2**0
                   ALLOC
-  3 .comment      00000030  00000000  00000000  00000270  2**0
+  2 .comment      00000030  00000000  00000000  0000021c  2**0
                   CONTENTS, READONLY
-  4 .debug_aranges 00000070  00000000  00000000  000002a0  2**0
+  3 .debug_aranges 00000070  00000000  00000000  0000024c  2**0
                   CONTENTS, READONLY, DEBUGGING
-  5 .debug_info   00000244  00000000  00000000  00000310  2**0
+  4 .debug_info   00000244  00000000  00000000  000002bc  2**0
                   CONTENTS, READONLY, DEBUGGING
-  6 .debug_abbrev 00000151  00000000  00000000  00000554  2**0
+  5 .debug_abbrev 00000151  00000000  00000000  00000500  2**0
                   CONTENTS, READONLY, DEBUGGING
-  7 .debug_line   00000215  00000000  00000000  000006a5  2**0
+  6 .debug_line   00000215  00000000  00000000  00000651  2**0
                   CONTENTS, READONLY, DEBUGGING
-  8 .debug_frame  00000138  00000000  00000000  000008bc  2**2
+  7 .debug_frame  00000128  00000000  00000000  00000868  2**2
                   CONTENTS, READONLY, DEBUGGING
-  9 .debug_str    0000020d  00000000  00000000  000009f4  2**0
+  8 .debug_str    0000020d  00000000  00000000  00000990  2**0
                   CONTENTS, READONLY, DEBUGGING
- 10 .debug_loc    0000015d  00000000  00000000  00000c01  2**0
+  9 .debug_loc    00000136  00000000  00000000  00000b9d  2**0
                   CONTENTS, READONLY, DEBUGGING
- 11 .debug_ranges 00000060  00000000  00000000  00000d5e  2**0
+ 10 .debug_ranges 00000060  00000000  00000000  00000cd3  2**0
                   CONTENTS, READONLY, DEBUGGING
 
 Disassembly of section .text:
@@ -71,11 +69,11 @@ Disassembly of section .text:
   4a:	00 00       	nop
   4c:	46 c0       	rjmp	.+140    	; 0xda <__vector_19>
   4e:	00 00       	nop
-  50:	79 c0       	rjmp	.+242    	; 0x144 <__vector_20>
+  50:	6a c0       	rjmp	.+212    	; 0x126 <__vector_20>
   52:	00 00       	nop
   54:	38 c0       	rjmp	.+112    	; 0xc6 <__bad_interrupt>
   56:	00 00       	nop
-  58:	a0 c0       	rjmp	.+320    	; 0x19a <__vector_22>
+  58:	91 c0       	rjmp	.+290    	; 0x17c <__vector_22>
   5a:	00 00       	nop
   5c:	34 c0       	rjmp	.+104    	; 0xc6 <__bad_interrupt>
   5e:	00 00       	nop
@@ -114,20 +112,20 @@ Disassembly of section .text:
   98:	11 e0       	ldi	r17, 0x01	; 1
   9a:	a0 e0       	ldi	r26, 0x00	; 0
   9c:	b1 e0       	ldi	r27, 0x01	; 1
-  9e:	ea ec       	ldi	r30, 0xCA	; 202
+  9e:	e8 ea       	ldi	r30, 0xA8	; 168
   a0:	f1 e0       	ldi	r31, 0x01	; 1
   a2:	00 e0       	ldi	r16, 0x00	; 0
   a4:	0b bf       	out	0x3b, r16	; 59
   a6:	02 c0       	rjmp	.+4      	; 0xac <__do_copy_data+0x14>
   a8:	07 90       	elpm	r0, Z+
   aa:	0d 92       	st	X+, r0
-  ac:	a2 31       	cpi	r26, 0x12	; 18
+  ac:	a0 30       	cpi	r26, 0x00	; 0
   ae:	b1 07       	cpc	r27, r17
   b0:	d9 f7       	brne	.-10     	; 0xa8 <__do_copy_data+0x10>
 
 000000b2 <__do_clear_bss>:
   b2:	21 e0       	ldi	r18, 0x01	; 1
-  b4:	a2 e1       	ldi	r26, 0x12	; 18
+  b4:	a0 e0       	ldi	r26, 0x00	; 0
   b6:	b1 e0       	ldi	r27, 0x01	; 1
   b8:	01 c0       	rjmp	.+2      	; 0xbc <.do_clear_bss_start>
 
@@ -135,11 +133,11 @@ Disassembly of section .text:
   ba:	1d 92       	st	X+, r1
 
 000000bc <.do_clear_bss_start>:
-  bc:	a7 31       	cpi	r26, 0x17	; 23
+  bc:	a3 30       	cpi	r26, 0x03	; 3
   be:	b2 07       	cpc	r27, r18
   c0:	e1 f7       	brne	.-8      	; 0xba <.do_clear_bss_loop>
-  c2:	75 d0       	rcall	.+234    	; 0x1ae <main>
-  c4:	80 c0       	rjmp	.+256    	; 0x1c6 <_exit>
+  c2:	66 d0       	rcall	.+204    	; 0x190 <main>
+  c4:	6f c0       	rjmp	.+222    	; 0x1a4 <_exit>
 
 000000c6 <__bad_interrupt>:
   c6:	9c cf       	rjmp	.-200    	; 0x0 <__vectors>
@@ -169,163 +167,148 @@ unsigned char BT_receive(void)
   de:	0f b6       	in	r0, 0x3f	; 63
   e0:	0f 92       	push	r0
   e2:	11 24       	eor	r1, r1
-  e4:	0b b6       	in	r0, 0x3b	; 59
-  e6:	0f 92       	push	r0
-  e8:	8f 93       	push	r24
-  ea:	9f 93       	push	r25
-  ec:	ef 93       	push	r30
-  ee:	ff 93       	push	r31
-  f0:	8e b5       	in	r24, 0x2e	; 46
-  f2:	90 e0       	ldi	r25, 0x00	; 0
-  f4:	90 93 13 01 	sts	0x0113, r25
-  f8:	80 93 12 01 	sts	0x0112, r24
-  fc:	fc 01       	movw	r30, r24
-  fe:	e0 50       	subi	r30, 0x00	; 0
- 100:	ff 4f       	sbci	r31, 0xFF	; 255
- 102:	80 81       	ld	r24, Z
- 104:	8e bd       	out	0x2e, r24	; 46
- 106:	ff 91       	pop	r31
- 108:	ef 91       	pop	r30
- 10a:	9f 91       	pop	r25
- 10c:	8f 91       	pop	r24
- 10e:	0f 90       	pop	r0
- 110:	0b be       	out	0x3b, r0	; 59
- 112:	0f 90       	pop	r0
- 114:	0f be       	out	0x3f, r0	; 63
- 116:	0f 90       	pop	r0
- 118:	1f 90       	pop	r1
- 11a:	18 95       	reti
+  e4:	8f 93       	push	r24
+  e6:	80 91 00 01 	lds	r24, 0x0100
+  ea:	8e bd       	out	0x2e, r24	; 46
+  ec:	8f 91       	pop	r24
+  ee:	0f 90       	pop	r0
+  f0:	0f be       	out	0x3f, r0	; 63
+  f2:	0f 90       	pop	r0
+  f4:	1f 90       	pop	r1
+  f6:	18 95       	reti
 
-0000011c <BT_init>:
- 11c:	10 92 c5 00 	sts	0x00C5, r1
- 120:	87 e0       	ldi	r24, 0x07	; 7
- 122:	80 93 c4 00 	sts	0x00C4, r24
- 126:	88 ed       	ldi	r24, 0xD8	; 216
- 128:	80 93 c1 00 	sts	0x00C1, r24
- 12c:	86 e0       	ldi	r24, 0x06	; 6
- 12e:	80 93 c2 00 	sts	0x00C2, r24
- 132:	08 95       	ret
+000000f8 <BT_init>:
+  f8:	10 92 c5 00 	sts	0x00C5, r1
+  fc:	87 e0       	ldi	r24, 0x07	; 7
+  fe:	80 93 c4 00 	sts	0x00C4, r24
+ 102:	88 ed       	ldi	r24, 0xD8	; 216
+ 104:	80 93 c1 00 	sts	0x00C1, r24
+ 108:	86 e0       	ldi	r24, 0x06	; 6
+ 10a:	80 93 c2 00 	sts	0x00C2, r24
+ 10e:	08 95       	ret
 
-00000134 <BT_transmit>:
+00000110 <BT_transmit>:
 
 // Transmit data via BT.
 void BT_transmit(char data)
 {
 	while(!( UCSR0A & (1<<UDRE0)));
- 134:	e0 ec       	ldi	r30, 0xC0	; 192
- 136:	f0 e0       	ldi	r31, 0x00	; 0
- 138:	90 81       	ld	r25, Z
- 13a:	95 ff       	sbrs	r25, 5
- 13c:	fd cf       	rjmp	.-6      	; 0x138 <BT_transmit+0x4>
+ 110:	e0 ec       	ldi	r30, 0xC0	; 192
+ 112:	f0 e0       	ldi	r31, 0x00	; 0
+ 114:	90 81       	ld	r25, Z
+ 116:	95 ff       	sbrs	r25, 5
+ 118:	fd cf       	rjmp	.-6      	; 0x114 <BT_transmit+0x4>
 	UDR0 = data;
- 13e:	80 93 c6 00 	sts	0x00C6, r24
- 142:	08 95       	ret
+ 11a:	80 93 c6 00 	sts	0x00C6, r24
+	SPDR = data;
+ 11e:	8e bd       	out	0x2e, r24	; 46
+	inSPDR = data;
+ 120:	80 93 00 01 	sts	0x0100, r24
+ 124:	08 95       	ret
 
-00000144 <__vector_20>:
+00000126 <__vector_20>:
 }
 
 // Receive complete
 ISR(USART0_RX_vect) 
 {
- 144:	1f 92       	push	r1
- 146:	0f 92       	push	r0
- 148:	0f b6       	in	r0, 0x3f	; 63
- 14a:	0f 92       	push	r0
- 14c:	11 24       	eor	r1, r1
- 14e:	0b b6       	in	r0, 0x3b	; 59
- 150:	0f 92       	push	r0
- 152:	2f 93       	push	r18
- 154:	3f 93       	push	r19
- 156:	4f 93       	push	r20
- 158:	5f 93       	push	r21
- 15a:	6f 93       	push	r22
- 15c:	7f 93       	push	r23
- 15e:	8f 93       	push	r24
- 160:	9f 93       	push	r25
- 162:	af 93       	push	r26
- 164:	bf 93       	push	r27
- 166:	ef 93       	push	r30
- 168:	ff 93       	push	r31
+ 126:	1f 92       	push	r1
+ 128:	0f 92       	push	r0
+ 12a:	0f b6       	in	r0, 0x3f	; 63
+ 12c:	0f 92       	push	r0
+ 12e:	11 24       	eor	r1, r1
+ 130:	0b b6       	in	r0, 0x3b	; 59
+ 132:	0f 92       	push	r0
+ 134:	2f 93       	push	r18
+ 136:	3f 93       	push	r19
+ 138:	4f 93       	push	r20
+ 13a:	5f 93       	push	r21
+ 13c:	6f 93       	push	r22
+ 13e:	7f 93       	push	r23
+ 140:	8f 93       	push	r24
+ 142:	9f 93       	push	r25
+ 144:	af 93       	push	r26
+ 146:	bf 93       	push	r27
+ 148:	ef 93       	push	r30
+ 14a:	ff 93       	push	r31
 	inBT = UDR0;
- 16a:	80 91 c6 00 	lds	r24, 0x00C6
- 16e:	80 93 16 01 	sts	0x0116, r24
+ 14c:	80 91 c6 00 	lds	r24, 0x00C6
+ 150:	80 93 02 01 	sts	0x0102, r24
 	//inBT = BT_receive();
 	BT_transmit(inBT); // Send back incoming
- 172:	e0 df       	rcall	.-64     	; 0x134 <BT_transmit>
+ 154:	dd df       	rcall	.-70     	; 0x110 <BT_transmit>
 }
- 174:	ff 91       	pop	r31
- 176:	ef 91       	pop	r30
- 178:	bf 91       	pop	r27
- 17a:	af 91       	pop	r26
- 17c:	9f 91       	pop	r25
- 17e:	8f 91       	pop	r24
- 180:	7f 91       	pop	r23
- 182:	6f 91       	pop	r22
- 184:	5f 91       	pop	r21
- 186:	4f 91       	pop	r20
- 188:	3f 91       	pop	r19
- 18a:	2f 91       	pop	r18
- 18c:	0f 90       	pop	r0
- 18e:	0b be       	out	0x3b, r0	; 59
- 190:	0f 90       	pop	r0
- 192:	0f be       	out	0x3f, r0	; 63
- 194:	0f 90       	pop	r0
- 196:	1f 90       	pop	r1
- 198:	18 95       	reti
+ 156:	ff 91       	pop	r31
+ 158:	ef 91       	pop	r30
+ 15a:	bf 91       	pop	r27
+ 15c:	af 91       	pop	r26
+ 15e:	9f 91       	pop	r25
+ 160:	8f 91       	pop	r24
+ 162:	7f 91       	pop	r23
+ 164:	6f 91       	pop	r22
+ 166:	5f 91       	pop	r21
+ 168:	4f 91       	pop	r20
+ 16a:	3f 91       	pop	r19
+ 16c:	2f 91       	pop	r18
+ 16e:	0f 90       	pop	r0
+ 170:	0b be       	out	0x3b, r0	; 59
+ 172:	0f 90       	pop	r0
+ 174:	0f be       	out	0x3f, r0	; 63
+ 176:	0f 90       	pop	r0
+ 178:	1f 90       	pop	r1
+ 17a:	18 95       	reti
 
-0000019a <__vector_22>:
+0000017c <__vector_22>:
 
 // Transmission complete
 ISR(USART0_TX_vect) 
 {
- 19a:	1f 92       	push	r1
- 19c:	0f 92       	push	r0
- 19e:	0f b6       	in	r0, 0x3f	; 63
- 1a0:	0f 92       	push	r0
- 1a2:	11 24       	eor	r1, r1
+ 17c:	1f 92       	push	r1
+ 17e:	0f 92       	push	r0
+ 180:	0f b6       	in	r0, 0x3f	; 63
+ 182:	0f 92       	push	r0
+ 184:	11 24       	eor	r1, r1
 
 }
- 1a4:	0f 90       	pop	r0
- 1a6:	0f be       	out	0x3f, r0	; 63
- 1a8:	0f 90       	pop	r0
- 1aa:	1f 90       	pop	r1
- 1ac:	18 95       	reti
+ 186:	0f 90       	pop	r0
+ 188:	0f be       	out	0x3f, r0	; 63
+ 18a:	0f 90       	pop	r0
+ 18c:	1f 90       	pop	r1
+ 18e:	18 95       	reti
 
-000001ae <main>:
+00000190 <main>:
 
 int main(void)
 {
-	inSPDR = 0x00;
- 1ae:	10 92 14 01 	sts	0x0114, r1
 	sleep_enable();
- 1b2:	83 b7       	in	r24, 0x33	; 51
- 1b4:	81 60       	ori	r24, 0x01	; 1
- 1b6:	83 bf       	out	0x33, r24	; 51
+ 190:	83 b7       	in	r24, 0x33	; 51
+ 192:	81 60       	ori	r24, 0x01	; 1
+ 194:	83 bf       	out	0x33, r24	; 51
 	Komm_InitPortDirections();
- 1b8:	87 df       	rcall	.-242    	; 0xc8 <Komm_InitPortDirections>
+ 196:	98 df       	rcall	.-208    	; 0xc8 <Komm_InitPortDirections>
 }
 
 // Initiate port values.
 void Komm_InitPortValues(void)
 {
 	PORTB = 1<<PORTB4;
- 1ba:	80 e1       	ldi	r24, 0x10	; 16
- 1bc:	85 b9       	out	0x05, r24	; 5
+ 198:	80 e1       	ldi	r24, 0x10	; 16
+ 19a:	85 b9       	out	0x05, r24	; 5
+int main(void)
 {
-	inSPDR = 0x00;
 	sleep_enable();
 	Komm_InitPortDirections();
 	Komm_InitPortValues();
 	SPI_SlaveInit();
- 1be:	89 df       	rcall	.-238    	; 0xd2 <SPI_SlaveInit>
+ 19c:	9a df       	rcall	.-204    	; 0xd2 <SPI_SlaveInit>
 	BT_init();
- 1c0:	ad df       	rcall	.-166    	; 0x11c <BT_init>
+ 19e:	ac df       	rcall	.-168    	; 0xf8 <BT_init>
 	sei();
- 1c2:	78 94       	sei
- 1c4:	ff cf       	rjmp	.-2      	; 0x1c4 <main+0x16>
+ 1a0:	78 94       	sei
+ 1a2:	ff cf       	rjmp	.-2      	; 0x1a2 <main+0x12>
 
-000001c6 <_exit>:
- 1c6:	f8 94       	cli
+000001a4 <_exit>:
+ 1a4:	f8 94       	cli
 
-000001c8 <__stop_program>:
- 1c8:	ff cf       	rjmp	.-2      	; 0x1c8 <__stop_program>
+000001a6 <__stop_program>:
+ 1a6:	ff cf       	rjmp	.-2      	; 0x1a6 <__stop_program>

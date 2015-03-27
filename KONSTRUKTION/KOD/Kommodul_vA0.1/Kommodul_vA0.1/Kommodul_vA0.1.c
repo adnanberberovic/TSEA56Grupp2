@@ -54,9 +54,9 @@ void SPI_SlaveTransmit(unsigned char cData)
 // Interrupt method runs when SPI transmission/reception is completed.
 ISR(SPI_STC_vect)
 {
-	i = SPDR;
-	SPDR = outSPDR[i];
-	
+	//i = SPDR;
+	//SPDR = outSPDR[i];
+	SPDR = inSPDR;
 }
 
 // Set up and enable Bluetooth
@@ -91,6 +91,8 @@ void BT_transmit(char data)
 {
 	while(!( UCSR0A & (1<<UDRE0)));
 	UDR0 = data;
+	SPDR = data;
+	inSPDR = data;
 }
 
 // Receive complete
@@ -109,7 +111,6 @@ ISR(USART0_TX_vect)
 
 int main(void)
 {
-	inSPDR = 0x00;
 	sleep_enable();
 	Komm_InitPortDirections();
 	Komm_InitPortValues();

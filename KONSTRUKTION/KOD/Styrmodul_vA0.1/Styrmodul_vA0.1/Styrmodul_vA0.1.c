@@ -15,6 +15,10 @@
 //#include <avr/pgmspace.h>
 //#define F_CPU 20000000UL
 
+// GLOBAL VARIABLES
+
+int LCD_Counter;
+
 // Setup data direction registers @ ports for out/inputs.
 void Styr_InitPortDirections(void)
 {
@@ -120,16 +124,19 @@ void LCD_SetRow(int row)
 	if (row == 1)
 	{
 		LCD_SendCommand(0b10000000); // Set the cursor on the first row, first char
+		LCD_Counter = 0;
 	}
 	else if (row == 2)
 	{
 		LCD_SendCommand(0b11000000); // Set the cursor on the second row, first char
+		LCD_Counter = 16;
 	}
 }
 
 // Sets position for cursor on LCD. Argument should be a number in the range of 0-31.
 void LCD_SetPosition(uint8_t pos)
 {
+	LCD_Counter =(int) pos - 1;
 	while(LCD_Busy())
 	{
 		_delay_ms(1);
@@ -150,11 +157,24 @@ void LCD_SetPosition(uint8_t pos)
 }
 void LCD_SendCharacter(char symbol)
 {
+	LCD_Counter++;
+	
+	if(LCD_Counter == 16)
+	{
+		LCD_SetRow(2);
+	}
+	else if(LCD_Counter == 32)
+	{
+		LCD_Counter = 0;
+		LCD_SetRow(1);
+	}
+	
 	while(LCD_Busy())
 	{
 		_delay_ms(1);
 	}
-	PORTB |= (1 << 0)|(0 << 1); // Set RS and clear R/W
+	PORTB |= (1 << 0); // Set RS
+	PORTB &= ~(1 << 1); // Clear R/W
 	
 	//uint8_t tempNum = (int)symbol;
 	//PORTD = tempNum;
@@ -184,6 +204,7 @@ void LCD_WelcomeScreen(void)
 // Initiatazion of the LCD, according to Initializing Flowchart(Condition fosc=270KHz) in the data sheet.
 void LCD_Init()
 {
+	LCD_Counter = 0;
 	_delay_ms(30);
 	// Configure the LCD for 8 bits, 2 lines, 5x8 pixlex (dots) send instruction 00 0011 1000
 	LCD_SendCommand(0b00111000);
@@ -238,6 +259,9 @@ int main(void)
 	
 	while(1)
     {		
+		SPDRrec_ = SPI_MasterTransmit(0,'k');
+		LCD_SendCharacter(SPDRrec_);
+		_delay_ms(20000);
 		
 		//
 		//SPDRrec_ = SPI_MasterTransmit(0,'k');
