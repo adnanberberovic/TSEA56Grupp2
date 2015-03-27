@@ -14,6 +14,8 @@ Discarded input sections
  .bss           0x00000000        0x0 Styrmodul_vA0.1.o
  .text.Styr_InitPortValues
                 0x00000000        0x6 Styrmodul_vA0.1.o
+ .text.LCD_SetPosition
+                0x00000000       0x44 Styrmodul_vA0.1.o
  .text          0x00000000        0x0 c:/program files (x86)/atmel/atmel toolchain/avr8 gcc/native/3.4.1061/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.8.1/avr51\libgcc.a(_exit.o)
  .data          0x00000000        0x0 c:/program files (x86)/atmel/atmel toolchain/avr8 gcc/native/3.4.1061/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.8.1/avr51\libgcc.a(_exit.o)
  .bss           0x00000000        0x0 c:/program files (x86)/atmel/atmel toolchain/avr8 gcc/native/3.4.1061/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.8.1/avr51\libgcc.a(_exit.o)
@@ -163,7 +165,7 @@ END GROUP
 .rela.plt
  *(.rela.plt)
 
-.text           0x00000000      0x352
+.text           0x00000000      0x268
  *(.vectors)
  .vectors       0x00000000       0x8c c:/program files (x86)/atmel/atmel toolchain/avr8 gcc/native/3.4.1061/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.8.1/../../../../avr/lib/avr51/crtm1284p.o
                 0x00000000                __vector_default
@@ -275,28 +277,25 @@ END GROUP
  .text.LCD_SetRow
                 0x00000168       0x38 Styrmodul_vA0.1.o
                 0x00000168                LCD_SetRow
- .text.LCD_SetPosition
-                0x000001a0       0x3c Styrmodul_vA0.1.o
-                0x000001a0                LCD_SetPosition
  .text.LCD_SendCharacter
-                0x000001dc       0x2c Styrmodul_vA0.1.o
-                0x000001dc                LCD_SendCharacter
+                0x000001a0       0x2c Styrmodul_vA0.1.o
+                0x000001a0                LCD_SendCharacter
  .text.LCD_SendString
-                0x00000208       0x1c Styrmodul_vA0.1.o
-                0x00000208                LCD_SendString
+                0x000001cc       0x1c Styrmodul_vA0.1.o
+                0x000001cc                LCD_SendString
  .text.LCD_WelcomeScreen
-                0x00000224       0x14 Styrmodul_vA0.1.o
-                0x00000224                LCD_WelcomeScreen
+                0x000001e8       0x14 Styrmodul_vA0.1.o
+                0x000001e8                LCD_WelcomeScreen
  .text.LCD_Init
-                0x00000238       0x38 Styrmodul_vA0.1.o
-                0x00000238                LCD_Init
- .text.main     0x00000270       0xde Styrmodul_vA0.1.o
-                0x00000270                main
-                0x0000034e                . = ALIGN (0x2)
+                0x000001fc       0x38 Styrmodul_vA0.1.o
+                0x000001fc                LCD_Init
+ .text.main     0x00000234       0x30 Styrmodul_vA0.1.o
+                0x00000234                main
+                0x00000264                . = ALIGN (0x2)
  *(.fini9)
- .fini9         0x0000034e        0x0 c:/program files (x86)/atmel/atmel toolchain/avr8 gcc/native/3.4.1061/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.8.1/avr51\libgcc.a(_exit.o)
-                0x0000034e                _exit
-                0x0000034e                exit
+ .fini9         0x00000264        0x0 c:/program files (x86)/atmel/atmel toolchain/avr8 gcc/native/3.4.1061/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.8.1/avr51\libgcc.a(_exit.o)
+                0x00000264                _exit
+                0x00000264                exit
  *(.fini9)
  *(.fini8)
  *(.fini8)
@@ -315,11 +314,11 @@ END GROUP
  *(.fini1)
  *(.fini1)
  *(.fini0)
- .fini0         0x0000034e        0x4 c:/program files (x86)/atmel/atmel toolchain/avr8 gcc/native/3.4.1061/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.8.1/avr51\libgcc.a(_exit.o)
+ .fini0         0x00000264        0x4 c:/program files (x86)/atmel/atmel toolchain/avr8 gcc/native/3.4.1061/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.8.1/avr51\libgcc.a(_exit.o)
  *(.fini0)
-                0x00000352                _etext = .
+                0x00000268                _etext = .
 
-.data           0x00800100       0x20 load address 0x00000352
+.data           0x00800100       0x20 load address 0x00000268
                 0x00800100                PROVIDE (__data_start, .)
  *(.data)
  *(.data*)
@@ -338,8 +337,8 @@ END GROUP
  *(.bss*)
  *(COMMON)
                 0x00800120                PROVIDE (__bss_end, .)
-                0x00000352                __data_load_start = LOADADDR (.data)
-                0x00000372                __data_load_end = (__data_load_start + SIZEOF (.data))
+                0x00000268                __data_load_start = LOADADDR (.data)
+                0x00000288                __data_load_end = (__data_load_start + SIZEOF (.data))
 
 .noinit         0x00800120        0x0
                 0x00800120                PROVIDE (__noinit_start, .)
@@ -413,17 +412,17 @@ END GROUP
 .debug_pubnames
  *(.debug_pubnames)
 
-.debug_info     0x00000000      0x9de
+.debug_info     0x00000000      0x76f
  *(.debug_info .gnu.linkonce.wi.*)
- .debug_info    0x00000000      0x9de Styrmodul_vA0.1.o
+ .debug_info    0x00000000      0x76f Styrmodul_vA0.1.o
 
-.debug_abbrev   0x00000000      0x24d
+.debug_abbrev   0x00000000      0x233
  *(.debug_abbrev)
- .debug_abbrev  0x00000000      0x24d Styrmodul_vA0.1.o
+ .debug_abbrev  0x00000000      0x233 Styrmodul_vA0.1.o
 
-.debug_line     0x00000000      0x570
+.debug_line     0x00000000      0x49b
  *(.debug_line .debug_line.* .debug_line_end)
- .debug_line    0x00000000      0x570 Styrmodul_vA0.1.o
+ .debug_line    0x00000000      0x49b Styrmodul_vA0.1.o
 
 .debug_frame    0x00000000      0x134
  *(.debug_frame)
@@ -434,9 +433,9 @@ END GROUP
  .debug_str     0x00000000      0x29f Styrmodul_vA0.1.o
                                 0x2d8 (size before relaxing)
 
-.debug_loc      0x00000000      0x40a
+.debug_loc      0x00000000      0x3d3
  *(.debug_loc)
- .debug_loc     0x00000000      0x40a Styrmodul_vA0.1.o
+ .debug_loc     0x00000000      0x3d3 Styrmodul_vA0.1.o
 
 .debug_macinfo
  *(.debug_macinfo)
