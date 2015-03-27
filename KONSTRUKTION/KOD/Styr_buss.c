@@ -108,6 +108,25 @@ void LCD_SendCommand(char cmd) {
 	PORTB &= ~(1 << 2);
 }
 
+void LCD_SetRow(int row)
+{
+	while(LCD_Busy())
+	{
+		_delay_ms(1);
+	}
+	
+	PORTB |= (0 << 0)|(0 << 1); // Set RS and R/W to 0 so that the following commands can be run
+	
+	if (row == 1)
+	{
+		LCD_SendCommand(0b00000010); // Set the cursor on the first of rows
+	}
+	else if (row == 2)
+	{
+		LCD_SendCommand(0b11000000); // Set the cursor on the second of rows
+	}
+}
+
 void LCD_SendCharacter(char symbol)
 {
 	while(LCD_Busy())
@@ -125,6 +144,46 @@ void LCD_SendCharacter(char symbol)
 	PORTB |= 1 << 2; // Set Enable
 	_delay_us(50); // 50us is the controller execution time of the LCD.
 	PORTB &= ~(1 << 2); // Pull Enable.
+}
+
+void LCD_WelcomeScreen(void)
+{
+	//Rad 1
+	LCD_SendCharacter(' ');
+	LCD_SendCharacter(' ');
+	LCD_SendCharacter(' ');
+	LCD_SendCharacter(' ');
+	LCD_SendCharacter('R');
+	LCD_SendCharacter('e');
+	LCD_SendCharacter('s');
+	LCD_SendCharacter('Q');
+	LCD_SendCharacter('.');
+	LCD_SendCharacter('P');
+	LCD_SendCharacter('L');
+	LCD_SendCharacter(' ');
+	LCD_SendCharacter(' ');
+	LCD_SendCharacter(' ');
+	LCD_SendCharacter(' ');
+	LCD_SendCharacter(' ');
+	
+	LCD_SetRow(2); //byt rad
+	
+	LCD_SendCharacter(' ');
+	LCD_SendCharacter(' ');
+	LCD_SendCharacter('M');
+	LCD_SendCharacter('a');
+	LCD_SendCharacter('s');
+	LCD_SendCharacter('t');
+	LCD_SendCharacter('e');
+	LCD_SendCharacter('r');
+	LCD_SendCharacter(' ');
+	LCD_SendCharacter('R');
+	LCD_SendCharacter('a');
+	LCD_SendCharacter('c');
+	LCD_SendCharacter('e');
+	LCD_SendCharacter(' ');
+	LCD_SendCharacter(' ');
+	LCD_SendCharacter(' ');
 }
 
 // Initiatazion of the LCD, according to Initializing Flowchart(Condition fosc=270KHz) in the data sheet.
@@ -146,8 +205,8 @@ void LCD_Init()
 	// Cursor moving direction: left-to-right, do not shift he display (shift disabled), instruction 00 0000 0110
 	LCD_SendCommand(0b00000110);
 
-	// Display on, cursor ON, blinking still off, instruction 00 0000 1110
-	LCD_SendCommand(0b00001110);
+	// Display on, cursor ON, blinking on, instruction 00 0000 1110
+	LCD_SendCommand(0b00001100);
 }
 
 int main(void)
@@ -159,51 +218,9 @@ int main(void)
 	Styr_InitPortValues();	// Initiate Port Values for the styrmodul.
 	SPI_MasterInit();	// Initiate the styrmodul as the SPI master.
 	LCD_Init(); // Initiate the LCD.
-	
-	//SPDRrec_ = SPI_MasterTransmit(0x01, 'k');
-	//_delay_us(10);
-	//SPDRrec_ = SPI_MasterTransmit(0x1F, 'k');
-	//if (SPDRrec_ == 0x0F)
-	//{
-	//	PORTC = (1<<PORTC0);
-	//}
-	//if (SPDRrec_ == 0x00)
-	//{
-	//	PORTC = (1<<PORTC0);
-	//}
-	//_delay_us(10);
-	//SPDRrec_ = SPI_MasterTransmit(0x0F, 'k');
-	//if (SPDRrec_ == 0x1E)
-	//{
-		//PORTC = (1<<PORTC0);
-	//}
-	//_delay_us(10);
-	//SPDRrec_ = SPI_MasterTransmit(0x1F, 'k');
-	//if (SPDRrec_ == 0x0E)
-	//{
-		//PORTC = (1<<PORTC0);
-	//}
-	//if (SPDRrec_ == 0x0F)
-	//{
-		//PORTC = (1<<PORTC0);
-	//}
+	LCD_WelcomeScreen(); // Welcomes the user with a nice message ;-)
 	
 	
-	
-	//while(LCD_Busy())
-	//{
-		//_delay_ms(1);
-	//}
-	//PORTB |= 1 << 0; // RS väljs till data 00000001
-	//PORTB |= 1 << 2; // E sätts hög
-	//_delay_ms(4);
-	//PORTD = (0 << 7)|(0 << 6)|(1 << 5)|(1 << 4)|(0 << 3)|(0 << 2)|(0 << 1)|(1 << 0);
-	//_delay_us(100);
-	//PORTB &= ~(1 << 2); // E sätts låg
-	
-	LCD_SendCharacter('S');
-	LCD_SendCharacter('T');
-	LCD_SendCharacter('D');
 	
 	while(1)
     {		
