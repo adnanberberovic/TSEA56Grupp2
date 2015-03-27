@@ -1,7 +1,7 @@
 /*
  *  styrmodul_test1.c
  *	Styrmodul
- *  Author: adnbe196, mansk700
+ *  Author: adnbe196, mansk700, nikag669
  */ 
 
 
