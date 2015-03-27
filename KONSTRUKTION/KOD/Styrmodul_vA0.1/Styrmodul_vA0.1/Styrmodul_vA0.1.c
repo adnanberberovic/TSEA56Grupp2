@@ -34,7 +34,7 @@ void Styr_InitPortValues(void)
 void SPI_MasterInit(void)
 {
 	SPSR = 0<<SPI2X;
-	SPCR = 1<<SPIE | 1<<SPE | 1<<DORD | 1<<MSTR | 0<<CPOL | 0<<CPHA | 1<<SPR1 | 1<<SPR0;
+	SPCR = 0<<SPIE | 1<<SPE | 1<<DORD | 1<<MSTR | 0<<CPOL | 0<<CPHA | 1<<SPR1 | 1<<SPR0;
 	// SPIE: SPI interrupt enable. Set to 1 to allow interrupts
 	// SPE: SPI Enable. Set to 1 to allow SPI communication
 	// DORD: Data order. Set to 1 to transmit LSB first, MSB last.
@@ -62,14 +62,12 @@ unsigned char SPI_MasterTransmit(unsigned char cData, char target)
 	// Wait until transmission completes.
 	while(!(SPSR & (1<<SPIF)));
 	
-	PORTB = 1<<PORTB4 | 1<<PORTB5;
-	
 	return SPDR;
 }
 
 ISR(SPI_STC_vect)
 {
-	
+	PORTB |= 1<<PORTB4 | 1<<PORTB5;
 }
 
 int LCD_Busy()
@@ -159,44 +157,18 @@ void LCD_SendCharacter(char symbol)
 	PORTB &= ~(1 << 2); // Pull Enable.
 }
 
+void LCD_SendString(char *text)
+{
+	while(*text)
+	{
+		LCD_SendCharacter(*text++);
+	}
+}
 void LCD_WelcomeScreen(void)
 {
-	//Rad 1
-	LCD_SendCharacter(' ');
-	LCD_SendCharacter(' ');
-	LCD_SendCharacter(' ');
-	LCD_SendCharacter(' ');
-	LCD_SendCharacter('R');
-	LCD_SendCharacter('e');
-	LCD_SendCharacter('s');
-	LCD_SendCharacter('Q');
-	LCD_SendCharacter('.');
-	LCD_SendCharacter('P');
-	LCD_SendCharacter('L');
-	LCD_SendCharacter(' ');
-	LCD_SendCharacter(' ');
-	LCD_SendCharacter(' ');
-	LCD_SendCharacter(' ');
-	LCD_SendCharacter(' ');
-	
-	LCD_SetRow(2); //byt rad
-	
-	LCD_SendCharacter(' ');
-	LCD_SendCharacter(' ');
-	LCD_SendCharacter('M');
-	LCD_SendCharacter('a');
-	LCD_SendCharacter('s');
-	LCD_SendCharacter('t');
-	LCD_SendCharacter('e');
-	LCD_SendCharacter('r');
-	LCD_SendCharacter(' ');
-	LCD_SendCharacter('R');
-	LCD_SendCharacter('a');
-	LCD_SendCharacter('c');
-	LCD_SendCharacter('e');
-	LCD_SendCharacter(' ');
-	LCD_SendCharacter(' ');
-	LCD_SendCharacter(' ');
+	LCD_SendString("    ResQ.Pl heh");
+	LCD_SetRow(2);
+	LCD_SendString("  Master Race  ");
 }
 
 // Initiatazion of the LCD, according to Initializing Flowchart(Condition fosc=270KHz) in the data sheet.
@@ -224,7 +196,7 @@ void LCD_Init()
 
 int main(void)
 {
-	char SPDRrec_ = 0;
+	char SPDRrec_ = '0';
 	sei();	// Enable global interrupts
 	sleep_enable();	// Enable sleep instruction
 	Styr_InitPortDirections();	// Initiate Port directions for the styrmodul.
@@ -234,29 +206,43 @@ int main(void)
 	
 	LCD_WelcomeScreen(); // Welcomes the user with a nice message ;-)
 	
- 	SPDRrec_ = SPI_MasterTransmit(0x01, 'k');
 	
+ 	//SPDRrec_ = SPI_MasterTransmit(0x01, 'k');
+	//
+
 	LCD_SetRow(1);
-	LCD_SendCharacter('F');
-	
+	LCD_SendCharacter('7');
+	SPDRrec_ = SPI_MasterTransmit(1, 'k');
+	LCD_SendCharacter(SPDRrec_);
+	SPDRrec_ = SPI_MasterTransmit(2, 'k');
 	LCD_SendCharacter(SPDRrec_);
 	
-	_delay_ms(500);
+	
+	//LCD_SendCharacter(SPDRrec_);
 	
 	
 	
 	while(1)
     {		
 		
-		_delay_ms(500);
-		LCD_SetRow(1);
-		SPDRrec_ = SPI_MasterTransmit(0x1F,'k');
-		printf(SPDRrec_);
-		LCD_SendCharacter(SPDRrec_);
 		
-		_delay_ms(500);
-		LCD_SetRow(1);
-		SPDRrec_ = SPI_MasterTransmit(0x0F,'k');
+		SPDRrec_ = SPI_MasterTransmit(0,'k');
 		LCD_SendCharacter(SPDRrec_);
+		_delay_ms(15000);
+		SPDRrec_ = SPI_MasterTransmit(0,'k');
+		LCD_SendCharacter(SPDRrec_);
+		_delay_ms(15000);
+		
+		SPDRrec_ = SPI_MasterTransmit(3,'k');
+		LCD_SendCharacter(SPDRrec_);
+		_delay_ms(15000);
+		//LCD_SetRow(1);
+		SPDRrec_ = SPI_MasterTransmit(4,'k');
+		LCD_SendCharacter(SPDRrec_);
+		_delay_ms(15000);
+		SPDRrec_ = SPI_MasterTransmit(5,'k');
+		LCD_SendCharacter(SPDRrec_);
+		_delay_ms(15000);
+		LCD_SetRow(1);
 	}
 }

@@ -7,9 +7,9 @@
 #include <avr/interrupt.h>
 #include <avr/sleep.h>
 
-unsigned char outSPDR;
-unsigned char inSPDR;
-	
+char outSPDR[] = "ABCDEFGHIJKLMNOP";
+char inSPDR;
+int i = 0;
 // Setup data direction registers @ ports for out/inputs.
 void Komm_InitPortDirections(void)
 {
@@ -27,8 +27,7 @@ void Komm_InitPortValues(void)
 void SPI_SlaveInit(void)
 {
 	SPSR = 0<<SPI2X;
-	SPCR = 1<<SPIE | 1<<SPE | 1<<DORD | 0<<MSTR | 0<<CPOL | 0<<CPHA | 
-	1<<SPR1 | 1<<SPR0;
+	SPCR = 1<<SPIE | 1<<SPE | 1<<DORD | 0<<MSTR | 0<<CPOL | 0<<CPHA | 1<<SPR1 | 1<<SPR0;
 	//SPIE: SPI interrupt enable. Set to 1 to allow interrupts
 	//SPE: SPI Enable. Set to 1 to allow SPI communication
 	//DORD: Data order. Set to 1 to transmit LSB first, MSB last.
@@ -51,15 +50,13 @@ void SPI_SlaveTransmit(unsigned char cData)
 // Interrupt method runs when SPI transmission/reception is completed.
 ISR(SPI_STC_vect)
 {
-	inSPDR = SPDR;
-	
-	SPDR = inSPDR -1;
+	i = SPDR;
+	SPDR = outSPDR[i];
 	
 }
 
 int main(void)
 {
-	outSPDR = 0x01;
 	inSPDR = 0x00;
 	sleep_enable();
 	Komm_InitPortDirections();
