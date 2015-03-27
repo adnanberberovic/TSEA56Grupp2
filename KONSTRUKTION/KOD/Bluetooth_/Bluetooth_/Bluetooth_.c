@@ -14,6 +14,8 @@ unsigned char outSPDR;
 unsigned char inSPDR;
 unsigned char outBT;
 unsigned char inBT;
+unsigned char BTbuffer_[128];
+int bufferPos = 0;
 
 //Setup data direction registers @ ports for out/inputs.
 void Komm_InitPortDirections(void)
@@ -59,6 +61,7 @@ ISR(SPI_STC_vect)
 	SPDR = inSPDR -1;
 }
 
+
 // Set up and enable Bluetooth
 void BT_init(void)
 {
@@ -79,28 +82,36 @@ void BT_init(void)
 	 */
 }
 
+// Receive data via BT.
 unsigned char BT_receive(void)
 {
-	while (!( UCSR0A & (1<<RXC0) ));
+
 	return UDR0;
 }
 
+// Transmit data via BT.
 void BT_transmit(char data)
 {
-	while(!( UCSR0A & (1<<TXC0)));
+	while(!( UCSR0A & (1<<UDRE0)));
 	UDR0 = data;
+	SPDR = data;
+	inSPDR = data;
 }
 
-ISR(USART0_RX_vect) //Receive complete
+// Receive complete
+ISR(USART0_RX_vect) 
 {
-	inBT = BT_receive();
-	BT_transmit(inBT); //send back incoming
+	inBT = UDR0;
+	//inBT = BT_receive();
+	BT_transmit(inBT); // Send back incoming
 }
 
-ISR(USART0_TX_vect) //Transmission complete
+// Transmission complete
+ISR(USART0_TX_vect) 
 {
 
 }
+
 
 int main(void)
 {
