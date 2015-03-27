@@ -128,7 +128,7 @@ Disassembly of section .text:
   ac:	a9 cf       	rjmp	.-174    	; 0x0 <__vectors>
 
 000000ae <Komm_InitPortDirections>:
-//Bus transmission. Send and receive data from styrmodulen.
+// Bus transmission. Send and receive data from styrmodulen.
 void SPI_SlaveTransmit(unsigned char cData)
 {
 	inSPDR = SPDR;
@@ -149,7 +149,7 @@ void SPI_SlaveTransmit(unsigned char cData)
 000000c0 <__vector_19>:
 }
 
-//Interrupt method runs when SPI transmission/reception is completed.
+// Interrupt method runs when SPI transmission/reception is completed.
 ISR(SPI_STC_vect)
 {
   c0:	1f 92       	push	r1
@@ -161,9 +161,11 @@ ISR(SPI_STC_vect)
 	inSPDR = SPDR;
   cc:	8e b5       	in	r24, 0x2e	; 46
   ce:	80 93 00 01 	sts	0x0100, r24
+	
 	SPDR = inSPDR -1;
   d2:	81 50       	subi	r24, 0x01	; 1
   d4:	8e bd       	out	0x2e, r24	; 46
+	
 }
   d6:	8f 91       	pop	r24
   d8:	0f 90       	pop	r0
@@ -189,7 +191,7 @@ int main(void)
   f2:	dd df       	rcall	.-70     	; 0xae <Komm_InitPortDirections>
 }
 
-//Initiate port values.
+// Initiate port values.
 void Komm_InitPortValues(void)
 {
 	PORTB = 1<<PORTB4;

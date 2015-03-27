@@ -224,7 +224,7 @@ void LCD_Init()
 
 int main(void)
 {
-	unsigned char SPDRrec_ = 0;
+	char SPDRrec_ = 0;
 	sei();	// Enable global interrupts
 	sleep_enable();	// Enable sleep instruction
 	Styr_InitPortDirections();	// Initiate Port directions for the styrmodul.
@@ -234,12 +234,15 @@ int main(void)
 	
 	LCD_WelcomeScreen(); // Welcomes the user with a nice message ;-)
 	
-	SPDRrec_ = SPI_MasterTransmit(0x01, 'k');
+ 	SPDRrec_ = SPI_MasterTransmit(0x01, 'k');
+	
+	LCD_SetRow(1);
+	LCD_SendCharacter('F');
+	
+	LCD_SendCharacter(SPDRrec_);
 	
 	_delay_ms(500);
 	
-	LCD_SetRow(1);
-	LCD_SendCharacter(SPDRrec_);
 	
 	
 	while(1)
@@ -248,6 +251,7 @@ int main(void)
 		_delay_ms(500);
 		LCD_SetRow(1);
 		SPDRrec_ = SPI_MasterTransmit(0x1F,'k');
+		printf(SPDRrec_);
 		LCD_SendCharacter(SPDRrec_);
 		
 		_delay_ms(500);

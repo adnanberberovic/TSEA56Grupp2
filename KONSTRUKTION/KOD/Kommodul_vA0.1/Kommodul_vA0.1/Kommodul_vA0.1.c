@@ -10,20 +10,20 @@
 unsigned char outSPDR;
 unsigned char inSPDR;
 	
-//Setup data direction registers @ ports for out/inputs.
+// Setup data direction registers @ ports for out/inputs.
 void Komm_InitPortDirections(void)
 {
 	DDRB = 1<<DDB6;
 	DDRD = 1<<DDD1;
 }
 
-//Initiate port values.
+// Initiate port values.
 void Komm_InitPortValues(void)
 {
 	PORTB = 1<<PORTB4;
 }
 
-//Configures device as spi slave.
+// Configures device as spi slave.
 void SPI_SlaveInit(void)
 {
 	SPSR = 0<<SPI2X;
@@ -40,7 +40,7 @@ void SPI_SlaveInit(void)
 }
 
 
-//Bus transmission. Send and receive data from styrmodulen.
+// Bus transmission. Send and receive data from styrmodulen.
 void SPI_SlaveTransmit(unsigned char cData)
 {
 	inSPDR = SPDR;
@@ -48,11 +48,13 @@ void SPI_SlaveTransmit(unsigned char cData)
 	SPDR = cData; 
 }
 
-//Interrupt method runs when SPI transmission/reception is completed.
+// Interrupt method runs when SPI transmission/reception is completed.
 ISR(SPI_STC_vect)
 {
 	inSPDR = SPDR;
+	
 	SPDR = inSPDR -1;
+	
 }
 
 int main(void)
