@@ -85,7 +85,7 @@ unsigned char BT_receive(void)
 	return UDR0;
 }
 
-void BT_transmit(unsigned char data)
+void BT_transmit(char data)
 {
 	while(!( UCSR0A & (1<<TXC0)));
 	UDR0 = data;
