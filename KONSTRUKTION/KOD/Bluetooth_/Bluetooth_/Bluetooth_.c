@@ -8,7 +8,7 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 #include <avr/sleep.h>
-
+#include <util/delay.h>
 
 unsigned char outSPDR;
 unsigned char inSPDR;
@@ -60,7 +60,7 @@ ISR(SPI_STC_vect)
 }
 
 // Set up and enable Bluetooth
-void BT_init(unsigned int ubrr)
+void BT_init(void)
 {
 	UBRR0H = 0x00; //correct value to change baud rate
 	UBRR0L = 0x07;//^^ same ^^ with a 14.7 mhz, scale with 1111 (7)
@@ -110,9 +110,9 @@ int main(void)
 	Komm_InitPortDirections();
 	Komm_InitPortValues();
 	SPI_SlaveInit();
+	BT_init();
 	sei();
 	while(1)
 	{
-		
 	}
 }

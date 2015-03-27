@@ -3,27 +3,27 @@ Bluetooth_.elf:     file format elf32-avr
 
 Sections:
 Idx Name          Size      VMA       LMA       File off  Algn
-  0 .text         0000018a  00000000  00000000  00000074  2**1
+  0 .text         000001a4  00000000  00000000  00000074  2**1
                   CONTENTS, ALLOC, LOAD, READONLY, CODE
-  1 .bss          00000004  00800100  00800100  000001fe  2**0
+  1 .bss          00000004  00800100  00800100  00000218  2**0
                   ALLOC
-  2 .comment      00000030  00000000  00000000  000001fe  2**0
+  2 .comment      00000030  00000000  00000000  00000218  2**0
                   CONTENTS, READONLY
-  3 .debug_aranges 00000070  00000000  00000000  0000022e  2**0
+  3 .debug_aranges 00000070  00000000  00000000  00000248  2**0
                   CONTENTS, READONLY, DEBUGGING
-  4 .debug_info   0000022a  00000000  00000000  0000029e  2**0
+  4 .debug_info   0000021f  00000000  00000000  000002b8  2**0
                   CONTENTS, READONLY, DEBUGGING
-  5 .debug_abbrev 0000013d  00000000  00000000  000004c8  2**0
+  5 .debug_abbrev 0000012e  00000000  00000000  000004d7  2**0
                   CONTENTS, READONLY, DEBUGGING
-  6 .debug_line   00000223  00000000  00000000  00000605  2**0
+  6 .debug_line   00000229  00000000  00000000  00000605  2**0
                   CONTENTS, READONLY, DEBUGGING
-  7 .debug_frame  00000128  00000000  00000000  00000828  2**2
+  7 .debug_frame  00000128  00000000  00000000  00000830  2**2
                   CONTENTS, READONLY, DEBUGGING
-  8 .debug_str    00000202  00000000  00000000  00000950  2**0
+  8 .debug_str    000001f8  00000000  00000000  00000958  2**0
                   CONTENTS, READONLY, DEBUGGING
-  9 .debug_loc    0000015c  00000000  00000000  00000b52  2**0
+  9 .debug_loc    00000136  00000000  00000000  00000b50  2**0
                   CONTENTS, READONLY, DEBUGGING
- 10 .debug_ranges 00000060  00000000  00000000  00000cae  2**0
+ 10 .debug_ranges 00000060  00000000  00000000  00000c86  2**0
                   CONTENTS, READONLY, DEBUGGING
 
 Disassembly of section .text:
@@ -69,11 +69,11 @@ Disassembly of section .text:
   4a:	00 00       	nop
   4c:	39 c0       	rjmp	.+114    	; 0xc0 <__vector_19>
   4e:	00 00       	nop
-  50:	58 c0       	rjmp	.+176    	; 0x102 <__vector_20>
+  50:	64 c0       	rjmp	.+200    	; 0x11a <__vector_20>
   52:	00 00       	nop
   54:	2b c0       	rjmp	.+86     	; 0xac <__bad_interrupt>
   56:	00 00       	nop
-  58:	7e c0       	rjmp	.+252    	; 0x156 <__vector_22>
+  58:	8a c0       	rjmp	.+276    	; 0x16e <__vector_22>
   5a:	00 00       	nop
   5c:	27 c0       	rjmp	.+78     	; 0xac <__bad_interrupt>
   5e:	00 00       	nop
@@ -121,19 +121,19 @@ Disassembly of section .text:
   a2:	a4 30       	cpi	r26, 0x04	; 4
   a4:	b2 07       	cpc	r27, r18
   a6:	e1 f7       	brne	.-8      	; 0xa0 <.do_clear_bss_loop>
-  a8:	60 d0       	rcall	.+192    	; 0x16a <main>
-  aa:	6d c0       	rjmp	.+218    	; 0x186 <_exit>
+  a8:	6c d0       	rcall	.+216    	; 0x182 <main>
+  aa:	7a c0       	rjmp	.+244    	; 0x1a0 <_exit>
 
 000000ac <__bad_interrupt>:
   ac:	a9 cf       	rjmp	.-174    	; 0x0 <__vectors>
 
 000000ae <Komm_InitPortDirections>:
-	/* RXCI, TXCI Complete transmission and complete interrupt is enabled
-	 * UDRIE0 not set, disabled interrupts due to UDRE0 flag. Data register empty
-	 * TXEN, TXEN, transmission and receiver enable 
-	 * UCSZ02 sets the third bit, defining framesize
-	*/
-	UCSR0C = (1<<UCSZ01) | (1<<UCSZ00);
+//Bus transmission. Send and receive data from styrmodulen.
+void SPI_SlaveTransmit(unsigned char cData)
+{
+	inSPDR = SPDR;
+	//Load data into SPI data register
+	SPDR = cData;
   ae:	80 e4       	ldi	r24, 0x40	; 64
   b0:	84 b9       	out	0x04, r24	; 4
   b2:	82 e0       	ldi	r24, 0x02	; 2
@@ -147,16 +147,24 @@ Disassembly of section .text:
   be:	08 95       	ret
 
 000000c0 <__vector_19>:
+}
+
+//Interrupt method runs when SPI transmission/reception is completed.
+ISR(SPI_STC_vect)
+{
   c0:	1f 92       	push	r1
   c2:	0f 92       	push	r0
   c4:	0f b6       	in	r0, 0x3f	; 63
   c6:	0f 92       	push	r0
   c8:	11 24       	eor	r1, r1
   ca:	8f 93       	push	r24
+	inSPDR = SPDR;
   cc:	8e b5       	in	r24, 0x2e	; 46
   ce:	80 93 00 01 	sts	0x0100, r24
+	SPDR = inSPDR -1;
   d2:	81 50       	subi	r24, 0x01	; 1
   d4:	8e bd       	out	0x2e, r24	; 46
+}
   d6:	8f 91       	pop	r24
   d8:	0f 90       	pop	r0
   da:	0f be       	out	0x3f, r0	; 63
@@ -164,140 +172,166 @@ Disassembly of section .text:
   de:	1f 90       	pop	r1
   e0:	18 95       	reti
 
-000000e2 <BT_receive>:
+000000e2 <BT_init>:
+
+// Set up and enable Bluetooth
+void BT_init(void)
+{
+	UBRR0H = 0x00; //correct value to change baud rate
+  e2:	10 92 c5 00 	sts	0x00C5, r1
+	UBRR0L = 0x07;//^^ same ^^ with a 14.7 mhz, scale with 1111 (7)
+  e6:	87 e0       	ldi	r24, 0x07	; 7
+  e8:	80 93 c4 00 	sts	0x00C4, r24
+	
+	UCSR0B = (1<<TXEN0) | (1<<RXEN0) | (0<<UCSZ02) | (1<<RXCIE0) | (1<<TXCIE0);
+  ec:	88 ed       	ldi	r24, 0xD8	; 216
+  ee:	80 93 c1 00 	sts	0x00C1, r24
+	/* RXCI, TXCI Complete transmission and complete interrupt is enabled
+	 * UDRIE0 not set, disabled interrupts due to UDRE0 flag. Data register empty
+	 * TXEN, TXEN, transmission and receiver enable 
+	 * UCSZ02 sets the third bit, defining framesize
+	*/
+	UCSR0C = (1<<UCSZ01) | (1<<UCSZ00);
+  f2:	86 e0       	ldi	r24, 0x06	; 6
+  f4:	80 93 c2 00 	sts	0x00C2, r24
+  f8:	08 95       	ret
+
+000000fa <BT_receive>:
 	 */
 }
 
 unsigned char BT_receive(void)
 {
 	while (!( UCSR0A & (1<<RXC0) ));
-  e2:	e0 ec       	ldi	r30, 0xC0	; 192
-  e4:	f0 e0       	ldi	r31, 0x00	; 0
-  e6:	80 81       	ld	r24, Z
-  e8:	88 23       	and	r24, r24
-  ea:	ec f7       	brge	.-6      	; 0xe6 <BT_receive+0x4>
+  fa:	e0 ec       	ldi	r30, 0xC0	; 192
+  fc:	f0 e0       	ldi	r31, 0x00	; 0
+  fe:	80 81       	ld	r24, Z
+ 100:	88 23       	and	r24, r24
+ 102:	ec f7       	brge	.-6      	; 0xfe <BT_receive+0x4>
 	return UDR0;
-  ec:	80 91 c6 00 	lds	r24, 0x00C6
+ 104:	80 91 c6 00 	lds	r24, 0x00C6
 }
-  f0:	08 95       	ret
+ 108:	08 95       	ret
 
-000000f2 <BT_transmit>:
+0000010a <BT_transmit>:
 
 void BT_transmit(unsigned char data)
 {
 	while(!( UCSR0A & (1<<TXC0)));
-  f2:	e0 ec       	ldi	r30, 0xC0	; 192
-  f4:	f0 e0       	ldi	r31, 0x00	; 0
-  f6:	90 81       	ld	r25, Z
-  f8:	96 ff       	sbrs	r25, 6
-  fa:	fd cf       	rjmp	.-6      	; 0xf6 <BT_transmit+0x4>
+ 10a:	e0 ec       	ldi	r30, 0xC0	; 192
+ 10c:	f0 e0       	ldi	r31, 0x00	; 0
+ 10e:	90 81       	ld	r25, Z
+ 110:	96 ff       	sbrs	r25, 6
+ 112:	fd cf       	rjmp	.-6      	; 0x10e <BT_transmit+0x4>
 	UDR0 = data;
-  fc:	80 93 c6 00 	sts	0x00C6, r24
- 100:	08 95       	ret
+ 114:	80 93 c6 00 	sts	0x00C6, r24
+ 118:	08 95       	ret
 
-00000102 <__vector_20>:
+0000011a <__vector_20>:
 }
 
 ISR(USART0_RX_vect) //Receive complete
 {
- 102:	1f 92       	push	r1
- 104:	0f 92       	push	r0
- 106:	0f b6       	in	r0, 0x3f	; 63
- 108:	0f 92       	push	r0
- 10a:	11 24       	eor	r1, r1
- 10c:	0b b6       	in	r0, 0x3b	; 59
- 10e:	0f 92       	push	r0
- 110:	2f 93       	push	r18
- 112:	3f 93       	push	r19
- 114:	4f 93       	push	r20
- 116:	5f 93       	push	r21
- 118:	6f 93       	push	r22
- 11a:	7f 93       	push	r23
- 11c:	8f 93       	push	r24
- 11e:	9f 93       	push	r25
- 120:	af 93       	push	r26
- 122:	bf 93       	push	r27
- 124:	ef 93       	push	r30
- 126:	ff 93       	push	r31
+ 11a:	1f 92       	push	r1
+ 11c:	0f 92       	push	r0
+ 11e:	0f b6       	in	r0, 0x3f	; 63
+ 120:	0f 92       	push	r0
+ 122:	11 24       	eor	r1, r1
+ 124:	0b b6       	in	r0, 0x3b	; 59
+ 126:	0f 92       	push	r0
+ 128:	2f 93       	push	r18
+ 12a:	3f 93       	push	r19
+ 12c:	4f 93       	push	r20
+ 12e:	5f 93       	push	r21
+ 130:	6f 93       	push	r22
+ 132:	7f 93       	push	r23
+ 134:	8f 93       	push	r24
+ 136:	9f 93       	push	r25
+ 138:	af 93       	push	r26
+ 13a:	bf 93       	push	r27
+ 13c:	ef 93       	push	r30
+ 13e:	ff 93       	push	r31
 	inBT = BT_receive();
- 128:	dc df       	rcall	.-72     	; 0xe2 <BT_receive>
- 12a:	80 93 03 01 	sts	0x0103, r24
+ 140:	dc df       	rcall	.-72     	; 0xfa <BT_receive>
+ 142:	80 93 03 01 	sts	0x0103, r24
 	BT_transmit(inBT); //send back incoming
- 12e:	e1 df       	rcall	.-62     	; 0xf2 <BT_transmit>
+ 146:	e1 df       	rcall	.-62     	; 0x10a <BT_transmit>
 }
- 130:	ff 91       	pop	r31
- 132:	ef 91       	pop	r30
- 134:	bf 91       	pop	r27
- 136:	af 91       	pop	r26
- 138:	9f 91       	pop	r25
- 13a:	8f 91       	pop	r24
- 13c:	7f 91       	pop	r23
- 13e:	6f 91       	pop	r22
- 140:	5f 91       	pop	r21
- 142:	4f 91       	pop	r20
- 144:	3f 91       	pop	r19
- 146:	2f 91       	pop	r18
- 148:	0f 90       	pop	r0
- 14a:	0b be       	out	0x3b, r0	; 59
- 14c:	0f 90       	pop	r0
- 14e:	0f be       	out	0x3f, r0	; 63
- 150:	0f 90       	pop	r0
- 152:	1f 90       	pop	r1
- 154:	18 95       	reti
+ 148:	ff 91       	pop	r31
+ 14a:	ef 91       	pop	r30
+ 14c:	bf 91       	pop	r27
+ 14e:	af 91       	pop	r26
+ 150:	9f 91       	pop	r25
+ 152:	8f 91       	pop	r24
+ 154:	7f 91       	pop	r23
+ 156:	6f 91       	pop	r22
+ 158:	5f 91       	pop	r21
+ 15a:	4f 91       	pop	r20
+ 15c:	3f 91       	pop	r19
+ 15e:	2f 91       	pop	r18
+ 160:	0f 90       	pop	r0
+ 162:	0b be       	out	0x3b, r0	; 59
+ 164:	0f 90       	pop	r0
+ 166:	0f be       	out	0x3f, r0	; 63
+ 168:	0f 90       	pop	r0
+ 16a:	1f 90       	pop	r1
+ 16c:	18 95       	reti
 
-00000156 <__vector_22>:
+0000016e <__vector_22>:
 
 ISR(USART0_TX_vect) //Transmission complete
 {
- 156:	1f 92       	push	r1
- 158:	0f 92       	push	r0
- 15a:	0f b6       	in	r0, 0x3f	; 63
- 15c:	0f 92       	push	r0
- 15e:	11 24       	eor	r1, r1
+ 16e:	1f 92       	push	r1
+ 170:	0f 92       	push	r0
+ 172:	0f b6       	in	r0, 0x3f	; 63
+ 174:	0f 92       	push	r0
+ 176:	11 24       	eor	r1, r1
 
 }
- 160:	0f 90       	pop	r0
- 162:	0f be       	out	0x3f, r0	; 63
- 164:	0f 90       	pop	r0
- 166:	1f 90       	pop	r1
- 168:	18 95       	reti
+ 178:	0f 90       	pop	r0
+ 17a:	0f be       	out	0x3f, r0	; 63
+ 17c:	0f 90       	pop	r0
+ 17e:	1f 90       	pop	r1
+ 180:	18 95       	reti
 
-0000016a <main>:
+00000182 <main>:
 
 int main(void)
 {
 	outSPDR = 0x01;
- 16a:	81 e0       	ldi	r24, 0x01	; 1
- 16c:	80 93 01 01 	sts	0x0101, r24
+ 182:	81 e0       	ldi	r24, 0x01	; 1
+ 184:	80 93 01 01 	sts	0x0101, r24
 	inSPDR = 0x00;
- 170:	10 92 00 01 	sts	0x0100, r1
+ 188:	10 92 00 01 	sts	0x0100, r1
 	sleep_enable();
- 174:	83 b7       	in	r24, 0x33	; 51
- 176:	81 60       	ori	r24, 0x01	; 1
- 178:	83 bf       	out	0x33, r24	; 51
+ 18c:	83 b7       	in	r24, 0x33	; 51
+ 18e:	81 60       	ori	r24, 0x01	; 1
+ 190:	83 bf       	out	0x33, r24	; 51
 	Komm_InitPortDirections();
- 17a:	99 df       	rcall	.-206    	; 0xae <Komm_InitPortDirections>
+ 192:	8d df       	rcall	.-230    	; 0xae <Komm_InitPortDirections>
 }
 
 //Initiate port values.
 void Komm_InitPortValues(void)
 {
 	PORTB = 1<<PORTB4;
- 17c:	80 e1       	ldi	r24, 0x10	; 16
- 17e:	85 b9       	out	0x05, r24	; 5
+ 194:	80 e1       	ldi	r24, 0x10	; 16
+ 196:	85 b9       	out	0x05, r24	; 5
 	outSPDR = 0x01;
 	inSPDR = 0x00;
 	sleep_enable();
 	Komm_InitPortDirections();
 	Komm_InitPortValues();
 	SPI_SlaveInit();
- 180:	9b df       	rcall	.-202    	; 0xb8 <SPI_SlaveInit>
+ 198:	8f df       	rcall	.-226    	; 0xb8 <SPI_SlaveInit>
+	BT_init();
+ 19a:	a3 df       	rcall	.-186    	; 0xe2 <BT_init>
 	sei();
- 182:	78 94       	sei
- 184:	ff cf       	rjmp	.-2      	; 0x184 <main+0x1a>
+ 19c:	78 94       	sei
+ 19e:	ff cf       	rjmp	.-2      	; 0x19e <main+0x1c>
 
-00000186 <_exit>:
- 186:	f8 94       	cli
+000001a0 <_exit>:
+ 1a0:	f8 94       	cli
 
-00000188 <__stop_program>:
- 188:	ff cf       	rjmp	.-2      	; 0x188 <__stop_program>
+000001a2 <__stop_program>:
+ 1a2:	ff cf       	rjmp	.-2      	; 0x1a2 <__stop_program>
