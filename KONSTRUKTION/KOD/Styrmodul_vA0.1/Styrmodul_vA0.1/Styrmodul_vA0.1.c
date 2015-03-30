@@ -259,23 +259,46 @@ int main(void)
 	
 	
 	
+	
+	//activate ADC in gyro, if it was not active already ("initieringen")
+	char dataH, dataL;
+	SPDRrec_ = SPI_MasterTransmit(0b10010100,'g');
+	SPDRrec_ = SPI_MasterTransmit(0,'g');
+	//SPDRrec_ = SPI_MasterTransmit(0,'g');
+	if (!(SPDR &= 0b10000000)) { // if bit 7 is zero, the instruction is accepted
+		LCD_SendString("instr1 accepted");
+		while (!(SPDR &= 0b00100000)) { // wait for EOC bit (bit 5) to be set - means AD-conversion is complete
+			_delay_us(5);  // instead of while loop can just wait for > 115us
+		}
+	}
+	else LCD_SendString("wrong instr1");
+	
 	while(1)
     {		
 		SPDRrec_ = SPI_MasterTransmit(0,'k');
 		LCD_SendCharacter(SPDRrec_);
 		_delay_ms(5000);
 		
-		//activate ADC in gyro
-		SPDRrec_ = SPI_MasterTransmit(0b10010100,'g');
+		
+		
+				
+		// start the conversion (notera att samma instruktion skickas vid aktivering av ADC:en i gyro)
+		SPDRrec_ = SPI_MasterTransmit(0b10010100,'g'); //ss to 0, enabling the sensor
 		SPDRrec_ = SPI_MasterTransmit(0,'g');
 		//SPDRrec_ = SPI_MasterTransmit(0,'g');
-		
-		// MISO on master is PB6 (input pin 7)
-		if !(SPDR &= 0b10000000) { // if bit 7 is zero, the instruction is accepted
-			while !(SPDR &= 0b00100000) { // wait for EOC bit (bit 5) to be set - means AD-conversion is complete
-				_delay_us(5);  // instead of while loop can just wait for 115us
+		if (!(SPDR &= 0b10000000)) { // if bit 7 is zero, the instruction is accepted
+			LCD_SendString("instr2 accepted");
 			}
-		}				
+		else LCD_SendString("wrong instr2");
+		
+		// polling and result obtaining
+		SPI_MasterTransmit(0b10000000, 'g'); // send SPI ADCR instruction
+		// mb need to check "instr accepted" bit and "and conversion done" bit before continuing.....
+		_delay_us(120); //but do this for now
+		dataH = SPI_MasterTransmit(0x00, 'g'); // get the sensor response high byte
+		dataL = SPI_MasterTransmit(0x00, 'g'); // get the sensor response low byte
+		PORTC |= 1<<PORTC0; //set ss to 1; disabling the sensor
+		// unsigned int result = makeWord((dataH & 0b00001111), (dataL>>1));
 		
 		
 		
