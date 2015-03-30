@@ -60,6 +60,10 @@ unsigned char SPI_MasterTransmit(unsigned char cData, char target)
 	{
 		PORTB = 0<<PORTB5;
 	}
+	else if (target == 'g') // G as in gyro
+	{
+		PORTB = 0<<PORTC0;
+	}
 	// Load data into SPI data register.
 	SPDR = cData; 
 	
