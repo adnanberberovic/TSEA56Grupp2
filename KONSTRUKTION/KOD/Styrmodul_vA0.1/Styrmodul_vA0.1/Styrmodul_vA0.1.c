@@ -31,7 +31,7 @@ void Styr_InitPortDirections(void)
 // Setups port values, more specifically puts SS on high.
 void Styr_InitPortValues(void)
 {
-	PORTB = 1<<PORTB3 | 1<<PORTB4;
+	PORTB = 1<<PORTB3 | 1<<PORTB4 | 1<<PORTC0;
 }
 
 // Configures device as spi master.
@@ -54,15 +54,15 @@ unsigned char SPI_MasterTransmit(unsigned char cData, char target)
 {
 	if (target == 'k') // K as in kommunikation
 	{
-		PORTB = 0<<PORTB4;
+		PORTB &= ~(1<<PORTB4);
 	}
 	else if (target == 's')	// S as in sensor
 	{
-		PORTB = 0<<PORTB5;
+		PORTB &= ~(1<<PORTB3);
 	}
 	else if (target == 'g') // G as in gyro
 	{
-		PORTB = 0<<PORTC0;
+		PORTC &= ~(1<<PORTC0);
 	}
 	// Load data into SPI data register.
 	SPDR = cData; 
@@ -75,7 +75,7 @@ unsigned char SPI_MasterTransmit(unsigned char cData, char target)
 
 ISR(SPI_STC_vect)
 {
-	PORTB |= 1<<PORTB4 | 1<<PORTB5;
+	PORTB |= 1<<PORTB3 | 1<<PORTB4 | 1<<PORTC0;
 }
 
 int LCD_Busy()
@@ -264,6 +264,20 @@ int main(void)
 		SPDRrec_ = SPI_MasterTransmit(0,'k');
 		LCD_SendCharacter(SPDRrec_);
 		_delay_ms(5000);
+		
+		//activate ADC in gyro
+		SPDRrec_ = SPI_MasterTransmit(0b10010100,'g');
+		SPDRrec_ = SPI_MasterTransmit(0,'g');
+		//SPDRrec_ = SPI_MasterTransmit(0,'g');
+		
+		// MISO on master is PB6 (input pin 7)
+		if !(SPDR &= 0b10000000) { // if bit 7 is zero, the instruction is accepted
+			while !(SPDR &= 0b00100000) { // wait for EOC bit (bit 5) to be set - means AD-conversion is complete
+				_delay_us(5);  // instead of while loop can just wait for 115us
+			}
+		}				
+		
+		
 		
 		//
 		//SPDRrec_ = SPI_MasterTransmit(0,'k');
