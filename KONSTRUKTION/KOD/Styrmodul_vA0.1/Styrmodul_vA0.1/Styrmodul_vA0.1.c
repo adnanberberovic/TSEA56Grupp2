@@ -80,15 +80,15 @@ ISR(SPI_STC_vect)
 
 int LCD_Busy()
 {
-	DDRD = 0; // Set PORTD as input
+	DDRA = 0; // Set PORTA as input
 	PORTB |= 1 << 1; // Read busy flag
 	PORTB &= ~(1 << 0); // Clear bit 0 in PORTB to 0 (Set register select to instruction "RS=0")
 	PORTB |= (1 << 2); // Activates the LCD (enable pin on LCD)
 	_delay_us(2);
-	char instr = PIND;
+	char instr = PINA;
 	PORTB &= ~(1 << 2); // Clear bit 2 in PORTB
 	PORTB &= ~(1 << 1); // Clear bit 1 in PORTB
-	DDRD = 0xff; // Set PORTD as output
+	DDRA = 0xff; // Set PORTA as output
 	return instr >> 7; // MSB is the busy flag
 }
 
@@ -99,7 +99,7 @@ void LCD_SendCommand(char cmd) {
 	}
 	
 	PORTB &= ~(1 << 0); // Clear bit 0 in PORTB to 0 (Set Register Select to instruction "RS=0")
-	PORTD = cmd;
+	PORTA = cmd;
 	PORTB |= 1 << 2; // Set R/W to 1.
 	
 	if (cmd == 0b01 || cmd == 0b10) // If clear or return home instruction
@@ -179,10 +179,10 @@ void LCD_SendCharacter(char symbol)
 	PORTB &= ~(1 << 1); // Clear R/W
 	
 	//uint8_t tempNum = (int)symbol;
-	//PORTD = tempNum;
+	//PORTA = tempNum;
 	
 	// If the following doesn't work, delete it and uncomment the two lines above.
-	PORTD = (int)symbol;
+	PORTA = (int)symbol;
 	
 	PORTB |= 1 << 2; // Set Enable
 	_delay_us(50); // 50us is the controller execution time of the LCD.
@@ -261,17 +261,17 @@ int main(void)
 	
 	
 	//activate ADC in gyro, if it was not active already ("initieringen")
-	char dataH, dataL;
-	SPDRrec_ = SPI_MasterTransmit(0b10010100,'g');
-	SPDRrec_ = SPI_MasterTransmit(0,'g');
+	//char dataH, dataL;
+	//SPDRrec_ = SPI_MasterTransmit(0b10010100,'g');
 	//SPDRrec_ = SPI_MasterTransmit(0,'g');
-	if (!(SPDR &= 0b10000000)) { // if bit 7 is zero, the instruction is accepted
-		LCD_SendString("instr1 accepted");
-		while (!(SPDR &= 0b00100000)) { // wait for EOC bit (bit 5) to be set - means AD-conversion is complete
-			_delay_us(5);  // instead of while loop can just wait for > 115us
-		}
-	}
-	else LCD_SendString("wrong instr1");
+	//SPDRrec_ = SPI_MasterTransmit(0,'g');
+	//if (!(SPDR &= 0b10000000)) { // if bit 7 is zero, the instruction is accepted
+	//	LCD_SendString("instr1 accepted");
+	//	while (!(SPDR &= 0b00100000)) { // wait for EOC bit (bit 5) to be set - means AD-conversion is complete
+	//		_delay_us(5);  // instead of while loop can just wait for > 115us
+	//	}
+	//}
+	//else LCD_SendString("wrong instr1");
 	
 	while(1)
     {		
@@ -282,23 +282,23 @@ int main(void)
 		
 		
 				
-		// start the conversion (notera att samma instruktion skickas vid aktivering av ADC:en i gyro)
-		SPDRrec_ = SPI_MasterTransmit(0b10010100,'g'); //ss to 0, enabling the sensor
-		SPDRrec_ = SPI_MasterTransmit(0,'g');
+		//// start the conversion (notera att samma instruktion skickas vid aktivering av ADC:en i gyro)
+		//SPDRrec_ = SPI_MasterTransmit(0b10010100,'g'); //ss to 0, enabling the sensor
 		//SPDRrec_ = SPI_MasterTransmit(0,'g');
-		if (!(SPDR &= 0b10000000)) { // if bit 7 is zero, the instruction is accepted
-			LCD_SendString("instr2 accepted");
-			}
-		else LCD_SendString("wrong instr2");
+		////SPDRrec_ = SPI_MasterTransmit(0,'g');
+		//if (!(SPDR &= 0b10000000)) { // if bit 7 is zero, the instruction is accepted
+			//LCD_SendString("instr2 accepted");
+			//}
+		//else LCD_SendString("wrong instr2");
 		
-		// polling and result obtaining
-		SPI_MasterTransmit(0b10000000, 'g'); // send SPI ADCR instruction
-		// mb need to check "instr accepted" bit and "and conversion done" bit before continuing.....
-		_delay_us(120); //but do this for now
-		dataH = SPI_MasterTransmit(0x00, 'g'); // get the sensor response high byte
-		dataL = SPI_MasterTransmit(0x00, 'g'); // get the sensor response low byte
-		PORTC |= 1<<PORTC0; //set ss to 1; disabling the sensor
-		// unsigned int result = makeWord((dataH & 0b00001111), (dataL>>1));
+		//// polling and result obtaining
+		//SPI_MasterTransmit(0b10000000, 'g'); // send SPI ADCR instruction
+		//// mb need to check "instr accepted" bit and "and conversion done" bit before continuing.....
+		//_delay_us(120); //but do this for now
+		//dataH = SPI_MasterTransmit(0x00, 'g'); // get the sensor response high byte
+		//dataL = SPI_MasterTransmit(0x00, 'g'); // get the sensor response low byte
+		//PORTC |= 1<<PORTC0; //set ss to 1; disabling the sensor
+		//// unsigned int result = makeWord((dataH & 0b00001111), (dataL>>1));
 		
 		
 		
