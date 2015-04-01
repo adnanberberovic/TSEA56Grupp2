@@ -12,8 +12,9 @@
 #include <stdio.h>
 #include <util/delay.h>
 #include <math.h>
+
 //#include <avr/pgmspace.h>
-//#define F_CPU 20000000UL
+#define F_CPU 20000000UL
 
 // GLOBAL VARIABLES
 
@@ -77,6 +78,99 @@ ISR(SPI_STC_vect)
 {
 	PORTB |= 1<<PORTB3 | 1<<PORTB4 | 1<<PORTC0;
 }
+
+//----------------------------PWM------------------------------------
+
+void PWM_Init(void)
+{
+	// TODO:::::sätt riktning på databitar
+	
+	// Configuration of the PWM setting for OC2A and OC2B
+	// TCCn1:0 = 3 equals phase correct PWM mode
+	// WGM22:0 = 5 equals phase correct PWM mode with compare from OCRn
+	// CS22:0 = 3 sets the division factor to 32
+	TCCR2A = 1<<COM2A1 | 1<<COM2A0 | 1<<COM2B1 | 1<<COM2B0 | 0<<WGM21 | 1<<WGM20;
+	TCCR2B = 1<<WGM22 | 0<<CS22 | 1<<CS21 | 1<<CS20;
+	
+	// Set the compare values for the PWM, 0 == 0% and 
+	OCR2A = 0;
+	OCR2B = 0;
+}
+
+void PWM_SetSpeedRight(int speed)
+{
+	if (speed >= 0 && speed <= 255)
+	{
+		OCR2B = speed;
+	}
+}
+
+void PWM_SetSpeedLeft(int speed)
+{
+	if (speed >= 0 && speed <= 255)
+	{
+		OCR2A = speed;
+	}
+}
+
+void PWM_SetDirRight(int dir)
+{
+	if (dir == 0)
+	{
+		PORTD &= ~(1 << PORTD0);
+	} 
+	//&= ~(1 << PORTD0)
+	else if (dir == 1)
+	{
+		PORTD |= 1 << PORTD0;
+	}
+}
+
+void PWM_SetDirLeft(int dir)
+{
+	if (dir == 0)
+	{
+		PORTD &= ~(1 << PORTD1);
+	}
+	else if (dir == 1)
+	{
+		PORTD |= 1 << PORTD1;
+	}
+}
+
+void PWM_Test(void)
+{
+	for (int i=0; i < 300; i++)
+	{
+		_delay_ms(250);
+	}
+	PWM_SetSpeedLeft(50);
+	//PWM_SetSpeedRight(0);
+	for (int i=0; i < 300; i++)
+	{
+		_delay_ms(250);
+	}
+	PWM_SetDirLeft(1);
+	//PWM_SetDirRight(0);
+	for (int i=0; i < 300; i++)
+	{
+		_delay_ms(250);
+	}
+	PWM_SetSpeedLeft(0);
+	//PWM_SetSpeedRight(150);
+	for (int i=0; i < 300; i++)
+	{
+		_delay_ms(250);
+	}
+	//PWM_SetDirRight(1);
+	for (int i=0; i < 300; i++)
+	{
+		_delay_ms(250);
+	}
+}
+
+
+//----------------------------PWM------------------------------------
 
 int LCD_Busy()
 {
@@ -236,7 +330,7 @@ int main(void)
 	Styr_InitPortValues();	// Initiate Port Values for the styrmodul.
 	SPI_MasterInit();	// Initiate the styrmodul as the SPI master.
 	LCD_Init(); // Initiate the LCD.
-	
+	PWM_Init(); // Initiate PWM for motör
 	LCD_WelcomeScreen(); // Welcomes the user with a nice message ;-)
 	
 	
@@ -278,7 +372,7 @@ int main(void)
 		SPDRrec_ = SPI_MasterTransmit(0,'k');
 		LCD_SendCharacter(SPDRrec_);
 		_delay_ms(5000);
-		
+		PWM_Test();
 		
 		
 				
