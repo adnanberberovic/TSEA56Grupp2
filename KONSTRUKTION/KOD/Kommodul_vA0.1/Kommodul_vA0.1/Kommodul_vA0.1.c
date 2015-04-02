@@ -8,11 +8,15 @@
 #include <avr/sleep.h>
 #include <util/delay.h>
 
-char outSPDR[] = "ABCDEFGHIJKLMNOP";
-char inSPDR;
+#define BuffSize 10
+char outSPDR[] = {'1','2','3','4','5','6','7','8','9','0'};
+char inSPDR[BuffSize];
 int i = 0;
-unsigned char outBT;
-unsigned char inBT;
+int posBuff = 0;
+int posBuff_SPI = 0;
+int sendFlag = 0;
+char outBT[BuffSize];
+char inBT[BuffSize];
 
 // Setup data direction registers @ ports for out/inputs.
 void Komm_InitPortDirections(void)
@@ -43,20 +47,27 @@ void SPI_SlaveInit(void)
 }
 
 
-// Bus transmission. Send and receive data from styrmodulen.
-void SPI_SlaveTransmit(unsigned char cData)
-{
-	inSPDR = SPDR;
-	//Load data into SPI data register
-	SPDR = cData; 
-}
-
 // Interrupt method runs when SPI transmission/reception is completed.
 ISR(SPI_STC_vect)
 {
-	//i = SPDR;
-	//SPDR = outSPDR[i];
-	SPDR = inSPDR;
+		if (posBuff_SPI < (BuffSize - 1))
+		{
+			inSPDR[posBuff_SPI] = SPDR; // Save received char in inSPDR-buffer
+			SPDR = outSPDR[posBuff_SPI]; //Send sign from outSPDR-buffer
+			posBuff_SPI++; // add 1 to bufferpos
+		}
+		else if (posBuff_SPI == (BuffSize - 1))
+		{
+			inSPDR[posBuff_SPI] = SPDR; //save received char in inSPDR-buffer
+			SPDR = outSPDR[posBuff_SPI]; //Send last sign from outSPDR-buffer
+			posBuff_SPI = 0; //Set bufferpos to restart
+		}
+		else 
+		{
+			SPDR = 'E';
+		}
+	
+	
 }
 
 // Set up and enable Bluetooth
@@ -65,7 +76,7 @@ void BT_init(void)
 	UBRR0H = 0x00; //correct value to change baud rate
 	UBRR0L = 0x07;//^^ same ^^ with a 14.7 mhz, scale with 1111 (7)
 	
-	UCSR0B = (1<<TXEN0) | (1<<RXEN0) | (0<<UCSZ02) | (1<<RXCIE0) | (1<<TXCIE0);
+	UCSR0B = (1<<TXEN0) | (1<<RXEN0) | (0<<UCSZ02) | (1<<RXCIE0) | (1<<TXCIE0) | (0<<UDRIE0);
 	/* RXCI, TXCI Complete transmission and complete interrupt is enabled
 	 * UDRIE0 not set, disabled interrupts due to UDRE0 flag. Data register empty
 	 * TXEN, TXEN, transmission and receiver enable 
@@ -79,34 +90,51 @@ void BT_init(void)
 	 */
 }
 
-// Receive data via BT.
-unsigned char BT_receive(void)
-{
-
-	return UDR0;
-}
 
 // Transmit data via BT.
-void BT_transmit(char data)
+void BT_transmit(unsigned char outData)
 {
-	while(!( UCSR0A & (1<<UDRE0)));
-	UDR0 = data;
-	SPDR = data;
-	inSPDR = data;
+	UDR0 = outData;
+	// UCSR0B |= (1<<UDRIE0); // enable 'empty buffer interrupt'
 }
 
-// Receive complete
+// Receive complete - triggered by interrupt
 ISR(USART0_RX_vect) 
 {
-	inBT = UDR0;
-	//inBT = BT_receive();
-	BT_transmit(inBT); // Send back incoming
+	if (posBuff == 0)
+	{
+		memset(&inBT,' ',10);
+	}
+	if (posBuff < BuffSize)
+	{
+		inBT[posBuff] = UDR0; //Load bit 1-9.
+		BT_transmit(inBT[posBuff]);
+		posBuff++;
+	}
+	else if (posBuff == BuffSize )
+	{
+		inBT[posBuff] = UDR0; //Load 10th bit
+		BT_transmit(inBT[posBuff]); // Send back incoming
+		posBuff = 0;	
+	}
+
 }
 
-// Transmission complete
-ISR(USART0_TX_vect) 
-{
 
+// Empty dataregister = send next character
+ISR(USART0_UDRE_vect)
+{
+	//if (posBuff < BuffSize)
+	//{
+		//UDR0 = outBT[posBuff]; //Load bit 1-9.
+		//posBuff++;
+	//}
+	//else
+	//{
+		//UDR0 = outBT[posBuff]; //Load 10th bit
+		//posBuff = 0;
+		//UCSR0B &= ~(1<<UDRIE0); // disable 'empty buffer interrupt'
+	//}
 }
 
 int main(void)
@@ -119,6 +147,6 @@ int main(void)
 	sei();
 	while(1)
 	{
-		
+		strncpy(outSPDR, inBT, BuffSize); //copy data from inBT to outbuffer (SLAVE)
 	}
 }
