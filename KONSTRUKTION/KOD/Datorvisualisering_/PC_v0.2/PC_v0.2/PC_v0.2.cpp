@@ -1,4 +1,4 @@
-// PC_.cpp : Defines the entry point for the console application.
+// PC_v0.2.cpp : Defines the entry point for the console application.
 //
 
 #include "stdafx.h"
@@ -83,25 +83,25 @@ void Write_ComData() //Writes data to hSerial (COM4) and stores in ReadBuff.
 
 	char W_in{};
 	int i = 0;
-	
+
 	while (cin.peek() != '\n')
 	{
 		cin >> W_in;
 		WriteBuff_[i] = W_in;
 		i++;
 	}
-	
+
 	cout << "\nWriteBuff_: " << WriteBuff_ << endl;
 	if (!WriteFile(hSerial, WriteBuff_, 10, &BytesWritten_, NULL)) // "10" says how many bytes to write
-			{
-				cerr << "Writing to file failed!\n";
-			}
+	{
+		cerr << "Writing to file failed!\n";
+	}
 	else
 	{
 		cin >> W_in;
 		cout << "Data written\n";
 	}
-	
+
 }
 
 void Init_Welcome()
@@ -122,7 +122,7 @@ int _tmain(int argc, _TCHAR* argv[])
 
 	string instring_;
 	wstring com4_(L"COM4");
-	
+
 	Init_Welcome();
 
 	//Read in from keyboard and initialize connection
@@ -133,15 +133,15 @@ int _tmain(int argc, _TCHAR* argv[])
 
 		if (in == '\n') //if command has been entered
 		{
-			
+
 			// init com-procedure if stringmatch
-			if (ComInit_ == false && instring_ == "init") 
+			if (ComInit_ == false && instring_ == "init")
 			{
 				Comport_init(com4_); //Initializes COM4 
 				ComInit_ = true;
 				cout << "COM4" << " initialized!\n";
 			}
-			
+
 			// initialization already done
 			else if (ComInit_ == true && instring_ == "init")
 			{
