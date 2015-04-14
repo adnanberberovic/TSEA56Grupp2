@@ -29,6 +29,8 @@ int BT_sent_flag = 0;
 int sendFlag = 0;
 char outBT[BuffSize];
 char inBT[BuffSize];
+char *outBTpntr_ = &outBT;
+char *inBTpntr_ = &inBT;
 
 // Setup data direction registers @ ports for out/inputs.
 void Komm_InitPortDirections(void)
@@ -103,6 +105,13 @@ void BT_init(void)
 	 */
 }
 
+void send_BT_buffer(char buffer[BuffSize] )
+{
+	strncpy(outBT, buffer, BuffSize); //Copy buffer to send to outBT
+	UCSR0B &= ~(1<<UDRIE0);	//Enable UDRE interrupt flag -> send when empty dataregister
+}
+
+
 void Write_Buffer(char buffer[BuffSize], char data, int *position)
 {
 	if ((*position) == (BuffSize - 1)) // If end of buffer restart from first pos, done with read.
@@ -134,17 +143,8 @@ ISR(USART0_RX_vect)
 	BT_received_flag = 0;
 	char data = UDR0; //Get received value
 	Write_Buffer(inBT, data, writePos_BTin); //Writes data to buffer in order they are received
-
-	UCSR0B |= (1<<UDRIE0); //Enable empty buffer interrupt
-
-
 }
 
-void send_BT_buffer(char buffer[BuffSize] )
-{
-	strncpy(outBT, buffer, BuffSize); //Copy buffer to send to outBT
-	UCSR0B &= ~(1<<UDRIE0);	//Enable UDRE interrupt flag -> send when empty dataregister
-}
 
 // Empty dataregister = send next character
 ISR(USART0_UDRE_vect)
