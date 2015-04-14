@@ -3,6 +3,7 @@
  *	Kommunikationsmodul
  *  Author: adnbe196, mansk700
  */ 
+#define F_CPU 20000000UL
 #include <avr/io.h>
 #include <avr/interrupt.h>
 #include <avr/sleep.h>
@@ -27,10 +28,9 @@ int BT_received_flag = 0;
 int BT_sent_flag = 0;
 
 int sendFlag = 0;
-char outBT[BuffSize];
+char outBT[BuffSize] = "12345678901234567890";
 char inBT[BuffSize];
-char *outBTpntr_ = &outBT;
-char *inBTpntr_ = &inBT;
+
 
 // Setup data direction registers @ ports for out/inputs.
 void Komm_InitPortDirections(void)
@@ -172,7 +172,6 @@ int main(void)
 	sei();
 	while(1)
 	{
-		strncpy(outSPDR, inBT, BuffSize); //copy data from inBT to outbuffer (SLAVE)
 		
 	}
 }

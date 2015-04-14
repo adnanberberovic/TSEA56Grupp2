@@ -3,29 +3,29 @@ Kommodul_vA0.1.elf:     file format elf32-avr
 
 Sections:
 Idx Name          Size      VMA       LMA       File off  Algn
-  0 .data         00000004  00800100  0000033c  000003d0  2**0
+  0 .data         00000068  00800100  0000032e  000003c2  2**0
                   CONTENTS, ALLOC, LOAD, DATA
-  1 .text         0000033c  00000000  00000000  00000094  2**1
+  1 .text         0000032e  00000000  00000000  00000094  2**1
                   CONTENTS, ALLOC, LOAD, READONLY, CODE
-  2 .bss          0000019a  00800104  00800104  000003d4  2**0
+  2 .bss          00000136  00800168  00800168  0000042a  2**0
                   ALLOC
-  3 .comment      00000030  00000000  00000000  000003d4  2**0
+  3 .comment      00000030  00000000  00000000  0000042a  2**0
                   CONTENTS, READONLY
-  4 .debug_aranges 00000070  00000000  00000000  00000404  2**0
+  4 .debug_aranges 00000070  00000000  00000000  0000045a  2**0
                   CONTENTS, READONLY, DEBUGGING
-  5 .debug_info   0000048c  00000000  00000000  00000474  2**0
+  5 .debug_info   00000437  00000000  00000000  000004ca  2**0
                   CONTENTS, READONLY, DEBUGGING
-  6 .debug_abbrev 000001a7  00000000  00000000  00000900  2**0
+  6 .debug_abbrev 000001a7  00000000  00000000  00000901  2**0
                   CONTENTS, READONLY, DEBUGGING
-  7 .debug_line   00000319  00000000  00000000  00000aa7  2**0
+  7 .debug_line   0000030f  00000000  00000000  00000aa8  2**0
                   CONTENTS, READONLY, DEBUGGING
-  8 .debug_frame  00000194  00000000  00000000  00000dc0  2**2
+  8 .debug_frame  00000194  00000000  00000000  00000db8  2**2
                   CONTENTS, READONLY, DEBUGGING
-  9 .debug_str    000002c6  00000000  00000000  00000f54  2**0
+  9 .debug_str    000002b1  00000000  00000000  00000f4c  2**0
                   CONTENTS, READONLY, DEBUGGING
- 10 .debug_loc    00000363  00000000  00000000  0000121a  2**0
+ 10 .debug_loc    00000363  00000000  00000000  000011fd  2**0
                   CONTENTS, READONLY, DEBUGGING
- 11 .debug_ranges 00000060  00000000  00000000  0000157d  2**0
+ 11 .debug_ranges 00000060  00000000  00000000  00001560  2**0
                   CONTENTS, READONLY, DEBUGGING
 
 Disassembly of section .text:
@@ -114,20 +114,20 @@ Disassembly of section .text:
   98:	11 e0       	ldi	r17, 0x01	; 1
   9a:	a0 e0       	ldi	r26, 0x00	; 0
   9c:	b1 e0       	ldi	r27, 0x01	; 1
-  9e:	ec e3       	ldi	r30, 0x3C	; 60
+  9e:	ee e2       	ldi	r30, 0x2E	; 46
   a0:	f3 e0       	ldi	r31, 0x03	; 3
   a2:	00 e0       	ldi	r16, 0x00	; 0
   a4:	0b bf       	out	0x3b, r16	; 59
   a6:	02 c0       	rjmp	.+4      	; 0xac <__do_copy_data+0x14>
   a8:	07 90       	elpm	r0, Z+
   aa:	0d 92       	st	X+, r0
-  ac:	a4 30       	cpi	r26, 0x04	; 4
+  ac:	a8 36       	cpi	r26, 0x68	; 104
   ae:	b1 07       	cpc	r27, r17
   b0:	d9 f7       	brne	.-10     	; 0xa8 <__do_copy_data+0x10>
 
 000000b2 <__do_clear_bss>:
   b2:	22 e0       	ldi	r18, 0x02	; 2
-  b4:	a4 e0       	ldi	r26, 0x04	; 4
+  b4:	a8 e6       	ldi	r26, 0x68	; 104
   b6:	b1 e0       	ldi	r27, 0x01	; 1
   b8:	01 c0       	rjmp	.+2      	; 0xbc <.do_clear_bss_start>
 
@@ -139,7 +139,7 @@ Disassembly of section .text:
   be:	b2 07       	cpc	r27, r18
   c0:	e1 f7       	brne	.-8      	; 0xba <.do_clear_bss_loop>
   c2:	1a d1       	rcall	.+564    	; 0x2f8 <main>
-  c4:	39 c1       	rjmp	.+626    	; 0x338 <_exit>
+  c4:	32 c1       	rjmp	.+612    	; 0x32a <_exit>
 
 000000c6 <__bad_interrupt>:
   c6:	9c cf       	rjmp	.-200    	; 0x0 <__vectors>
@@ -191,8 +191,8 @@ ISR(SPI_STC_vect)
   f0:	ff 93       	push	r31
 
 		if (posBuff_SPI < (BuffSize - 1))
-  f2:	80 91 0c 01 	lds	r24, 0x010C
-  f6:	90 91 0d 01 	lds	r25, 0x010D
+  f2:	80 91 70 01 	lds	r24, 0x0170
+  f6:	90 91 71 01 	lds	r25, 0x0171
   fa:	83 36       	cpi	r24, 0x63	; 99
   fc:	91 05       	cpc	r25, r1
   fe:	a4 f4       	brge	.+40     	; 0x128 <__vector_19+0x4e>
@@ -200,21 +200,21 @@ ISR(SPI_STC_vect)
 			inSPDR[posBuff_SPI] = SPDR; // Save received char in inSPDR-buffer
  100:	2e b5       	in	r18, 0x2e	; 46
  102:	fc 01       	movw	r30, r24
- 104:	e2 5f       	subi	r30, 0xF2	; 242
+ 104:	ee 58       	subi	r30, 0x8E	; 142
  106:	fe 4f       	sbci	r31, 0xFE	; 254
  108:	20 83       	st	Z, r18
 			SPDR = outSPDR[posBuff_SPI]; //Sett next bit to send from outSPDR-buffer
  10a:	fc 01       	movw	r30, r24
- 10c:	ee 58       	subi	r30, 0x8E	; 142
+ 10c:	ea 52       	subi	r30, 0x2A	; 42
  10e:	fe 4f       	sbci	r31, 0xFE	; 254
  110:	80 81       	ld	r24, Z
  112:	8e bd       	out	0x2e, r24	; 46
 			posBuff_SPI++; // add 1 to bufferpos
- 114:	80 91 0c 01 	lds	r24, 0x010C
- 118:	90 91 0d 01 	lds	r25, 0x010D
+ 114:	80 91 70 01 	lds	r24, 0x0170
+ 118:	90 91 71 01 	lds	r25, 0x0171
  11c:	01 96       	adiw	r24, 0x01	; 1
- 11e:	90 93 0d 01 	sts	0x010D, r25
- 122:	80 93 0c 01 	sts	0x010C, r24
+ 11e:	90 93 71 01 	sts	0x0171, r25
+ 122:	80 93 70 01 	sts	0x0170, r24
  126:	10 c0       	rjmp	.+32     	; 0x148 <__vector_19+0x6e>
 		}
 		else if (posBuff_SPI == (BuffSize - 1))
@@ -224,13 +224,13 @@ ISR(SPI_STC_vect)
 		{
 			inSPDR[posBuff_SPI] = SPDR; //save received char in inSPDR-buffer
  12e:	8e b5       	in	r24, 0x2e	; 46
- 130:	80 93 71 01 	sts	0x0171, r24
+ 130:	80 93 d5 01 	sts	0x01D5, r24
 			SPDR = outSPDR[posBuff_SPI]; //Send last sign from outSPDR-buffer
- 134:	80 91 d5 01 	lds	r24, 0x01D5
+ 134:	80 91 39 02 	lds	r24, 0x0239
  138:	8e bd       	out	0x2e, r24	; 46
 			posBuff_SPI = 0; //Set bufferpos to restart
- 13a:	10 92 0d 01 	sts	0x010D, r1
- 13e:	10 92 0c 01 	sts	0x010C, r1
+ 13a:	10 92 71 01 	sts	0x0171, r1
+ 13e:	10 92 70 01 	sts	0x0170, r1
  142:	02 c0       	rjmp	.+4      	; 0x148 <__vector_19+0x6e>
 		}
 		else 
@@ -289,9 +289,9 @@ void send_BT_buffer(char buffer[BuffSize] )
  178:	44 e6       	ldi	r20, 0x64	; 100
  17a:	50 e0       	ldi	r21, 0x00	; 0
  17c:	bc 01       	movw	r22, r24
- 17e:	86 ed       	ldi	r24, 0xD6	; 214
+ 17e:	80 e0       	ldi	r24, 0x00	; 0
  180:	91 e0       	ldi	r25, 0x01	; 1
- 182:	cb d0       	rcall	.+406    	; 0x31a <strncpy>
+ 182:	c4 d0       	rcall	.+392    	; 0x30c <strncpy>
 	UCSR0B &= ~(1<<UDRIE0);	//Enable UDRE interrupt flag -> send when empty dataregister
  184:	e1 ec       	ldi	r30, 0xC1	; 193
  186:	f0 e0       	ldi	r31, 0x00	; 0
@@ -324,8 +324,8 @@ void Write_Buffer(char buffer[BuffSize], char data, int *position)
 		BT_received_flag = 1;
  1aa:	81 e0       	ldi	r24, 0x01	; 1
  1ac:	90 e0       	ldi	r25, 0x00	; 0
- 1ae:	90 93 07 01 	sts	0x0107, r25
- 1b2:	80 93 06 01 	sts	0x0106, r24
+ 1ae:	90 93 6b 01 	sts	0x016B, r25
+ 1b2:	80 93 6a 01 	sts	0x016A, r24
 		(*position) = 0; 
  1b6:	19 82       	std	Y+1, r1	; 0x01
  1b8:	18 82       	st	Y, r1
@@ -414,13 +414,13 @@ ISR(USART0_RX_vect)
  22a:	ef 93       	push	r30
  22c:	ff 93       	push	r31
 	BT_received_flag = 0;
- 22e:	10 92 07 01 	sts	0x0107, r1
- 232:	10 92 06 01 	sts	0x0106, r1
+ 22e:	10 92 6b 01 	sts	0x016B, r1
+ 232:	10 92 6a 01 	sts	0x016A, r1
 	char data = UDR0; //Get received value
  236:	60 91 c6 00 	lds	r22, 0x00C6
 	Write_Buffer(inBT, data, writePos_BTin); //Writes data to buffer in order they are received
- 23a:	40 91 02 01 	lds	r20, 0x0102
- 23e:	50 91 03 01 	lds	r21, 0x0103
+ 23a:	40 91 66 01 	lds	r20, 0x0166
+ 23e:	50 91 67 01 	lds	r21, 0x0167
  242:	8a e3       	ldi	r24, 0x3A	; 58
  244:	92 e0       	ldi	r25, 0x02	; 2
  246:	a4 df       	rcall	.-184    	; 0x190 <Write_Buffer>
@@ -471,8 +471,8 @@ ISR(USART0_UDRE_vect)
  290:	ef 93       	push	r30
  292:	ff 93       	push	r31
 	if ((*readPos_BTout) == BuffSize) //Read entire buff and sent it
- 294:	60 91 00 01 	lds	r22, 0x0100
- 298:	70 91 01 01 	lds	r23, 0x0101
+ 294:	60 91 64 01 	lds	r22, 0x0164
+ 298:	70 91 65 01 	lds	r23, 0x0165
  29c:	fb 01       	movw	r30, r22
  29e:	80 81       	ld	r24, Z
  2a0:	91 81       	ldd	r25, Z+1	; 0x01
@@ -483,8 +483,8 @@ ISR(USART0_UDRE_vect)
 		BT_sent_flag = 1; // done with transmission
  2a8:	81 e0       	ldi	r24, 0x01	; 1
  2aa:	90 e0       	ldi	r25, 0x00	; 0
- 2ac:	90 93 05 01 	sts	0x0105, r25
- 2b0:	80 93 04 01 	sts	0x0104, r24
+ 2ac:	90 93 69 01 	sts	0x0169, r25
+ 2b0:	80 93 68 01 	sts	0x0168, r24
 		UCSR0B &= ~(1<<UDRIE0); //Disable UDRE interrupt, All data is sent. 
  2b4:	e1 ec       	ldi	r30, 0xC1	; 193
  2b6:	f0 e0       	ldi	r31, 0x00	; 0
@@ -496,10 +496,10 @@ ISR(USART0_UDRE_vect)
 	else
 	{
 		BT_sent_flag = 0;
- 2c0:	10 92 05 01 	sts	0x0105, r1
- 2c4:	10 92 04 01 	sts	0x0104, r1
+ 2c0:	10 92 69 01 	sts	0x0169, r1
+ 2c4:	10 92 68 01 	sts	0x0168, r1
 		UDR0 = Read_Buffer(outBT, readPos_BTout); //Send back the next value in out-buffer. 														
- 2c8:	86 ed       	ldi	r24, 0xD6	; 214
+ 2c8:	80 e0       	ldi	r24, 0x00	; 0
  2ca:	91 e0       	ldi	r25, 0x01	; 1
  2cc:	8a df       	rcall	.-236    	; 0x1e2 <Read_Buffer>
  2ce:	80 93 c6 00 	sts	0x00C6, r24
@@ -555,37 +555,27 @@ int main(void)
  306:	2c df       	rcall	.-424    	; 0x160 <BT_init>
 	sei();
  308:	78 94       	sei
-	while(1)
-	{
-		strncpy(outSPDR, inBT, BuffSize); //copy data from inBT to outbuffer (SLAVE)
- 30a:	44 e6       	ldi	r20, 0x64	; 100
- 30c:	50 e0       	ldi	r21, 0x00	; 0
- 30e:	6a e3       	ldi	r22, 0x3A	; 58
- 310:	72 e0       	ldi	r23, 0x02	; 2
- 312:	82 e7       	ldi	r24, 0x72	; 114
- 314:	91 e0       	ldi	r25, 0x01	; 1
- 316:	01 d0       	rcall	.+2      	; 0x31a <strncpy>
- 318:	f8 cf       	rjmp	.-16     	; 0x30a <main+0x12>
+ 30a:	ff cf       	rjmp	.-2      	; 0x30a <main+0x12>
 
-0000031a <strncpy>:
- 31a:	fb 01       	movw	r30, r22
- 31c:	dc 01       	movw	r26, r24
- 31e:	41 50       	subi	r20, 0x01	; 1
- 320:	50 40       	sbci	r21, 0x00	; 0
- 322:	48 f0       	brcs	.+18     	; 0x336 <strncpy+0x1c>
- 324:	01 90       	ld	r0, Z+
- 326:	0d 92       	st	X+, r0
- 328:	00 20       	and	r0, r0
- 32a:	c9 f7       	brne	.-14     	; 0x31e <strncpy+0x4>
- 32c:	01 c0       	rjmp	.+2      	; 0x330 <strncpy+0x16>
- 32e:	1d 92       	st	X+, r1
- 330:	41 50       	subi	r20, 0x01	; 1
- 332:	50 40       	sbci	r21, 0x00	; 0
- 334:	e0 f7       	brcc	.-8      	; 0x32e <strncpy+0x14>
- 336:	08 95       	ret
+0000030c <strncpy>:
+ 30c:	fb 01       	movw	r30, r22
+ 30e:	dc 01       	movw	r26, r24
+ 310:	41 50       	subi	r20, 0x01	; 1
+ 312:	50 40       	sbci	r21, 0x00	; 0
+ 314:	48 f0       	brcs	.+18     	; 0x328 <strncpy+0x1c>
+ 316:	01 90       	ld	r0, Z+
+ 318:	0d 92       	st	X+, r0
+ 31a:	00 20       	and	r0, r0
+ 31c:	c9 f7       	brne	.-14     	; 0x310 <strncpy+0x4>
+ 31e:	01 c0       	rjmp	.+2      	; 0x322 <strncpy+0x16>
+ 320:	1d 92       	st	X+, r1
+ 322:	41 50       	subi	r20, 0x01	; 1
+ 324:	50 40       	sbci	r21, 0x00	; 0
+ 326:	e0 f7       	brcc	.-8      	; 0x320 <strncpy+0x14>
+ 328:	08 95       	ret
 
-00000338 <_exit>:
- 338:	f8 94       	cli
+0000032a <_exit>:
+ 32a:	f8 94       	cli
 
-0000033a <__stop_program>:
- 33a:	ff cf       	rjmp	.-2      	; 0x33a <__stop_program>
+0000032c <__stop_program>:
+ 32c:	ff cf       	rjmp	.-2      	; 0x32c <__stop_program>
