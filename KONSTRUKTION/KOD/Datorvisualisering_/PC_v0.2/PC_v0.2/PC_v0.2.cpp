@@ -18,9 +18,9 @@ DCB dcbSerialParams = { 0 };
 COMMTIMEOUTS timeouts = { 0 };
 
 //For reading/writning from com
-char ReadBuff_[10] = { 0 }; // Buffer to store indata from com, [2]-bytes
+char ReadBuff_[100]; // Buffer to store indata from com, [2]-bytes
 DWORD BytesRead_ = 0; // how many bytes that were actually read
-char WriteBuff_[10] = { 0 }; // Buffer to store outdata from com, [2]-bytes
+char WriteBuff_[100]; // Buffer to store outdata from com, [2]-bytes
 DWORD BytesWritten_ = 0; // how many bytes that were actually written
 
 void TimeoutSetup()
@@ -70,17 +70,18 @@ void Comport_init(wstring comport)
 
 void Read_ComData() //Reads data from hSerial (COM4) and stores in ReadBuff.
 {
-	if (!ReadFile(hSerial, ReadBuff_, 10, &BytesRead_, NULL)) // BytesRead contains amount of read bytes
+	fill(begin(ReadBuff_), end(ReadBuff_), '\0');
+	if (!ReadFile(hSerial, ReadBuff_, 100, &BytesRead_, NULL)) // BytesRead contains amount of read bytes
 	{
 		cerr << "Reading from file failed!\n";
 	}
-	cout << "\nReadbuff: " << ReadBuff_ << endl;
+	cout << "\nReadbuff: " << ReadBuff_ << endl << "> ";
 
 }
 
-void Write_ComData() //Writes data to hSerial (COM4) and stores in ReadBuff.
+void Write_ComData() //Writes data to hSerial (COM4) and stores in WriteBuff.
 {
-
+	fill(begin(WriteBuff_), end(WriteBuff_), '\0');
 	char W_in{};
 	int i = 0;
 
@@ -92,14 +93,14 @@ void Write_ComData() //Writes data to hSerial (COM4) and stores in ReadBuff.
 	}
 
 	cout << "\nWriteBuff_: " << WriteBuff_ << endl;
-	if (!WriteFile(hSerial, WriteBuff_, 10, &BytesWritten_, NULL)) // "10" says how many bytes to write
+	if (!WriteFile(hSerial, WriteBuff_, 100, &BytesWritten_, NULL)) // "100" says how many bytes to write
 	{
 		cerr << "Writing to file failed!\n";
 	}
 	else
 	{
 		cin >> W_in;
-		cout << "Data written\n";
+		cout << "Data written\n> ";
 	}
 
 }
@@ -110,7 +111,7 @@ void Init_Welcome()
 	cout << "          ResQ.Pl - Master Race \n";
 	cout << "\n*******************************************\n\n";
 	cout << " \n - 'init' to establish connection\n - 'close connection' to close initialized connection \n - 'read' / 'write' to do that\n Enter command:" << endl;
-
+	cout << "> ";
 }
 
 int _tmain(int argc, _TCHAR* argv[])
@@ -121,7 +122,7 @@ int _tmain(int argc, _TCHAR* argv[])
 
 
 	string instring_;
-	wstring com4_(L"COM4");
+	wstring com3_(L"COM3");
 
 	Init_Welcome();
 
@@ -137,21 +138,21 @@ int _tmain(int argc, _TCHAR* argv[])
 			// init com-procedure if stringmatch
 			if (ComInit_ == false && instring_ == "init")
 			{
-				Comport_init(com4_); //Initializes COM4 
+				Comport_init(com3_); //Initializes COM4 
 				ComInit_ = true;
-				cout << "COM4" << " initialized!\n";
+				cout << "COM3" << " initialized!\n> ";
 			}
 
 			// initialization already done
 			else if (ComInit_ == true && instring_ == "init")
 			{
-				cout << "COM4 already initialized!\n";
+				cout << "COM3 already initialized!\n> ";
 			}
 
 			//Write to com
 			else if (instring_ == "write")
 			{
-				cout << "Write what to send:\n";
+				cout << "Write what to send:\n> ";
 				Write_ComData();
 			}
 
@@ -167,7 +168,7 @@ int _tmain(int argc, _TCHAR* argv[])
 			{
 				CloseHandle(hSerial);
 				ComInit_ = false;
-				cout << "Connection to COM4 closed!\n";
+				cout << "Connection to COM3 closed!\n> ";
 			}
 			else
 			{
