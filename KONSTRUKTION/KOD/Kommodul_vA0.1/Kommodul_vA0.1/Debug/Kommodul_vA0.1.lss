@@ -3,29 +3,29 @@ Kommodul_vA0.1.elf:     file format elf32-avr
 
 Sections:
 Idx Name          Size      VMA       LMA       File off  Algn
-  0 .data         00000004  00800100  00000322  000003b6  2**0
+  0 .data         00000004  00800100  000002e8  0000037c  2**0
                   CONTENTS, ALLOC, LOAD, DATA
-  1 .text         00000322  00000000  00000000  00000094  2**1
+  1 .text         000002e8  00000000  00000000  00000094  2**1
                   CONTENTS, ALLOC, LOAD, READONLY, CODE
-  2 .bss          00000196  00800104  00800104  000003ba  2**0
+  2 .bss          00000196  00800104  00800104  00000380  2**0
                   ALLOC
-  3 .comment      00000030  00000000  00000000  000003ba  2**0
+  3 .comment      00000030  00000000  00000000  00000380  2**0
                   CONTENTS, READONLY
-  4 .debug_aranges 00000068  00000000  00000000  000003ea  2**0
+  4 .debug_aranges 00000070  00000000  00000000  000003b0  2**0
                   CONTENTS, READONLY, DEBUGGING
-  5 .debug_info   0000041c  00000000  00000000  00000452  2**0
+  5 .debug_info   00000451  00000000  00000000  00000420  2**0
                   CONTENTS, READONLY, DEBUGGING
-  6 .debug_abbrev 0000018f  00000000  00000000  0000086e  2**0
+  6 .debug_abbrev 000001a7  00000000  00000000  00000871  2**0
                   CONTENTS, READONLY, DEBUGGING
-  7 .debug_line   000002e3  00000000  00000000  000009fd  2**0
+  7 .debug_line   000002fa  00000000  00000000  00000a18  2**0
                   CONTENTS, READONLY, DEBUGGING
-  8 .debug_frame  0000018c  00000000  00000000  00000ce0  2**2
+  8 .debug_frame  00000178  00000000  00000000  00000d14  2**2
                   CONTENTS, READONLY, DEBUGGING
-  9 .debug_str    00000290  00000000  00000000  00000e6c  2**0
+  9 .debug_str    000002b1  00000000  00000000  00000e8c  2**0
                   CONTENTS, READONLY, DEBUGGING
- 10 .debug_loc    000002c0  00000000  00000000  000010fc  2**0
+ 10 .debug_loc    0000029b  00000000  00000000  0000113d  2**0
                   CONTENTS, READONLY, DEBUGGING
- 11 .debug_ranges 00000058  00000000  00000000  000013bc  2**0
+ 11 .debug_ranges 00000060  00000000  00000000  000013d8  2**0
                   CONTENTS, READONLY, DEBUGGING
 
 Disassembly of section .text:
@@ -71,9 +71,9 @@ Disassembly of section .text:
   4a:	00 00       	nop
   4c:	46 c0       	rjmp	.+140    	; 0xda <__vector_19>
   4e:	00 00       	nop
-  50:	cf c0       	rjmp	.+414    	; 0x1f0 <__vector_20>
+  50:	ba c0       	rjmp	.+372    	; 0x1c6 <__vector_20>
   52:	00 00       	nop
-  54:	01 c1       	rjmp	.+514    	; 0x258 <__vector_21>
+  54:	ec c0       	rjmp	.+472    	; 0x22e <__vector_21>
   56:	00 00       	nop
   58:	36 c0       	rjmp	.+108    	; 0xc6 <__bad_interrupt>
   5a:	00 00       	nop
@@ -114,8 +114,8 @@ Disassembly of section .text:
   98:	11 e0       	ldi	r17, 0x01	; 1
   9a:	a0 e0       	ldi	r26, 0x00	; 0
   9c:	b1 e0       	ldi	r27, 0x01	; 1
-  9e:	e2 e2       	ldi	r30, 0x22	; 34
-  a0:	f3 e0       	ldi	r31, 0x03	; 3
+  9e:	e8 ee       	ldi	r30, 0xE8	; 232
+  a0:	f2 e0       	ldi	r31, 0x02	; 2
   a2:	00 e0       	ldi	r16, 0x00	; 0
   a4:	0b bf       	out	0x3b, r16	; 59
   a6:	02 c0       	rjmp	.+4      	; 0xac <__do_copy_data+0x14>
@@ -138,8 +138,8 @@ Disassembly of section .text:
   bc:	aa 39       	cpi	r26, 0x9A	; 154
   be:	b2 07       	cpc	r27, r18
   c0:	e1 f7       	brne	.-8      	; 0xba <.do_clear_bss_loop>
-  c2:	0d d1       	rcall	.+538    	; 0x2de <main>
-  c4:	2c c1       	rjmp	.+600    	; 0x31e <_exit>
+  c2:	f0 d0       	rcall	.+480    	; 0x2a4 <main>
+  c4:	0f c1       	rjmp	.+542    	; 0x2e4 <_exit>
 
 000000c6 <__bad_interrupt>:
   c6:	9c cf       	rjmp	.-200    	; 0x0 <__vectors>
@@ -147,10 +147,10 @@ Disassembly of section .text:
 000000c8 <Komm_InitPortDirections>:
 }
 
-// Initiate port values.
-void Komm_InitPortValues(void)
+void send_BT_buffer(char buffer[BuffSize] )
 {
-	PORTB = 1<<PORTB4;
+	strncpy(outBT, buffer, BuffSize); //Copy buffer to send to outBT
+	UCSR0B &= ~(1<<UDRIE0);	//Enable UDRE interrupt flag -> send when empty dataregister
   c8:	80 e4       	ldi	r24, 0x40	; 64
   ca:	84 b9       	out	0x04, r24	; 4
   cc:	82 e0       	ldi	r24, 0x02	; 2
@@ -158,25 +158,12 @@ void Komm_InitPortValues(void)
   d0:	08 95       	ret
 
 000000d2 <SPI_SlaveInit>:
-}
-
-// Configures device as spi slave.
-void SPI_SlaveInit(void)
-{
-	SPSR = 0<<SPI2X;
   d2:	1d bc       	out	0x2d, r1	; 45
-	SPCR = 1<<SPIE | 1<<SPE | 1<<DORD | 0<<MSTR | 0<<CPOL | 0<<CPHA | 1<<SPR1 | 1<<SPR0;
   d4:	83 ee       	ldi	r24, 0xE3	; 227
   d6:	8c bd       	out	0x2c, r24	; 44
   d8:	08 95       	ret
 
 000000da <__vector_19>:
-}
-
-
-// Interrupt method runs when SPI transmission/reception is completed.
-ISR(SPI_STC_vect)
-{
   da:	1f 92       	push	r1
   dc:	0f 92       	push	r0
   de:	0f b6       	in	r0, 0x3f	; 63
@@ -185,392 +172,293 @@ ISR(SPI_STC_vect)
   e4:	0b b6       	in	r0, 0x3b	; 59
   e6:	0f 92       	push	r0
   e8:	2f 93       	push	r18
-  ea:	3f 93       	push	r19
-  ec:	4f 93       	push	r20
-  ee:	5f 93       	push	r21
-  f0:	6f 93       	push	r22
-  f2:	7f 93       	push	r23
-  f4:	8f 93       	push	r24
-  f6:	9f 93       	push	r25
-  f8:	af 93       	push	r26
-  fa:	bf 93       	push	r27
-  fc:	ef 93       	push	r30
-  fe:	ff 93       	push	r31
-	strncpy(outSPDR, inBT, BuffSize); //copy data from inBT to outbuffer (SLAVE)
- 100:	44 e6       	ldi	r20, 0x64	; 100
- 102:	50 e0       	ldi	r21, 0x00	; 0
- 104:	66 e3       	ldi	r22, 0x36	; 54
- 106:	72 e0       	ldi	r23, 0x02	; 2
- 108:	8e e6       	ldi	r24, 0x6E	; 110
- 10a:	91 e0       	ldi	r25, 0x01	; 1
- 10c:	f9 d0       	rcall	.+498    	; 0x300 <strncpy>
-		if (posBuff_SPI < (BuffSize - 1))
- 10e:	80 91 04 01 	lds	r24, 0x0104
- 112:	90 91 05 01 	lds	r25, 0x0105
- 116:	83 36       	cpi	r24, 0x63	; 99
- 118:	91 05       	cpc	r25, r1
- 11a:	a4 f4       	brge	.+40     	; 0x144 <__vector_19+0x6a>
-		{
-			inSPDR[posBuff_SPI] = SPDR; // Save received char in inSPDR-buffer
- 11c:	2e b5       	in	r18, 0x2e	; 46
- 11e:	fc 01       	movw	r30, r24
- 120:	e6 5f       	subi	r30, 0xF6	; 246
- 122:	fe 4f       	sbci	r31, 0xFE	; 254
- 124:	20 83       	st	Z, r18
-			SPDR = outSPDR[posBuff_SPI]; //Send sign from outSPDR-buffer
- 126:	fc 01       	movw	r30, r24
- 128:	e2 59       	subi	r30, 0x92	; 146
- 12a:	fe 4f       	sbci	r31, 0xFE	; 254
- 12c:	80 81       	ld	r24, Z
- 12e:	8e bd       	out	0x2e, r24	; 46
-			posBuff_SPI++; // add 1 to bufferpos
- 130:	80 91 04 01 	lds	r24, 0x0104
- 134:	90 91 05 01 	lds	r25, 0x0105
- 138:	01 96       	adiw	r24, 0x01	; 1
- 13a:	90 93 05 01 	sts	0x0105, r25
- 13e:	80 93 04 01 	sts	0x0104, r24
- 142:	10 c0       	rjmp	.+32     	; 0x164 <__vector_19+0x8a>
-		}
-		else if (posBuff_SPI == (BuffSize - 1))
- 144:	83 36       	cpi	r24, 0x63	; 99
- 146:	91 05       	cpc	r25, r1
- 148:	59 f4       	brne	.+22     	; 0x160 <__vector_19+0x86>
-		{
-			inSPDR[posBuff_SPI] = SPDR; //save received char in inSPDR-buffer
- 14a:	8e b5       	in	r24, 0x2e	; 46
- 14c:	80 93 6d 01 	sts	0x016D, r24
-			SPDR = outSPDR[posBuff_SPI]; //Send last sign from outSPDR-buffer
- 150:	80 91 d1 01 	lds	r24, 0x01D1
- 154:	8e bd       	out	0x2e, r24	; 46
-			posBuff_SPI = 0; //Set bufferpos to restart
- 156:	10 92 05 01 	sts	0x0105, r1
- 15a:	10 92 04 01 	sts	0x0104, r1
- 15e:	02 c0       	rjmp	.+4      	; 0x164 <__vector_19+0x8a>
-		}
-		else 
-		{
-			SPDR = 'E';
- 160:	85 e4       	ldi	r24, 0x45	; 69
- 162:	8e bd       	out	0x2e, r24	; 46
-		}
-	
-	
+  ea:	8f 93       	push	r24
+  ec:	9f 93       	push	r25
+  ee:	ef 93       	push	r30
+  f0:	ff 93       	push	r31
+  f2:	80 91 08 01 	lds	r24, 0x0108
+  f6:	90 91 09 01 	lds	r25, 0x0109
+  fa:	83 36       	cpi	r24, 0x63	; 99
+  fc:	91 05       	cpc	r25, r1
+  fe:	a4 f4       	brge	.+40     	; 0x128 <__vector_19+0x4e>
+ 100:	2e b5       	in	r18, 0x2e	; 46
+ 102:	fc 01       	movw	r30, r24
+ 104:	e6 5f       	subi	r30, 0xF6	; 246
+ 106:	fe 4f       	sbci	r31, 0xFE	; 254
+ 108:	20 83       	st	Z, r18
+ 10a:	fc 01       	movw	r30, r24
+ 10c:	e2 59       	subi	r30, 0x92	; 146
+ 10e:	fe 4f       	sbci	r31, 0xFE	; 254
+ 110:	80 81       	ld	r24, Z
+ 112:	8e bd       	out	0x2e, r24	; 46
+ 114:	80 91 08 01 	lds	r24, 0x0108
+ 118:	90 91 09 01 	lds	r25, 0x0109
+ 11c:	01 96       	adiw	r24, 0x01	; 1
+ 11e:	90 93 09 01 	sts	0x0109, r25
+ 122:	80 93 08 01 	sts	0x0108, r24
+ 126:	10 c0       	rjmp	.+32     	; 0x148 <__vector_19+0x6e>
+ 128:	83 36       	cpi	r24, 0x63	; 99
+ 12a:	91 05       	cpc	r25, r1
+ 12c:	59 f4       	brne	.+22     	; 0x144 <__vector_19+0x6a>
+ 12e:	8e b5       	in	r24, 0x2e	; 46
+ 130:	80 93 6d 01 	sts	0x016D, r24
+ 134:	80 91 d1 01 	lds	r24, 0x01D1
+ 138:	8e bd       	out	0x2e, r24	; 46
+ 13a:	10 92 09 01 	sts	0x0109, r1
+ 13e:	10 92 08 01 	sts	0x0108, r1
+ 142:	02 c0       	rjmp	.+4      	; 0x148 <__vector_19+0x6e>
+ 144:	85 e4       	ldi	r24, 0x45	; 69
+ 146:	8e bd       	out	0x2e, r24	; 46
+ 148:	ff 91       	pop	r31
+ 14a:	ef 91       	pop	r30
+ 14c:	9f 91       	pop	r25
+ 14e:	8f 91       	pop	r24
+ 150:	2f 91       	pop	r18
+ 152:	0f 90       	pop	r0
+ 154:	0b be       	out	0x3b, r0	; 59
+ 156:	0f 90       	pop	r0
+ 158:	0f be       	out	0x3f, r0	; 63
+ 15a:	0f 90       	pop	r0
+ 15c:	1f 90       	pop	r1
+ 15e:	18 95       	reti
+
+00000160 <BT_init>:
+ 160:	10 92 c5 00 	sts	0x00C5, r1
+ 164:	87 e0       	ldi	r24, 0x07	; 7
+ 166:	80 93 c4 00 	sts	0x00C4, r24
+ 16a:	88 ed       	ldi	r24, 0xD8	; 216
+ 16c:	80 93 c1 00 	sts	0x00C1, r24
+ 170:	86 e0       	ldi	r24, 0x06	; 6
+ 172:	80 93 c2 00 	sts	0x00C2, r24
+ 176:	08 95       	ret
+
+00000178 <Write_Buffer>:
+ 178:	fa 01       	movw	r30, r20
+ 17a:	20 81       	ld	r18, Z
+ 17c:	31 81       	ldd	r19, Z+1	; 0x01
+ 17e:	23 36       	cpi	r18, 0x63	; 99
+ 180:	31 05       	cpc	r19, r1
+ 182:	11 f4       	brne	.+4      	; 0x188 <Write_Buffer+0x10>
+ 184:	11 82       	std	Z+1, r1	; 0x01
+ 186:	10 82       	st	Z, r1
+ 188:	20 81       	ld	r18, Z
+ 18a:	31 81       	ldd	r19, Z+1	; 0x01
+ 18c:	dc 01       	movw	r26, r24
+ 18e:	a2 0f       	add	r26, r18
+ 190:	b3 1f       	adc	r27, r19
+ 192:	6c 93       	st	X, r22
+ 194:	80 81       	ld	r24, Z
+ 196:	91 81       	ldd	r25, Z+1	; 0x01
+ 198:	01 96       	adiw	r24, 0x01	; 1
+ 19a:	91 83       	std	Z+1, r25	; 0x01
+ 19c:	80 83       	st	Z, r24
+ 19e:	08 95       	ret
+
+000001a0 <Read_Buffer>:
+ 1a0:	fb 01       	movw	r30, r22
+ 1a2:	20 81       	ld	r18, Z
+ 1a4:	31 81       	ldd	r19, Z+1	; 0x01
+ 1a6:	23 36       	cpi	r18, 0x63	; 99
+ 1a8:	31 05       	cpc	r19, r1
+ 1aa:	11 f4       	brne	.+4      	; 0x1b0 <Read_Buffer+0x10>
+ 1ac:	11 82       	std	Z+1, r1	; 0x01
+ 1ae:	10 82       	st	Z, r1
+ 1b0:	20 81       	ld	r18, Z
+ 1b2:	31 81       	ldd	r19, Z+1	; 0x01
+ 1b4:	dc 01       	movw	r26, r24
+ 1b6:	a2 0f       	add	r26, r18
+ 1b8:	b3 1f       	adc	r27, r19
+ 1ba:	8c 91       	ld	r24, X
+ 1bc:	2f 5f       	subi	r18, 0xFF	; 255
+ 1be:	3f 4f       	sbci	r19, 0xFF	; 255
+ 1c0:	31 83       	std	Z+1, r19	; 0x01
+ 1c2:	20 83       	st	Z, r18
+ 1c4:	08 95       	ret
+
+000001c6 <__vector_20>:
+ 1c6:	1f 92       	push	r1
+ 1c8:	0f 92       	push	r0
+ 1ca:	0f b6       	in	r0, 0x3f	; 63
+ 1cc:	0f 92       	push	r0
+ 1ce:	11 24       	eor	r1, r1
+ 1d0:	0b b6       	in	r0, 0x3b	; 59
+ 1d2:	0f 92       	push	r0
+ 1d4:	2f 93       	push	r18
+ 1d6:	3f 93       	push	r19
+ 1d8:	4f 93       	push	r20
+ 1da:	5f 93       	push	r21
+ 1dc:	6f 93       	push	r22
+ 1de:	7f 93       	push	r23
+ 1e0:	8f 93       	push	r24
+ 1e2:	9f 93       	push	r25
+ 1e4:	af 93       	push	r26
+ 1e6:	bf 93       	push	r27
+ 1e8:	ef 93       	push	r30
+ 1ea:	ff 93       	push	r31
+ 1ec:	60 91 c6 00 	lds	r22, 0x00C6
+ 1f0:	40 91 02 01 	lds	r20, 0x0102
+ 1f4:	50 91 03 01 	lds	r21, 0x0103
+ 1f8:	86 e3       	ldi	r24, 0x36	; 54
+ 1fa:	92 e0       	ldi	r25, 0x02	; 2
+ 1fc:	bd df       	rcall	.-134    	; 0x178 <Write_Buffer>
+ 1fe:	e1 ec       	ldi	r30, 0xC1	; 193
+ 200:	f0 e0       	ldi	r31, 0x00	; 0
+ 202:	80 81       	ld	r24, Z
+ 204:	80 62       	ori	r24, 0x20	; 32
+ 206:	80 83       	st	Z, r24
+ 208:	ff 91       	pop	r31
+ 20a:	ef 91       	pop	r30
+ 20c:	bf 91       	pop	r27
+ 20e:	af 91       	pop	r26
+ 210:	9f 91       	pop	r25
+ 212:	8f 91       	pop	r24
+ 214:	7f 91       	pop	r23
+ 216:	6f 91       	pop	r22
+ 218:	5f 91       	pop	r21
+ 21a:	4f 91       	pop	r20
+ 21c:	3f 91       	pop	r19
+ 21e:	2f 91       	pop	r18
+ 220:	0f 90       	pop	r0
+ 222:	0b be       	out	0x3b, r0	; 59
+ 224:	0f 90       	pop	r0
+ 226:	0f be       	out	0x3f, r0	; 63
+ 228:	0f 90       	pop	r0
+ 22a:	1f 90       	pop	r1
+ 22c:	18 95       	reti
+
+0000022e <__vector_21>:
 }
- 164:	ff 91       	pop	r31
- 166:	ef 91       	pop	r30
- 168:	bf 91       	pop	r27
- 16a:	af 91       	pop	r26
- 16c:	9f 91       	pop	r25
- 16e:	8f 91       	pop	r24
- 170:	7f 91       	pop	r23
- 172:	6f 91       	pop	r22
- 174:	5f 91       	pop	r21
- 176:	4f 91       	pop	r20
- 178:	3f 91       	pop	r19
- 17a:	2f 91       	pop	r18
- 17c:	0f 90       	pop	r0
- 17e:	0b be       	out	0x3b, r0	; 59
- 180:	0f 90       	pop	r0
- 182:	0f be       	out	0x3f, r0	; 63
- 184:	0f 90       	pop	r0
- 186:	1f 90       	pop	r1
- 188:	18 95       	reti
-
-0000018a <BT_init>:
-
-// Set up and enable Bluetooth
-void BT_init(void)
-{
-	UBRR0H = 0x00; //correct value to change baud rate
- 18a:	10 92 c5 00 	sts	0x00C5, r1
-	UBRR0L = 0x07;//^^ same ^^ with a 14.7 mhz, scale with 1111 (7)
- 18e:	87 e0       	ldi	r24, 0x07	; 7
- 190:	80 93 c4 00 	sts	0x00C4, r24
-	
-	UCSR0B = (1<<TXEN0) | (1<<RXEN0) | (0<<UCSZ02) | (1<<RXCIE0) | (1<<TXCIE0) | (0<<UDRIE0);
- 194:	88 ed       	ldi	r24, 0xD8	; 216
- 196:	80 93 c1 00 	sts	0x00C1, r24
-	/* RXCI, TXCI Complete transmission and complete interrupt is enabled
-	 * UDRIE0 not set, disabled interrupts due to UDRE0 flag. Data register empty
-	 * TXEN, TXEN, transmission and receiver enable 
-	 * UCSZ02 sets the third bit, defining framesize
-	*/
-	UCSR0C = (1<<UCSZ01) | (1<<UCSZ00);
- 19a:	86 e0       	ldi	r24, 0x06	; 6
- 19c:	80 93 c2 00 	sts	0x00C2, r24
- 1a0:	08 95       	ret
-
-000001a2 <Write_Buffer>:
-	 * UCSZ01:0 = 1, char size = 8
-	 */
-}
-
-void Write_Buffer(char buffer[BuffSize], char data, int *position)
-{
- 1a2:	fa 01       	movw	r30, r20
-	if ((*position) == BuffSize) // If end of buffer restart from first pos
- 1a4:	20 81       	ld	r18, Z
- 1a6:	31 81       	ldd	r19, Z+1	; 0x01
- 1a8:	24 36       	cpi	r18, 0x64	; 100
- 1aa:	31 05       	cpc	r19, r1
- 1ac:	11 f4       	brne	.+4      	; 0x1b2 <Write_Buffer+0x10>
-	{
-		(*position) = 0; 
- 1ae:	11 82       	std	Z+1, r1	; 0x01
- 1b0:	10 82       	st	Z, r1
-	}
-	buffer[(*position)] = data; //Add data to correct location
- 1b2:	20 81       	ld	r18, Z
- 1b4:	31 81       	ldd	r19, Z+1	; 0x01
- 1b6:	dc 01       	movw	r26, r24
- 1b8:	a2 0f       	add	r26, r18
- 1ba:	b3 1f       	adc	r27, r19
- 1bc:	6c 93       	st	X, r22
-	(*position)++;
- 1be:	80 81       	ld	r24, Z
- 1c0:	91 81       	ldd	r25, Z+1	; 0x01
- 1c2:	01 96       	adiw	r24, 0x01	; 1
- 1c4:	91 83       	std	Z+1, r25	; 0x01
- 1c6:	80 83       	st	Z, r24
- 1c8:	08 95       	ret
-
-000001ca <Read_Buffer>:
-}
-
-char Read_Buffer(char buffer[BuffSize], int *pos_read, int *pos_write)
-{
- 1ca:	fb 01       	movw	r30, r22
-	char data;
-	if ( (*pos_read) == BuffSize) // End of buffer, reset from start 
- 1cc:	20 81       	ld	r18, Z
- 1ce:	31 81       	ldd	r19, Z+1	; 0x01
- 1d0:	24 36       	cpi	r18, 0x64	; 100
- 1d2:	31 05       	cpc	r19, r1
- 1d4:	11 f4       	brne	.+4      	; 0x1da <Read_Buffer+0x10>
-	{
-		(*pos_read) = 0;
- 1d6:	11 82       	std	Z+1, r1	; 0x01
- 1d8:	10 82       	st	Z, r1
-	}
-	data = buffer[(*pos_read)]; //return next value in queue
- 1da:	20 81       	ld	r18, Z
- 1dc:	31 81       	ldd	r19, Z+1	; 0x01
- 1de:	dc 01       	movw	r26, r24
- 1e0:	a2 0f       	add	r26, r18
- 1e2:	b3 1f       	adc	r27, r19
- 1e4:	8c 91       	ld	r24, X
-	(*pos_read)++;
- 1e6:	2f 5f       	subi	r18, 0xFF	; 255
- 1e8:	3f 4f       	sbci	r19, 0xFF	; 255
- 1ea:	31 83       	std	Z+1, r19	; 0x01
- 1ec:	20 83       	st	Z, r18
-	return data;
-}
- 1ee:	08 95       	ret
-
-000001f0 <__vector_20>:
-
-
-// Receive complete - triggered by interrupt
-ISR(USART0_RX_vect) 
-{
- 1f0:	1f 92       	push	r1
- 1f2:	0f 92       	push	r0
- 1f4:	0f b6       	in	r0, 0x3f	; 63
- 1f6:	0f 92       	push	r0
- 1f8:	11 24       	eor	r1, r1
- 1fa:	0b b6       	in	r0, 0x3b	; 59
- 1fc:	0f 92       	push	r0
- 1fe:	2f 93       	push	r18
- 200:	3f 93       	push	r19
- 202:	4f 93       	push	r20
- 204:	5f 93       	push	r21
- 206:	6f 93       	push	r22
- 208:	7f 93       	push	r23
- 20a:	8f 93       	push	r24
- 20c:	9f 93       	push	r25
- 20e:	af 93       	push	r26
- 210:	bf 93       	push	r27
- 212:	ef 93       	push	r30
- 214:	ff 93       	push	r31
-	char data = UDR0; //Get received value
- 216:	60 91 c6 00 	lds	r22, 0x00C6
-	Write_Buffer(inBT, data, writePos_BTin); //Writes data to buffer in order they are received
- 21a:	40 91 00 01 	lds	r20, 0x0100
- 21e:	50 91 01 01 	lds	r21, 0x0101
- 222:	86 e3       	ldi	r24, 0x36	; 54
- 224:	92 e0       	ldi	r25, 0x02	; 2
- 226:	bd df       	rcall	.-134    	; 0x1a2 <Write_Buffer>
-
-	UCSR0B |= (1<<UDRIE0); //Enable empty buffer interrupt
- 228:	e1 ec       	ldi	r30, 0xC1	; 193
- 22a:	f0 e0       	ldi	r31, 0x00	; 0
- 22c:	80 81       	ld	r24, Z
- 22e:	80 62       	ori	r24, 0x20	; 32
- 230:	80 83       	st	Z, r24
-
-
-}
- 232:	ff 91       	pop	r31
- 234:	ef 91       	pop	r30
- 236:	bf 91       	pop	r27
- 238:	af 91       	pop	r26
- 23a:	9f 91       	pop	r25
- 23c:	8f 91       	pop	r24
- 23e:	7f 91       	pop	r23
- 240:	6f 91       	pop	r22
- 242:	5f 91       	pop	r21
- 244:	4f 91       	pop	r20
- 246:	3f 91       	pop	r19
- 248:	2f 91       	pop	r18
- 24a:	0f 90       	pop	r0
- 24c:	0b be       	out	0x3b, r0	; 59
- 24e:	0f 90       	pop	r0
- 250:	0f be       	out	0x3f, r0	; 63
- 252:	0f 90       	pop	r0
- 254:	1f 90       	pop	r1
- 256:	18 95       	reti
-
-00000258 <__vector_21>:
-
 
 // Empty dataregister = send next character
 ISR(USART0_UDRE_vect)
 {
- 258:	1f 92       	push	r1
- 25a:	0f 92       	push	r0
- 25c:	0f b6       	in	r0, 0x3f	; 63
- 25e:	0f 92       	push	r0
- 260:	11 24       	eor	r1, r1
- 262:	0b b6       	in	r0, 0x3b	; 59
- 264:	0f 92       	push	r0
- 266:	2f 93       	push	r18
- 268:	3f 93       	push	r19
- 26a:	4f 93       	push	r20
- 26c:	5f 93       	push	r21
- 26e:	6f 93       	push	r22
- 270:	7f 93       	push	r23
- 272:	8f 93       	push	r24
- 274:	9f 93       	push	r25
- 276:	af 93       	push	r26
- 278:	bf 93       	push	r27
- 27a:	ef 93       	push	r30
- 27c:	ff 93       	push	r31
-	
-	if ((*writePos_BTin) <= (*readPos_BTin)) //Nothing new to read
- 27e:	a0 91 00 01 	lds	r26, 0x0100
- 282:	b0 91 01 01 	lds	r27, 0x0101
- 286:	e0 91 02 01 	lds	r30, 0x0102
- 28a:	f0 91 03 01 	lds	r31, 0x0103
- 28e:	2d 91       	ld	r18, X+
- 290:	3c 91       	ld	r19, X
- 292:	11 97       	sbiw	r26, 0x01	; 1
- 294:	80 81       	ld	r24, Z
- 296:	91 81       	ldd	r25, Z+1	; 0x01
- 298:	82 17       	cp	r24, r18
- 29a:	93 07       	cpc	r25, r19
- 29c:	34 f0       	brlt	.+12     	; 0x2aa <__vector_21+0x52>
+ 22e:	1f 92       	push	r1
+ 230:	0f 92       	push	r0
+ 232:	0f b6       	in	r0, 0x3f	; 63
+ 234:	0f 92       	push	r0
+ 236:	11 24       	eor	r1, r1
+ 238:	0b b6       	in	r0, 0x3b	; 59
+ 23a:	0f 92       	push	r0
+ 23c:	2f 93       	push	r18
+ 23e:	3f 93       	push	r19
+ 240:	4f 93       	push	r20
+ 242:	5f 93       	push	r21
+ 244:	6f 93       	push	r22
+ 246:	7f 93       	push	r23
+ 248:	8f 93       	push	r24
+ 24a:	9f 93       	push	r25
+ 24c:	af 93       	push	r26
+ 24e:	bf 93       	push	r27
+ 250:	ef 93       	push	r30
+ 252:	ff 93       	push	r31
+	if ((*readPos_BTout) == BuffSize) //Read entire buff and sent it
+ 254:	60 91 00 01 	lds	r22, 0x0100
+ 258:	70 91 01 01 	lds	r23, 0x0101
+ 25c:	fb 01       	movw	r30, r22
+ 25e:	80 81       	ld	r24, Z
+ 260:	91 81       	ldd	r25, Z+1	; 0x01
+ 262:	84 36       	cpi	r24, 0x64	; 100
+ 264:	91 05       	cpc	r25, r1
+ 266:	31 f4       	brne	.+12     	; 0x274 <__vector_21+0x46>
 	{
-		UCSR0B &= ~(1<<UDRIE0); //Disable UDRE interrupt, enables when new data is received
- 29e:	e1 ec       	ldi	r30, 0xC1	; 193
- 2a0:	f0 e0       	ldi	r31, 0x00	; 0
- 2a2:	80 81       	ld	r24, Z
- 2a4:	8f 7d       	andi	r24, 0xDF	; 223
- 2a6:	80 83       	st	Z, r24
- 2a8:	07 c0       	rjmp	.+14     	; 0x2b8 <__vector_21+0x60>
+		UCSR0B &= ~(1<<UDRIE0); //Disable UDRE interrupt, All data is sent. 
+ 268:	e1 ec       	ldi	r30, 0xC1	; 193
+ 26a:	f0 e0       	ldi	r31, 0x00	; 0
+ 26c:	80 81       	ld	r24, Z
+ 26e:	8f 7d       	andi	r24, 0xDF	; 223
+ 270:	80 83       	st	Z, r24
+ 272:	05 c0       	rjmp	.+10     	; 0x27e <__vector_21+0x50>
 	}
 	else
 	{
-		UDR0 = Read_Buffer(inBT, readPos_BTin, writePos_BTin); //Echo back the next value in buffer. 														
- 2aa:	ad 01       	movw	r20, r26
- 2ac:	bf 01       	movw	r22, r30
- 2ae:	86 e3       	ldi	r24, 0x36	; 54
- 2b0:	92 e0       	ldi	r25, 0x02	; 2
- 2b2:	8b df       	rcall	.-234    	; 0x1ca <Read_Buffer>
- 2b4:	80 93 c6 00 	sts	0x00C6, r24
+		UDR0 = Read_Buffer(outBT, readPos_BTout); //Send back the next value in out-buffer. 														
+ 274:	82 ed       	ldi	r24, 0xD2	; 210
+ 276:	91 e0       	ldi	r25, 0x01	; 1
+ 278:	93 df       	rcall	.-218    	; 0x1a0 <Read_Buffer>
+ 27a:	80 93 c6 00 	sts	0x00C6, r24
 	}
 		
 }
- 2b8:	ff 91       	pop	r31
- 2ba:	ef 91       	pop	r30
- 2bc:	bf 91       	pop	r27
- 2be:	af 91       	pop	r26
- 2c0:	9f 91       	pop	r25
- 2c2:	8f 91       	pop	r24
- 2c4:	7f 91       	pop	r23
- 2c6:	6f 91       	pop	r22
- 2c8:	5f 91       	pop	r21
- 2ca:	4f 91       	pop	r20
- 2cc:	3f 91       	pop	r19
- 2ce:	2f 91       	pop	r18
- 2d0:	0f 90       	pop	r0
- 2d2:	0b be       	out	0x3b, r0	; 59
- 2d4:	0f 90       	pop	r0
- 2d6:	0f be       	out	0x3f, r0	; 63
- 2d8:	0f 90       	pop	r0
- 2da:	1f 90       	pop	r1
- 2dc:	18 95       	reti
+ 27e:	ff 91       	pop	r31
+ 280:	ef 91       	pop	r30
+ 282:	bf 91       	pop	r27
+ 284:	af 91       	pop	r26
+ 286:	9f 91       	pop	r25
+ 288:	8f 91       	pop	r24
+ 28a:	7f 91       	pop	r23
+ 28c:	6f 91       	pop	r22
+ 28e:	5f 91       	pop	r21
+ 290:	4f 91       	pop	r20
+ 292:	3f 91       	pop	r19
+ 294:	2f 91       	pop	r18
+ 296:	0f 90       	pop	r0
+ 298:	0b be       	out	0x3b, r0	; 59
+ 29a:	0f 90       	pop	r0
+ 29c:	0f be       	out	0x3f, r0	; 63
+ 29e:	0f 90       	pop	r0
+ 2a0:	1f 90       	pop	r1
+ 2a2:	18 95       	reti
 
-000002de <main>:
+000002a4 <main>:
 
 int main(void)
 {
 	sleep_enable();
- 2de:	83 b7       	in	r24, 0x33	; 51
- 2e0:	81 60       	ori	r24, 0x01	; 1
- 2e2:	83 bf       	out	0x33, r24	; 51
+ 2a4:	83 b7       	in	r24, 0x33	; 51
+ 2a6:	81 60       	ori	r24, 0x01	; 1
+ 2a8:	83 bf       	out	0x33, r24	; 51
 	Komm_InitPortDirections();
- 2e4:	f1 de       	rcall	.-542    	; 0xc8 <Komm_InitPortDirections>
+ 2aa:	0e df       	rcall	.-484    	; 0xc8 <Komm_InitPortDirections>
 }
 
 // Initiate port values.
 void Komm_InitPortValues(void)
 {
 	PORTB = 1<<PORTB4;
- 2e6:	80 e1       	ldi	r24, 0x10	; 16
- 2e8:	85 b9       	out	0x05, r24	; 5
+ 2ac:	80 e1       	ldi	r24, 0x10	; 16
+ 2ae:	85 b9       	out	0x05, r24	; 5
 int main(void)
 {
 	sleep_enable();
 	Komm_InitPortDirections();
 	Komm_InitPortValues();
 	SPI_SlaveInit();
- 2ea:	f3 de       	rcall	.-538    	; 0xd2 <SPI_SlaveInit>
+ 2b0:	10 df       	rcall	.-480    	; 0xd2 <SPI_SlaveInit>
 	BT_init();
- 2ec:	4e df       	rcall	.-356    	; 0x18a <BT_init>
+ 2b2:	56 df       	rcall	.-340    	; 0x160 <BT_init>
 	sei();
- 2ee:	78 94       	sei
+ 2b4:	78 94       	sei
 	while(1)
 	{
-		strncpy(outSPDR,inBT,BuffSize);
- 2f0:	44 e6       	ldi	r20, 0x64	; 100
- 2f2:	50 e0       	ldi	r21, 0x00	; 0
- 2f4:	66 e3       	ldi	r22, 0x36	; 54
- 2f6:	72 e0       	ldi	r23, 0x02	; 2
- 2f8:	8e e6       	ldi	r24, 0x6E	; 110
- 2fa:	91 e0       	ldi	r25, 0x01	; 1
- 2fc:	01 d0       	rcall	.+2      	; 0x300 <strncpy>
- 2fe:	f8 cf       	rjmp	.-16     	; 0x2f0 <main+0x12>
+		strncpy(outSPDR, inBT, BuffSize); //copy data from inBT to outbuffer (SLAVE)
+ 2b6:	44 e6       	ldi	r20, 0x64	; 100
+ 2b8:	50 e0       	ldi	r21, 0x00	; 0
+ 2ba:	66 e3       	ldi	r22, 0x36	; 54
+ 2bc:	72 e0       	ldi	r23, 0x02	; 2
+ 2be:	8e e6       	ldi	r24, 0x6E	; 110
+ 2c0:	91 e0       	ldi	r25, 0x01	; 1
+ 2c2:	01 d0       	rcall	.+2      	; 0x2c6 <strncpy>
+ 2c4:	f8 cf       	rjmp	.-16     	; 0x2b6 <main+0x12>
 
-00000300 <strncpy>:
- 300:	fb 01       	movw	r30, r22
- 302:	dc 01       	movw	r26, r24
- 304:	41 50       	subi	r20, 0x01	; 1
- 306:	50 40       	sbci	r21, 0x00	; 0
- 308:	48 f0       	brcs	.+18     	; 0x31c <strncpy+0x1c>
- 30a:	01 90       	ld	r0, Z+
- 30c:	0d 92       	st	X+, r0
- 30e:	00 20       	and	r0, r0
- 310:	c9 f7       	brne	.-14     	; 0x304 <strncpy+0x4>
- 312:	01 c0       	rjmp	.+2      	; 0x316 <strncpy+0x16>
- 314:	1d 92       	st	X+, r1
- 316:	41 50       	subi	r20, 0x01	; 1
- 318:	50 40       	sbci	r21, 0x00	; 0
- 31a:	e0 f7       	brcc	.-8      	; 0x314 <strncpy+0x14>
- 31c:	08 95       	ret
+000002c6 <strncpy>:
+ 2c6:	fb 01       	movw	r30, r22
+ 2c8:	dc 01       	movw	r26, r24
+ 2ca:	41 50       	subi	r20, 0x01	; 1
+ 2cc:	50 40       	sbci	r21, 0x00	; 0
+ 2ce:	48 f0       	brcs	.+18     	; 0x2e2 <strncpy+0x1c>
+ 2d0:	01 90       	ld	r0, Z+
+ 2d2:	0d 92       	st	X+, r0
+ 2d4:	00 20       	and	r0, r0
+ 2d6:	c9 f7       	brne	.-14     	; 0x2ca <strncpy+0x4>
+ 2d8:	01 c0       	rjmp	.+2      	; 0x2dc <strncpy+0x16>
+ 2da:	1d 92       	st	X+, r1
+ 2dc:	41 50       	subi	r20, 0x01	; 1
+ 2de:	50 40       	sbci	r21, 0x00	; 0
+ 2e0:	e0 f7       	brcc	.-8      	; 0x2da <strncpy+0x14>
+ 2e2:	08 95       	ret
 
-0000031e <_exit>:
- 31e:	f8 94       	cli
+000002e4 <_exit>:
+ 2e4:	f8 94       	cli
 
-00000320 <__stop_program>:
- 320:	ff cf       	rjmp	.-2      	; 0x320 <__stop_program>
+000002e6 <__stop_program>:
+ 2e6:	ff cf       	rjmp	.-2      	; 0x2e6 <__stop_program>

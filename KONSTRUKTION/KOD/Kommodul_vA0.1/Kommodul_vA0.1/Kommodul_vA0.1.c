@@ -13,6 +13,8 @@
 char outSPDR[BuffSize];
 char inSPDR[BuffSize];
 int i = 0;
+int posBuff_SPI = 0;
+
 int rBTin = 0;
 int wBTin = 0;
 int rBTout = 0;
@@ -21,7 +23,9 @@ int *readPos_BTin = &rBTin;
 int *writePos_BTin = &wBTin; // Add BTout positioners aswell if needed.
 int *readPos_BTout = &rBTout;
 int *writePos_BTout = &wBTout;
-int posBuff_SPI = 0;
+int BT_received_flag = 0;
+int BT_sent_flag = 0;
+
 int sendFlag = 0;
 char outBT[BuffSize];
 char inBT[BuffSize];
@@ -58,11 +62,11 @@ void SPI_SlaveInit(void)
 // Interrupt method runs when SPI transmission/reception is completed.
 ISR(SPI_STC_vect)
 {
-	strncpy(outSPDR, inBT, BuffSize); //copy data from inBT to outbuffer (SLAVE)
+
 		if (posBuff_SPI < (BuffSize - 1))
 		{
 			inSPDR[posBuff_SPI] = SPDR; // Save received char in inSPDR-buffer
-			SPDR = outSPDR[posBuff_SPI]; //Send sign from outSPDR-buffer
+			SPDR = outSPDR[posBuff_SPI]; //Sett next bit to send from outSPDR-buffer
 			posBuff_SPI++; // add 1 to bufferpos
 		}
 		else if (posBuff_SPI == (BuffSize - 1))
@@ -101,18 +105,20 @@ void BT_init(void)
 
 void Write_Buffer(char buffer[BuffSize], char data, int *position)
 {
-	if ((*position) == BuffSize) // If end of buffer restart from first pos
+	if ((*position) == (BuffSize - 1)) // If end of buffer restart from first pos, done with read.
 	{
+		BT_received_flag = 1;
 		(*position) = 0; 
+		send_BT_buffer(inBT); //Echo back inBT *****************ONLY FOR TEST******************
 	}
 	buffer[(*position)] = data; //Add data to correct location
 	(*position)++;
 }
 
-char Read_Buffer(char buffer[BuffSize], int *pos_read, int *pos_write)
+char Read_Buffer(char buffer[BuffSize], int *pos_read)
 {
 	char data;
-	if ( (*pos_read) == BuffSize) // End of buffer, reset from start 
+	if ((*pos_read) == (BuffSize - 1)) // End of buffer, reset from start 
 	{
 		(*pos_read) = 0;
 	}
@@ -125,6 +131,7 @@ char Read_Buffer(char buffer[BuffSize], int *pos_read, int *pos_write)
 // Receive complete - triggered by interrupt
 ISR(USART0_RX_vect) 
 {
+	BT_received_flag = 0;
 	char data = UDR0; //Get received value
 	Write_Buffer(inBT, data, writePos_BTin); //Writes data to buffer in order they are received
 
@@ -133,18 +140,24 @@ ISR(USART0_RX_vect)
 
 }
 
+void send_BT_buffer(char buffer[BuffSize] )
+{
+	strncpy(outBT, buffer, BuffSize); //Copy buffer to send to outBT
+	UCSR0B &= ~(1<<UDRIE0);	//Enable UDRE interrupt flag -> send when empty dataregister
+}
 
 // Empty dataregister = send next character
 ISR(USART0_UDRE_vect)
 {
-	
-	if ((*writePos_BTin) <= (*readPos_BTin)) //Nothing new to read
+	if ((*readPos_BTout) == BuffSize) //Read entire buff and sent it
 	{
-		UCSR0B &= ~(1<<UDRIE0); //Disable UDRE interrupt, enables when new data is received
+		BT_sent_flag = 1; // done with transmission
+		UCSR0B &= ~(1<<UDRIE0); //Disable UDRE interrupt, All data is sent. 
 	}
 	else
 	{
-		UDR0 = Read_Buffer(inBT, readPos_BTin, writePos_BTin); //Echo back the next value in buffer. 														
+		BT_sent_flag = 0;
+		UDR0 = Read_Buffer(outBT, readPos_BTout); //Send back the next value in out-buffer. 														
 	}
 		
 }
@@ -159,6 +172,7 @@ int main(void)
 	sei();
 	while(1)
 	{
-		strncpy(outSPDR,inBT,BuffSize);
+		strncpy(outSPDR, inBT, BuffSize); //copy data from inBT to outbuffer (SLAVE)
+		
 	}
 }
