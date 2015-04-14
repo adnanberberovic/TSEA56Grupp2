@@ -3,29 +3,29 @@ Styrmodul_vA0.1.elf:     file format elf32-avr
 
 Sections:
 Idx Name          Size      VMA       LMA       File off  Algn
-  0 .data         00000020  00800100  00000382  00000416  2**0
+  0 .data         00000020  00800100  00000358  000003ec  2**0
                   CONTENTS, ALLOC, LOAD, DATA
-  1 .text         00000382  00000000  00000000  00000094  2**1
+  1 .text         00000358  00000000  00000000  00000094  2**1
                   CONTENTS, ALLOC, LOAD, READONLY, CODE
-  2 .bss          00000002  00800120  00800120  00000436  2**0
+  2 .bss          00000002  00800120  00800120  0000040c  2**0
                   ALLOC
-  3 .comment      00000030  00000000  00000000  00000436  2**0
+  3 .comment      00000030  00000000  00000000  0000040c  2**0
                   CONTENTS, READONLY
-  4 .debug_aranges 000000b8  00000000  00000000  00000466  2**0
+  4 .debug_aranges 000000b8  00000000  00000000  0000043c  2**0
                   CONTENTS, READONLY, DEBUGGING
-  5 .debug_info   00000b09  00000000  00000000  0000051e  2**0
+  5 .debug_info   00000c78  00000000  00000000  000004f4  2**0
                   CONTENTS, READONLY, DEBUGGING
-  6 .debug_abbrev 00000312  00000000  00000000  00001027  2**0
+  6 .debug_abbrev 00000312  00000000  00000000  0000116c  2**0
                   CONTENTS, READONLY, DEBUGGING
-  7 .debug_line   00000643  00000000  00000000  00001339  2**0
+  7 .debug_line   000006c6  00000000  00000000  0000147e  2**0
                   CONTENTS, READONLY, DEBUGGING
-  8 .debug_frame  00000194  00000000  00000000  0000197c  2**2
+  8 .debug_frame  00000194  00000000  00000000  00001b44  2**2
                   CONTENTS, READONLY, DEBUGGING
-  9 .debug_str    00000305  00000000  00000000  00001b10  2**0
+  9 .debug_str    00000305  00000000  00000000  00001cd8  2**0
                   CONTENTS, READONLY, DEBUGGING
- 10 .debug_loc    0000054b  00000000  00000000  00001e15  2**0
+ 10 .debug_loc    00000577  00000000  00000000  00001fdd  2**0
                   CONTENTS, READONLY, DEBUGGING
- 11 .debug_ranges 000000a8  00000000  00000000  00002360  2**0
+ 11 .debug_ranges 000000a8  00000000  00000000  00002554  2**0
                   CONTENTS, READONLY, DEBUGGING
 
 Disassembly of section .text:
@@ -114,7 +114,7 @@ Disassembly of section .text:
   98:	11 e0       	ldi	r17, 0x01	; 1
   9a:	a0 e0       	ldi	r26, 0x00	; 0
   9c:	b1 e0       	ldi	r27, 0x01	; 1
-  9e:	e2 e8       	ldi	r30, 0x82	; 130
+  9e:	e8 e5       	ldi	r30, 0x58	; 88
   a0:	f3 e0       	ldi	r31, 0x03	; 3
   a2:	00 e0       	ldi	r16, 0x00	; 0
   a4:	0b bf       	out	0x3b, r16	; 59
@@ -138,8 +138,8 @@ Disassembly of section .text:
   bc:	a2 32       	cpi	r26, 0x22	; 34
   be:	b2 07       	cpc	r27, r18
   c0:	e1 f7       	brne	.-8      	; 0xba <.do_clear_bss_loop>
-  c2:	36 d1       	rcall	.+620    	; 0x330 <main>
-  c4:	5c c1       	rjmp	.+696    	; 0x37e <_exit>
+  c2:	ee d0       	rcall	.+476    	; 0x2a0 <main>
+  c4:	47 c1       	rjmp	.+654    	; 0x354 <_exit>
 
 000000c6 <__bad_interrupt>:
   c6:	9c cf       	rjmp	.-200    	; 0x0 <__vectors>
@@ -211,459 +211,448 @@ Disassembly of section .text:
  130:	10 92 b4 00 	sts	0x00B4, r1
  134:	08 95       	ret
 
-00000136 <PWM_SetDirLeft>:
- 136:	00 97       	sbiw	r24, 0x00	; 0
- 138:	11 f4       	brne	.+4      	; 0x13e <PWM_SetDirLeft+0x8>
- 13a:	59 98       	cbi	0x0b, 1	; 11
- 13c:	08 95       	ret
- 13e:	01 97       	sbiw	r24, 0x01	; 1
- 140:	09 f4       	brne	.+2      	; 0x144 <PWM_SetDirLeft+0xe>
- 142:	59 9a       	sbi	0x0b, 1	; 11
- 144:	08 95       	ret
+00000136 <LCD_Busy>:
+ 136:	11 b8       	out	0x01, r1	; 1
+ 138:	29 9a       	sbi	0x05, 1	; 5
+ 13a:	28 98       	cbi	0x05, 0	; 5
+ 13c:	2a 9a       	sbi	0x05, 2	; 5
+ 13e:	00 c0       	rjmp	.+0      	; 0x140 <LCD_Busy+0xa>
+ 140:	80 b1       	in	r24, 0x00	; 0
+ 142:	2a 98       	cbi	0x05, 2	; 5
+ 144:	29 98       	cbi	0x05, 1	; 5
+ 146:	9f ef       	ldi	r25, 0xFF	; 255
+ 148:	91 b9       	out	0x01, r25	; 1
+ 14a:	88 1f       	adc	r24, r24
+ 14c:	88 27       	eor	r24, r24
+ 14e:	88 1f       	adc	r24, r24
+ 150:	90 e0       	ldi	r25, 0x00	; 0
+ 152:	08 95       	ret
 
-00000146 <PWM_Test>:
- 146:	8c e2       	ldi	r24, 0x2C	; 44
- 148:	91 e0       	ldi	r25, 0x01	; 1
- 14a:	e3 e2       	ldi	r30, 0x23	; 35
- 14c:	f4 ef       	ldi	r31, 0xF4	; 244
- 14e:	31 97       	sbiw	r30, 0x01	; 1
- 150:	f1 f7       	brne	.-4      	; 0x14e <PWM_Test+0x8>
- 152:	00 c0       	rjmp	.+0      	; 0x154 <PWM_Test+0xe>
- 154:	00 00       	nop
- 156:	01 97       	sbiw	r24, 0x01	; 1
- 158:	00 97       	sbiw	r24, 0x00	; 0
- 15a:	b9 f7       	brne	.-18     	; 0x14a <PWM_Test+0x4>
- 15c:	82 e3       	ldi	r24, 0x32	; 50
- 15e:	80 93 b3 00 	sts	0x00B3, r24
- 162:	8c e2       	ldi	r24, 0x2C	; 44
- 164:	91 e0       	ldi	r25, 0x01	; 1
- 166:	e3 e2       	ldi	r30, 0x23	; 35
- 168:	f4 ef       	ldi	r31, 0xF4	; 244
- 16a:	31 97       	sbiw	r30, 0x01	; 1
- 16c:	f1 f7       	brne	.-4      	; 0x16a <PWM_Test+0x24>
- 16e:	00 c0       	rjmp	.+0      	; 0x170 <PWM_Test+0x2a>
- 170:	00 00       	nop
- 172:	01 97       	sbiw	r24, 0x01	; 1
- 174:	00 97       	sbiw	r24, 0x00	; 0
- 176:	b9 f7       	brne	.-18     	; 0x166 <PWM_Test+0x20>
- 178:	81 e0       	ldi	r24, 0x01	; 1
- 17a:	90 e0       	ldi	r25, 0x00	; 0
- 17c:	dc df       	rcall	.-72     	; 0x136 <PWM_SetDirLeft>
- 17e:	8c e2       	ldi	r24, 0x2C	; 44
- 180:	91 e0       	ldi	r25, 0x01	; 1
- 182:	e3 e2       	ldi	r30, 0x23	; 35
- 184:	f4 ef       	ldi	r31, 0xF4	; 244
- 186:	31 97       	sbiw	r30, 0x01	; 1
- 188:	f1 f7       	brne	.-4      	; 0x186 <PWM_Test+0x40>
- 18a:	00 c0       	rjmp	.+0      	; 0x18c <PWM_Test+0x46>
- 18c:	00 00       	nop
- 18e:	01 97       	sbiw	r24, 0x01	; 1
- 190:	00 97       	sbiw	r24, 0x00	; 0
- 192:	b9 f7       	brne	.-18     	; 0x182 <PWM_Test+0x3c>
- 194:	10 92 b3 00 	sts	0x00B3, r1
- 198:	8c e2       	ldi	r24, 0x2C	; 44
- 19a:	91 e0       	ldi	r25, 0x01	; 1
- 19c:	e3 e2       	ldi	r30, 0x23	; 35
- 19e:	f4 ef       	ldi	r31, 0xF4	; 244
- 1a0:	31 97       	sbiw	r30, 0x01	; 1
- 1a2:	f1 f7       	brne	.-4      	; 0x1a0 <PWM_Test+0x5a>
- 1a4:	00 c0       	rjmp	.+0      	; 0x1a6 <PWM_Test+0x60>
+00000154 <LCD_SendCommand>:
+ 154:	cf 93       	push	r28
+ 156:	c8 2f       	mov	r28, r24
+ 158:	06 c0       	rjmp	.+12     	; 0x166 <LCD_SendCommand+0x12>
+ 15a:	89 ef       	ldi	r24, 0xF9	; 249
+ 15c:	90 e0       	ldi	r25, 0x00	; 0
+ 15e:	01 97       	sbiw	r24, 0x01	; 1
+ 160:	f1 f7       	brne	.-4      	; 0x15e <LCD_SendCommand+0xa>
+ 162:	00 c0       	rjmp	.+0      	; 0x164 <LCD_SendCommand+0x10>
+ 164:	00 00       	nop
+ 166:	e7 df       	rcall	.-50     	; 0x136 <LCD_Busy>
+ 168:	89 2b       	or	r24, r25
+ 16a:	b9 f7       	brne	.-18     	; 0x15a <LCD_SendCommand+0x6>
+ 16c:	28 98       	cbi	0x05, 0	; 5
+ 16e:	c2 b9       	out	0x02, r28	; 2
+ 170:	2a 9a       	sbi	0x05, 2	; 5
+ 172:	c1 50       	subi	r28, 0x01	; 1
+ 174:	c2 30       	cpi	r28, 0x02	; 2
+ 176:	38 f4       	brcc	.+14     	; 0x186 <LCD_SendCommand+0x32>
+ 178:	86 e7       	ldi	r24, 0x76	; 118
+ 17a:	91 e0       	ldi	r25, 0x01	; 1
+ 17c:	01 97       	sbiw	r24, 0x01	; 1
+ 17e:	f1 f7       	brne	.-4      	; 0x17c <LCD_SendCommand+0x28>
+ 180:	00 c0       	rjmp	.+0      	; 0x182 <LCD_SendCommand+0x2e>
+ 182:	00 00       	nop
+ 184:	04 c0       	rjmp	.+8      	; 0x18e <LCD_SendCommand+0x3a>
+ 186:	90 e1       	ldi	r25, 0x10	; 16
+ 188:	9a 95       	dec	r25
+ 18a:	f1 f7       	brne	.-4      	; 0x188 <LCD_SendCommand+0x34>
+ 18c:	00 c0       	rjmp	.+0      	; 0x18e <LCD_SendCommand+0x3a>
+ 18e:	2a 98       	cbi	0x05, 2	; 5
+ 190:	cf 91       	pop	r28
+ 192:	08 95       	ret
+
+00000194 <LCD_SetRow>:
+ 194:	cf 93       	push	r28
+ 196:	df 93       	push	r29
+ 198:	ec 01       	movw	r28, r24
+ 19a:	06 c0       	rjmp	.+12     	; 0x1a8 <LCD_SetRow+0x14>
+ 19c:	89 ef       	ldi	r24, 0xF9	; 249
+ 19e:	90 e0       	ldi	r25, 0x00	; 0
+ 1a0:	01 97       	sbiw	r24, 0x01	; 1
+ 1a2:	f1 f7       	brne	.-4      	; 0x1a0 <LCD_SetRow+0xc>
+ 1a4:	00 c0       	rjmp	.+0      	; 0x1a6 <LCD_SetRow+0x12>
  1a6:	00 00       	nop
- 1a8:	01 97       	sbiw	r24, 0x01	; 1
- 1aa:	00 97       	sbiw	r24, 0x00	; 0
- 1ac:	b9 f7       	brne	.-18     	; 0x19c <PWM_Test+0x56>
- 1ae:	8c e2       	ldi	r24, 0x2C	; 44
- 1b0:	91 e0       	ldi	r25, 0x01	; 1
- 1b2:	e3 e2       	ldi	r30, 0x23	; 35
- 1b4:	f4 ef       	ldi	r31, 0xF4	; 244
- 1b6:	31 97       	sbiw	r30, 0x01	; 1
- 1b8:	f1 f7       	brne	.-4      	; 0x1b6 <PWM_Test+0x70>
- 1ba:	00 c0       	rjmp	.+0      	; 0x1bc <PWM_Test+0x76>
- 1bc:	00 00       	nop
- 1be:	01 97       	sbiw	r24, 0x01	; 1
- 1c0:	00 97       	sbiw	r24, 0x00	; 0
- 1c2:	b9 f7       	brne	.-18     	; 0x1b2 <PWM_Test+0x6c>
- 1c4:	08 95       	ret
+ 1a8:	c6 df       	rcall	.-116    	; 0x136 <LCD_Busy>
+ 1aa:	89 2b       	or	r24, r25
+ 1ac:	b9 f7       	brne	.-18     	; 0x19c <LCD_SetRow+0x8>
+ 1ae:	28 98       	cbi	0x05, 0	; 5
+ 1b0:	29 98       	cbi	0x05, 1	; 5
+ 1b2:	c1 30       	cpi	r28, 0x01	; 1
+ 1b4:	d1 05       	cpc	r29, r1
+ 1b6:	19 f4       	brne	.+6      	; 0x1be <LCD_SetRow+0x2a>
+ 1b8:	80 e8       	ldi	r24, 0x80	; 128
+ 1ba:	cc df       	rcall	.-104    	; 0x154 <LCD_SendCommand>
+ 1bc:	04 c0       	rjmp	.+8      	; 0x1c6 <LCD_SetRow+0x32>
+ 1be:	22 97       	sbiw	r28, 0x02	; 2
+ 1c0:	11 f4       	brne	.+4      	; 0x1c6 <LCD_SetRow+0x32>
+ 1c2:	80 ec       	ldi	r24, 0xC0	; 192
+ 1c4:	c7 df       	rcall	.-114    	; 0x154 <LCD_SendCommand>
+ 1c6:	df 91       	pop	r29
+ 1c8:	cf 91       	pop	r28
+ 1ca:	08 95       	ret
 
-000001c6 <LCD_Busy>:
- 1c6:	11 b8       	out	0x01, r1	; 1
- 1c8:	29 9a       	sbi	0x05, 1	; 5
- 1ca:	28 98       	cbi	0x05, 0	; 5
- 1cc:	2a 9a       	sbi	0x05, 2	; 5
- 1ce:	00 c0       	rjmp	.+0      	; 0x1d0 <LCD_Busy+0xa>
- 1d0:	80 b1       	in	r24, 0x00	; 0
- 1d2:	2a 98       	cbi	0x05, 2	; 5
- 1d4:	29 98       	cbi	0x05, 1	; 5
- 1d6:	9f ef       	ldi	r25, 0xFF	; 255
- 1d8:	91 b9       	out	0x01, r25	; 1
- 1da:	88 1f       	adc	r24, r24
- 1dc:	88 27       	eor	r24, r24
- 1de:	88 1f       	adc	r24, r24
- 1e0:	90 e0       	ldi	r25, 0x00	; 0
- 1e2:	08 95       	ret
-
-000001e4 <LCD_SendCommand>:
- 1e4:	cf 93       	push	r28
- 1e6:	c8 2f       	mov	r28, r24
- 1e8:	06 c0       	rjmp	.+12     	; 0x1f6 <LCD_SendCommand+0x12>
- 1ea:	89 ef       	ldi	r24, 0xF9	; 249
- 1ec:	90 e0       	ldi	r25, 0x00	; 0
- 1ee:	01 97       	sbiw	r24, 0x01	; 1
- 1f0:	f1 f7       	brne	.-4      	; 0x1ee <LCD_SendCommand+0xa>
- 1f2:	00 c0       	rjmp	.+0      	; 0x1f4 <LCD_SendCommand+0x10>
- 1f4:	00 00       	nop
- 1f6:	e7 df       	rcall	.-50     	; 0x1c6 <LCD_Busy>
- 1f8:	89 2b       	or	r24, r25
- 1fa:	b9 f7       	brne	.-18     	; 0x1ea <LCD_SendCommand+0x6>
- 1fc:	28 98       	cbi	0x05, 0	; 5
- 1fe:	c2 b9       	out	0x02, r28	; 2
- 200:	2a 9a       	sbi	0x05, 2	; 5
- 202:	c1 50       	subi	r28, 0x01	; 1
- 204:	c2 30       	cpi	r28, 0x02	; 2
- 206:	38 f4       	brcc	.+14     	; 0x216 <LCD_SendCommand+0x32>
- 208:	86 e7       	ldi	r24, 0x76	; 118
- 20a:	91 e0       	ldi	r25, 0x01	; 1
- 20c:	01 97       	sbiw	r24, 0x01	; 1
- 20e:	f1 f7       	brne	.-4      	; 0x20c <LCD_SendCommand+0x28>
- 210:	00 c0       	rjmp	.+0      	; 0x212 <LCD_SendCommand+0x2e>
- 212:	00 00       	nop
- 214:	04 c0       	rjmp	.+8      	; 0x21e <LCD_SendCommand+0x3a>
- 216:	90 e1       	ldi	r25, 0x10	; 16
- 218:	9a 95       	dec	r25
- 21a:	f1 f7       	brne	.-4      	; 0x218 <LCD_SendCommand+0x34>
- 21c:	00 c0       	rjmp	.+0      	; 0x21e <LCD_SendCommand+0x3a>
- 21e:	2a 98       	cbi	0x05, 2	; 5
- 220:	cf 91       	pop	r28
- 222:	08 95       	ret
-
-00000224 <LCD_SetRow>:
- 224:	cf 93       	push	r28
- 226:	df 93       	push	r29
- 228:	ec 01       	movw	r28, r24
- 22a:	06 c0       	rjmp	.+12     	; 0x238 <LCD_SetRow+0x14>
- 22c:	89 ef       	ldi	r24, 0xF9	; 249
- 22e:	90 e0       	ldi	r25, 0x00	; 0
- 230:	01 97       	sbiw	r24, 0x01	; 1
- 232:	f1 f7       	brne	.-4      	; 0x230 <LCD_SetRow+0xc>
- 234:	00 c0       	rjmp	.+0      	; 0x236 <LCD_SetRow+0x12>
- 236:	00 00       	nop
- 238:	c6 df       	rcall	.-116    	; 0x1c6 <LCD_Busy>
- 23a:	89 2b       	or	r24, r25
- 23c:	b9 f7       	brne	.-18     	; 0x22c <LCD_SetRow+0x8>
- 23e:	28 98       	cbi	0x05, 0	; 5
- 240:	29 98       	cbi	0x05, 1	; 5
- 242:	c1 30       	cpi	r28, 0x01	; 1
- 244:	d1 05       	cpc	r29, r1
- 246:	19 f4       	brne	.+6      	; 0x24e <LCD_SetRow+0x2a>
- 248:	80 e8       	ldi	r24, 0x80	; 128
- 24a:	cc df       	rcall	.-104    	; 0x1e4 <LCD_SendCommand>
- 24c:	04 c0       	rjmp	.+8      	; 0x256 <LCD_SetRow+0x32>
- 24e:	22 97       	sbiw	r28, 0x02	; 2
- 250:	11 f4       	brne	.+4      	; 0x256 <LCD_SetRow+0x32>
- 252:	80 ec       	ldi	r24, 0xC0	; 192
- 254:	c7 df       	rcall	.-114    	; 0x1e4 <LCD_SendCommand>
- 256:	df 91       	pop	r29
- 258:	cf 91       	pop	r28
- 25a:	08 95       	ret
-
-0000025c <LCD_SendCharacter>:
+000001cc <LCD_SendCharacter>:
 void LCD_SendCharacter(char symbol)
 {
- 25c:	cf 93       	push	r28
- 25e:	c8 2f       	mov	r28, r24
+ 1cc:	cf 93       	push	r28
+ 1ce:	c8 2f       	mov	r28, r24
 	LCD_Counter++;
- 260:	20 91 20 01 	lds	r18, 0x0120
- 264:	30 91 21 01 	lds	r19, 0x0121
- 268:	2f 5f       	subi	r18, 0xFF	; 255
- 26a:	3f 4f       	sbci	r19, 0xFF	; 255
- 26c:	30 93 21 01 	sts	0x0121, r19
- 270:	20 93 20 01 	sts	0x0120, r18
+ 1d0:	20 91 20 01 	lds	r18, 0x0120
+ 1d4:	30 91 21 01 	lds	r19, 0x0121
+ 1d8:	2f 5f       	subi	r18, 0xFF	; 255
+ 1da:	3f 4f       	sbci	r19, 0xFF	; 255
+ 1dc:	30 93 21 01 	sts	0x0121, r19
+ 1e0:	20 93 20 01 	sts	0x0120, r18
 	
 	if(LCD_Counter == 16)
- 274:	20 31       	cpi	r18, 0x10	; 16
- 276:	31 05       	cpc	r19, r1
- 278:	21 f4       	brne	.+8      	; 0x282 <LCD_SendCharacter+0x26>
+ 1e4:	20 31       	cpi	r18, 0x10	; 16
+ 1e6:	31 05       	cpc	r19, r1
+ 1e8:	21 f4       	brne	.+8      	; 0x1f2 <LCD_SendCharacter+0x26>
 	{
 		LCD_SetRow(2);
- 27a:	82 e0       	ldi	r24, 0x02	; 2
- 27c:	90 e0       	ldi	r25, 0x00	; 0
- 27e:	d2 df       	rcall	.-92     	; 0x224 <LCD_SetRow>
- 280:	11 c0       	rjmp	.+34     	; 0x2a4 <LCD_SendCharacter+0x48>
+ 1ea:	82 e0       	ldi	r24, 0x02	; 2
+ 1ec:	90 e0       	ldi	r25, 0x00	; 0
+ 1ee:	d2 df       	rcall	.-92     	; 0x194 <LCD_SetRow>
+ 1f0:	11 c0       	rjmp	.+34     	; 0x214 <LCD_SendCharacter+0x48>
 	}
 	else if(LCD_Counter == 32)
- 282:	20 32       	cpi	r18, 0x20	; 32
- 284:	31 05       	cpc	r19, r1
- 286:	71 f4       	brne	.+28     	; 0x2a4 <LCD_SendCharacter+0x48>
+ 1f2:	20 32       	cpi	r18, 0x20	; 32
+ 1f4:	31 05       	cpc	r19, r1
+ 1f6:	71 f4       	brne	.+28     	; 0x214 <LCD_SendCharacter+0x48>
 	{
 		LCD_Counter = 0;
- 288:	10 92 21 01 	sts	0x0121, r1
- 28c:	10 92 20 01 	sts	0x0120, r1
+ 1f8:	10 92 21 01 	sts	0x0121, r1
+ 1fc:	10 92 20 01 	sts	0x0120, r1
 		LCD_SetRow(1);
- 290:	81 e0       	ldi	r24, 0x01	; 1
- 292:	90 e0       	ldi	r25, 0x00	; 0
- 294:	c7 df       	rcall	.-114    	; 0x224 <LCD_SetRow>
- 296:	06 c0       	rjmp	.+12     	; 0x2a4 <LCD_SendCharacter+0x48>
+ 200:	81 e0       	ldi	r24, 0x01	; 1
+ 202:	90 e0       	ldi	r25, 0x00	; 0
+ 204:	c7 df       	rcall	.-114    	; 0x194 <LCD_SetRow>
+ 206:	06 c0       	rjmp	.+12     	; 0x214 <LCD_SendCharacter+0x48>
 	#else
 		//round up by default
 		__ticks_dc = (uint32_t)(ceil(fabs(__tmp)));
 	#endif
 
 	__builtin_avr_delay_cycles(__ticks_dc);
- 298:	89 ef       	ldi	r24, 0xF9	; 249
- 29a:	90 e0       	ldi	r25, 0x00	; 0
- 29c:	01 97       	sbiw	r24, 0x01	; 1
- 29e:	f1 f7       	brne	.-4      	; 0x29c <LCD_SendCharacter+0x40>
- 2a0:	00 c0       	rjmp	.+0      	; 0x2a2 <LCD_SendCharacter+0x46>
- 2a2:	00 00       	nop
+ 208:	89 ef       	ldi	r24, 0xF9	; 249
+ 20a:	90 e0       	ldi	r25, 0x00	; 0
+ 20c:	01 97       	sbiw	r24, 0x01	; 1
+ 20e:	f1 f7       	brne	.-4      	; 0x20c <LCD_SendCharacter+0x40>
+ 210:	00 c0       	rjmp	.+0      	; 0x212 <LCD_SendCharacter+0x46>
+ 212:	00 00       	nop
 	}
 	
 	while(LCD_Busy())
- 2a4:	90 df       	rcall	.-224    	; 0x1c6 <LCD_Busy>
- 2a6:	89 2b       	or	r24, r25
- 2a8:	b9 f7       	brne	.-18     	; 0x298 <LCD_SendCharacter+0x3c>
+ 214:	90 df       	rcall	.-224    	; 0x136 <LCD_Busy>
+ 216:	89 2b       	or	r24, r25
+ 218:	b9 f7       	brne	.-18     	; 0x208 <LCD_SendCharacter+0x3c>
 	{
 		_delay_ms(1);
 	}
 	PORTB |= (1 << 0); // Set RS
- 2aa:	28 9a       	sbi	0x05, 0	; 5
+ 21a:	28 9a       	sbi	0x05, 0	; 5
 	PORTB &= ~(1 << 1); // Clear R/W
- 2ac:	29 98       	cbi	0x05, 1	; 5
+ 21c:	29 98       	cbi	0x05, 1	; 5
 	
 	//uint8_t tempNum = (int)symbol;
 	//PORTA = tempNum;
 	
 	// If the following doesn't work, delete it and uncomment the two lines above.
 	PORTA = (int)symbol;
- 2ae:	c2 b9       	out	0x02, r28	; 2
+ 21e:	c2 b9       	out	0x02, r28	; 2
 	
 	PORTB |= 1 << 2; // Set Enable
- 2b0:	2a 9a       	sbi	0x05, 2	; 5
+ 220:	2a 9a       	sbi	0x05, 2	; 5
 	#else
 		//round up by default
 		__ticks_dc = (uint32_t)(ceil(fabs(__tmp)));
 	#endif
 
 	__builtin_avr_delay_cycles(__ticks_dc);
- 2b2:	90 e1       	ldi	r25, 0x10	; 16
- 2b4:	9a 95       	dec	r25
- 2b6:	f1 f7       	brne	.-4      	; 0x2b4 <LCD_SendCharacter+0x58>
- 2b8:	00 c0       	rjmp	.+0      	; 0x2ba <LCD_SendCharacter+0x5e>
+ 222:	90 e1       	ldi	r25, 0x10	; 16
+ 224:	9a 95       	dec	r25
+ 226:	f1 f7       	brne	.-4      	; 0x224 <LCD_SendCharacter+0x58>
+ 228:	00 c0       	rjmp	.+0      	; 0x22a <LCD_SendCharacter+0x5e>
 	_delay_us(50); // 50us is the controller execution time of the LCD.
 	PORTB &= ~(1 << 2); // Pull Enable.
- 2ba:	2a 98       	cbi	0x05, 2	; 5
+ 22a:	2a 98       	cbi	0x05, 2	; 5
 }
- 2bc:	cf 91       	pop	r28
- 2be:	08 95       	ret
+ 22c:	cf 91       	pop	r28
+ 22e:	08 95       	ret
 
-000002c0 <LCD_SendString>:
+00000230 <LCD_SendString>:
 
 void LCD_SendString(char *text)
 {
- 2c0:	cf 93       	push	r28
- 2c2:	df 93       	push	r29
- 2c4:	ec 01       	movw	r28, r24
+ 230:	cf 93       	push	r28
+ 232:	df 93       	push	r29
+ 234:	ec 01       	movw	r28, r24
 	while(*text)
- 2c6:	88 81       	ld	r24, Y
- 2c8:	88 23       	and	r24, r24
- 2ca:	29 f0       	breq	.+10     	; 0x2d6 <LCD_SendString+0x16>
- 2cc:	21 96       	adiw	r28, 0x01	; 1
+ 236:	88 81       	ld	r24, Y
+ 238:	88 23       	and	r24, r24
+ 23a:	29 f0       	breq	.+10     	; 0x246 <LCD_SendString+0x16>
+ 23c:	21 96       	adiw	r28, 0x01	; 1
 	{
 		LCD_SendCharacter(*text++);
- 2ce:	c6 df       	rcall	.-116    	; 0x25c <LCD_SendCharacter>
+ 23e:	c6 df       	rcall	.-116    	; 0x1cc <LCD_SendCharacter>
 	PORTB &= ~(1 << 2); // Pull Enable.
 }
 
 void LCD_SendString(char *text)
 {
 	while(*text)
- 2d0:	89 91       	ld	r24, Y+
- 2d2:	81 11       	cpse	r24, r1
- 2d4:	fc cf       	rjmp	.-8      	; 0x2ce <LCD_SendString+0xe>
+ 240:	89 91       	ld	r24, Y+
+ 242:	81 11       	cpse	r24, r1
+ 244:	fc cf       	rjmp	.-8      	; 0x23e <LCD_SendString+0xe>
 	{
 		LCD_SendCharacter(*text++);
 	}
 }
- 2d6:	df 91       	pop	r29
- 2d8:	cf 91       	pop	r28
- 2da:	08 95       	ret
+ 246:	df 91       	pop	r29
+ 248:	cf 91       	pop	r28
+ 24a:	08 95       	ret
 
-000002dc <LCD_WelcomeScreen>:
+0000024c <LCD_WelcomeScreen>:
 void LCD_WelcomeScreen(void)
 {
 	LCD_SendString("    ResQ.Pl heh");
- 2dc:	80 e0       	ldi	r24, 0x00	; 0
- 2de:	91 e0       	ldi	r25, 0x01	; 1
- 2e0:	ef df       	rcall	.-34     	; 0x2c0 <LCD_SendString>
+ 24c:	80 e0       	ldi	r24, 0x00	; 0
+ 24e:	91 e0       	ldi	r25, 0x01	; 1
+ 250:	ef df       	rcall	.-34     	; 0x230 <LCD_SendString>
 	LCD_SetRow(2);
- 2e2:	82 e0       	ldi	r24, 0x02	; 2
- 2e4:	90 e0       	ldi	r25, 0x00	; 0
- 2e6:	9e df       	rcall	.-196    	; 0x224 <LCD_SetRow>
+ 252:	82 e0       	ldi	r24, 0x02	; 2
+ 254:	90 e0       	ldi	r25, 0x00	; 0
+ 256:	9e df       	rcall	.-196    	; 0x194 <LCD_SetRow>
 	LCD_SendString("  Master Race  ");
- 2e8:	80 e1       	ldi	r24, 0x10	; 16
- 2ea:	91 e0       	ldi	r25, 0x01	; 1
- 2ec:	e9 cf       	rjmp	.-46     	; 0x2c0 <LCD_SendString>
- 2ee:	08 95       	ret
+ 258:	80 e1       	ldi	r24, 0x10	; 16
+ 25a:	91 e0       	ldi	r25, 0x01	; 1
+ 25c:	e9 cf       	rjmp	.-46     	; 0x230 <LCD_SendString>
+ 25e:	08 95       	ret
 
-000002f0 <LCD_Init>:
+00000260 <LCD_Init>:
 }
 
 // Initiatazion of the LCD, according to Initializing Flowchart(Condition fosc=270KHz) in the data sheet.
 void LCD_Init()
 {
 	LCD_Counter = 0;
- 2f0:	10 92 21 01 	sts	0x0121, r1
- 2f4:	10 92 20 01 	sts	0x0120, r1
+ 260:	10 92 21 01 	sts	0x0121, r1
+ 264:	10 92 20 01 	sts	0x0120, r1
 	#else
 		//round up by default
 		__ticks_dc = (uint32_t)(ceil(fabs(__tmp)));
 	#endif
 
 	__builtin_avr_delay_cycles(__ticks_dc);
- 2f8:	8b e4       	ldi	r24, 0x4B	; 75
- 2fa:	9d e1       	ldi	r25, 0x1D	; 29
- 2fc:	01 97       	sbiw	r24, 0x01	; 1
- 2fe:	f1 f7       	brne	.-4      	; 0x2fc <LCD_Init+0xc>
- 300:	00 c0       	rjmp	.+0      	; 0x302 <LCD_Init+0x12>
- 302:	00 00       	nop
+ 268:	8b e4       	ldi	r24, 0x4B	; 75
+ 26a:	9d e1       	ldi	r25, 0x1D	; 29
+ 26c:	01 97       	sbiw	r24, 0x01	; 1
+ 26e:	f1 f7       	brne	.-4      	; 0x26c <LCD_Init+0xc>
+ 270:	00 c0       	rjmp	.+0      	; 0x272 <LCD_Init+0x12>
+ 272:	00 00       	nop
 	_delay_ms(30);
 	// Configure the LCD for 8 bits, 2 lines, 5x8 pixlex (dots) send instruction 00 0011 1000
 	LCD_SendCommand(0b00111000);
- 304:	88 e3       	ldi	r24, 0x38	; 56
- 306:	6e df       	rcall	.-292    	; 0x1e4 <LCD_SendCommand>
+ 274:	88 e3       	ldi	r24, 0x38	; 56
+ 276:	6e df       	rcall	.-292    	; 0x154 <LCD_SendCommand>
 	#else
 		//round up by default
 		__ticks_dc = (uint32_t)(ceil(fabs(__tmp)));
 	#endif
 
 	__builtin_avr_delay_cycles(__ticks_dc);
- 308:	9d e0       	ldi	r25, 0x0D	; 13
- 30a:	9a 95       	dec	r25
- 30c:	f1 f7       	brne	.-4      	; 0x30a <LCD_Init+0x1a>
+ 278:	9d e0       	ldi	r25, 0x0D	; 13
+ 27a:	9a 95       	dec	r25
+ 27c:	f1 f7       	brne	.-4      	; 0x27a <LCD_Init+0x1a>
 	_delay_us(39);
 
 	// Display, cursor and blinking off, instruction 00 0000 1000
 	LCD_SendCommand(0b00001000);
- 30e:	88 e0       	ldi	r24, 0x08	; 8
- 310:	69 df       	rcall	.-302    	; 0x1e4 <LCD_SendCommand>
- 312:	8d e0       	ldi	r24, 0x0D	; 13
- 314:	8a 95       	dec	r24
- 316:	f1 f7       	brne	.-4      	; 0x314 <LCD_Init+0x24>
+ 27e:	88 e0       	ldi	r24, 0x08	; 8
+ 280:	69 df       	rcall	.-302    	; 0x154 <LCD_SendCommand>
+ 282:	8d e0       	ldi	r24, 0x0D	; 13
+ 284:	8a 95       	dec	r24
+ 286:	f1 f7       	brne	.-4      	; 0x284 <LCD_Init+0x24>
 	_delay_us(39);
 
 	// Clear display, instruction 00 0000 0001
 	LCD_SendCommand(0b00000001);
- 318:	81 e0       	ldi	r24, 0x01	; 1
- 31a:	64 df       	rcall	.-312    	; 0x1e4 <LCD_SendCommand>
+ 288:	81 e0       	ldi	r24, 0x01	; 1
+ 28a:	64 df       	rcall	.-312    	; 0x154 <LCD_SendCommand>
 	#else
 		//round up by default
 		__ticks_dc = (uint32_t)(ceil(fabs(__tmp)));
 	#endif
 
 	__builtin_avr_delay_cycles(__ticks_dc);
- 31c:	8e e7       	ldi	r24, 0x7E	; 126
- 31e:	91 e0       	ldi	r25, 0x01	; 1
- 320:	01 97       	sbiw	r24, 0x01	; 1
- 322:	f1 f7       	brne	.-4      	; 0x320 <LCD_Init+0x30>
- 324:	00 00       	nop
+ 28c:	8e e7       	ldi	r24, 0x7E	; 126
+ 28e:	91 e0       	ldi	r25, 0x01	; 1
+ 290:	01 97       	sbiw	r24, 0x01	; 1
+ 292:	f1 f7       	brne	.-4      	; 0x290 <LCD_Init+0x30>
+ 294:	00 00       	nop
 	_delay_ms(1.53);
 
 	// Cursor moving direction: left-to-right, do not shift he display (shift disabled), instruction 00 0000 0110
 	LCD_SendCommand(0b00000110);
- 326:	86 e0       	ldi	r24, 0x06	; 6
- 328:	5d df       	rcall	.-326    	; 0x1e4 <LCD_SendCommand>
+ 296:	86 e0       	ldi	r24, 0x06	; 6
+ 298:	5d df       	rcall	.-326    	; 0x154 <LCD_SendCommand>
 
 	// Display on, cursor ON, blinking on, instruction 00 0000 1110
 	LCD_SendCommand(0b00001110);
- 32a:	8e e0       	ldi	r24, 0x0E	; 14
- 32c:	5b cf       	rjmp	.-330    	; 0x1e4 <LCD_SendCommand>
- 32e:	08 95       	ret
+ 29a:	8e e0       	ldi	r24, 0x0E	; 14
+ 29c:	5b cf       	rjmp	.-330    	; 0x154 <LCD_SendCommand>
+ 29e:	08 95       	ret
 
-00000330 <main>:
+000002a0 <main>:
 }
 
 int main(void)
 {
 	char SPDRrec_ = '0';
 	sei();	// Enable global interrupts
- 330:	78 94       	sei
+ 2a0:	78 94       	sei
 	sleep_enable();	// Enable sleep instruction
- 332:	83 b7       	in	r24, 0x33	; 51
- 334:	81 60       	ori	r24, 0x01	; 1
- 336:	83 bf       	out	0x33, r24	; 51
+ 2a2:	83 b7       	in	r24, 0x33	; 51
+ 2a4:	81 60       	ori	r24, 0x01	; 1
+ 2a6:	83 bf       	out	0x33, r24	; 51
 	Styr_InitPortDirections();	// Initiate Port directions for the styrmodul.
- 338:	c7 de       	rcall	.-626    	; 0xc8 <Styr_InitPortDirections>
+ 2a8:	0f df       	rcall	.-482    	; 0xc8 <Styr_InitPortDirections>
 } 
 
 // Setups port values, more specifically puts SS on high.
 void Styr_InitPortValues(void)
 {
 	PORTB = 1<<PORTB3 | 1<<PORTB4 | 1<<PORTC0;
- 33a:	89 e1       	ldi	r24, 0x19	; 25
- 33c:	85 b9       	out	0x05, r24	; 5
+ 2aa:	89 e1       	ldi	r24, 0x19	; 25
+ 2ac:	85 b9       	out	0x05, r24	; 5
 	char SPDRrec_ = '0';
 	sei();	// Enable global interrupts
 	sleep_enable();	// Enable sleep instruction
 	Styr_InitPortDirections();	// Initiate Port directions for the styrmodul.
 	Styr_InitPortValues();	// Initiate Port Values for the styrmodul.
 	SPI_MasterInit();	// Initiate the styrmodul as the SPI master.
- 33e:	cc de       	rcall	.-616    	; 0xd8 <SPI_MasterInit>
+ 2ae:	14 df       	rcall	.-472    	; 0xd8 <SPI_MasterInit>
 	LCD_Init(); // Initiate the LCD.
- 340:	d7 df       	rcall	.-82     	; 0x2f0 <LCD_Init>
+ 2b0:	d7 df       	rcall	.-82     	; 0x260 <LCD_Init>
 	PWM_Init(); // Initiate PWM for motör
- 342:	ee de       	rcall	.-548    	; 0x120 <PWM_Init>
+ 2b2:	36 df       	rcall	.-404    	; 0x120 <PWM_Init>
 	LCD_WelcomeScreen(); // Welcomes the user with a nice message ;-)
- 344:	cb df       	rcall	.-106    	; 0x2dc <LCD_WelcomeScreen>
+ 2b4:	cb df       	rcall	.-106    	; 0x24c <LCD_WelcomeScreen>
 	
 	
  	//SPDRrec_ = SPI_MasterTransmit(0x01, 'k');
 	//
 
 	LCD_SetRow(1);
- 346:	81 e0       	ldi	r24, 0x01	; 1
- 348:	90 e0       	ldi	r25, 0x00	; 0
- 34a:	6c df       	rcall	.-296    	; 0x224 <LCD_SetRow>
+ 2b6:	81 e0       	ldi	r24, 0x01	; 1
+ 2b8:	90 e0       	ldi	r25, 0x00	; 0
+ 2ba:	6c df       	rcall	.-296    	; 0x194 <LCD_SetRow>
 	LCD_SendCharacter('7');
- 34c:	87 e3       	ldi	r24, 0x37	; 55
- 34e:	86 df       	rcall	.-244    	; 0x25c <LCD_SendCharacter>
+ 2bc:	87 e3       	ldi	r24, 0x37	; 55
+ 2be:	86 df       	rcall	.-244    	; 0x1cc <LCD_SendCharacter>
 	SPDRrec_ = SPI_MasterTransmit(1, 'k');
- 350:	6b e6       	ldi	r22, 0x6B	; 107
- 352:	81 e0       	ldi	r24, 0x01	; 1
- 354:	c5 de       	rcall	.-630    	; 0xe0 <SPI_MasterTransmit>
+ 2c0:	6b e6       	ldi	r22, 0x6B	; 107
+ 2c2:	81 e0       	ldi	r24, 0x01	; 1
+ 2c4:	0d df       	rcall	.-486    	; 0xe0 <SPI_MasterTransmit>
 	LCD_SendCharacter(SPDRrec_);
- 356:	82 df       	rcall	.-252    	; 0x25c <LCD_SendCharacter>
+ 2c6:	82 df       	rcall	.-252    	; 0x1cc <LCD_SendCharacter>
 	SPDRrec_ = SPI_MasterTransmit(2, 'k');
- 358:	6b e6       	ldi	r22, 0x6B	; 107
- 35a:	82 e0       	ldi	r24, 0x02	; 2
- 35c:	c1 de       	rcall	.-638    	; 0xe0 <SPI_MasterTransmit>
+ 2c8:	6b e6       	ldi	r22, 0x6B	; 107
+ 2ca:	82 e0       	ldi	r24, 0x02	; 2
+ 2cc:	09 df       	rcall	.-494    	; 0xe0 <SPI_MasterTransmit>
 	LCD_SendCharacter(SPDRrec_);
- 35e:	7e df       	rcall	.-260    	; 0x25c <LCD_SendCharacter>
-	//}
-	//else LCD_SendString("wrong instr1");
-	
-	while(1)
-    {		
+ 2ce:	7e df       	rcall	.-260    	; 0x1cc <LCD_SendCharacter>
+		//// unsigned int result = makeWord((dataH & 0b00001111), (dataL>>1));
+		
+		
+		
+		
 		SPDRrec_ = SPI_MasterTransmit(0,'k');
- 360:	6b e6       	ldi	r22, 0x6B	; 107
- 362:	80 e0       	ldi	r24, 0x00	; 0
- 364:	bd de       	rcall	.-646    	; 0xe0 <SPI_MasterTransmit>
+ 2d0:	6b e6       	ldi	r22, 0x6B	; 107
+ 2d2:	80 e0       	ldi	r24, 0x00	; 0
+ 2d4:	05 df       	rcall	.-502    	; 0xe0 <SPI_MasterTransmit>
 		LCD_SendCharacter(SPDRrec_);
- 366:	7a df       	rcall	.-268    	; 0x25c <LCD_SendCharacter>
- 368:	2f e3       	ldi	r18, 0x3F	; 63
- 36a:	82 e4       	ldi	r24, 0x42	; 66
- 36c:	9f e0       	ldi	r25, 0x0F	; 15
- 36e:	21 50       	subi	r18, 0x01	; 1
- 370:	80 40       	sbci	r24, 0x00	; 0
- 372:	90 40       	sbci	r25, 0x00	; 0
- 374:	e1 f7       	brne	.-8      	; 0x36e <main+0x3e>
- 376:	00 c0       	rjmp	.+0      	; 0x378 <main+0x48>
- 378:	00 00       	nop
-		_delay_ms(5000);
-		PWM_Test();
- 37a:	e5 de       	rcall	.-566    	; 0x146 <PWM_Test>
- 37c:	f1 cf       	rjmp	.-30     	; 0x360 <main+0x30>
+ 2d6:	7a df       	rcall	.-268    	; 0x1cc <LCD_SendCharacter>
+ 2d8:	2f eb       	ldi	r18, 0xBF	; 191
+ 2da:	86 ec       	ldi	r24, 0xC6	; 198
+ 2dc:	9d e2       	ldi	r25, 0x2D	; 45
+ 2de:	21 50       	subi	r18, 0x01	; 1
+ 2e0:	80 40       	sbci	r24, 0x00	; 0
+ 2e2:	90 40       	sbci	r25, 0x00	; 0
+ 2e4:	e1 f7       	brne	.-8      	; 0x2de <main+0x3e>
+ 2e6:	00 c0       	rjmp	.+0      	; 0x2e8 <main+0x48>
+ 2e8:	00 00       	nop
+		_delay_ms(15000);
+		SPDRrec_ = SPI_MasterTransmit(0,'k');
+ 2ea:	6b e6       	ldi	r22, 0x6B	; 107
+ 2ec:	80 e0       	ldi	r24, 0x00	; 0
+ 2ee:	f8 de       	rcall	.-528    	; 0xe0 <SPI_MasterTransmit>
+		LCD_SendCharacter(SPDRrec_);
+ 2f0:	6d df       	rcall	.-294    	; 0x1cc <LCD_SendCharacter>
+ 2f2:	2f eb       	ldi	r18, 0xBF	; 191
+ 2f4:	86 ec       	ldi	r24, 0xC6	; 198
+ 2f6:	9d e2       	ldi	r25, 0x2D	; 45
+ 2f8:	21 50       	subi	r18, 0x01	; 1
+ 2fa:	80 40       	sbci	r24, 0x00	; 0
+ 2fc:	90 40       	sbci	r25, 0x00	; 0
+ 2fe:	e1 f7       	brne	.-8      	; 0x2f8 <main+0x58>
+ 300:	00 c0       	rjmp	.+0      	; 0x302 <main+0x62>
+ 302:	00 00       	nop
+		_delay_ms(15000);
+		
+		SPDRrec_ = SPI_MasterTransmit(3,'k');
+ 304:	6b e6       	ldi	r22, 0x6B	; 107
+ 306:	83 e0       	ldi	r24, 0x03	; 3
+ 308:	eb de       	rcall	.-554    	; 0xe0 <SPI_MasterTransmit>
+		LCD_SendCharacter(SPDRrec_);
+ 30a:	60 df       	rcall	.-320    	; 0x1cc <LCD_SendCharacter>
+ 30c:	2f eb       	ldi	r18, 0xBF	; 191
+ 30e:	86 ec       	ldi	r24, 0xC6	; 198
+ 310:	9d e2       	ldi	r25, 0x2D	; 45
+ 312:	21 50       	subi	r18, 0x01	; 1
+ 314:	80 40       	sbci	r24, 0x00	; 0
+ 316:	90 40       	sbci	r25, 0x00	; 0
+ 318:	e1 f7       	brne	.-8      	; 0x312 <main+0x72>
+ 31a:	00 c0       	rjmp	.+0      	; 0x31c <main+0x7c>
+ 31c:	00 00       	nop
+		_delay_ms(15000);
+		//LCD_SetRow(1);
+		SPDRrec_ = SPI_MasterTransmit(4,'k');
+ 31e:	6b e6       	ldi	r22, 0x6B	; 107
+ 320:	84 e0       	ldi	r24, 0x04	; 4
+ 322:	de de       	rcall	.-580    	; 0xe0 <SPI_MasterTransmit>
+		LCD_SendCharacter(SPDRrec_);
+ 324:	53 df       	rcall	.-346    	; 0x1cc <LCD_SendCharacter>
+ 326:	2f eb       	ldi	r18, 0xBF	; 191
+ 328:	86 ec       	ldi	r24, 0xC6	; 198
+ 32a:	9d e2       	ldi	r25, 0x2D	; 45
+ 32c:	21 50       	subi	r18, 0x01	; 1
+ 32e:	80 40       	sbci	r24, 0x00	; 0
+ 330:	90 40       	sbci	r25, 0x00	; 0
+ 332:	e1 f7       	brne	.-8      	; 0x32c <main+0x8c>
+ 334:	00 c0       	rjmp	.+0      	; 0x336 <main+0x96>
+ 336:	00 00       	nop
+		_delay_ms(15000);
+		SPDRrec_ = SPI_MasterTransmit(5,'k');
+ 338:	6b e6       	ldi	r22, 0x6B	; 107
+ 33a:	85 e0       	ldi	r24, 0x05	; 5
+ 33c:	d1 de       	rcall	.-606    	; 0xe0 <SPI_MasterTransmit>
+		LCD_SendCharacter(SPDRrec_);
+ 33e:	46 df       	rcall	.-372    	; 0x1cc <LCD_SendCharacter>
+ 340:	2f eb       	ldi	r18, 0xBF	; 191
+ 342:	86 ec       	ldi	r24, 0xC6	; 198
+ 344:	9d e2       	ldi	r25, 0x2D	; 45
+ 346:	21 50       	subi	r18, 0x01	; 1
+ 348:	80 40       	sbci	r24, 0x00	; 0
+ 34a:	90 40       	sbci	r25, 0x00	; 0
+ 34c:	e1 f7       	brne	.-8      	; 0x346 <main+0xa6>
+ 34e:	00 c0       	rjmp	.+0      	; 0x350 <main+0xb0>
+ 350:	00 00       	nop
+ 352:	be cf       	rjmp	.-132    	; 0x2d0 <main+0x30>
 
-0000037e <_exit>:
- 37e:	f8 94       	cli
+00000354 <_exit>:
+ 354:	f8 94       	cli
 
-00000380 <__stop_program>:
- 380:	ff cf       	rjmp	.-2      	; 0x380 <__stop_program>
+00000356 <__stop_program>:
+ 356:	ff cf       	rjmp	.-2      	; 0x356 <__stop_program>

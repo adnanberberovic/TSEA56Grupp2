@@ -7,12 +7,20 @@
 #include <avr/interrupt.h>
 #include <avr/sleep.h>
 #include <util/delay.h>
+#include <string.h>
 
-#define BuffSize 10
-char outSPDR[] = {'1','2','3','4','5','6','7','8','9','0'};
+#define BuffSize 100
+char outSPDR[BuffSize];
 char inSPDR[BuffSize];
 int i = 0;
-int posBuff = 0;
+int rBTin = 0;
+int wBTin = 0;
+int rBTout = 0;
+int wBTout = 0;
+int *readPos_BTin = &rBTin;
+int *writePos_BTin = &wBTin; // Add BTout positioners aswell if needed.
+int *readPos_BTout = &rBTout;
+int *writePos_BTout = &wBTout;
 int posBuff_SPI = 0;
 int sendFlag = 0;
 char outBT[BuffSize];
@@ -50,6 +58,7 @@ void SPI_SlaveInit(void)
 // Interrupt method runs when SPI transmission/reception is completed.
 ISR(SPI_STC_vect)
 {
+	strncpy(outSPDR, inBT, BuffSize); //copy data from inBT to outbuffer (SLAVE)
 		if (posBuff_SPI < (BuffSize - 1))
 		{
 			inSPDR[posBuff_SPI] = SPDR; // Save received char in inSPDR-buffer
@@ -90,33 +99,37 @@ void BT_init(void)
 	 */
 }
 
-
-// Transmit data via BT.
-void BT_transmit(unsigned char outData)
+void Write_Buffer(char buffer[BuffSize], char data, int *position)
 {
-	UDR0 = outData;
-	// UCSR0B |= (1<<UDRIE0); // enable 'empty buffer interrupt'
+	if ((*position) == BuffSize) // If end of buffer restart from first pos
+	{
+		(*position) = 0; 
+	}
+	buffer[(*position)] = data; //Add data to correct location
+	(*position)++;
 }
+
+char Read_Buffer(char buffer[BuffSize], int *pos_read, int *pos_write)
+{
+	char data;
+	if ( (*pos_read) == BuffSize) // End of buffer, reset from start 
+	{
+		(*pos_read) = 0;
+	}
+	data = buffer[(*pos_read)]; //return next value in queue
+	(*pos_read)++;
+	return data;
+}
+
 
 // Receive complete - triggered by interrupt
 ISR(USART0_RX_vect) 
 {
-	if (posBuff == 0)
-	{
-		memset(&inBT,' ',10);
-	}
-	if (posBuff < BuffSize)
-	{
-		inBT[posBuff] = UDR0; //Load bit 1-9.
-		BT_transmit(inBT[posBuff]);
-		posBuff++;
-	}
-	else if (posBuff == BuffSize )
-	{
-		inBT[posBuff] = UDR0; //Load 10th bit
-		BT_transmit(inBT[posBuff]); // Send back incoming
-		posBuff = 0;	
-	}
+	char data = UDR0; //Get received value
+	Write_Buffer(inBT, data, writePos_BTin); //Writes data to buffer in order they are received
+
+	UCSR0B |= (1<<UDRIE0); //Enable empty buffer interrupt
+
 
 }
 
@@ -124,17 +137,16 @@ ISR(USART0_RX_vect)
 // Empty dataregister = send next character
 ISR(USART0_UDRE_vect)
 {
-	//if (posBuff < BuffSize)
-	//{
-		//UDR0 = outBT[posBuff]; //Load bit 1-9.
-		//posBuff++;
-	//}
-	//else
-	//{
-		//UDR0 = outBT[posBuff]; //Load 10th bit
-		//posBuff = 0;
-		//UCSR0B &= ~(1<<UDRIE0); // disable 'empty buffer interrupt'
-	//}
+	
+	if ((*writePos_BTin) <= (*readPos_BTin)) //Nothing new to read
+	{
+		UCSR0B &= ~(1<<UDRIE0); //Disable UDRE interrupt, enables when new data is received
+	}
+	else
+	{
+		UDR0 = Read_Buffer(inBT, readPos_BTin, writePos_BTin); //Echo back the next value in buffer. 														
+	}
+		
 }
 
 int main(void)
@@ -147,6 +159,6 @@ int main(void)
 	sei();
 	while(1)
 	{
-		strncpy(outSPDR, inBT, BuffSize); //copy data from inBT to outbuffer (SLAVE)
+		strncpy(outSPDR,inBT,BuffSize);
 	}
 }

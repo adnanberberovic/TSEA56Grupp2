@@ -369,10 +369,10 @@ int main(void)
 	
 	while(1)
     {		
-		SPDRrec_ = SPI_MasterTransmit(0,'k');
-		LCD_SendCharacter(SPDRrec_);
-		_delay_ms(5000);
-		PWM_Test();
+		//SPDRrec_ = SPI_MasterTransmit(0,'k');
+		//LCD_SendCharacter(SPDRrec_);
+		//_delay_ms(5000);
+		//PWM_Test();
 		
 		
 				
@@ -396,24 +396,24 @@ int main(void)
 		
 		
 		
-		//
-		//SPDRrec_ = SPI_MasterTransmit(0,'k');
-		//LCD_SendCharacter(SPDRrec_);
-		//_delay_ms(15000);
-		//SPDRrec_ = SPI_MasterTransmit(0,'k');
-		//LCD_SendCharacter(SPDRrec_);
-		//_delay_ms(15000);
-		//
-		//SPDRrec_ = SPI_MasterTransmit(3,'k');
-		//LCD_SendCharacter(SPDRrec_);
-		//_delay_ms(15000);
-		////LCD_SetRow(1);
-		//SPDRrec_ = SPI_MasterTransmit(4,'k');
-		//LCD_SendCharacter(SPDRrec_);
-		//_delay_ms(15000);
-		//SPDRrec_ = SPI_MasterTransmit(5,'k');
-		//LCD_SendCharacter(SPDRrec_);
-		//_delay_ms(15000);
+		
+		SPDRrec_ = SPI_MasterTransmit(0,'k');
+		LCD_SendCharacter(SPDRrec_);
+		_delay_ms(15000);
+		SPDRrec_ = SPI_MasterTransmit(0,'k');
+		LCD_SendCharacter(SPDRrec_);
+		_delay_ms(15000);
+		
+		SPDRrec_ = SPI_MasterTransmit(3,'k');
+		LCD_SendCharacter(SPDRrec_);
+		_delay_ms(15000);
 		//LCD_SetRow(1);
+		SPDRrec_ = SPI_MasterTransmit(4,'k');
+		LCD_SendCharacter(SPDRrec_);
+		_delay_ms(15000);
+		SPDRrec_ = SPI_MasterTransmit(5,'k');
+		LCD_SendCharacter(SPDRrec_);
+		_delay_ms(15000);
+	
 	}
 }
