@@ -13,21 +13,21 @@
 #define BuffSize 100
 char outSPDR[BuffSize];
 char inSPDR[BuffSize];
-int i = 0;
-int posBuff_SPI = 0;
+uint8_t i = 0;
+uint8_t posBuff_SPI = 0;
 
-int rBTin = 0;
-int wBTin = 0;
-int rBTout = 0;
-int wBTout = 0;
-int *readPos_BTin = &rBTin;
-int *writePos_BTin = &wBTin; // Add BTout positioners aswell if needed.
-int *readPos_BTout = &rBTout;
-int *writePos_BTout = &wBTout;
-int BT_received_flag = 0;
-int BT_sent_flag = 0;
+volatile uint8_t rBTin = 0;
+volatile uint8_t wBTin = 0;
+volatile uint8_t rBTout = 0;
+volatile uint8_t wBTout = 0;
+volatile uint8_t *readPos_BTin = &rBTin;
+volatile uint8_t *writePos_BTin = &wBTin; // Add BTout positioners aswell if needed.
+volatile uint8_t *readPos_BTout = &rBTout;
+volatile uint8_t *writePos_BTout = &wBTout;
+volatile uint8_t BT_received_flag = 0;
+volatile uint8_t BT_sent_flag = 0;
 
-int sendFlag = 0;
+uint8_t sendFlag = 0;
 char outBT[BuffSize] = "12345678901234567890";
 char inBT[BuffSize];
 
@@ -112,9 +112,9 @@ void send_BT_buffer(char buffer[BuffSize] )
 }
 
 
-void Write_Buffer(char buffer[BuffSize], char data, int *position)
+void Write_Buffer(char *buffer, char data, uint8_t *position)
 {
-	if ((*position) == (BuffSize - 1)) // If end of buffer restart from first pos, done with read.
+	if ((*position) == (BuffSize - 2)) // If end of buffer restart from first pos, done with read.
 	{
 		BT_received_flag = 1;
 		(*position) = 0; 
@@ -122,9 +122,10 @@ void Write_Buffer(char buffer[BuffSize], char data, int *position)
 	}
 	buffer[(*position)] = data; //Add data to correct location
 	(*position)++;
+	
 }
 
-char Read_Buffer(char buffer[BuffSize], int *pos_read)
+char Read_Buffer(char buffer[BuffSize], uint8_t *pos_read)
 {
 	char data;
 	if ((*pos_read) == (BuffSize - 1)) // End of buffer, reset from start 
@@ -143,12 +144,14 @@ ISR(USART0_RX_vect)
 	BT_received_flag = 0;
 	char data = UDR0; //Get received value
 	Write_Buffer(inBT, data, writePos_BTin); //Writes data to buffer in order they are received
+	
 }
 
 
 // Empty dataregister = send next character
 ISR(USART0_UDRE_vect)
 {
+	UDR0 = 'c';
 	if ((*readPos_BTout) == BuffSize) //Read entire buff and sent it
 	{
 		BT_sent_flag = 1; // done with transmission
@@ -172,6 +175,6 @@ int main(void)
 	sei();
 	while(1)
 	{
-		
+
 	}
 }

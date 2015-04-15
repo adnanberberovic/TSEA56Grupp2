@@ -3,29 +3,29 @@ Styrmodul_vA0.1.elf:     file format elf32-avr
 
 Sections:
 Idx Name          Size      VMA       LMA       File off  Algn
-  0 .data         00000020  00800100  00000358  000003ec  2**0
+  0 .data         00000020  00800100  00000372  00000406  2**0
                   CONTENTS, ALLOC, LOAD, DATA
-  1 .text         00000358  00000000  00000000  00000094  2**1
+  1 .text         00000372  00000000  00000000  00000094  2**1
                   CONTENTS, ALLOC, LOAD, READONLY, CODE
-  2 .bss          00000002  00800120  00800120  0000040c  2**0
+  2 .bss          00000002  00800120  00800120  00000426  2**0
                   ALLOC
-  3 .comment      00000030  00000000  00000000  0000040c  2**0
+  3 .comment      00000030  00000000  00000000  00000426  2**0
                   CONTENTS, READONLY
-  4 .debug_aranges 000000b8  00000000  00000000  0000043c  2**0
+  4 .debug_aranges 000000b8  00000000  00000000  00000456  2**0
                   CONTENTS, READONLY, DEBUGGING
-  5 .debug_info   00000c78  00000000  00000000  000004f4  2**0
+  5 .debug_info   00000d3b  00000000  00000000  0000050e  2**0
                   CONTENTS, READONLY, DEBUGGING
-  6 .debug_abbrev 00000312  00000000  00000000  0000116c  2**0
+  6 .debug_abbrev 00000312  00000000  00000000  00001249  2**0
                   CONTENTS, READONLY, DEBUGGING
-  7 .debug_line   000006c6  00000000  00000000  0000147e  2**0
+  7 .debug_line   000006fe  00000000  00000000  0000155b  2**0
                   CONTENTS, READONLY, DEBUGGING
-  8 .debug_frame  00000194  00000000  00000000  00001b44  2**2
+  8 .debug_frame  00000194  00000000  00000000  00001c5c  2**2
                   CONTENTS, READONLY, DEBUGGING
-  9 .debug_str    00000305  00000000  00000000  00001cd8  2**0
+  9 .debug_str    00000305  00000000  00000000  00001df0  2**0
                   CONTENTS, READONLY, DEBUGGING
- 10 .debug_loc    00000577  00000000  00000000  00001fdd  2**0
+ 10 .debug_loc    000005ae  00000000  00000000  000020f5  2**0
                   CONTENTS, READONLY, DEBUGGING
- 11 .debug_ranges 000000a8  00000000  00000000  00002554  2**0
+ 11 .debug_ranges 000000a8  00000000  00000000  000026a3  2**0
                   CONTENTS, READONLY, DEBUGGING
 
 Disassembly of section .text:
@@ -114,7 +114,7 @@ Disassembly of section .text:
   98:	11 e0       	ldi	r17, 0x01	; 1
   9a:	a0 e0       	ldi	r26, 0x00	; 0
   9c:	b1 e0       	ldi	r27, 0x01	; 1
-  9e:	e8 e5       	ldi	r30, 0x58	; 88
+  9e:	e2 e7       	ldi	r30, 0x72	; 114
   a0:	f3 e0       	ldi	r31, 0x03	; 3
   a2:	00 e0       	ldi	r16, 0x00	; 0
   a4:	0b bf       	out	0x3b, r16	; 59
@@ -139,7 +139,7 @@ Disassembly of section .text:
   be:	b2 07       	cpc	r27, r18
   c0:	e1 f7       	brne	.-8      	; 0xba <.do_clear_bss_loop>
   c2:	ee d0       	rcall	.+476    	; 0x2a0 <main>
-  c4:	47 c1       	rjmp	.+654    	; 0x354 <_exit>
+  c4:	54 c1       	rjmp	.+680    	; 0x36e <_exit>
 
 000000c6 <__bad_interrupt>:
   c6:	9c cf       	rjmp	.-200    	; 0x0 <__vectors>
@@ -557,102 +557,121 @@ void Styr_InitPortValues(void)
  2c4:	0d df       	rcall	.-486    	; 0xe0 <SPI_MasterTransmit>
 	LCD_SendCharacter(SPDRrec_);
  2c6:	82 df       	rcall	.-252    	; 0x1cc <LCD_SendCharacter>
+	LCD_SetRow(1);
+ 2c8:	81 e0       	ldi	r24, 0x01	; 1
+ 2ca:	90 e0       	ldi	r25, 0x00	; 0
+ 2cc:	63 df       	rcall	.-314    	; 0x194 <LCD_SetRow>
 	SPDRrec_ = SPI_MasterTransmit(2, 'k');
- 2c8:	6b e6       	ldi	r22, 0x6B	; 107
- 2ca:	82 e0       	ldi	r24, 0x02	; 2
- 2cc:	09 df       	rcall	.-494    	; 0xe0 <SPI_MasterTransmit>
+ 2ce:	6b e6       	ldi	r22, 0x6B	; 107
+ 2d0:	82 e0       	ldi	r24, 0x02	; 2
+ 2d2:	06 df       	rcall	.-500    	; 0xe0 <SPI_MasterTransmit>
 	LCD_SendCharacter(SPDRrec_);
- 2ce:	7e df       	rcall	.-260    	; 0x1cc <LCD_SendCharacter>
+ 2d4:	7b df       	rcall	.-266    	; 0x1cc <LCD_SendCharacter>
 		//// unsigned int result = makeWord((dataH & 0b00001111), (dataL>>1));
 		
 		
 		
 		
 		SPDRrec_ = SPI_MasterTransmit(0,'k');
- 2d0:	6b e6       	ldi	r22, 0x6B	; 107
- 2d2:	80 e0       	ldi	r24, 0x00	; 0
- 2d4:	05 df       	rcall	.-502    	; 0xe0 <SPI_MasterTransmit>
+ 2d6:	6b e6       	ldi	r22, 0x6B	; 107
+ 2d8:	80 e0       	ldi	r24, 0x00	; 0
+ 2da:	02 df       	rcall	.-508    	; 0xe0 <SPI_MasterTransmit>
+ 2dc:	c8 2f       	mov	r28, r24
+		LCD_SetRow(1);
+ 2de:	81 e0       	ldi	r24, 0x01	; 1
+ 2e0:	90 e0       	ldi	r25, 0x00	; 0
+ 2e2:	58 df       	rcall	.-336    	; 0x194 <LCD_SetRow>
 		LCD_SendCharacter(SPDRrec_);
- 2d6:	7a df       	rcall	.-268    	; 0x1cc <LCD_SendCharacter>
- 2d8:	2f eb       	ldi	r18, 0xBF	; 191
- 2da:	86 ec       	ldi	r24, 0xC6	; 198
- 2dc:	9d e2       	ldi	r25, 0x2D	; 45
- 2de:	21 50       	subi	r18, 0x01	; 1
- 2e0:	80 40       	sbci	r24, 0x00	; 0
- 2e2:	90 40       	sbci	r25, 0x00	; 0
- 2e4:	e1 f7       	brne	.-8      	; 0x2de <main+0x3e>
- 2e6:	00 c0       	rjmp	.+0      	; 0x2e8 <main+0x48>
- 2e8:	00 00       	nop
-		_delay_ms(15000);
+ 2e4:	8c 2f       	mov	r24, r28
+ 2e6:	72 df       	rcall	.-284    	; 0x1cc <LCD_SendCharacter>
+ 2e8:	8b e7       	ldi	r24, 0x7B	; 123
+ 2ea:	92 e9       	ldi	r25, 0x92	; 146
+ 2ec:	01 97       	sbiw	r24, 0x01	; 1
+ 2ee:	f1 f7       	brne	.-4      	; 0x2ec <main+0x4c>
+ 2f0:	00 c0       	rjmp	.+0      	; 0x2f2 <main+0x52>
+ 2f2:	00 00       	nop
+		_delay_ms(150);
 		SPDRrec_ = SPI_MasterTransmit(0,'k');
- 2ea:	6b e6       	ldi	r22, 0x6B	; 107
- 2ec:	80 e0       	ldi	r24, 0x00	; 0
- 2ee:	f8 de       	rcall	.-528    	; 0xe0 <SPI_MasterTransmit>
+ 2f4:	6b e6       	ldi	r22, 0x6B	; 107
+ 2f6:	80 e0       	ldi	r24, 0x00	; 0
+ 2f8:	f3 de       	rcall	.-538    	; 0xe0 <SPI_MasterTransmit>
+ 2fa:	c8 2f       	mov	r28, r24
+		LCD_SetRow(1);
+ 2fc:	81 e0       	ldi	r24, 0x01	; 1
+ 2fe:	90 e0       	ldi	r25, 0x00	; 0
+ 300:	49 df       	rcall	.-366    	; 0x194 <LCD_SetRow>
 		LCD_SendCharacter(SPDRrec_);
- 2f0:	6d df       	rcall	.-294    	; 0x1cc <LCD_SendCharacter>
- 2f2:	2f eb       	ldi	r18, 0xBF	; 191
- 2f4:	86 ec       	ldi	r24, 0xC6	; 198
- 2f6:	9d e2       	ldi	r25, 0x2D	; 45
- 2f8:	21 50       	subi	r18, 0x01	; 1
- 2fa:	80 40       	sbci	r24, 0x00	; 0
- 2fc:	90 40       	sbci	r25, 0x00	; 0
- 2fe:	e1 f7       	brne	.-8      	; 0x2f8 <main+0x58>
- 300:	00 c0       	rjmp	.+0      	; 0x302 <main+0x62>
- 302:	00 00       	nop
-		_delay_ms(15000);
+ 302:	8c 2f       	mov	r24, r28
+ 304:	63 df       	rcall	.-314    	; 0x1cc <LCD_SendCharacter>
+ 306:	8b e7       	ldi	r24, 0x7B	; 123
+ 308:	92 e9       	ldi	r25, 0x92	; 146
+ 30a:	01 97       	sbiw	r24, 0x01	; 1
+ 30c:	f1 f7       	brne	.-4      	; 0x30a <main+0x6a>
+ 30e:	00 c0       	rjmp	.+0      	; 0x310 <main+0x70>
+ 310:	00 00       	nop
+		_delay_ms(150);
 		
 		SPDRrec_ = SPI_MasterTransmit(3,'k');
- 304:	6b e6       	ldi	r22, 0x6B	; 107
- 306:	83 e0       	ldi	r24, 0x03	; 3
- 308:	eb de       	rcall	.-554    	; 0xe0 <SPI_MasterTransmit>
+ 312:	6b e6       	ldi	r22, 0x6B	; 107
+ 314:	83 e0       	ldi	r24, 0x03	; 3
+ 316:	e4 de       	rcall	.-568    	; 0xe0 <SPI_MasterTransmit>
+ 318:	c8 2f       	mov	r28, r24
+		LCD_SetRow(1);
+ 31a:	81 e0       	ldi	r24, 0x01	; 1
+ 31c:	90 e0       	ldi	r25, 0x00	; 0
+ 31e:	3a df       	rcall	.-396    	; 0x194 <LCD_SetRow>
 		LCD_SendCharacter(SPDRrec_);
- 30a:	60 df       	rcall	.-320    	; 0x1cc <LCD_SendCharacter>
- 30c:	2f eb       	ldi	r18, 0xBF	; 191
- 30e:	86 ec       	ldi	r24, 0xC6	; 198
- 310:	9d e2       	ldi	r25, 0x2D	; 45
- 312:	21 50       	subi	r18, 0x01	; 1
- 314:	80 40       	sbci	r24, 0x00	; 0
- 316:	90 40       	sbci	r25, 0x00	; 0
- 318:	e1 f7       	brne	.-8      	; 0x312 <main+0x72>
- 31a:	00 c0       	rjmp	.+0      	; 0x31c <main+0x7c>
- 31c:	00 00       	nop
-		_delay_ms(15000);
+ 320:	8c 2f       	mov	r24, r28
+ 322:	54 df       	rcall	.-344    	; 0x1cc <LCD_SendCharacter>
+ 324:	8b e7       	ldi	r24, 0x7B	; 123
+ 326:	92 e9       	ldi	r25, 0x92	; 146
+ 328:	01 97       	sbiw	r24, 0x01	; 1
+ 32a:	f1 f7       	brne	.-4      	; 0x328 <main+0x88>
+ 32c:	00 c0       	rjmp	.+0      	; 0x32e <main+0x8e>
+ 32e:	00 00       	nop
+		_delay_ms(150);
 		//LCD_SetRow(1);
 		SPDRrec_ = SPI_MasterTransmit(4,'k');
- 31e:	6b e6       	ldi	r22, 0x6B	; 107
- 320:	84 e0       	ldi	r24, 0x04	; 4
- 322:	de de       	rcall	.-580    	; 0xe0 <SPI_MasterTransmit>
+ 330:	6b e6       	ldi	r22, 0x6B	; 107
+ 332:	84 e0       	ldi	r24, 0x04	; 4
+ 334:	d5 de       	rcall	.-598    	; 0xe0 <SPI_MasterTransmit>
+ 336:	c8 2f       	mov	r28, r24
+		LCD_SetRow(1);
+ 338:	81 e0       	ldi	r24, 0x01	; 1
+ 33a:	90 e0       	ldi	r25, 0x00	; 0
+ 33c:	2b df       	rcall	.-426    	; 0x194 <LCD_SetRow>
 		LCD_SendCharacter(SPDRrec_);
- 324:	53 df       	rcall	.-346    	; 0x1cc <LCD_SendCharacter>
- 326:	2f eb       	ldi	r18, 0xBF	; 191
- 328:	86 ec       	ldi	r24, 0xC6	; 198
- 32a:	9d e2       	ldi	r25, 0x2D	; 45
- 32c:	21 50       	subi	r18, 0x01	; 1
- 32e:	80 40       	sbci	r24, 0x00	; 0
- 330:	90 40       	sbci	r25, 0x00	; 0
- 332:	e1 f7       	brne	.-8      	; 0x32c <main+0x8c>
- 334:	00 c0       	rjmp	.+0      	; 0x336 <main+0x96>
- 336:	00 00       	nop
-		_delay_ms(15000);
+ 33e:	8c 2f       	mov	r24, r28
+ 340:	45 df       	rcall	.-374    	; 0x1cc <LCD_SendCharacter>
+ 342:	8b e7       	ldi	r24, 0x7B	; 123
+ 344:	92 e9       	ldi	r25, 0x92	; 146
+ 346:	01 97       	sbiw	r24, 0x01	; 1
+ 348:	f1 f7       	brne	.-4      	; 0x346 <main+0xa6>
+ 34a:	00 c0       	rjmp	.+0      	; 0x34c <main+0xac>
+ 34c:	00 00       	nop
+		_delay_ms(150);
 		SPDRrec_ = SPI_MasterTransmit(5,'k');
- 338:	6b e6       	ldi	r22, 0x6B	; 107
- 33a:	85 e0       	ldi	r24, 0x05	; 5
- 33c:	d1 de       	rcall	.-606    	; 0xe0 <SPI_MasterTransmit>
+ 34e:	6b e6       	ldi	r22, 0x6B	; 107
+ 350:	85 e0       	ldi	r24, 0x05	; 5
+ 352:	c6 de       	rcall	.-628    	; 0xe0 <SPI_MasterTransmit>
+ 354:	c8 2f       	mov	r28, r24
+		LCD_SetRow(1);
+ 356:	81 e0       	ldi	r24, 0x01	; 1
+ 358:	90 e0       	ldi	r25, 0x00	; 0
+ 35a:	1c df       	rcall	.-456    	; 0x194 <LCD_SetRow>
 		LCD_SendCharacter(SPDRrec_);
- 33e:	46 df       	rcall	.-372    	; 0x1cc <LCD_SendCharacter>
- 340:	2f eb       	ldi	r18, 0xBF	; 191
- 342:	86 ec       	ldi	r24, 0xC6	; 198
- 344:	9d e2       	ldi	r25, 0x2D	; 45
- 346:	21 50       	subi	r18, 0x01	; 1
- 348:	80 40       	sbci	r24, 0x00	; 0
- 34a:	90 40       	sbci	r25, 0x00	; 0
- 34c:	e1 f7       	brne	.-8      	; 0x346 <main+0xa6>
- 34e:	00 c0       	rjmp	.+0      	; 0x350 <main+0xb0>
- 350:	00 00       	nop
- 352:	be cf       	rjmp	.-132    	; 0x2d0 <main+0x30>
+ 35c:	8c 2f       	mov	r24, r28
+ 35e:	36 df       	rcall	.-404    	; 0x1cc <LCD_SendCharacter>
+ 360:	8b e7       	ldi	r24, 0x7B	; 123
+ 362:	92 e9       	ldi	r25, 0x92	; 146
+ 364:	01 97       	sbiw	r24, 0x01	; 1
+ 366:	f1 f7       	brne	.-4      	; 0x364 <main+0xc4>
+ 368:	00 c0       	rjmp	.+0      	; 0x36a <main+0xca>
+ 36a:	00 00       	nop
+ 36c:	b4 cf       	rjmp	.-152    	; 0x2d6 <main+0x36>
 
-00000354 <_exit>:
- 354:	f8 94       	cli
+0000036e <_exit>:
+ 36e:	f8 94       	cli
 
-00000356 <__stop_program>:
- 356:	ff cf       	rjmp	.-2      	; 0x356 <__stop_program>
+00000370 <__stop_program>:
+ 370:	ff cf       	rjmp	.-2      	; 0x370 <__stop_program>

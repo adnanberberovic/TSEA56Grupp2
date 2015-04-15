@@ -341,6 +341,7 @@ int main(void)
 	LCD_SendCharacter('7');
 	SPDRrec_ = SPI_MasterTransmit(1, 'k');
 	LCD_SendCharacter(SPDRrec_);
+	LCD_SetRow(1);
 	SPDRrec_ = SPI_MasterTransmit(2, 'k');
 	LCD_SendCharacter(SPDRrec_);
 	
@@ -398,22 +399,27 @@ int main(void)
 		
 		
 		SPDRrec_ = SPI_MasterTransmit(0,'k');
+		LCD_SetRow(1);
 		LCD_SendCharacter(SPDRrec_);
-		_delay_ms(15000);
+		_delay_ms(150);
 		SPDRrec_ = SPI_MasterTransmit(0,'k');
+		LCD_SetRow(1);
 		LCD_SendCharacter(SPDRrec_);
-		_delay_ms(15000);
+		_delay_ms(150);
 		
 		SPDRrec_ = SPI_MasterTransmit(3,'k');
+		LCD_SetRow(1);
 		LCD_SendCharacter(SPDRrec_);
-		_delay_ms(15000);
+		_delay_ms(150);
 		//LCD_SetRow(1);
 		SPDRrec_ = SPI_MasterTransmit(4,'k');
+		LCD_SetRow(1);
 		LCD_SendCharacter(SPDRrec_);
-		_delay_ms(15000);
+		_delay_ms(150);
 		SPDRrec_ = SPI_MasterTransmit(5,'k');
+		LCD_SetRow(1);
 		LCD_SendCharacter(SPDRrec_);
-		_delay_ms(15000);
+		_delay_ms(150);
 	
 	}
 }
