@@ -44,6 +44,8 @@ volatile uint8_t BT_sent_flag = 0;
 
 uint8_t sendFlag = 0;
 
+
+
 struct node { // definition of the linked list node
 	int val;
 	struct node *next;
@@ -51,6 +53,8 @@ struct node { // definition of the linked list node
 
 typedef struct node buffer_; // buffer_ definieras
 
+buffer_ *head_SPIout = NULL;
+buffer_ *head_SPIin = NULL;
 
 // Setup data direction registers @ ports for out/inputs.
 void Komm_InitPortDirections(void)
@@ -166,34 +170,10 @@ void send_SPI_buffer(char *buffer)
 	
 }
 
-// Interrupt method runs when SPI transmission/reception is completed.
-ISR(SPI_STC_vect)
-{
-	char data = SPDR;
-	// Add condition for WCOL to avoid missing datawrite
-	
-	Write_Buffer(inSPDR, data, posBuff_SPIin); //Write received value to inBT buffer
-	
-	if (ongoing_SPI_transfer == 1) //something to send
-	{
-		if ( (*posBuff_SPIout) == BuffSize ) // end of buffer, all sent. sett pointer to beginning.
-		{
-			(*posBuff_SPIout) = 0;
-			ongoing_SPI_transfer = 0;
-		}
-		
-		SPDR = Read_Buffer(outSPDR, posBuff_SPIout); //Add next element in buffer to SPDR.
-	}
-	else 
-	{
-		SPDR = '-'; //Return blank.
-	}
-}
-
 void add_node(buffer_* lst_head, int val)
 {
-	buffer_ * curr = lst_head;
 
+	buffer_ * curr = lst_head;
 	while(curr->next != NULL) // step to end of list
 	{
 		curr = curr->next;
@@ -203,16 +183,83 @@ void add_node(buffer_* lst_head, int val)
 	curr->next->next = NULL; // Add node last.
 }
 
+int pop_node(buffer_ ** lst_head)
+{
+	buffer_* next_node = NULL;
+	int retval = 0;
+	
+	if ( *lst_head != NULL)
+	{
+		next_node = (*lst_head)->next;
+		retval = (*lst_head)->val;
+		free(*lst_head);
+		*lst_head = next_node;
+	}
+	
+	return retval;
+}
+
+void flush_list(buffer_ ** lst_head)
+{
+	while(*lst_head != NULL)
+	{
+		pop_node(lst_head);
+	}
+}
+
+void SPI_send(int tosend)
+{
+	add_node(head_SPIout, tosend); //Add node with tosend-value to desired list
+}
+
+// Interrupt method runs when SPI transmission/reception is completed.
+ISR(SPI_STC_vect)
+{
+	int data = (int)SPDR;
+	add_node(head_SPIin, data); // Add received data to in-queue
+	if (head_SPIout == NULL)
+	{
+		SPDR = '-';
+	}
+	else
+	{
+		SPDR = (uint8_t)pop_node(&head_SPIout);
+	}
+
+	
+	//char data = SPDR;
+	//// Add condition for WCOL to avoid missing datawrite
+	//
+	//Write_Buffer(inSPDR, data, posBuff_SPIin); //Write received value to inBT buffer
+	//
+	//if (ongoing_SPI_transfer == 1) //something to send
+	//{
+		//if ( (*posBuff_SPIout) == BuffSize ) // end of buffer, all sent. sett pointer to beginning.
+		//{
+			//(*posBuff_SPIout) = 0;
+			//ongoing_SPI_transfer = 0;
+		//}
+		//
+		//SPDR = Read_Buffer(outSPDR, posBuff_SPIout); //Add next element in buffer to SPDR.
+	//}
+	//else 
+	//{
+		//SPDR = '-'; //Return blank.
+	//}
+}
+
+
 int main(void)
 {
 	
+	head_SPIout = (buffer_ *)malloc(sizeof(buffer_)); //Define head of list for SPI- values to send and alloc memory.
+	head_SPIout->next= NULL;
+	head_SPIout->val = 0;
 	
-	buffer_ *head = (buffer_ *)malloc(sizeof(buffer_)); //Define head of list and alloc memory.
-	head->next= NULL;
-	head->val = 0;
-	
-	
-	
+
+	head_SPIin = (buffer_ *)malloc(sizeof(buffer_)); //Define head of list for SPI- values to receive and alloc memory.
+	head_SPIin->next= NULL;
+	head_SPIin->val = 0;
 	
 	sleep_enable();
 	Komm_InitPortDirections();
@@ -220,11 +267,14 @@ int main(void)
 	SPI_SlaveInit();
 	BT_init();
 	sei();
-	char testbuffer2_[] = " 9/11 is a lie. ";
+	//char testbuffer2_[] = " 9/11 is a lie. ";
 	while(1)
 	{
-		send_SPI_buffer(testbuffer_);
-		send_SPI_buffer(testbuffer2_);
+		for (int i = 0; i<10; i++)
+		{
+			SPI_send(i);
+		}
+		_delay_ms(500);
 		
 	}
 }
