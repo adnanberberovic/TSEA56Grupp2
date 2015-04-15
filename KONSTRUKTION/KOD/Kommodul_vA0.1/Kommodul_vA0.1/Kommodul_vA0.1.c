@@ -9,13 +9,28 @@
 #include <avr/sleep.h>
 #include <util/delay.h>
 #include <string.h>
+#include <stdlib.h>
+#include <alloca.h>
+#include <stdio.h>
+#include <ctype.h>
+
 
 #define BuffSize 100
 char outSPDR[BuffSize];
 char inSPDR[BuffSize];
-uint8_t i = 0;
-uint8_t posBuff_SPI = 0;
+char *SPI_queue[BuffSize];
 
+char testbuffer_[] = "All I do is win!";
+volatile uint8_t pos_queue = 0;
+volatile uint8_t *pos_SPIqueue = &pos_queue;
+volatile uint8_t posSPIout = 0;
+volatile uint8_t posSPIin = 0;
+volatile uint8_t *posBuff_SPIout = &posSPIout;
+volatile uint8_t *posBuff_SPIin = &posSPIin;
+volatile uint8_t ongoing_SPI_transfer = 0;
+
+char outBT[BuffSize];
+char inBT[BuffSize];
 volatile uint8_t rBTin = 0;
 volatile uint8_t wBTin = 0;
 volatile uint8_t rBTout = 0;
@@ -28,8 +43,13 @@ volatile uint8_t BT_received_flag = 0;
 volatile uint8_t BT_sent_flag = 0;
 
 uint8_t sendFlag = 0;
-char outBT[BuffSize] = "12345678901234567890";
-char inBT[BuffSize];
+
+struct node { // definition of the linked list node
+	int val;
+	struct node *next;
+	};
+
+typedef struct node buffer_; // buffer_ definieras
 
 
 // Setup data direction registers @ ports for out/inputs.
@@ -60,31 +80,6 @@ void SPI_SlaveInit(void)
 	
 }
 
-
-// Interrupt method runs when SPI transmission/reception is completed.
-ISR(SPI_STC_vect)
-{
-
-		if (posBuff_SPI < (BuffSize - 1))
-		{
-			inSPDR[posBuff_SPI] = SPDR; // Save received char in inSPDR-buffer
-			SPDR = outSPDR[posBuff_SPI]; //Sett next bit to send from outSPDR-buffer
-			posBuff_SPI++; // add 1 to bufferpos
-		}
-		else if (posBuff_SPI == (BuffSize - 1))
-		{
-			inSPDR[posBuff_SPI] = SPDR; //save received char in inSPDR-buffer
-			SPDR = outSPDR[posBuff_SPI]; //Send last sign from outSPDR-buffer
-			posBuff_SPI = 0; //Set bufferpos to restart
-		}
-		else 
-		{
-			SPDR = 'E';
-		}
-	
-	
-}
-
 // Set up and enable Bluetooth
 void BT_init(void)
 {
@@ -109,6 +104,7 @@ void send_BT_buffer(char buffer[BuffSize] )
 {
 	strncpy(outBT, buffer, BuffSize); //Copy buffer to send to outBT
 	UCSR0B |= (1<<UDRIE0);	//Enable UDRE interrupt flag -> send when empty dataregister
+	// maby add while UDRIE0 = 0 here to counter multiple send_BT_buffer in a row
 }
 
 
@@ -116,7 +112,6 @@ void Write_Buffer(char *buffer, char data, volatile uint8_t *position)
 {
 	if ((*position) == (BuffSize - 2)) // If end of buffer restart from first pos, done with read.
 	{
-		BT_received_flag = 1;
 		(*position) = 0; 
 		send_BT_buffer(inBT); //Echo back inBT *****************ONLY FOR TEST******************
 	}
@@ -127,9 +122,7 @@ void Write_Buffer(char *buffer, char data, volatile uint8_t *position)
 
 char Read_Buffer(char *buffer, volatile uint8_t *pos_read)
 {
-	char data;
-	data = buffer[(*pos_read)]; //return next value in queue
-	_delay_ms(10);
+	char data = buffer[(*pos_read)]; //return next value in queue
 	(*pos_read)++;
 	return data;
 }
@@ -162,16 +155,81 @@ ISR(USART0_UDRE_vect)
 		
 }
 
+void send_SPI_buffer(char *buffer)
+{
+	
+	memset(outSPDR, '\0', BuffSize);
+	strncpy(outSPDR, buffer, BuffSize); //Copy what to send into outSPDR
+	(*posBuff_SPIout) = 0; // start reading from beginning
+	ongoing_SPI_transfer = 1; //something to send.
+	while(((ongoing_SPI_transfer == 1) & !(outSPDR[(*posBuff_SPIout)] == '\0'))); //Wait until entire buffer is sent.
+	
+}
+
+// Interrupt method runs when SPI transmission/reception is completed.
+ISR(SPI_STC_vect)
+{
+	char data = SPDR;
+	// Add condition for WCOL to avoid missing datawrite
+	
+	Write_Buffer(inSPDR, data, posBuff_SPIin); //Write received value to inBT buffer
+	
+	if (ongoing_SPI_transfer == 1) //something to send
+	{
+		if ( (*posBuff_SPIout) == BuffSize ) // end of buffer, all sent. sett pointer to beginning.
+		{
+			(*posBuff_SPIout) = 0;
+			ongoing_SPI_transfer = 0;
+		}
+		
+		SPDR = Read_Buffer(outSPDR, posBuff_SPIout); //Add next element in buffer to SPDR.
+	}
+	else 
+	{
+		SPDR = '-'; //Return blank.
+	}
+}
+
+void add_node(buffer_* lst_head, int val)
+{
+	buffer_ * curr = lst_head;
+
+	while(curr->next != NULL) // step to end of list
+	{
+		curr = curr->next;
+	}
+	curr->next = (buffer_ *)malloc(sizeof(buffer_));
+	curr->next->val = val;
+	curr->next->next = NULL; // Add node last.
+}
+
 int main(void)
 {
+	
+	
+	buffer_ *head = (buffer_ *)malloc(sizeof(buffer_)); //Define head of list and alloc memory.
+	head->next= NULL;
+	head->val = 0;
+	
+	
+	
+	
 	sleep_enable();
 	Komm_InitPortDirections();
 	Komm_InitPortValues();
 	SPI_SlaveInit();
 	BT_init();
 	sei();
+	char testbuffer2_[] = " 9/11 is a lie. ";
 	while(1)
 	{
+		send_SPI_buffer(testbuffer_);
+		send_SPI_buffer(testbuffer2_);
 		
 	}
 }
+
+/* Todo:
+		- Göra så att läsning sker tills buffern är null. Någon form av stoppbit i buffer, måhända skriva över nyligen läst med \0.
+		- Avsluta alla SPI-buffrar med något bra tecken.
+*/
