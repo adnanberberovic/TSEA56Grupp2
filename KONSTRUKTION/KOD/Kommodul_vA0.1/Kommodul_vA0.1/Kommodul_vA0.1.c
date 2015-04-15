@@ -108,11 +108,11 @@ void BT_init(void)
 void send_BT_buffer(char buffer[BuffSize] )
 {
 	strncpy(outBT, buffer, BuffSize); //Copy buffer to send to outBT
-	UCSR0B &= ~(1<<UDRIE0);	//Enable UDRE interrupt flag -> send when empty dataregister
+	UCSR0B |= (1<<UDRIE0);	//Enable UDRE interrupt flag -> send when empty dataregister
 }
 
 
-void Write_Buffer(char *buffer, char data, uint8_t *position)
+void Write_Buffer(char *buffer, char data, volatile uint8_t *position)
 {
 	if ((*position) == (BuffSize - 2)) // If end of buffer restart from first pos, done with read.
 	{
@@ -125,14 +125,11 @@ void Write_Buffer(char *buffer, char data, uint8_t *position)
 	
 }
 
-char Read_Buffer(char buffer[BuffSize], uint8_t *pos_read)
+char Read_Buffer(char *buffer, volatile uint8_t *pos_read)
 {
 	char data;
-	if ((*pos_read) == (BuffSize - 1)) // End of buffer, reset from start 
-	{
-		(*pos_read) = 0;
-	}
 	data = buffer[(*pos_read)]; //return next value in queue
+	_delay_ms(10);
 	(*pos_read)++;
 	return data;
 }
@@ -151,9 +148,9 @@ ISR(USART0_RX_vect)
 // Empty dataregister = send next character
 ISR(USART0_UDRE_vect)
 {
-	UDR0 = 'c';
 	if ((*readPos_BTout) == BuffSize) //Read entire buff and sent it
 	{
+		(*readPos_BTout) = 0;
 		BT_sent_flag = 1; // done with transmission
 		UCSR0B &= ~(1<<UDRIE0); //Disable UDRE interrupt, All data is sent. 
 	}
@@ -175,6 +172,6 @@ int main(void)
 	sei();
 	while(1)
 	{
-
+		
 	}
 }
