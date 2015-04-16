@@ -1,9 +1,11 @@
 /*
- *  styrmodul_test1.c
- *	Styrmodul
- *  Author: adnbe196, mansk700, nikag669
+ * pwmpls.c
+ *
+ * Created: 4/13/2015 12:39:10 PM
+ *  Author: robop806
  */ 
 
+#define F_CPU 20000000UL
 
 #include <avr/io.h>
 #include <avr/interrupt.h>
@@ -14,7 +16,6 @@
 #include <math.h>
 
 //#include <avr/pgmspace.h>
-#define F_CPU 20000000UL
 
 // GLOBAL VARIABLES
 
@@ -27,7 +28,7 @@ void Styr_InitPortDirections(void)
 	DDRB = 1<<DDB0 | 1<<DDB1 | 1<<DDB2 | 1<<DDB3 | 1<<DDB4 | 1<<DDB5 | 1<<DDB7;
 	DDRC = 1<<DDC0;
 	DDRD = 1<<DDD0 | 1<<DDD1 | 1<<DDD2 | 1<<DDD3 | 1<<DDD4 | 1<<DDD5 | 1<<DDD6 | 1<<DDD7;
-} 
+}
 
 // Setups port values, more specifically puts SS on high.
 void Styr_InitPortValues(void)
@@ -66,35 +67,44 @@ unsigned char SPI_MasterTransmit(unsigned char cData, char target)
 		PORTC &= ~(1<<PORTC0);
 	}
 	// Load data into SPI data register.
-	SPDR = cData; 
+	SPDR = cData;
 	
 	// Wait until transmission completes.
 	while(!(SPSR & (1<<SPIF)));
 	
+	// Reset SS.
+	PORTB |= 1<<PORTB3 | 1<<PORTB4;
+	PORTC |= 1<<PORTC0;
+	
 	return SPDR;
 }
 
-ISR(SPI_STC_vect)
-{
-	PORTB |= 1<<PORTB3 | 1<<PORTB4 | 1<<PORTC0;
-}
 
 //----------------------------PWM------------------------------------
 
 void PWM_Init(void)
-{
-	// TODO:::::sätt riktning på databitar
-	
+{	
 	// Configuration of the PWM setting for OC2A and OC2B
-	// TCCn1:0 = 3 equals phase correct PWM mode
-	// WGM22:0 = 5 equals phase correct PWM mode with compare from OCRn
-	// CS22:0 = 3 sets the division factor to 32
-	TCCR2A = 1<<COM2A1 | 1<<COM2A0 | 1<<COM2B1 | 1<<COM2B0 | 0<<WGM21 | 1<<WGM20;
-	TCCR2B = 1<<WGM22 | 0<<CS22 | 1<<CS21 | 1<<CS20;
+	// COM2n1:0 = 2 equals clear OC2A/B on compare match, and set at bottom
+	// WGM22:0 = 3 equals fast PWM mode
+	// CS22:0 = 4 sets the division factor to 64
+	TCCR2A = 1<<COM2A1 | 0<<COM2A0 | 1<<COM2B1 | 0<<COM2B0 | 1<<WGM21 | 1<<WGM20;
+	TCCR2B = 0<<WGM22 | 1<<CS22 | 0<<CS21 | 0<<CS20;	
 	
-	// Set the compare values for the PWM, 0 == 0% and 
+	// Set the compare values for the PWM, 0 == 0% and 255 for 100%
 	OCR2A = 0;
 	OCR2B = 0;
+	
+	// Configuration of the PWM setting for OC1A and OC1B
+	// COM1n1:0 = 2 equals clear OC1A/B on compare match, and set at bottom
+	// WGM12:0 = 5 equals 8-bit fast PWM mode
+	// CS12:0 = 3 sets division factor to 64
+	TCCR1A = 1<<COM1A1 | 0<<COM1A0 | 1<<COM1B1 | 0<<COM1B0 | 1<<WGM11 | 0<<WGM10;
+	TCCR1B = 1<<WGM12 | 1<<CS12 | 0<<CS11 | 1<<CS10;
+	
+	// Set the compare values for the PWM, 0 == 0% and 255 for 100%
+	OCR1A = 0;
+	OCR1B = 0;
 }
 
 void PWM_SetSpeedRight(int speed)
@@ -113,20 +123,19 @@ void PWM_SetSpeedLeft(int speed)
 	}
 }
 
-void PWM_SetDirRight(int dir)
+void PWM_SetDirLeft(int dir)
 {
 	if (dir == 0)
 	{
 		PORTD &= ~(1 << PORTD0);
-	} 
-	//&= ~(1 << PORTD0)
+	}
 	else if (dir == 1)
 	{
 		PORTD |= 1 << PORTD0;
 	}
 }
 
-void PWM_SetDirLeft(int dir)
+void PWM_SetDirRight(int dir)
 {
 	if (dir == 0)
 	{
@@ -138,39 +147,49 @@ void PWM_SetDirLeft(int dir)
 	}
 }
 
-void PWM_Test(void)
+// testa värden mellan 18 och 38 för sänk/höj-läge, så att den inte gnäller i maxlägena
+void SERVO_SetSpeedVertical(int speed)
 {
-	for (int i=0; i < 300; i++)
+	if (speed >= 0 && speed <= 255)
 	{
-		_delay_ms(250);
-	}
-	PWM_SetSpeedLeft(50);
-	//PWM_SetSpeedRight(0);
-	for (int i=0; i < 300; i++)
-	{
-		_delay_ms(250);
-	}
-	PWM_SetDirLeft(1);
-	//PWM_SetDirRight(0);
-	for (int i=0; i < 300; i++)
-	{
-		_delay_ms(250);
-	}
-	PWM_SetSpeedLeft(0);
-	//PWM_SetSpeedRight(150);
-	for (int i=0; i < 300; i++)
-	{
-		_delay_ms(250);
-	}
-	//PWM_SetDirRight(1);
-	for (int i=0; i < 300; i++)
-	{
-		_delay_ms(250);
+		OCR1A = speed;
 	}
 }
 
+// speed = 44 ger bra grip, 18 eller ev mindre ger bra släpp
+void SERVO_SetSpeedGrip(int speed)
+{
+	if (speed >= 0 && speed <= 255)
+	{
+		OCR1B = speed;
+	}
+}
 
-//----------------------------PWM------------------------------------
+void SERVO_SetGrip()
+{
+	OCR1B = 44;
+}
+void SERVO_ReleaseGrip()
+{
+	OCR1B = 18;	
+}
+
+void SERVO_LevelHigh()
+{
+	OCR1A = 35;
+}
+
+void SERVO_LevelLow()
+{
+	OCR1A = 24;
+}
+
+void SERVO_LevelMid()
+{
+	OCR1A = 28;
+}
+
+//----------------------------PWM----END-----------------------------
 
 int LCD_Busy()
 {
@@ -272,10 +291,6 @@ void LCD_SendCharacter(char symbol)
 	PORTB |= (1 << 0); // Set RS
 	PORTB &= ~(1 << 1); // Clear R/W
 	
-	//uint8_t tempNum = (int)symbol;
-	//PORTA = tempNum;
-	
-	// If the following doesn't work, delete it and uncomment the two lines above.
 	PORTA = (int)symbol;
 	
 	PORTB |= 1 << 2; // Set Enable
@@ -292,7 +307,7 @@ void LCD_SendString(char *text)
 }
 void LCD_WelcomeScreen(void)
 {
-	LCD_SendString("    ResQ.Pl heh");
+	LCD_SendString("    ResQ.Pl    ");
 	LCD_SetRow(2);
 	LCD_SendString("  Master Race  ");
 }
@@ -332,28 +347,7 @@ int main(void)
 	LCD_Init(); // Initiate the LCD.
 	PWM_Init(); // Initiate PWM for motör
 	LCD_WelcomeScreen(); // Welcomes the user with a nice message ;-)
-	
-	
- 	//SPDRrec_ = SPI_MasterTransmit(0x01, 'k');
-	//
-
-	LCD_SetRow(1);
-	LCD_SendCharacter('7');
-	SPDRrec_ = SPI_MasterTransmit(1, 'k');
-	LCD_SendCharacter(SPDRrec_);
-	LCD_SetRow(1);
-	SPDRrec_ = SPI_MasterTransmit(2, 'k');
-	LCD_SendCharacter(SPDRrec_);
-	
-	//LCD_SetPosition(31);
-	//_delay_ms(15000);
-	//LCD_SendCharacter('T');
-	//_delay_ms(15000);
-	
-	//LCD_SendCharacter(SPDRrec_);
-	
-	
-	
+	_delay_ms(250);
 	
 	//activate ADC in gyro, if it was not active already ("initieringen")
 	//char dataH, dataL;
@@ -368,58 +362,78 @@ int main(void)
 	//}
 	//else LCD_SendString("wrong instr1");
 	
-	while(1)
-    {		
-		//SPDRrec_ = SPI_MasterTransmit(0,'k');
-		//LCD_SendCharacter(SPDRrec_);
-		//_delay_ms(5000);
-		//PWM_Test();
-		
-		
-				
-		//// start the conversion (notera att samma instruktion skickas vid aktivering av ADC:en i gyro)
-		//SPDRrec_ = SPI_MasterTransmit(0b10010100,'g'); //ss to 0, enabling the sensor
-		//SPDRrec_ = SPI_MasterTransmit(0,'g');
-		////SPDRrec_ = SPI_MasterTransmit(0,'g');
-		//if (!(SPDR &= 0b10000000)) { // if bit 7 is zero, the instruction is accepted
-			//LCD_SendString("instr2 accepted");
-			//}
-		//else LCD_SendString("wrong instr2");
-		
-		//// polling and result obtaining
-		//SPI_MasterTransmit(0b10000000, 'g'); // send SPI ADCR instruction
-		//// mb need to check "instr accepted" bit and "and conversion done" bit before continuing.....
-		//_delay_us(120); //but do this for now
-		//dataH = SPI_MasterTransmit(0x00, 'g'); // get the sensor response high byte
-		//dataL = SPI_MasterTransmit(0x00, 'g'); // get the sensor response low byte
-		//PORTC |= 1<<PORTC0; //set ss to 1; disabling the sensor
-		//// unsigned int result = makeWord((dataH & 0b00001111), (dataL>>1));
-		
-		
-		
-		
-		SPDRrec_ = SPI_MasterTransmit(0,'k');
-		LCD_SetRow(1);
-		LCD_SendCharacter(SPDRrec_);
-		_delay_ms(150);
-		SPDRrec_ = SPI_MasterTransmit(0,'k');
-		LCD_SetRow(1);
-		LCD_SendCharacter(SPDRrec_);
-		_delay_ms(150);
-		
-		SPDRrec_ = SPI_MasterTransmit(3,'k');
-		LCD_SetRow(1);
-		LCD_SendCharacter(SPDRrec_);
-		_delay_ms(150);
-		//LCD_SetRow(1);
-		SPDRrec_ = SPI_MasterTransmit(4,'k');
-		LCD_SetRow(1);
-		LCD_SendCharacter(SPDRrec_);
-		_delay_ms(150);
-		SPDRrec_ = SPI_MasterTransmit(5,'k');
-		LCD_SetRow(1);
-		LCD_SendCharacter(SPDRrec_);
-		_delay_ms(150);
+	//-------SERVO----
+	SERVO_SetGrip();
+	SERVO_LevelMid();
 	
+	for (int i=0; i < 20; i++)
+	{
+	_delay_ms(250);
 	}
+	SERVO_ReleaseGrip();
+	SERVO_LevelLow();
+	for (int i=0; i < 20; i++)
+	{
+		_delay_ms(250);
+	}
+	SERVO_SetGrip();
+	SERVO_LevelHigh();
+	
+	while(1)
+	{
+		SPDRrec_ = SPI_MasterTransmit(0,'k');
+		LCD_SendCharacter(SPDRrec_);
+		_delay_ms(200);
+		////PWM_Test();
+			////----------------------------------TEST--PWM------------------------------------------------------
+			//			
+			////LEFTE
+			//PWM_SetDirLeft(1);
+			//PWM_SetSpeedLeft(50);
+			//for (int i=0; i < 30; i++)
+			//{
+				//_delay_ms(250);
+			//}
+			//
+			//PWM_SetSpeedLeft(200);
+			//for (int i=0; i < 30; i++)
+			//{
+				//_delay_ms(250);
+			//}
+			//PWM_SetDirLeft(0);
+			//PWM_SetSpeedLeft(120);
+			//
+			//for (int i=0; i < 30; i++)
+			//{
+				//_delay_ms(250);
+			//}
+			//
+			//PWM_SetSpeedLeft(0);
+			//
+			////Richty
+			//PWM_SetDirRight(1);
+			//PWM_SetSpeedRight(50);
+			//for (int i=0; i < 30; i++)
+			//{
+				//_delay_ms(250);
+			//}
+			//
+			//PWM_SetSpeedRight(200);
+			//for (int i=0; i < 30; i++)
+			//{
+				//_delay_ms(250);
+			//}
+			//PWM_SetDirRight(0);
+			//PWM_SetSpeedRight(120);
+			//
+			//for (int i=0; i < 30; i++)
+			//{
+				//_delay_ms(250);
+			//}
+			//
+			//PWM_SetSpeedRight(0);
+			//PWM_SetSpeedLeft(0);
+			//
+			////----------------------------------TEST--PWM--END---------------------------------------------------
+			}
 }
