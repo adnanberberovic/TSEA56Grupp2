@@ -35,7 +35,8 @@ void Styr_InitPortDirections(void)
 // Setups port values, more specifically puts SS on high.
 void Styr_InitPortValues(void)
 {
-	PORTB = 1<<PORTB3 | 1<<PORTB4 | 1<<PORTC0;
+	PORTB |= 1<<PORTB3 | 1<<PORTB4;
+	PORTC |= 1<<PORTC0;
 }
 
 // Configures device as spi master.
@@ -149,7 +150,7 @@ void PWM_SetDirRight(int dir)
 	}
 }
 
-// testa värden mellan 18 och 38 för sänk/höj-läge, så att den inte gnäller i maxlägena
+// testa vÃ¤rden mellan 18 och 38 fÃ¶r sÃ¤nk/hÃ¶j-lÃ¤ge, sÃ¥ att den inte gnÃ¤ller i maxlÃ¤gena
 void SERVO_SetSpeedVertical(int speed)
 {
 	if (speed >= 0 && speed <= 255)
@@ -158,7 +159,7 @@ void SERVO_SetSpeedVertical(int speed)
 	}
 }
 
-// speed = 44 ger bra grip, 18 eller ev mindre ger bra släpp
+// speed = 44 ger bra grip, 18 eller ev mindre ger bra slÃ¤pp
 void SERVO_SetSpeedGrip(int speed)
 {
 	if (speed >= 0 && speed <= 255)
@@ -334,6 +335,12 @@ void LCD_WelcomeScreen(void)
 	 }
  }
 
+void LCD_Clear()
+{
+	LCD_SendCommand(0b00000001);
+	_delay_ms(1.53);
+}
+
 // Initiatazion of the LCD, according to Initializing Flowchart(Condition fosc=270KHz) in the data sheet.
 void LCD_Init()
 {
@@ -348,8 +355,7 @@ void LCD_Init()
 	_delay_us(39);
 
 	// Clear display, instruction 00 0000 0001
-	LCD_SendCommand(0b00000001);
-	_delay_ms(1.53);
+	LCD_Clear();
 
 	// Cursor moving direction: left-to-right, do not shift he display (shift disabled), instruction 00 0000 0110
 	LCD_SendCommand(0b00000110);
@@ -375,7 +381,7 @@ int main(void)
 	Styr_InitPortValues();	// Initiate Port Values for the styrmodul.
 	SPI_MasterInit();	// Initiate the styrmodul as the SPI master.
 	LCD_Init(); // Initiate the LCD.
-	PWM_Init(); // Initiate PWM for motör
+	PWM_Init(); // Initiate PWM for motÃ¶r
 	LCD_WelcomeScreen(); // Welcomes the user with a nice message ;-)
 	_delay_ms(250);
 	
