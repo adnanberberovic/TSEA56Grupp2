@@ -14,10 +14,34 @@
 #include<util/delay.h>
 
 int sensor_data [8]; //Skapa en array med 8 element.
-int send_buffer [4];
+int8_t send_buffer [4];
 int distance_table[255]; 
 int buffer_flag = 0;
 
+int SPI_counter = 3;
+
+void Sensor_InitPortDirections()
+{
+	DDRB = 1<<DDB6;
+	DDRA = 0;
+}
+void Sensor_InitPortValues()
+{
+	PORTB = 1<<PORTB4;
+}
+
+void SPI_SlaveInit()
+{
+	SPSR = 0<<SPI2X;
+	SPCR = 1<<SPIE | 1<<SPE | 1<<DORD | 0<<MSTR | 0<<CPOL | 0<<CPHA | 1<<SPR1 | 1<<SPR0;
+	//SPIE: SPI interrupt enable. Set to 1 to allow interrupts
+	//SPE: SPI Enable. Set to 1 to allow SPI communication
+	//DORD: Data order. Set to 1 to transmit LSB first, MSB last.
+	//MSTR: Master select. Set to 1 to set master.
+	//CPOL and CPHA: set to 0 to sample on rising edge and setup on falling edge.
+	//SPI2X, SPR1, SPR0, set to 0,1,1 to scale clock with f_osc/128.
+	//Bus config similar to comm and sensor module, though set 0<<MSTR
+}
 
 void distance_table_generator()
 {
@@ -69,7 +93,7 @@ void distance_table_generator()
 	
 }
 
-int angle_generator(int back, int front)
+int8_t angle_generator(int back, int front)
 {
 	int angle;
 	double length_quotient;
@@ -78,10 +102,10 @@ int angle_generator(int back, int front)
 	length_difference = front - back;
 	length_quotient= length_difference/130; //130 är avståndet mellan sensorerna
 	angle = atan(length_quotient) * 180/M_PI;
-	return angle;
+	return (int8_t)angle;
 }
 
-int offset_generator(int angle, int back, int front)
+int8_t offset_generator(int angle, int back, int front)
 {
 	int hyp;
 	int cath;
@@ -89,23 +113,25 @@ int offset_generator(int angle, int back, int front)
 	hyp = (front + back)/2 + 80; //100 är avståndet mellan sensorerna
 	cath = hyp * cos(angle*M_PI/180);
 	
-	return cath/10;
+	return (int8_t)(cath/10);
 }
 
 int main(void)
 { 
-	int angle;
-	int offset;
-	int front_sensor;
-	int wall_reflex_information;
+	int8_t angle;
+	int8_t offset;
+	int8_t front_sensor;
+	int8_t wall_reflex_information;
 	int reflex_bool;
-	int left_wall_counter;
-	int right_wall_counter;
+	int8_t left_wall_counter;
+	int8_t right_wall_counter;
 	
 	distance_table_generator(); //Skapa avståndstabellen
 	
-	DDRB = 255;//Sätt Port B till utgång
-	DDRA = 0; //Sätt Port A till ingång (default)
+	Sensor_InitPortValues();
+	Sensor_InitPortDirections();
+	SPI_SlaveInit();
+	
 	sei(); //Aktiverar globala avbrott
 	ADCSRA = 143; //Aktivera ADC, ADC-interrupt, Sätt division factor till 128. 20 MHz/128 = 156,25 kHz
 		
@@ -141,9 +167,8 @@ int main(void)
 		
 //_________________________________________Frontsensor________________________________________
 		//Dividera resultatet med 10 för att det ska bli centimeter
-		//Detta är för att vi bara kan beskriva högst 127 mm annars blir det tvåkomplement
-		//NEJ! VI SKICKAR I MILLIMETER VI SKITER I JÄVLA 2KOMP 
-		front_sensor = sensor_data[6];
+
+		front_sensor = (int8_t)(sensor_data[6]/10);
 				
 //_________________________________________Reflexsensor________________________________________
 		if((sensor_data[7] > 127))
@@ -155,10 +180,6 @@ int main(void)
 		//Om kort inte detekterar ett avstånd - läs av lång sensor.
 		//Skicka ut hur många väggar vi ser från tabell.
 
-		
-		PORTB = sensor_data[0];
-		PORTB = sensor_data[1];
-		PORTB = sensor_data[2];
 			//Vänster långsensor
 			if (sensor_data[0] > 170|| sensor_data[1] > 170)
 			{			
@@ -175,11 +196,6 @@ int main(void)
 				{
 					left_wall_counter = 0;
 				}
-
-		PORTB = left_wall_counter;
-		PORTB = sensor_data[3];
-		PORTB = sensor_data[4];
-		PORTB = sensor_data[5];
 			if(sensor_data[3] > 170|| sensor_data[4] > 170){
 				
 			if(sensor_data[5] > 51)
@@ -196,8 +212,6 @@ int main(void)
 				right_wall_counter = 0;
 			}
 			
-		PORTB = right_wall_counter;
-		PORTB = sensor_data[6];
 		
 		
 		
@@ -218,12 +232,11 @@ int main(void)
 		//Lägg send buffer på rätt ställe för Måns funktion
 		sei();
 		
-		PORTB=send_buffer[0];	
-		PORTB=send_buffer[1];
-		PORTB=send_buffer[2];
-		PORTB=send_buffer[3];
+		//Skicka till Styrmodul via SPI
+		
+		
 		//_________________________________________TEST________________________________________
-		_delay_ms(1000);
+		_delay_ms(250);
 	}			
 }
 
@@ -239,10 +252,14 @@ ISR(ADC_vect)
 		
 }
 
-
 ISR(SPI_STC_vect)
 {
-	//Måns funktion startas
+	SPDR = (char)send_buffer[SPI_counter];
+	SPI_counter++;
+	if(SPI_counter > 3)
+	{
+		SPI_counter = 0;
+	}
 }
 
 
@@ -258,3 +275,4 @@ ADMUX 6 = Kort framåt
 
 Är riktningen OK?!
 */
+
