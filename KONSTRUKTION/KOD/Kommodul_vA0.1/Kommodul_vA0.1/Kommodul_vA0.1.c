@@ -20,6 +20,7 @@ char outSPDR[BuffSize];
 char inSPDR[BuffSize];
 char *SPI_queue[BuffSize];
 
+
 char testbuffer_[] = "All I do is win!";
 volatile uint8_t pos_queue = 0;
 volatile uint8_t *pos_SPIqueue = &pos_queue;
@@ -212,6 +213,16 @@ void SPI_send(int tosend)
 	add_node(head_SPIout, tosend); //Add node with tosend-value to desired list
 }
 
+void SPI_send_arr(int8_t tosend[], int size) // lenght of array = sizeof(array)/sizeof(element in array)
+{
+	int i = 0;
+	while(i < size)// +2 due to continu
+	{
+		SPI_send(tosend[i]);
+		i++;
+	}
+}
+
 // Interrupt method runs when SPI transmission/reception is completed.
 ISR(SPI_STC_vect)
 {
@@ -219,39 +230,19 @@ ISR(SPI_STC_vect)
 	add_node(head_SPIin, data); // Add received data to in-queue
 	if (head_SPIout == NULL)
 	{
-		SPDR = '-';
+		int8_t stop_bit = -128; //0b10000000, cant be shown on lcd as -128 due to limits in print func.
+		SPDR = stop_bit;
 	}
 	else
 	{
 		SPDR = (int8_t)pop_node(&head_SPIout);
 	}
-
-	
-	//char data = SPDR;
-	//// Add condition for WCOL to avoid missing datawrite
-	//
-	//Write_Buffer(inSPDR, data, posBuff_SPIin); //Write received value to inBT buffer
-	//
-	//if (ongoing_SPI_transfer == 1) //something to send
-	//{
-		//if ( (*posBuff_SPIout) == BuffSize ) // end of buffer, all sent. sett pointer to beginning.
-		//{
-			//(*posBuff_SPIout) = 0;
-			//ongoing_SPI_transfer = 0;
-		//}
-		//
-		//SPDR = Read_Buffer(outSPDR, posBuff_SPIout); //Add next element in buffer to SPDR.
-	//}
-	//else 
-	//{
-		//SPDR = '-'; //Return blank.
-	//}
 }
 
 
 int main(void)
 {
-	
+
 	head_SPIout = (buffer_ *)malloc(sizeof(buffer_)); //Define head of list for SPI- values to send and alloc memory.
 	head_SPIout->next= NULL;
 	head_SPIout->val = 0;
@@ -267,15 +258,13 @@ int main(void)
 	SPI_SlaveInit();
 	BT_init();
 	sei();
-	//char testbuffer2_[] = " 9/11 is a lie. ";
+	//flush_list(&head_SPIout);
+	//flush_list(&head_SPIin);
+	int8_t array[] ={1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20};
+	SPI_send_arr(array, (sizeof(array)/sizeof(array[0]))); // sizeof(array)/sizeof(element in array) = lenght of array
 	while(1)
 	{
-		for (int i = 0; i<10; i++)
-		{
-			SPI_send(i);
-		}
-		_delay_ms(500);
-		
+		flush_list(&head_SPIin);
 	}
 }
 
