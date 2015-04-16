@@ -45,10 +45,10 @@ volatile uint8_t BT_sent_flag = 0;
 
 uint8_t sendFlag = 0;
 
-
+//*********** BUFFER STRUCT ****************
 
 struct node { // definition of the linked list node
-	int val;
+	int8_t val;
 	struct node *next;
 	};
 
@@ -56,6 +56,12 @@ typedef struct node buffer_; // buffer_ definieras
 
 buffer_ *head_SPIout = NULL;
 buffer_ *head_SPIin = NULL;
+
+buffer_ *head_BTout = NULL;
+buffer_ *head_BTin = NULL;
+
+//_______________________________________________
+
 
 // Setup data direction registers @ ports for out/inputs.
 void Komm_InitPortDirections(void)
@@ -132,46 +138,7 @@ char Read_Buffer(char *buffer, volatile uint8_t *pos_read)
 	return data;
 }
 
-
-// Receive complete - triggered by interrupt
-ISR(USART0_RX_vect) 
-{
-	BT_received_flag = 0;
-	char data = UDR0; //Get received value
-	Write_Buffer(inBT, data, writePos_BTin); //Writes data to buffer in order they are received
-	
-}
-
-
-// Empty dataregister = send next character
-ISR(USART0_UDRE_vect)
-{
-	if ((*readPos_BTout) == BuffSize) //Read entire buff and sent it
-	{
-		(*readPos_BTout) = 0;
-		BT_sent_flag = 1; // done with transmission
-		UCSR0B &= ~(1<<UDRIE0); //Disable UDRE interrupt, All data is sent. 
-	}
-	else
-	{
-		BT_sent_flag = 0;
-		UDR0 = Read_Buffer(outBT, readPos_BTout); //Send back the next value in out-buffer. 														
-	}
-		
-}
-
-void send_SPI_buffer(char *buffer)
-{
-	
-	memset(outSPDR, '\0', BuffSize);
-	strncpy(outSPDR, buffer, BuffSize); //Copy what to send into outSPDR
-	(*posBuff_SPIout) = 0; // start reading from beginning
-	ongoing_SPI_transfer = 1; //something to send.
-	while(((ongoing_SPI_transfer == 1) & !(outSPDR[(*posBuff_SPIout)] == '\0'))); //Wait until entire buffer is sent.
-	
-}
-
-void add_node(buffer_* lst_head, int val)
+void add_node(buffer_* lst_head, int8_t val)
 {
 
 	buffer_ * curr = lst_head;
@@ -187,7 +154,7 @@ void add_node(buffer_* lst_head, int val)
 int pop_node(buffer_ ** lst_head)
 {
 	buffer_* next_node = NULL;
-	int retval = 0;
+	int8_t retval = 0;
 	
 	if ( *lst_head != NULL)
 	{
@@ -199,6 +166,68 @@ int pop_node(buffer_ ** lst_head)
 	
 	return retval;
 }
+
+void BT_send(uint8_t val)
+{
+	
+	add_node(head_BTout, val);
+	UCSR0B |= (1<<UDRIE0); // activate interrupt
+	//UDR0 = (char)val;
+}
+
+// Receive complete - triggered by interrupt
+ISR(USART0_RX_vect) 
+{
+	uint8_t data = (uint8_t)UDR0;
+	
+	add_node(head_BTin, data); //Saved received data in list 
+	BT_send(data); //echo **** CHANGE WHEN NOT TESTING ****
+	
+	//BT_received_flag = 0;
+	//char data = UDR0; //Get received value
+	//Write_Buffer(inBT, data, writePos_BTin); //Writes data to buffer in order they are received
+	
+}
+
+
+// Empty dataregister = send next character
+ISR(USART0_UDRE_vect)
+{
+	if (head_BTout == NULL) // Nothing more to send, disable interrupt ******* REMEMBER TO ACTIVATE UDRIE0 WHEN TRANSMITTING (auto in BT_send)
+	{
+		UCSR0B &= ~(1<<UDRIE0);
+	}
+	else
+	{
+		UDR0 = (int8_t)pop_node(&head_BTout); 
+	}
+	
+	
+	//if ((*readPos_BTout) == BuffSize) //Read entire buff and sent it
+	//{
+		//(*readPos_BTout) = 0;
+		//BT_sent_flag = 1; // done with transmission
+		//UCSR0B &= ~(1<<UDRIE0); //Disable UDRE interrupt, All data is sent. 
+	//}
+	//else
+	//{
+		//BT_sent_flag = 0;
+		//UDR0 = Read_Buffer(outBT, readPos_BTout); //Send back the next value in out-buffer. 														
+	//}
+		
+}
+
+void send_SPI_buffer(char *buffer)
+{
+	
+	memset(outSPDR, '\0', BuffSize);
+	strncpy(outSPDR, buffer, BuffSize); //Copy what to send into outSPDR
+	(*posBuff_SPIout) = 0; // start reading from beginning
+	ongoing_SPI_transfer = 1; //something to send.
+	while(((ongoing_SPI_transfer == 1) & !(outSPDR[(*posBuff_SPIout)] == '\0'))); //Wait until entire buffer is sent.
+	
+}
+
 
 void flush_list(buffer_ ** lst_head)
 {
@@ -252,6 +281,14 @@ int main(void)
 	head_SPIin->next= NULL;
 	head_SPIin->val = 0;
 	
+	head_BTin = (buffer_ *)malloc(sizeof(buffer_));
+	head_BTin->next= NULL;
+	head_BTin->val = 0;
+	head_BTout = (buffer_ *)malloc(sizeof(buffer_));
+	head_BTout->next= NULL;
+	head_BTout->val = 0;
+	
+	
 	sleep_enable();
 	Komm_InitPortDirections();
 	Komm_InitPortValues();
@@ -260,7 +297,7 @@ int main(void)
 	sei();
 	//flush_list(&head_SPIout);
 	//flush_list(&head_SPIin);
-	int8_t array[] ={1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20};
+	int8_t array[] ={1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29};
 	SPI_send_arr(array, (sizeof(array)/sizeof(array[0]))); // sizeof(array)/sizeof(element in array) = lenght of array
 	while(1)
 	{

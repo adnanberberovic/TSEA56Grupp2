@@ -8,7 +8,7 @@
 #include <iostream>
 #include <sstream>
 #include <windows.h>
-
+#include <stdint.h>
 
 using namespace std;
 
@@ -18,9 +18,9 @@ DCB dcbSerialParams = { 0 };
 COMMTIMEOUTS timeouts = { 0 };
 
 //For reading/writning from com
-char ReadBuff_[100]; // Buffer to store indata from com, [2]-bytes
+int8_t ReadBuff_[10]; // Buffer to store indata from com, [2]-bytes
 DWORD BytesRead_ = 0; // how many bytes that were actually read
-char WriteBuff_[100]; // Buffer to store outdata from com, [2]-bytes
+int8_t WriteBuff_[10]; // Buffer to store outdata from com, [2]-bytes
 DWORD BytesWritten_ = 0; // how many bytes that were actually written
 
 void TimeoutSetup()
@@ -71,11 +71,17 @@ void Comport_init(wstring comport)
 void Read_ComData() //Reads data from hSerial (COM4) and stores in ReadBuff.
 {
 	fill(begin(ReadBuff_), end(ReadBuff_), '\0');
-	if (!ReadFile(hSerial, ReadBuff_, 100, &BytesRead_, NULL)) // BytesRead contains amount of read bytes
+	if (!ReadFile(hSerial, ReadBuff_, 10, &BytesRead_, NULL)) // BytesRead contains amount of read bytes
 	{
 		cerr << "Reading from file failed!\n";
 	}
-	cout << "\nReadbuff: " << ReadBuff_ << endl << "> ";
+	cout << "\nReadbuff: ";
+	for (int i = 0; i < 10; i++)
+	{
+		char c = static_cast<char>(ReadBuff_[i]);
+		cout << c;
+	}
+	cout <<	"\n Bytes read: "<< BytesRead_ << endl << "> ";
 
 }
 
@@ -93,7 +99,7 @@ void Write_ComData() //Writes data to hSerial (COM4) and stores in WriteBuff.
 	}
 
 	cout << "\nWriteBuff_: " << WriteBuff_ << endl;
-	if (!WriteFile(hSerial, WriteBuff_, 100, &BytesWritten_, NULL)) // "100" says how many bytes to write
+	if (!WriteFile(hSerial, WriteBuff_, 10, &BytesWritten_, NULL)) // "100" says how many bytes to write
 	{
 		cerr << "Writing to file failed!\n";
 	}
@@ -164,7 +170,7 @@ int _tmain(int argc, _TCHAR* argv[])
 			}
 
 			// Close connection
-			else if (instring_ == "close connection")
+			else if ((instring_ == "close connection") | (instring_ == "close"))
 			{
 				CloseHandle(hSerial);
 				ComInit_ = false;
@@ -172,7 +178,7 @@ int _tmain(int argc, _TCHAR* argv[])
 			}
 			else
 			{
-				cout << "Unknown input\n";
+				cout << "Unknown input\n> ";
 			}
 
 			instring_ = "";
