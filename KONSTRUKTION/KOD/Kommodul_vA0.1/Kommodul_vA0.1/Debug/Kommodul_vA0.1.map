@@ -517,9 +517,9 @@ END GROUP
 .debug_pubnames
  *(.debug_pubnames)
 
-.debug_info     0x00000000      0x815
+.debug_info     0x00000000      0x820
  *(.debug_info .gnu.linkonce.wi.*)
- .debug_info    0x00000000      0x815 Kommodul_vA0.1.o
+ .debug_info    0x00000000      0x820 Kommodul_vA0.1.o
 
 .debug_abbrev   0x00000000      0x28f
  *(.debug_abbrev)
@@ -536,7 +536,7 @@ END GROUP
 .debug_str      0x00000000      0x3e1
  *(.debug_str)
  .debug_str     0x00000000      0x3e1 Kommodul_vA0.1.o
-                                0x42e (size before relaxing)
+                                0x435 (size before relaxing)
 
 .debug_loc      0x00000000      0x6c5
  *(.debug_loc)

@@ -223,7 +223,7 @@ ISR(SPI_STC_vect)
 	}
 	else
 	{
-		SPDR = (uint8_t)pop_node(&head_SPIout);
+		SPDR = (int8_t)pop_node(&head_SPIout);
 	}
 
 	

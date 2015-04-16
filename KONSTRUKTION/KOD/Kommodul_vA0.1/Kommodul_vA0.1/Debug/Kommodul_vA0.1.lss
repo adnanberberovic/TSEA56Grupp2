@@ -13,19 +13,19 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, READONLY
   4 .debug_aranges 00000098  00000000  00000000  000006e0  2**0
                   CONTENTS, READONLY, DEBUGGING
-  5 .debug_info   00000815  00000000  00000000  00000778  2**0
+  5 .debug_info   00000820  00000000  00000000  00000778  2**0
                   CONTENTS, READONLY, DEBUGGING
-  6 .debug_abbrev 0000028f  00000000  00000000  00000f8d  2**0
+  6 .debug_abbrev 0000028f  00000000  00000000  00000f98  2**0
                   CONTENTS, READONLY, DEBUGGING
-  7 .debug_line   000004b8  00000000  00000000  0000121c  2**0
+  7 .debug_line   000004b8  00000000  00000000  00001227  2**0
                   CONTENTS, READONLY, DEBUGGING
-  8 .debug_frame  00000248  00000000  00000000  000016d4  2**2
+  8 .debug_frame  00000248  00000000  00000000  000016e0  2**2
                   CONTENTS, READONLY, DEBUGGING
-  9 .debug_str    000003e1  00000000  00000000  0000191c  2**0
+  9 .debug_str    000003e1  00000000  00000000  00001928  2**0
                   CONTENTS, READONLY, DEBUGGING
- 10 .debug_loc    000006c5  00000000  00000000  00001cfd  2**0
+ 10 .debug_loc    000006c5  00000000  00000000  00001d09  2**0
                   CONTENTS, READONLY, DEBUGGING
- 11 .debug_ranges 000000a0  00000000  00000000  000023c2  2**0
+ 11 .debug_ranges 000000a0  00000000  00000000  000023ce  2**0
                   CONTENTS, READONLY, DEBUGGING
 
 Disassembly of section .text:
@@ -457,7 +457,7 @@ ISR(SPI_STC_vect)
 	}
 	else
 	{
-		SPDR = (uint8_t)pop_node(&head_SPIout);
+		SPDR = (int8_t)pop_node(&head_SPIout);
  304:	8c e0       	ldi	r24, 0x0C	; 12
  306:	91 e0       	ldi	r25, 0x01	; 1
  308:	b5 df       	rcall	.-150    	; 0x274 <pop_node>
