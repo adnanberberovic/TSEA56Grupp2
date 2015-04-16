@@ -364,18 +364,15 @@ void LCD_Init()
 	LCD_SendCommand(0b00001110);
 }
 
-
-int main(void)
+int8_t sensor_value(int8_t val)
 {
-	char SPDRrec_ ;
-	
-	//char sensor_angle;	// Sensor data to be displayed on the LCD
-	//char sensor_offset;
-	//char sensor_front;
-	//char sensor_mix;	
-	
-	int8_t sensor_data[4];
-	sei();	// Enable global interrupts
+	SPI_MasterTransmit(val,'s');
+	uint8_t temp = (uint8_t)SPI_MasterTransmit(0,'s');
+	return temp;
+}
+
+void init_all()
+{
 	sleep_enable();	// Enable sleep instruction
 	Styr_InitPortDirections();	// Initiate Port directions for the styrmodul.
 	Styr_InitPortValues();	// Initiate Port Values for the styrmodul.
@@ -383,58 +380,52 @@ int main(void)
 	LCD_Init(); // Initiate the LCD.
 	PWM_Init(); // Initiate PWM for motör
 	LCD_WelcomeScreen(); // Welcomes the user with a nice message ;-)
+	sei();	// Enable global interrupts
+}
+
+int main(void)
+{
+	init_all();
+	int8_t sensor_data[4];
 	_delay_ms(250);
 	
-	SPDRrec_ = SPI_MasterTransmit(0,'k'); // Dummy transfers
-	sensor_data[0] = SPI_MasterTransmit(0,'s'); // ..
 	
 	while(1)
 	{
-		//SPDRrec_ = SPI_MasterTransmit(0,'k');
-		//LCD_SendCharacter(SPDRrec_);
-		//_delay_ms(100);
-		
-		
+
 		for(int i = 0; i < 4; i++)
 		{
-			sensor_data[i] = (int8_t)SPI_MasterTransmit(0,'s');
+			sensor_data[i] =  sensor_value(i);
+			//_delay_ms(10);
 		}
-		
-		
-		//sensor_angle = sensor_data[0];
-		//sensor_offset = sensor_data[1];
-		//sensor_front = sensor_data[2];
-		//sensor_mix = sensor_data[3];
+
 		LCD_SendCommand(0b00000001);
-		_delay_ms(1.53);
 
 		LCD_SetPosition(0);
-				_delay_ms(1.53);
-		LCD_SendString("-0: ");
-				_delay_ms(1.53);
+		LCD_SendString("");
 		LCD_display_int8(sensor_data[0]);
-				_delay_ms(1.53);
-				LCD_SetPosition(8);
-		LCD_SendString("-1: ");
-				_delay_ms(1.53);
+				LCD_SetPosition(3);
+		LCD_SendString(" /");
 		LCD_display_int8(sensor_data[1]);
-				_delay_ms(1.53);
-		LCD_SetPosition(16);
-				_delay_ms(1.53);
-		LCD_SendString("-2: ");
-				_delay_ms(1.53);
+		LCD_SetPosition(7);
+		LCD_SendString(" /");
 		LCD_display_int8(sensor_data[2]);
-				_delay_ms(1.53);
-				LCD_SetPosition(24);
-		LCD_SendString("-3: ");
-				_delay_ms(1.53);
-		LCD_display_int8(sensor_data[3]);
-				_delay_ms(1.53);
+				LCD_SetPosition(12);
+		LCD_SendString(" /");
+		LCD_display_int8((sensor_data[3] & 192)/64);
+		
+		LCD_SetPosition(16);
+		LCD_SendString(" /");
+		LCD_display_int8((sensor_data[3] & 56)/8);
 		
 		
-		for(int i = 0; i < 5; i++)
+		LCD_SetPosition(24);
+		LCD_SendString(" /");
+		LCD_display_int8(sensor_data[3] & 3);
+		
+ 		for(int i = 0; i < 2; i++)
 		{
-			_delay_ms(250);
-		}
+ 			_delay_ms(75);
+ 		}
 	}
 }
