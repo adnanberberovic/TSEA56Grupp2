@@ -21,7 +21,10 @@
 // GLOBAL VARIABLES
 
 int LCD_Counter;
-
+// One overflow corresponds to 13.1 ms if the F_CPU is 20 MHz and the defined prescaler.
+int TIMER_overflows;
+// The following overflow storage corresponds to 131ms.
+int TIMER_overflows_deci;
 
 // Setup data direction registers @ ports for out/inputs.
 void Styr_InitPortDirections(void)
@@ -149,6 +152,15 @@ void PWM_SetDirRight(int dir)
 		PORTD |= 1 << PORTD1;
 	}
 }
+
+// Setup a timer. Used by the D regulator.
+void TIMER_init()
+{
+	TCCR0B = 1<<CS00 | 0<<CS01 | 1<<CS02; // Prescaler set to 1024
+	TCNT0 = 0; // Initialize cunter
+	TIMSK0 = 1<<TOIE0; // Enable timer interrupts.
+}
+
 
 // testa värden mellan 18 och 38 för sänk/höj-läge, så att den inte gnäller i maxlägena
 void SERVO_SetSpeedVertical(int speed)
@@ -371,6 +383,18 @@ int8_t sensor_value(int8_t val)
 	return temp;
 }
 
+ISR(TIMER0_OVF_vect)
+{
+	TIMER_overflows++;
+	if (TIMER_overflows >= 10)
+	{
+		TIMER_overflows = 0;
+		TIMER_overflows_deci++;
+		LCD_display_int8(TIMER_overflows_deci);
+		LCD_SendCharacter(' ');
+	}
+}
+
 void init_all()
 {
 	sleep_enable();	// Enable sleep instruction
@@ -379,53 +403,61 @@ void init_all()
 	SPI_MasterInit();	// Initiate the styrmodul as the SPI master.
 	LCD_Init(); // Initiate the LCD.
 	PWM_Init(); // Initiate PWM for motör
-	LCD_WelcomeScreen(); // Welcomes the user with a nice message ;-)
+	LCD_WelcomeScreen(); // Welcomes the user with a nice message ;^)
+	TIMER_init();
 	sei();	// Enable global interrupts
 }
 
 int main(void)
 {
 	init_all();
-	int8_t sensor_data[4];
+	//int8_t sensor_data[4];
 	_delay_ms(250);
 	
+	LCD_display_int8(TIMER_overflows_deci);
 	
 	while(1)
 	{
 
-		for(int i = 0; i < 4; i++)
-		{
-			sensor_data[i] =  sensor_value(i);
-			//_delay_ms(10);
-		}
 
-		LCD_SendCommand(0b00000001);
-
-		LCD_SetPosition(0);
-		LCD_SendString("");
-		LCD_display_int8(sensor_data[0]);
-				LCD_SetPosition(3);
-		LCD_SendString(" /");
-		LCD_display_int8(sensor_data[1]);
-		LCD_SetPosition(7);
-		LCD_SendString(" /");
-		LCD_display_int8(sensor_data[2]);
-				LCD_SetPosition(12);
-		LCD_SendString(" /");
-		LCD_display_int8((sensor_data[3] & 192)/64);
-		
-		LCD_SetPosition(16);
-		LCD_SendString(" /");
-		LCD_display_int8((sensor_data[3] & 56)/8);
-		
-		
-		LCD_SetPosition(24);
-		LCD_SendString(" /");
-		LCD_display_int8(sensor_data[3] & 3);
-		
- 		for(int i = 0; i < 2; i++)
-		{
- 			_delay_ms(75);
- 		}
 	}
 }
+
+
+
+// TEST CODULAR
+//
+		//for(int i = 0; i < 4; i++)
+		//{
+			//sensor_data[i] =  sensor_value(i);
+			////_delay_ms(10);
+		//}
+//
+		//LCD_SendCommand(0b00000001);
+//
+		//LCD_SetPosition(0);
+		//LCD_SendString("");
+		//LCD_display_int8(sensor_data[0]);
+		//LCD_SetPosition(3);
+		//LCD_SendString(" /");
+		//LCD_display_int8(sensor_data[1]);
+		//LCD_SetPosition(7);
+		//LCD_SendString(" /");
+		//LCD_display_int8(sensor_data[2]);
+		//LCD_SetPosition(12);
+		//LCD_SendString(" /");
+		//LCD_display_int8((sensor_data[3] & 192)/64);
+		//
+		//LCD_SetPosition(16);
+		//LCD_SendString(" /");
+		//LCD_display_int8((sensor_data[3] & 56)/8);
+		//
+		//
+		//LCD_SetPosition(24);
+		//LCD_SendString(" /");
+		//LCD_display_int8(sensor_data[3] & 3);
+		//
+		//for(int i = 0; i < 2; i++)
+		//{
+			//_delay_ms(75);
+		//}
