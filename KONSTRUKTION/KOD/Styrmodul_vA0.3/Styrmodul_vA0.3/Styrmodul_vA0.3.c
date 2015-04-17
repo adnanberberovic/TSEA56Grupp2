@@ -390,8 +390,14 @@ ISR(TIMER0_OVF_vect)
 	{
 		TIMER_overflows = 0;
 		TIMER_overflows_deci++;
-		LCD_display_int8(TIMER_overflows_deci);
-		LCD_SendCharacter(' ');
+		//LCD_display_int8(TIMER_overflows_deci);
+		//LCD_SendCharacter(' ');
+	}
+	if (TIMER_overflows_deci >= 229)
+	{
+		TIMER_overflows_deci = 0;
+		LCD_SetPosition(1);
+		LCD_SendString("ALLAHU AKBAR!");
 	}
 }
 
@@ -414,12 +420,10 @@ int main(void)
 	//int8_t sensor_data[4];
 	_delay_ms(250);
 	
-	LCD_display_int8(TIMER_overflows_deci);
 	
 	while(1)
 	{
-
-
+		// Forever I shall repeat!		
 	}
 }
 
