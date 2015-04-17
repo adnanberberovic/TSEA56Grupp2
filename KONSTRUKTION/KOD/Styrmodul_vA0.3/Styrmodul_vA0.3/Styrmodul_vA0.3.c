@@ -418,6 +418,7 @@ void init_all()
 }
 
 //Returns speed in millimeters/milliseconds = meters/second
+/*int speed_calculator()
 {
 	int start_time = TIMER_overflows_deci; //Read start time
 	int wheel_circuit = 204; //Wheel circuit is 204 mm
@@ -431,6 +432,7 @@ void init_all()
 	}
 	
 	return wheel_circuit/(TIMER_overflows_deci - start_time)*131; //speed = length/(finish_time - start_time)
+}*/
 
 int main(void)
 {
