@@ -184,6 +184,7 @@ void SERVO_SetGrip()
 {
 	OCR1B = 44;
 }
+
 void SERVO_ReleaseGrip()
 {
 	OCR1B = 18;	
@@ -285,6 +286,7 @@ void LCD_SetPosition(uint8_t pos)
 	else LCD_SendCommand(0b10000000);
 	
 }
+
 void LCD_SendCharacter(char symbol)
 {
 	LCD_Counter++;
@@ -320,6 +322,7 @@ void LCD_SendString(char *text)
 		LCD_SendCharacter(*text++);
 	}
 }
+
 void LCD_WelcomeScreen(void)
 {
 	LCD_SendString("    ResQ.Pl    ");
@@ -389,7 +392,7 @@ ISR(TIMER0_OVF_vect)
 	if (TIMER_overflows >= 10)
 	{
 		TIMER_overflows = 0;
-		TIMER_overflows_deci++;
+		TIMER_overflows_deci++; 
 		//LCD_display_int8(TIMER_overflows_deci);
 		//LCD_SendCharacter(' ');
 	}
@@ -413,6 +416,21 @@ void init_all()
 	TIMER_init();
 	sei();	// Enable global interrupts
 }
+
+//Returns speed in millimeters/milliseconds = meters/second
+{
+	int start_time = TIMER_overflows_deci; //Read start time
+	int wheel_circuit = 204; //Wheel circuit is 204 mm
+	int wheel_marker_bool = PORTD2; //PORTD2 = pin 16. ADC from comparator - LM311. 1 if marker, 0 else.
+	int wheel_marker_counter = 0; //Hjulet är uppdelat i 4 svarta och vita 4 sektioner. Öka antal?
+	
+	while(wheel_marker_counter < 4)
+	{
+		if(wheel_marker_bool==1)
+			wheel_marker_counter++;
+	}
+	
+	return wheel_circuit/(TIMER_overflows_deci - start_time)*131; //speed = length/(finish_time - start_time)
 
 int main(void)
 {

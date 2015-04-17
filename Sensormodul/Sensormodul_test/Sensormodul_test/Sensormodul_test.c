@@ -229,14 +229,13 @@ int main(void)
 		send_buffer[1] = offset;
 		send_buffer[2] = front_sensor;
 		send_buffer[3] = wall_reflex_information;
-		//Lägg send buffer på rätt ställe för Måns funktion
 		sei();
 		
 		//Skicka till Styrmodul via SPI
 		
 		
 		//_________________________________________TEST________________________________________
-		_delay_ms(250);
+		//_delay_ms(250);
 	}			
 }
 
@@ -254,12 +253,9 @@ ISR(ADC_vect)
 
 ISR(SPI_STC_vect)
 {
-	SPDR = (char)send_buffer[SPI_counter];
-	SPI_counter++;
-	if(SPI_counter > 3)
-	{
-		SPI_counter = 0;
-	}
+	int8_t inval_ = (int8_t)SPDR;
+	
+	SPDR = send_buffer[inval_];
 }
 
 
