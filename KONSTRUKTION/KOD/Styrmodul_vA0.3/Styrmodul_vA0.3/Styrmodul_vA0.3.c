@@ -32,7 +32,8 @@ void Styr_InitPortDirections(void)
 	DDRA = 1<<DDA0 | 1<<DDA1 | 1<<DDA2 | 1<<DDA3 | 1<<DDA4 | 1<<DDA5 | 1<<DDA6 | 1<<DDA7;
 	DDRB = 1<<DDB0 | 1<<DDB1 | 1<<DDB2 | 1<<DDB3 | 1<<DDB4 | 1<<DDB5 | 1<<DDB7;
 	DDRC = 1<<DDC0;
-	DDRD = 1<<DDD0 | 1<<DDD1 | 1<<DDD2 | 1<<DDD3 | 1<<DDD4 | 1<<DDD5 | 1<<DDD6 | 1<<DDD7;
+	DDRD = 1<<DDD0 | 1<<DDD1 | 0<<DDD2 | 1<<DDD3 | 1<<DDD4 | 1<<DDD5 | 1<<DDD6 | 1<<DDD7;
+	//D2 ingång för reflexsensor
 }
 
 // Setups port values, more specifically puts SS on high.
@@ -160,7 +161,6 @@ void TIMER_init()
 	TCNT0 = 0; // Initialize cunter
 	TIMSK0 = 1<<TOIE0; // Enable timer interrupts.
 }
-
 
 // testa värden mellan 18 och 38 för sänk/höj-läge, så att den inte gnäller i maxlägena
 void SERVO_SetSpeedVertical(int speed)
@@ -418,70 +418,30 @@ void init_all()
 }
 
 //Returns speed in millimeters/milliseconds = meters/second
-/*int speed_calculator()
+int speed_calculator()
 {
 	int start_time = TIMER_overflows_deci; //Read start time
 	int wheel_circuit = 204; //Wheel circuit is 204 mm
-	int wheel_marker_bool = PORTD2; //PORTD2 = pin 16. ADC from comparator - LM311. 1 if marker, 0 else.
-	int wheel_marker_counter = 0; //Hjulet är uppdelat i 4 svarta och vita 4 sektioner. Öka antal?
-	
-	while(wheel_marker_counter < 4)
+	int wheel_marker_counter = 0; //Hjulet är uppdelat i 8 svarta och vita 8 sektioner. Öka antal?
+ 
+	while(wheel_marker_counter < 8)
 	{
-		if(wheel_marker_bool==1)
+		if(PIND & 0b00000100) //When PIND2 == 1 (reflex sensor) - increase counter. 
 			wheel_marker_counter++;
 	}
 	
-	return wheel_circuit/(TIMER_overflows_deci - start_time)*131; //speed = length/(finish_time - start_time)
-}*/
+	return wheel_circuit/(TIMER_overflows_deci - start_time)*131; //speed = distance/(finish_time - start_time)
+}
 
 int main(void)
 {
 	init_all();
 	//int8_t sensor_data[4];
-	_delay_ms(250);
+	_delay_ms(250);		
 	
 	
 	while(1)
-	{
+	{	
 		// Forever I shall repeat!		
 	}
 }
-
-
-
-// TEST CODULAR
-//
-		//for(int i = 0; i < 4; i++)
-		//{
-			//sensor_data[i] =  sensor_value(i);
-			////_delay_ms(10);
-		//}
-//
-		//LCD_SendCommand(0b00000001);
-//
-		//LCD_SetPosition(0);
-		//LCD_SendString("");
-		//LCD_display_int8(sensor_data[0]);
-		//LCD_SetPosition(3);
-		//LCD_SendString(" /");
-		//LCD_display_int8(sensor_data[1]);
-		//LCD_SetPosition(7);
-		//LCD_SendString(" /");
-		//LCD_display_int8(sensor_data[2]);
-		//LCD_SetPosition(12);
-		//LCD_SendString(" /");
-		//LCD_display_int8((sensor_data[3] & 192)/64);
-		//
-		//LCD_SetPosition(16);
-		//LCD_SendString(" /");
-		//LCD_display_int8((sensor_data[3] & 56)/8);
-		//
-		//
-		//LCD_SetPosition(24);
-		//LCD_SendString(" /");
-		//LCD_display_int8(sensor_data[3] & 3);
-		//
-		//for(int i = 0; i < 2; i++)
-		//{
-			//_delay_ms(75);
-		//}
