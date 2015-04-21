@@ -84,7 +84,7 @@ unsigned char SPI_MasterTransmit(unsigned char cData, char target)
 	
 	// Reset SS.
 	PORTB |= 1<<PORTB3 | 1<<PORTB4;
-	PORTC |= 1<<PORTC0;
+	//PORTC |= 1<<PORTC0; Send more messages
 	
 	return SPDR;
 }
@@ -166,6 +166,7 @@ void MOTOR_Forward(int speed)
 	PWM_SetSpeedLeft(speed);
 	PWM_SetSpeedRight(speed);
 }
+
 void MOTOR_Backward(int speed)
 {
 	PWM_SetDirRight(0);
@@ -173,6 +174,7 @@ void MOTOR_Backward(int speed)
 	PWM_SetSpeedLeft(speed);
 	PWM_SetSpeedRight(speed);
 }
+
 void MOTOR_RotateLeft()
 {
 	PWM_SetDirRight(1);
@@ -184,6 +186,7 @@ void MOTOR_RotateLeft()
 		_delay_ms(250);
 	}
 }
+
 void MOTOR_RotateRight()
 {
 	PWM_SetDirRight(0);
@@ -195,6 +198,7 @@ void MOTOR_RotateRight()
 		_delay_ms(250);
 	}
 }
+
 void MOTOR_Stop()
 {
 	PWM_SetSpeedRight(0);
@@ -202,12 +206,12 @@ void MOTOR_Stop()
 }
 
 // Setup a timer. Used by the D regulator.
-//void TIMER_init()
-//{
-	//TCCR0B = 1<<CS00 | 0<<CS01 | 1<<CS02; // Prescaler set to 1024
-	//TCNT0 = 0; // Initialize cunter
-	//TIMSK0 = 1<<TOIE0; // Enable timer interrupts.
-//}
+void TIMER_init()
+{
+	TCCR0B = 1<<CS00 | 0<<CS01 | 1<<CS02; // Prescaler set to 1024
+	TCNT0 = 0; // Initialize cunter
+	TIMSK0 = 1<<TOIE0; // Enable timer interrupts.
+}
 
 // testa värden mellan 18 och 38 för sänk/höj-läge, så att den inte gnäller i maxlägena
 void SERVO_SetSpeedVertical(int speed)
@@ -433,21 +437,113 @@ int8_t sensor_value(int8_t val)
 	return temp;
 }
 
-//ISR(TIMER0_OVF_vect)
-//{
-	//TIMER_overflows++;
-	//if (TIMER_overflows >= 10)
-	//{
-		//TIMER_overflows = 0;
-		//TIMER_overflows_deci++; 
-	//}
+ISR(TIMER0_OVF_vect)
+{
+	TIMER_overflows++;
+	if (TIMER_overflows >= 10)
+	{
+		TIMER_overflows = 0;
+		TIMER_overflows_deci++; 
+	}
 	//if (TIMER_overflows_deci >= 229)
 	//{
 		//TIMER_overflows_deci = 0;
 		//LCD_SetPosition(1);
 		//LCD_SendString("ALLAHU AKBAR!");
 	//}
-//}
+}
+//----------------------------GYRO------------------------------------
+void activateGyroADC()
+{
+	int dataH;
+	SPI_MasterTransmit(0b10010100,'g');
+	// check if instruction received
+	// by sending two dummy bytes:
+	dataH = SPI_MasterTransmit(0x00,'g');
+	_delay_us(200);
+	SPI_MasterTransmit(0x00,'g');
+	_delay_us(200);
+	
+	//LCD_SendCharacter(dataH); // displays "d" (0b 0100 0110)
+	
+	if (dataH & 0b10000000) {
+		LCD_SendString("not accepted");
+	}
+	// 	else LCD_SendString("ADC activated");
+}
+
+void sleepGyroADC()
+{
+	unsigned int dataH;
+	SPI_MasterTransmit(0b10010000,'g');
+	// check if instruction received
+	// by sending two dummy bytes:
+	dataH = SPI_MasterTransmit(0x00,'g');
+	_delay_us(200);
+	SPI_MasterTransmit(0x00,'g');
+	_delay_us(200);
+
+	
+	// 	if (dataH & 0b10000000) {
+	// 		LCD_SendString("not accepted");
+	// 	}
+	// 	else LCD_SendString("sleep");
+}
+
+unsigned int getGyroADC() // gets the angular rate value (in mV) from ADC
+{
+	uint16_t result=0, dataH, dataL; // angular rate is written in two parts 8 bits each
+	SPI_MasterTransmit(0b10010100,'g'); // send SPI ADCC for angular rate
+	// check if instruction received
+	// by sending two dummy bytes:
+	dataH = SPI_MasterTransmit(0x00,'g');
+	_delay_us(200);
+	SPI_MasterTransmit(0x00,'g');
+	_delay_us(200);
+	
+	
+	if (dataH & 0b10000000) {
+		LCD_SendString("not accepted");
+	}
+	
+	SPI_MasterTransmit(0b10000000,'g'); // conversion start instruction (send SPI ADCR instr)
+	
+	dataH = SPI_MasterTransmit(0x00, 'g');
+	_delay_ms(200);
+	if (!(dataH & 0b00100000)) {
+		LCD_SendString("EOC not set");
+	}
+	// 	while(!(dataH & 0b00100000)) //Delay until EOC = 1;
+	// 	{
+	// 		dataH = SPI_MasterTransmit(0x00,'g');
+	// 	}
+	dataL = SPI_MasterTransmit(0x00,'g');
+	_delay_us(200);
+
+	//PORTC |= 1<<PORTC0;
+	LCD_SendString("H|L=");
+	LCD_display_uint16(dataH); // "D" (0b 0100 0100)
+	LCD_SendCharacter('|');
+	LCD_display_uint16(dataL); // "beta" (0b 1110 0010)
+	
+	if(!(dataH & 0b10000000))
+	{
+		result = ((dataH & 0x0f) << 7) + (dataL >> 1);
+	}
+	return result;
+}
+
+// converts the adc reading to angles per second
+int adcToAngularRate(unsigned int adcValue)
+{
+	int AngularRate = (adcValue * 25/12)+400;  // in mV
+	// from the data sheet, R2 gyroscope sensor version is 26,67 mV/deg
+	// for gyroscope with max angular rate 300 deg/s
+	return (AngularRate - 2500)/26.67;
+}
+
+//----------------------------GYRO----END-----------------------------
+
 
 void init_all()
 {
@@ -456,8 +552,8 @@ void init_all()
 	Styr_InitPortValues();	// Initiate Port Values for the styrmodul.
 	SPI_MasterInit();	// Initiate the styrmodul as the SPI master.
 	LCD_Init(); // Initiate the LCD.
-	PWM_Init(); // Initiate PWM for motör
-	//TIMER_init(); // Initiate Timer settings
+	PWM_Init(); // Initiate PWM for motor
+	TIMER_init(); // Initiate Timer settings
 	LCD_WelcomeScreen(); // Welcomes the user with a nice message ;^)
 	sei();	// Enable global interrupts
 }
@@ -528,6 +624,51 @@ int main(void)
 	_delay_ms(250);		
 	
 	
+	/* logik test */
+	uint8_t dataH, dataL, result;
+	SPI_MasterTransmit(0b10010100,'g'); // activation BRA
+	_delay_us(50); // to separate packets
+	dataH = SPI_MasterTransmit(0x00,'g'); // dummy
+	_delay_us(50); // to separate packets
+	dataL = SPI_MasterTransmit(0x00,'g'); // dummy
+	_delay_us(200); // wait for EOC to be set / separate instructions
+	LCD_display_int8(dataH & 0b10000000);
+	_delay_us(200);
+	PORTC |= 1<<PORTC0;
+	
+	while(1)
+	{
+		LCD_Clear();
+		SPI_MasterTransmit(0b10010100,'g'); // select angular rate channel
+		_delay_us(50); // to separate packets
+		dataH = SPI_MasterTransmit(0x00,'g'); // dummy
+		_delay_us(50); // to separate packets
+		dataL = SPI_MasterTransmit(0x00,'g'); // dummy
+		_delay_us(200); // to separate instructions
+		PORTC |= 1<<PORTC0;
+// 		LCD_display_int8(dataH & 0b10000000);
+// 		_delay_ms(1000);
+
+		do
+			{
+				LCD_Clear();
+				SPI_MasterTransmit(0b10000000,'g'); // Start conversion Gyro sänder till SPI
+				_delay_us(50); // to separate packets
+				dataH = SPI_MasterTransmit(0x00, 'g'); // dummy
+				_delay_us(50); // to separate packets
+				dataL = SPI_MasterTransmit(0x00,'g'); // dummy
+				_delay_us(400);
+				PORTC |= 1<<PORTC0; //Gyro sänder inte längre till SPI
+// 				LCD_display_int8(dataH & 0b10000000);
+// 				_delay_ms(400);
+// 				LCD_display_int8(dataH & 0b00100000);
+ 			} while(!(dataH & 0b00100100)); // read ADC until EOC bit is set
+// 	LCD_display_int8(dataH & 0b10000000);
+// 	_delay_ms(400);
+// 	LCD_display_int8(dataH & 0b00100000);
+// 	_delay_ms(400);
+// 	
+	}
 	while(1)
 	{	
 		// Forever I shall repeat!
