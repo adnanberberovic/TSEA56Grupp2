@@ -21,9 +21,12 @@
 // GLOBAL VARIABLES
 
 int LCD_Counter;
+
 // One overflow corresponds to 13.1 ms if the F_CPU is 20 MHz and the defined prescaler.
+// This timer will reset every time it reaches 10.
 int TIMER_overflows;
-// The following overflow storage corresponds to 131ms.
+
+// The following overflow storage corresponds to 131ms. This timer will never reset.
 int TIMER_overflows_deci;
 
 // Setup data direction registers @ ports for out/inputs.
@@ -130,6 +133,7 @@ void PWM_SetSpeedLeft(int speed)
 	}
 }
 
+// 0 for forward, 1 for backward
 void PWM_SetDirLeft(int dir)
 {
 	if (dir == 0)
@@ -142,6 +146,7 @@ void PWM_SetDirLeft(int dir)
 	}
 }
 
+// 1 for forward, 0 for backward
 void PWM_SetDirRight(int dir)
 {
 	if (dir == 0)
@@ -154,13 +159,55 @@ void PWM_SetDirRight(int dir)
 	}
 }
 
-// Setup a timer. Used by the D regulator.
-void TIMER_init()
+void MOTOR_Forward(int speed)
 {
-	TCCR0B = 1<<CS00 | 0<<CS01 | 1<<CS02; // Prescaler set to 1024
-	TCNT0 = 0; // Initialize cunter
-	TIMSK0 = 1<<TOIE0; // Enable timer interrupts.
+	PWM_SetDirRight(1);
+	PWM_SetDirLeft(0);
+	PWM_SetSpeedLeft(speed);
+	PWM_SetSpeedRight(speed);
 }
+void MOTOR_Backward(int speed)
+{
+	PWM_SetDirRight(0);
+	PWM_SetDirLeft(1);
+	PWM_SetSpeedLeft(speed);
+	PWM_SetSpeedRight(speed);
+}
+void MOTOR_RotateLeft()
+{
+	PWM_SetDirRight(1);
+	PWM_SetDirLeft(1);
+	PWM_SetSpeedLeft(100);
+	PWM_SetSpeedRight(100);
+	for(int i = 0; i <= 8; i++)
+	{
+		_delay_ms(250);
+	}
+}
+void MOTOR_RotateRight()
+{
+	PWM_SetDirRight(0);
+	PWM_SetDirLeft(0);	
+	PWM_SetSpeedLeft(100);
+	PWM_SetSpeedRight(100);
+	for(int i = 0; i <= 8; i++)
+	{
+		_delay_ms(250);
+	}
+}
+void MOTOR_Stop()
+{
+	PWM_SetSpeedRight(0);
+	PWM_SetSpeedLeft(0);
+}
+
+// Setup a timer. Used by the D regulator.
+//void TIMER_init()
+//{
+	//TCCR0B = 1<<CS00 | 0<<CS01 | 1<<CS02; // Prescaler set to 1024
+	//TCNT0 = 0; // Initialize cunter
+	//TIMSK0 = 1<<TOIE0; // Enable timer interrupts.
+//}
 
 // testa värden mellan 18 och 38 för sänk/höj-läge, så att den inte gnäller i maxlägena
 void SERVO_SetSpeedVertical(int speed)
@@ -386,23 +433,21 @@ int8_t sensor_value(int8_t val)
 	return temp;
 }
 
-ISR(TIMER0_OVF_vect)
-{
-	TIMER_overflows++;
-	if (TIMER_overflows >= 10)
-	{
-		TIMER_overflows = 0;
-		TIMER_overflows_deci++; 
-		//LCD_display_int8(TIMER_overflows_deci);
-		//LCD_SendCharacter(' ');
-	}
-	if (TIMER_overflows_deci >= 229)
-	{
-		TIMER_overflows_deci = 0;
-		LCD_SetPosition(1);
-		LCD_SendString("ALLAHU AKBAR!");
-	}
-}
+//ISR(TIMER0_OVF_vect)
+//{
+	//TIMER_overflows++;
+	//if (TIMER_overflows >= 10)
+	//{
+		//TIMER_overflows = 0;
+		//TIMER_overflows_deci++; 
+	//}
+	//if (TIMER_overflows_deci >= 229)
+	//{
+		//TIMER_overflows_deci = 0;
+		//LCD_SetPosition(1);
+		//LCD_SendString("ALLAHU AKBAR!");
+	//}
+//}
 
 void init_all()
 {
@@ -412,8 +457,8 @@ void init_all()
 	SPI_MasterInit();	// Initiate the styrmodul as the SPI master.
 	LCD_Init(); // Initiate the LCD.
 	PWM_Init(); // Initiate PWM for motör
+	//TIMER_init(); // Initiate Timer settings
 	LCD_WelcomeScreen(); // Welcomes the user with a nice message ;^)
-	TIMER_init();
 	sei();	// Enable global interrupts
 }
 
@@ -421,7 +466,7 @@ void init_all()
 int speed_calculator()
 {
 	int start_time = TIMER_overflows_deci; //Read start time
-	int wheel_circuit = 204; //Wheel circuit is 204 mm
+	int wheel_circumference = 204; //Wheel circumference is 204 mm
 	int wheel_marker_counter = 0; //Hjulet är uppdelat i 8 svarta och vita 8 sektioner. Öka antal?
  
 	while(wheel_marker_counter < 8)
@@ -430,9 +475,52 @@ int speed_calculator()
 			wheel_marker_counter++;
 	}
 	
-	return wheel_circuit/(TIMER_overflows_deci - start_time)*131; //speed = distance/(finish_time - start_time)
+	return wheel_circumference/(TIMER_overflows_deci - start_time)*131; //speed = distance/(finish_time - start_time)
 }
 
+void Drive_test()
+{
+	MOTOR_Forward(80);
+	SERVO_LevelHigh();
+	for(int i = 0; i <= 15; i++)
+	{
+		_delay_ms(250);
+	}
+	MOTOR_RotateRight();
+	MOTOR_Stop();
+	SERVO_SetGrip();
+	for(int i = 0; i <= 5; i++)
+	{
+		_delay_ms(250);
+	}
+	SERVO_LevelMid();
+	MOTOR_Backward(80);
+	for(int i = 0; i <= 15; i++)
+	{
+		_delay_ms(250);
+	}
+	SERVO_ReleaseGrip();
+	MOTOR_RotateLeft();
+	MOTOR_Stop();
+	for(int i = 0; i <= 5; i++)
+	{
+		_delay_ms(250);
+	}
+	SERVO_LevelLow();
+	MOTOR_Backward(80);
+	for(int i = 0; i <= 32; i++)
+	{
+		_delay_ms(250);
+	}
+	SERVO_LevelMid();
+	SERVO_SetGrip();
+	MOTOR_Stop();
+	for(int i = 0; i <= 5; i++)
+	{
+		_delay_ms(250);
+	}
+	SERVO_ReleaseGrip();
+}
 int main(void)
 {
 	init_all();
@@ -442,6 +530,7 @@ int main(void)
 	
 	while(1)
 	{	
-		// Forever I shall repeat!		
+		// Forever I shall repeat!
+		Drive_test();
 	}
 }
