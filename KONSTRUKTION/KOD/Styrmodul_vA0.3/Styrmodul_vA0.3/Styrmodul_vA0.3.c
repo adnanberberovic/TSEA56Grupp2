@@ -531,6 +531,8 @@ int main(void)
 	while(1)
 	{	
 		// Forever I shall repeat!
-		Drive_test();
+		//Drive_test();
+		LCD_SendCharacter(SPI_MasterTransmit('0','k'));
+		_delay_ms(250);
 	}
 }
