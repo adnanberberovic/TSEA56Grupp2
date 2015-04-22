@@ -178,10 +178,12 @@ void BT_send(uint8_t val)
 // Receive complete - triggered by interrupt
 ISR(USART0_RX_vect) 
 {
-	uint8_t data = (uint8_t)UDR0;
-	
-	add_node(head_BTin, data); //Saved received data in list 
-	BT_send(data); //echo **** CHANGE WHEN NOT TESTING ****
+	UCSR0B &= ~(1<<UDRIE0);
+	//uint8_t data = (uint8_t)UDR0;
+	char data = UDR0;
+	//add_node(head_BTin, data); //Saved received data in list 
+	UDR0 = data;
+	//BT_send(data); //echo **** CHANGE WHEN NOT TESTING ****
 	
 	//BT_received_flag = 0;
 	//char data = UDR0; //Get received value
