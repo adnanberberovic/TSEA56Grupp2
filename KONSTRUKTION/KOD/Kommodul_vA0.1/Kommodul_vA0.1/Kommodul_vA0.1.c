@@ -15,13 +15,14 @@
 #include <ctype.h>
 
 
-#define BuffSize 100
+#define BuffSize 10
 char outSPDR[BuffSize];
 char inSPDR[BuffSize];
 char *SPI_queue[BuffSize];
 
-
-char testbuffer_[] = "All I do is win!";
+int8_t testbuffer3_[] = {'9','8','7','6','5','4','3','2','1','0'};
+int8_t testbuffer2_[] = {9,8,7,6,5,4,3,2,1,0};
+int8_t testbuffer1_[] = {'1','2','3','4','5','6','7','8','9','0'};	
 volatile uint8_t pos_queue = 0;
 volatile uint8_t *pos_SPIqueue = &pos_queue;
 volatile uint8_t posSPIout = 0;
@@ -111,20 +112,41 @@ void BT_init(void)
 	 */
 }
 
-void send_BT_buffer(char buffer[BuffSize] )
+void add_node(buffer_* lst_head, int8_t val)
 {
-	strncpy(outBT, buffer, BuffSize); //Copy buffer to send to outBT
-	UCSR0B |= (1<<UDRIE0);	//Enable UDRE interrupt flag -> send when empty dataregister
-	// maby add while UDRIE0 = 0 here to counter multiple send_BT_buffer in a row
-}
+	if (lst_head != NULL)
+	{
+		buffer_ * curr = lst_head;
+		while (curr->next != NULL){ // step to end of list
+			curr = curr->next;
+		}
+		curr->next = (buffer_ *)malloc(sizeof(buffer_));
+		curr->next->val = val;
+		curr->next->next = NULL; // Add node last.
+	}
+	else
+	{
+		lst_head = (buffer_ *)malloc(sizeof(buffer_));
+		lst_head->val = val;
+		lst_head->next = NULL;
+	}
 
+	//buffer_ * curr = lst_head;
+	//while(curr->next != NULL) // step to end of list
+	//{
+	//curr = curr->next;
+	//}
+	//curr->next =
+	//curr->next->val = val;
+	//curr->next->next = NULL; // Add node last.
+}
 
 void Write_Buffer(char *buffer, char data, volatile uint8_t *position)
 {
 	if ((*position) == (BuffSize - 2)) // If end of buffer restart from first pos, done with read.
 	{
 		(*position) = 0; 
-		send_BT_buffer(inBT); //Echo back inBT *****************ONLY FOR TEST******************
+		//send_BT_buffer(inBT); //Echo back inBT *****************ONLY FOR TEST******************
 	}
 	buffer[(*position)] = data; //Add data to correct location
 	(*position)++;
@@ -138,20 +160,7 @@ char Read_Buffer(char *buffer, volatile uint8_t *pos_read)
 	return data;
 }
 
-void add_node(buffer_* lst_head, int8_t val)
-{
-
-	buffer_ * curr = lst_head;
-	while(curr->next != NULL) // step to end of list
-	{
-		curr = curr->next;
-	}
-	curr->next = (buffer_ *)malloc(sizeof(buffer_));
-	curr->next->val = val;
-	curr->next->next = NULL; // Add node last.
-}
-
-int pop_node(buffer_ ** lst_head)
+int8_t pop_node(buffer_ ** lst_head)
 {
 	buffer_* next_node = NULL;
 	int8_t retval = 0;
@@ -169,20 +178,56 @@ int pop_node(buffer_ ** lst_head)
 
 void BT_send(uint8_t val)
 {
-	
 	add_node(head_BTout, val);
 	UCSR0B |= (1<<UDRIE0); // activate interrupt
 	//UDR0 = (char)val;
 }
 
+void flush_list(buffer_ ** lst_head)
+{
+	while(*lst_head != NULL)
+	{
+		pop_node(lst_head);
+	}
+}
+
+void send_BT_buffer(int8_t buffer[BuffSize] )
+{
+	//flush_list(&head_BTout);
+	//strncpy(outBT, buffer, BuffSize); //Copy buffer to send to outBT
+	for(int i = 0; buffer[i]; i++ )
+	{
+		add_node(head_BTout, buffer[i]);
+	}
+	UCSR0B |= (1<<UDRIE0);	//Enable UDRE interrupt flag -> send when empty dataregister
+	// maby add while UDRIE0 = 0 here to counter multiple send_BT_buffer in a row
+}
+
+
 // Receive complete - triggered by interrupt
 ISR(USART0_RX_vect) 
 {
-	UCSR0B &= ~(1<<UDRIE0);
+	//UCSR0B &= ~(1<<UDRIE0);
 	//uint8_t data = (uint8_t)UDR0;
 	char data = UDR0;
+	if (data == '1')
+	{
+		send_BT_buffer(testbuffer1_);
+		
+	}
+	else if (data == '2')
+	{
+		send_BT_buffer(testbuffer2_);
+	}
+	else if (data == '3')
+	{
+		send_BT_buffer(testbuffer3_);
+	}
+	else{
+		UDR0 = data;
+	}
 	//add_node(head_BTin, data); //Saved received data in list 
-	UDR0 = data;
+	//UDR0 = data;
 	//BT_send(data); //echo **** CHANGE WHEN NOT TESTING ****
 	
 	//BT_received_flag = 0;
@@ -231,13 +276,6 @@ void send_SPI_buffer(char *buffer)
 }
 
 
-void flush_list(buffer_ ** lst_head)
-{
-	while(*lst_head != NULL)
-	{
-		pop_node(lst_head);
-	}
-}
 
 void SPI_send(int tosend)
 {
