@@ -23,6 +23,59 @@ DWORD BytesRead_ = 0; // how many bytes that were actually read
 int8_t WriteBuff_[10]; // Buffer to store outdata from com, [2]-bytes
 DWORD BytesWritten_ = 0; // how many bytes that were actually written
 
+struct node { // definition of the linked list node
+	int8_t val;
+	struct node *next;
+};
+
+typedef struct node buffer_; // buffer_ definieras
+
+buffer_ *head_BTout = NULL;
+buffer_ *head_BTin = NULL;
+
+void add_node(buffer_* lst_head, int8_t val)
+{
+
+	buffer_ * curr = lst_head;
+	while (curr->next != NULL) // step to end of list
+	{
+		curr = curr->next;
+	}
+	curr->next = new buffer_;
+	curr->next->val = val;
+	curr->next->next = NULL; // Add node last.
+}
+
+int pop_node(buffer_ ** lst_head)
+{
+	buffer_* next_node = NULL;
+	int8_t retval = 0;
+
+	if (*lst_head != NULL)
+	{
+		next_node = (*lst_head)->next;
+		retval = (*lst_head)->val;
+		free(*lst_head);
+		*lst_head = next_node;
+	}
+
+	return retval;
+}
+
+void BT_send(uint8_t val)
+{
+	add_node(head_BTout, val);
+}
+
+void flush_list(buffer_ ** lst_head)
+{
+	while (*lst_head != NULL)
+	{
+		pop_node(lst_head);
+	}
+}
+
+
 void TimeoutSetup()
 {
 	timeouts.ReadIntervalTimeout = 50;
@@ -34,7 +87,6 @@ void TimeoutSetup()
 		cerr << "**** TimeoutSetup error. ****\n";
 	}
 }
-
 
 void Comport_init(wstring comport)
 {
