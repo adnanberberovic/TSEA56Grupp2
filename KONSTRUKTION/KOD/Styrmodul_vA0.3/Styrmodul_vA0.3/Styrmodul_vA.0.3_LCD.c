@@ -99,6 +99,30 @@ void LCD_SetPosition(uint8_t pos)
 	
 }
 
+// Sets position for cursor on LCD. Argument should be a number in the range of 0-31.
+void LCD_SetPosition(uint8_t pos)
+{
+	LCD_Counter =(int) pos - 1;
+	while(LCD_Busy())
+	{
+		_delay_ms(1);
+	}
+	PORTB &= ~(1 << 0); // Clear RS and
+	PORTB &= ~(1 << 1); // clear R/W bits so that the following commands can be run
+	
+	if (pos < 16)
+	{
+		LCD_SendCommand(128+pos);
+	}
+	else if (pos < 32)
+	{
+		LCD_SendCommand(128+64-16+pos);
+	}
+	else LCD_SendCommand(0b10000000);
+	
+}
+
+
 void LCD_SendCharacter(char symbol)
 {
 	LCD_Counter++;
