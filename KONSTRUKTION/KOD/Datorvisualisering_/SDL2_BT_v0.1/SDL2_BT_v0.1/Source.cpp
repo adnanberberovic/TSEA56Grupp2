@@ -22,6 +22,8 @@ DWORD BytesRead_ = 0; // how many bytes that were actually read
 char ReadBuff_[BUFFSIZE];
 char WriteBuff_[BUFFSIZE];
 
+bool Command_flag = false;
+
 
 //Initialize commport
 void Init_CommPort(string comport){
@@ -81,19 +83,41 @@ void Init_Welcome()
 void Read_ComData(){
 	fill(begin(ReadBuff_), end(ReadBuff_), '\0');
 	
+	if (Command_flag == true) //instruction that was sent = command/request 
+	{
+		if (!ReadFile(hComm, ReadBuff_, 1, &BytesRead_, NULL)) // rid of ninja 0
+		{
+			cerr << "Reading from file failed!\n";
+		}
+	}
+	cout << Command_flag;
+	Command_flag = false; //Reset commandflag
+
 	if (!ReadFile(hComm, ReadBuff_, BUFFSIZE, &BytesRead_, NULL)) // BytesRead contains amount of read bytes
 	{
 		cerr << "Reading from file failed!\n";
 	}
 	cout << "\nReadbuff: ";
 
-	for (int i = 0; i < BUFFSIZE; i++)
+	for (int i = 0; i < BytesRead_; i++)
 		{
-			char c = ReadBuff_[i];
+			int c = ReadBuff_[i];
 			cout << c;
 		}
 		cout << "\n Bytes read: " << BytesRead_ << endl << "> ";
 	
+}
+
+void Check_command(char in_){ //check if input
+	switch (in_){
+	case '2': Command_flag = true;
+		break;
+	case '3': Command_flag = true;
+		break;
+	case '1': Command_flag = true;
+		break;
+	}
+	return;
 }
 
 void Write_ComData(){
@@ -102,6 +126,7 @@ void Write_ComData(){
 	int i = 0;
 	while ((cin.peek() != '\n') && (i != BUFFSIZE)){
 		cin >> W_in;
+		Check_command(W_in);
 		WriteBuff_[i] = W_in;
 		i++;
 	}
@@ -116,8 +141,6 @@ void Write_ComData(){
 		cout << "Data written\n> ";
 	}
 }
-
-
 
 //Handles input from keyboard
 void Input_Loop(){
@@ -175,6 +198,9 @@ void Input_Loop(){
 	}
 }
 
+//Screen dimension constants
+const int SCREEN_WIDTH = 640;
+const int SCREEN_HEIGHT = 480;
 
 int main(int argc, char* argv[])
 {
