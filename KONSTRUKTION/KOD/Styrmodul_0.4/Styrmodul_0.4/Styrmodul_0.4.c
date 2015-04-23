@@ -1,4 +1,4 @@
-/*
+ï»¿/*
  * pwmpls.c
  *
  * Created: 4/13/2015 12:39:10 PM
@@ -7,6 +7,7 @@
 
 #define F_CPU 20000000UL
 
+#include <stdlib.h>
 #include <avr/io.h>
 #include <avr/interrupt.h>
 #include <avr/sleep.h>
@@ -25,35 +26,15 @@ uint8_t arrSpeed[2] = {93,93}; //array with current speed from manual controll
 
 // GLOBAL VARIABLES
 
-// Sets position for cursor on LCD. Argument should be a number in the range of 0-31.
-//void LCD_SetPosition(uint8_t pos)
-//{
-	//LCD_Counter =(int) pos - 1;
-	//while(LCD_Busy())
-	//{
-		//_delay_ms(1);
-	//}
-	//PORTB &= ~(1 << 0); // Clear RS and
-	//PORTB &= ~(1 << 1); // clear R/W bits so that the following commands can be run
-	//
-	//if (pos < 16)
-	//{
-		//LCD_SendCommand(128+pos);
-	//}
-	//else if (pos < 32)
-	//{
-		//LCD_SendCommand(128+64-16+pos);
-	//}
-	//else LCD_SendCommand(0b10000000);
-	//
-//}
-
 // One overflow corresponds to 13.1 ms if the F_CPU is 20 MHz and the defined prescaler.
 // This timer will reset every time it reaches 10.
 int TIMER_overflows;
 
 // The following overflow storage corresponds to 131ms. This timer will never reset.
 int TIMER_overflows_deci;
+
+// This variable is used to store robots angle in degrees
+int rotation_angle = 0;
 
 // Setup data direction registers @ ports for out/inputs.
 void Styr_InitPortDirections(void)
@@ -62,7 +43,7 @@ void Styr_InitPortDirections(void)
 	DDRB = 1<<DDB0 | 1<<DDB1 | 1<<DDB2 | 1<<DDB3 | 1<<DDB4 | 1<<DDB5 | 1<<DDB7;
 	DDRC = 1<<DDC0;
 	DDRD = 1<<DDD0 | 1<<DDD1 | 0<<DDD2 | 1<<DDD3 | 1<<DDD4 | 1<<DDD5 | 1<<DDD6 | 1<<DDD7;
-	//D2 ingång för reflexsensor
+	//D2 ingÐµng fÑ†r reflexsensor
 }
 
 // Setups port values, more specifically puts SS on high.
@@ -98,11 +79,7 @@ unsigned char SPI_MasterTransmit(uint8_t cData, char target)
 	{
 		PORTB &= ~(1<<PORTB3);
 	}
-	else if (target == 'g') // G as in gyro
-	{
-		PORTC &= ~(1<<PORTC0);
-		
-	}
+	
 	// Load data into SPI data register.
 	SPDR = cData;
 	
@@ -112,29 +89,12 @@ unsigned char SPI_MasterTransmit(uint8_t cData, char target)
 	// Reset SS.
 	PORTB |= 1<<PORTB3 | 1<<PORTB4;
 	PORTC |= 1<<PORTC0;
+
 		
 	return SPDR;
 }
 
-void set_GyroSS_Low()
-{
-	PORTC &= ~(1<<PORTC0);
-}
-void set_GyroSS_High()
-{
-	PORTC |= (1<<PORTC0);
-}
 
-unsigned char SPI_MasterTransmit_Gyro(unsigned char cData)
-{
-	// Load data into SPI data register.
-	SPDR = cData;
-	
-	// Wait until transmission completes.
-	while(!(SPSR & (1<<SPIF)));
-	
-	return SPDR;
-}
 
 //----------------------------PWM------------------------------------
 
@@ -293,71 +253,77 @@ ISR(TIMER0_OVF_vect)
 		//LCD_SendString("ALLAHU AKBAR!");
 	//}
 }
-//----------------------------GYRO------------------------------------
-/*
-void sleepGyroADC()
-{
-	unsigned int dataH;
-	SPI_MasterTransmit(0b10010000,'g');
-	// check if instruction received
-	// by sending two dummy bytes:
-	dataH = SPI_MasterTransmit(0x00,'g');
-	_delay_us(200);
-	SPI_MasterTransmit(0x00,'g');
-	_delay_us(200);
 
+//----------------------------GYRO------------------------------------
+
+unsigned char SPI_MasterTransmit_Gyro(unsigned char cData)
+{
+	// Load data into SPI data register.
+	SPDR = cData;
 	
-	// 	if (dataH & 0b10000000) {
-	// 		LCD_SendString("not accepted");
-	// 	}
-	// 	else LCD_SendString("sleep");
+	// Wait until transmission completes.
+	while(!(SPSR & (1<<SPIF)));
+	
+	return SPDR;
 }
-*/
+
+void set_GyroSS_Low() // connect gyro
+{
+	PORTC &= ~(1<<PORTC0);
+}
+void set_GyroSS_High() // disconnect gyro
+{
+	PORTC |= (1<<PORTC0);
+}
 
 void Gyro_Init()
 {
+
 	SPCR &= ~(1<<DORD);
 	int8_t first_byte1;
 	do{
 		set_GyroSS_Low();
 		SPI_MasterTransmit_Gyro(0b10010100); //Activate adc
-		first_byte1 = SPI_MasterTransmit_Gyro(0x00); //Byte with EOC and Accepted instr. bit
-		SPI_MasterTransmit_Gyro(0x00); //Last byte
+		high_byte = SPI_MasterTransmit_Gyro(0x00); //Byte with EOC and Accepted instr. bit
+		SPI_MasterTransmit_Gyro(0x00); //low byte
 		set_GyroSS_High();
 	} while ( (first_byte1 & 0b10000000) & !(first_byte1 & 0b00100000)); // IF EOC = 0 and acc.instr. = 1 we continue
 	SPCR |= (1<<DORD);
+
 }
 
 void Gyro_StartConversion()
 {
+
 	int8_t first_byte2;
 	SPCR &= ~(1<<DORD);
 	do{
 		set_GyroSS_Low();
-		SPI_MasterTransmit_Gyro(0b10010100); //Activate adc with angular rate signal
-		first_byte2 = SPI_MasterTransmit_Gyro(0x00); //Byte with EOC and Accepted instr. bit
-		SPI_MasterTransmit_Gyro(0x00); //Last byte
+		SPI_MasterTransmit_Gyro(0b10010100); //Activate adc, select angular rate channel
+		high_byte = SPI_MasterTransmit_Gyro(0x00); //Byte with EOC and Accepted instr. bit
+		SPI_MasterTransmit_Gyro(0x00); //low byte
 		set_GyroSS_High();
+
 	} while (first_byte2 & 0b10000000); // IF  acc.instr. = 1 we continue
 	SPCR |= (1<<DORD);
+
 }
 
 int16_t Gyro_PollResult()
 {
-	int8_t first_byte3;
-	int8_t second_byte;
+	int8_t high_byte, low_byte;
 	int16_t return_val;
+
 	SPCR &= ~(1<<DORD);
-		do{
-			set_GyroSS_Low();
-			SPI_MasterTransmit_Gyro(0b10000000); //Activate adc
-			first_byte3 = SPI_MasterTransmit_Gyro(0x00); //Byte with EOC and Accepted instr. bit
-			second_byte = SPI_MasterTransmit_Gyro(0x00); //Last byte
-			set_GyroSS_High();
-		} while ( (first_byte3 & 0b10000000) & !(first_byte3 & 0b00100000)); // IF EOC = 0 and acc.instr. = 1 we continue
-		
+	do{
+		set_GyroSS_Low();
+		SPI_MasterTransmit_Gyro(0b10000000); //Activate adc
+		high_byte = SPI_MasterTransmit_Gyro(0x00); //Byte with EOC and Accepted instr. bit
+		low_byte = SPI_MasterTransmit_Gyro(0x00); //low byte
+		set_GyroSS_High();
+	} while ((high_byte & 0b10000000) & !(high_byte & 0b00100000)); // IF EOC = 0 and acc.instr. = 1 we continue
 	SPCR |= (1<<DORD);
-	return_val = ((first_byte3 & 0x00ff) << 8) | (second_byte);
+	return_val = ((high_byte & 0x00ff) << 8) | (low_byte);
 	return return_val;
 }
 
@@ -366,9 +332,61 @@ int16_t Get_ADC_value(int16_t inval_)
 	int16_t result_;
 	result_ = inval_ & 0x0fff;
 	result_ = result_ >> 1;
-
 	return result_;
-} 
+}
+
+// Converts the adc reading to angles per second
+int16_t adcToAngularRate(int16_t adcValue)
+{
+	int16_t AngularRate = (adcValue * 25/12)+400;  // in mV
+	// from the data sheet, R2 gyroscope sensor version is 26,67 mV/deg
+	// for gyroscope with max angular rate 300 deg/s
+	return (AngularRate - 2500)/26.67;
+}
+
+void Gyro_Sleep()
+{
+	SPCR &= ~(1<<DORD);
+	int8_t dataH;
+	do {
+		set_GyroSS_Low();
+		SPI_MasterTransmit_Gyro(0b10010000);
+		dataH = SPI_MasterTransmit_Gyro(0x00);
+		SPI_MasterTransmit_Gyro(0x00);
+		set_GyroSS_High();
+	} while (dataH & 0b10000000);
+	SPCR |= (1<<DORD);
+}
+
+// use after decision to turn is made and rotation has began
+// use in functions MOTOR_RotateLeft(), MOTOR_RotateLeft()
+// stop rotating when 90 degrees reached; use only during rotation
+// FUNCTION has not been TESTED! too low angular rate may result in total rotation angle larger than 90 degrees
+void checkAngle90()
+{
+	int16_t result = 0;
+	int16_t temp = 0;
+	int start_time = TIMER_overflows_deci;
+	do {
+		start_time = TIMER_overflows_deci;
+		Gyro_StartConversion();
+		result = Gyro_PollResult();
+		result = Get_ADC_value(result);
+		result = adcToAngularRate(result);
+		// sometimes gyro shows 80 deg/s when it is not in rotation, or rotation is too slow
+		// if-satsen kontrollerar att det inte fÃ¶rekommer "stora hopp" i vinkelhastighet
+		if (60 < abs(temp - result)) { // precaution (value "60" can be changed to another)
+			rotation_angle += temp * (TIMER_overflows_deci - start_time) * 131;
+		}
+		else {
+			rotation_angle += result * (TIMER_overflows_deci - start_time) * 131;
+			temp = result;
+		}
+		
+	} while (rotation_angle >= 90);
+	
+	rotation_angle = 0; //reset
+}
 
 //----------------------------GYRO----END-----------------------------
 
@@ -378,7 +396,7 @@ int speed_calculator()
 {
 	int start_time = TIMER_overflows_deci; //Read start time
 	int wheel_circumference = 204; //Wheel circumference is 204 mm
-	int wheel_marker_counter = 0; //Hjulet är uppdelat i 8 svarta och vita 8 sektioner. Öka antal?
+	int wheel_marker_counter = 0; //Hjulet Ð´r uppdelat i 8 svarta och vita 8 sektioner. Ð¦ka antal?
 	int speed;
 	
 	while(wheel_marker_counter < 8)
@@ -474,7 +492,7 @@ void Drive_test()
 
 void Gyro_test()
 {
-	//DORD: Data order. Set to 1 to transmit LSB first, MSB last
+	//DORD: Data order. Set to 0 to transmit MSB first, LSB last
 	//OBS: Spegla det som skickas!
 	
 	int16_t result = 0;
