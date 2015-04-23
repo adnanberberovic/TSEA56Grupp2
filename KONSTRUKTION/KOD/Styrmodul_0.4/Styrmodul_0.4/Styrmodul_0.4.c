@@ -19,6 +19,7 @@
 #include "Styrmodul_Servo.c"
 
 
+uint8_t arrSpeed[2] = {93,93}; //array with current speed from manual controll
 
 //#include <avr/pgmspace.h>
 
@@ -75,7 +76,7 @@ void Styr_InitPortValues(void)
 void SPI_MasterInit(void)
 {
 	SPSR = 0<<SPI2X;
-	SPCR = 0<<SPIE | 1<<SPE | 0<<DORD | 1<<MSTR | 0<<CPOL | 0<<CPHA | 1<<SPR1 | 1<<SPR0;
+	SPCR = 0<<SPIE | 1<<SPE | 1<<DORD | 1<<MSTR | 0<<CPOL | 0<<CPHA | 1<<SPR1 | 1<<SPR0;
 	// SPIE: SPI interrupt enable. Set to 1 to allow interrupts
 	// SPE: SPI Enable. Set to 1 to allow SPI communication
 	// DORD: Data order. Set to 1 to transmit LSB first, MSB last.
@@ -87,7 +88,7 @@ void SPI_MasterInit(void)
 }
 
 // Initiates communication with other modules.
-unsigned char SPI_MasterTransmit(unsigned char cData, char target)
+unsigned char SPI_MasterTransmit(uint8_t cData, char target)
 {
 	if (target == 'k') // K as in kommunikation
 	{
@@ -110,7 +111,7 @@ unsigned char SPI_MasterTransmit(unsigned char cData, char target)
 	
 	// Reset SS.
 	PORTB |= 1<<PORTB3 | 1<<PORTB4;
-	//PORTC |= 1<<PORTC0;
+	PORTC |= 1<<PORTC0;
 		
 	return SPDR;
 }
@@ -267,6 +268,16 @@ int8_t sensor_value(int8_t val)
 	return temp;
 }
 
+void Get_speed_value()
+{
+	SPI_MasterTransmit(1, 'k');
+	_delay_us(40);
+	arrSpeed[0] = SPI_MasterTransmit(0x07,'k'); //Get left speed
+	_delay_us(40);
+	arrSpeed[1] = SPI_MasterTransmit(0x07,'k'); //Get right speed
+	
+}
+
 ISR(TIMER0_OVF_vect)
 {
 	TIMER_overflows++;
@@ -305,6 +316,7 @@ void sleepGyroADC()
 
 void Gyro_Init()
 {
+	SPCR &= ~(1<<DORD);
 	int8_t first_byte1;
 	do{
 		set_GyroSS_Low();
@@ -313,11 +325,13 @@ void Gyro_Init()
 		SPI_MasterTransmit_Gyro(0x00); //Last byte
 		set_GyroSS_High();
 	} while ( (first_byte1 & 0b10000000) & !(first_byte1 & 0b00100000)); // IF EOC = 0 and acc.instr. = 1 we continue
+	SPCR |= (1<<DORD);
 }
 
 void Gyro_StartConversion()
 {
 	int8_t first_byte2;
+	SPCR &= ~(1<<DORD);
 	do{
 		set_GyroSS_Low();
 		SPI_MasterTransmit_Gyro(0b10010100); //Activate adc with angular rate signal
@@ -325,6 +339,7 @@ void Gyro_StartConversion()
 		SPI_MasterTransmit_Gyro(0x00); //Last byte
 		set_GyroSS_High();
 	} while (first_byte2 & 0b10000000); // IF  acc.instr. = 1 we continue
+	SPCR |= (1<<DORD);
 }
 
 int16_t Gyro_PollResult()
@@ -332,7 +347,7 @@ int16_t Gyro_PollResult()
 	int8_t first_byte3;
 	int8_t second_byte;
 	int16_t return_val;
-	
+	SPCR &= ~(1<<DORD);
 		do{
 			set_GyroSS_Low();
 			SPI_MasterTransmit_Gyro(0b10000000); //Activate adc
@@ -341,6 +356,7 @@ int16_t Gyro_PollResult()
 			set_GyroSS_High();
 		} while ( (first_byte3 & 0b10000000) & !(first_byte3 & 0b00100000)); // IF EOC = 0 and acc.instr. = 1 we continue
 		
+	SPCR |= (1<<DORD);
 	return_val = ((first_byte3 & 0x00ff) << 8) | (second_byte);
 	return return_val;
 }
@@ -355,7 +371,6 @@ int16_t Get_ADC_value(int16_t inval_)
 } 
 
 //----------------------------GYRO----END-----------------------------
-
 
 
 //Returns speed in millimeters/milliseconds = meters/second
@@ -457,14 +472,13 @@ void Drive_test()
 	SERVO_ReleaseGrip();
 }
 
-
 void Gyro_test()
 {
 	//DORD: Data order. Set to 1 to transmit LSB first, MSB last
 	//OBS: Spegla det som skickas!
 	
 	int16_t result = 0;
-	
+	SPCR &= ~(1<<DORD);
 	while (1)
 	{
 		LCD_Clear();
@@ -475,10 +489,9 @@ void Gyro_test()
 		LCD_display_int16(adcToAngularRate(result));
 		_delay_ms(250);
 	}
-	
+	SPCR |= (1<<DORD);
 	return;
 }
-
 
 void Speed_test()
 {
@@ -505,13 +518,31 @@ int main(void)
 	init_all();
 	//int8_t sensor_data[4];
 	//_delay_ms(250);		
-	
-	
+	uint16_t i;
+	LCD_Clear();
 	while (1)
 	{
+		Get_speed_value();
+		LCD_Clear();
+		LCD_SetPosition(0);
+		//arrSpeed[0] = SPI_MasterTransmit(0x00, 'k');
+		i = (uint16_t)arrSpeed[0];
+		LCD_display_uint16(i);
+		LCD_SendCharacter(' ');
+		_delay_ms(250);
+		_delay_ms(250);
+
+		LCD_SetPosition(16);
+		
+		LCD_display_uint16((uint16_t)arrSpeed[1]);
+		LCD_SendCharacter(' ');
+		_delay_ms(250);
+		_delay_ms(250);
+
+
 		//Gyro_test();
 		//Drive_test();
-		Speed_test();
+		//Speed_test();
 	}
 	
 }
