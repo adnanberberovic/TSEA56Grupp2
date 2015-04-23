@@ -20,16 +20,17 @@ char outSPDR[BuffSize];
 char inSPDR[BuffSize];
 char *SPI_queue[BuffSize];
 
-int8_t testbuffer3_[] = {'9','8','7','6','5','4','3','2','1','0'};
-int8_t testbuffer2_[] = {9,8,7,6,5,4,3,2,1,0};
-int8_t testbuffer1_[] = {'1','2','3','4','5','6','7','8','9','0'};	
+uint8_t testbuffer3_[] = {9,8,7,6,5,4,3,2,1,0};
+uint8_t testbuffer2_[] = {9,8,7,6,5,4,3,2,1,0};
+uint8_t testbuffer1_[] = {'1','2','3','4','5','6','7','8','9','0'};
+char testbuffer4_[] = {'a','b','c','d','e','f','g','h','i','j'};		
 volatile uint8_t pos_queue = 0;
 volatile uint8_t *pos_SPIqueue = &pos_queue;
 volatile uint8_t posSPIout = 0;
 volatile uint8_t posSPIin = 0;
 volatile uint8_t *posBuff_SPIout = &posSPIout;
 volatile uint8_t *posBuff_SPIin = &posSPIin;
-volatile uint8_t ongoing_SPI_transfer = 0;
+volatile uint8_t ongoing_SPI_transfer = 0; 
 
 char outBT[BuffSize];
 char inBT[BuffSize];
@@ -44,23 +45,26 @@ volatile uint8_t *writePos_BTout = &wBTout;
 volatile uint8_t BT_received_flag = 0;
 volatile uint8_t BT_sent_flag = 0;
 
+
+uint8_t arrSpeed[] = {0,0}; //Array with current speed. From/to PC/master left
+uint8_t incomingSpeed_ = 0;
+
 uint8_t sendFlag = 0;
 
 //*********** BUFFER STRUCT ****************
 
 struct node { // definition of the linked list node
-	int8_t val;
+	uint8_t val;
 	struct node *next;
 	};
 
 typedef struct node buffer_; // buffer_ definieras
 
-buffer_ *head_SPIout = NULL;
-buffer_ *head_SPIin = NULL;
+buffer_* head_SPIout = NULL;
+buffer_* head_SPIin = NULL;
 
-buffer_ *head_BTout = NULL;
-buffer_ *head_BTin = NULL;
-
+buffer_* head_BTout = NULL;
+buffer_* head_BTin = NULL;
 //_______________________________________________
 
 
@@ -112,33 +116,26 @@ void BT_init(void)
 	 */
 }
 
-void add_node(buffer_* lst_head, int8_t val)
+void add_node(buffer_** lst_head, uint8_t val)
 {
-	if (lst_head != NULL)
+	if (*lst_head == 0)
 	{
-		buffer_ * curr = lst_head;
-		while (curr->next != NULL){ // step to end of list
-			curr = curr->next;
-		}
-		curr->next = (buffer_ *)malloc(sizeof(buffer_));
-		curr->next->val = val;
-		curr->next->next = NULL; // Add node last.
-	}
-	else
-	{
-		lst_head = (buffer_ *)malloc(sizeof(buffer_));
-		lst_head->val = val;
-		lst_head->next = NULL;
-	}
 
-	//buffer_ * curr = lst_head;
-	//while(curr->next != NULL) // step to end of list
-	//{
-	//curr = curr->next;
-	//}
-	//curr->next =
-	//curr->next->val = val;
-	//curr->next->next = NULL; // Add node last.
+		(*lst_head) = (buffer_*)malloc(sizeof(buffer_));
+		(*lst_head)->next = 0;
+		(*lst_head)->val = val;
+	}
+	
+	//UDR0 = val;
+
+	buffer_ * curr = *lst_head;
+	while (curr->next != 0){ // step to end of list
+		curr = curr->next;
+	}
+	curr->next = (buffer_ *)malloc(sizeof(buffer_));
+	curr->val = val;
+	curr->next->next = 0; // Add node last.
+
 }
 
 void Write_Buffer(char *buffer, char data, volatile uint8_t *position)
@@ -160,10 +157,10 @@ char Read_Buffer(char *buffer, volatile uint8_t *pos_read)
 	return data;
 }
 
-int8_t pop_node(buffer_ ** lst_head)
+uint8_t pop_node(buffer_ ** lst_head)
 {
 	buffer_* next_node = NULL;
-	int8_t retval = 0;
+	uint8_t retval = 3;
 	
 	if ( *lst_head != NULL)
 	{
@@ -171,33 +168,44 @@ int8_t pop_node(buffer_ ** lst_head)
 		retval = (*lst_head)->val;
 		free(*lst_head);
 		*lst_head = next_node;
+		return retval;
 	}
-	
+
 	return retval;
+	
 }
 
 void BT_send(uint8_t val)
 {
-	add_node(head_BTout, val);
+	add_node(&head_BTout, val);
 	UCSR0B |= (1<<UDRIE0); // activate interrupt
-	//UDR0 = (char)val;
 }
 
 void flush_list(buffer_ ** lst_head)
 {
-	while(*lst_head != NULL)
+	if (*lst_head == NULL)
 	{
-		pop_node(lst_head);
+		return;
 	}
+	
+	buffer_* curr_node = *lst_head;
+	*lst_head = NULL;
+	
+	if (curr_node->next != NULL)
+	{
+		flush_list(&(curr_node->next));
+	}
+	free(curr_node);
 }
 
-void send_BT_buffer(int8_t buffer[BuffSize] )
+void send_BT_buffer(uint8_t buffer[BuffSize] )
 {
-	//flush_list(&head_BTout);
+	flush_list(&head_BTout);
+
 	//strncpy(outBT, buffer, BuffSize); //Copy buffer to send to outBT
 	for(int i = 0; buffer[i]; i++ )
 	{
-		add_node(head_BTout, buffer[i]);
+		add_node(&head_BTout, buffer[i]);
 	}
 	UCSR0B |= (1<<UDRIE0);	//Enable UDRE interrupt flag -> send when empty dataregister
 	// maby add while UDRIE0 = 0 here to counter multiple send_BT_buffer in a row
@@ -207,13 +215,22 @@ void send_BT_buffer(int8_t buffer[BuffSize] )
 // Receive complete - triggered by interrupt
 ISR(USART0_RX_vect) 
 {
-	//UCSR0B &= ~(1<<UDRIE0);
-	//uint8_t data = (uint8_t)UDR0;
-	char data = UDR0;
-	if (data == '1')
-	{
-		send_BT_buffer(testbuffer1_);
-		
+	uint8_t data = (uint8_t)UDR0;
+	uint8_t SpeedFlag_ = 1;
+	if (data /*== SpeedFlag_*/ ) //Incoming speed array, size 2
+	{	
+		if (incomingSpeed_ == 0){
+			incomingSpeed_++; //Set flag of incoming Speedarray
+		}
+		else{
+			arrSpeed[(incomingSpeed_ - 1)] = data; //Load incoming data
+			if (incomingSpeed_ == 2){ //if second byte received
+				incomingSpeed_ = 0; //set incoming speed = 0
+			}
+			else{
+				incomingSpeed_++; //Step up incoming speed
+			}
+		}
 	}
 	else if (data == '2')
 	{
@@ -225,14 +242,12 @@ ISR(USART0_RX_vect)
 	}
 	else{
 		UDR0 = data;
+		
+		
+		//add_node(head_BTin, data); //Saved received data in list 
+
 	}
-	//add_node(head_BTin, data); //Saved received data in list 
-	//UDR0 = data;
-	//BT_send(data); //echo **** CHANGE WHEN NOT TESTING ****
 	
-	//BT_received_flag = 0;
-	//char data = UDR0; //Get received value
-	//Write_Buffer(inBT, data, writePos_BTin); //Writes data to buffer in order they are received
 	
 }
 
@@ -246,22 +261,8 @@ ISR(USART0_UDRE_vect)
 	}
 	else
 	{
-		UDR0 = (int8_t)pop_node(&head_BTout); 
+		UDR0 = pop_node(&head_BTout); 
 	}
-	
-	
-	//if ((*readPos_BTout) == BuffSize) //Read entire buff and sent it
-	//{
-		//(*readPos_BTout) = 0;
-		//BT_sent_flag = 1; // done with transmission
-		//UCSR0B &= ~(1<<UDRIE0); //Disable UDRE interrupt, All data is sent. 
-	//}
-	//else
-	//{
-		//BT_sent_flag = 0;
-		//UDR0 = Read_Buffer(outBT, readPos_BTout); //Send back the next value in out-buffer. 														
-	//}
-		
 }
 
 void send_SPI_buffer(char *buffer)
@@ -275,17 +276,15 @@ void send_SPI_buffer(char *buffer)
 	
 }
 
-
-
-void SPI_send(int tosend)
+void SPI_send(uint8_t tosend)
 {
-	add_node(head_SPIout, tosend); //Add node with tosend-value to desired list
+	add_node(&head_SPIout, tosend); //Add node with tosend-value to desired list
 }
 
-void SPI_send_arr(int8_t tosend[], int size) // lenght of array = sizeof(array)/sizeof(element in array)
+void SPI_send_arr(uint8_t tosend[], int size) // lenght of array = sizeof(array)/sizeof(element in array)
 {
 	int i = 0;
-	while(i < size)// +2 due to continu
+	while(i < size)
 	{
 		SPI_send(tosend[i]);
 		i++;
@@ -295,16 +294,27 @@ void SPI_send_arr(int8_t tosend[], int size) // lenght of array = sizeof(array)/
 // Interrupt method runs when SPI transmission/reception is completed.
 ISR(SPI_STC_vect)
 {
-	int data = (int)SPDR;
-	add_node(head_SPIin, data); // Add received data to in-queue
+	uint8_t data = SPDR;
+	
+	if (data == 1)
+	{
+		SPI_send_arr(arrSpeed,sizeof(arrSpeed)/sizeof(arrSpeed[0]));
+		SPDR = pop_node(&head_SPIout);
+		return;
+	}
+	
+	//add_node(&head_SPIin, data); // Add received data to in-queue
+	
+	
 	if (head_SPIout == NULL)
 	{
-		int8_t stop_bit = -128; //0b10000000, cant be shown on lcd as -128 due to limits in print func.
+		uint8_t stop_bit = 255; //0b10000000, cant be shown on lcd as -128 due to limits in print func.
 		SPDR = stop_bit;
 	}
 	else
 	{
-		SPDR = (int8_t)pop_node(&head_SPIout);
+		SPDR = pop_node(&head_SPIout);
+		
 	}
 }
 
@@ -312,22 +322,23 @@ ISR(SPI_STC_vect)
 int main(void)
 {
 
-	head_SPIout = (buffer_ *)malloc(sizeof(buffer_)); //Define head of list for SPI- values to send and alloc memory.
-	head_SPIout->next= NULL;
-	head_SPIout->val = 0;
-	
+	//head_SPIout = (buffer_ *)malloc(sizeof(buffer_)); //Define head of list for SPI- values to send and alloc memory.
+	//head_SPIout->next= NULL;
+	//head_SPIout->val = 0;
+	//
 
-	head_SPIin = (buffer_ *)malloc(sizeof(buffer_)); //Define head of list for SPI- values to receive and alloc memory.
-	head_SPIin->next= NULL;
-	head_SPIin->val = 0;
-	
-	head_BTin = (buffer_ *)malloc(sizeof(buffer_));
-	head_BTin->next= NULL;
-	head_BTin->val = 0;
-	head_BTout = (buffer_ *)malloc(sizeof(buffer_));
-	head_BTout->next= NULL;
-	head_BTout->val = 0;
-	
+	//head_SPIin = (buffer_ *)malloc(sizeof(buffer_)); //Define head of list for SPI- values to receive and alloc memory.
+	//head_SPIin->next= NULL;
+	//head_SPIin->val = 0;
+	//
+	//head_BTin = (buffer_ *)malloc(sizeof(buffer_));
+	//head_BTin->next= NULL;
+	//head_BTin->val = 0;
+	//
+	//head_BTout = (buffer_ *)malloc(sizeof(buffer_));
+	//head_BTout->next= NULL;
+	//head_BTout->val = 0;
+	//
 	
 	sleep_enable();
 	Komm_InitPortDirections();
@@ -337,11 +348,12 @@ int main(void)
 	sei();
 	//flush_list(&head_SPIout);
 	//flush_list(&head_SPIin);
-	int8_t array[] ={1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29};
-	SPI_send_arr(array, (sizeof(array)/sizeof(array[0]))); // sizeof(array)/sizeof(element in array) = lenght of array
+	//uint8_t array[] ={1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29};
+	//SPI_send_arr(array, (sizeof(array)/sizeof(array[0]))); // sizeof(array)/sizeof(element in array) = lenght of array
+	//SPI_send_arr(testbuffer3_, sizeof(testbuffer3_)/sizeof(testbuffer3_[0]));
 	while(1)
 	{
-		flush_list(&head_SPIin);
+		//flush_list(&head_SPIin);
 	}
 }
 
