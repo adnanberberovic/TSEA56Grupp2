@@ -364,15 +364,53 @@ int speed_calculator()
 	int start_time = TIMER_overflows_deci; //Read start time
 	int wheel_circumference = 204; //Wheel circumference is 204 mm
 	int wheel_marker_counter = 0; //Hjulet är uppdelat i 8 svarta och vita 8 sektioner. Öka antal?
- 
+	int speed;
+	
 	while(wheel_marker_counter < 8)
 	{
-		if(
-		) //When PIND2 == 1 (reflex sensor) - increase counter. 
+		LCD_Clear();
+		if((PIND & 0b00000100) == 4) //PIND2 motsvarar 3 biten = 2^2
+		{ 
+			//When reflex sensor high - increase counter. 
 			wheel_marker_counter++;
+			LCD_Clear();
+			LCD_SendString("OK");
+			_delay_ms(250);
+			_delay_ms(250);
+			_delay_ms(250);
+			LCD_Clear();
+			LCD_display_int16(wheel_marker_counter);
+			_delay_ms(250);
+			_delay_ms(250);	
+		}
+		else
+		{	
+			 int speed = 0;
+			 LCD_display_int16(PIND2);
+			 _delay_ms(250);
+			 _delay_ms(250);
+			 _delay_ms(250);
+			 _delay_ms(250);
+			 LCD_Clear();
+			 LCD_display_int16(PIND&0b00000100);
+			  _delay_ms(250);
+			  _delay_ms(250);
+			  _delay_ms(250);
+			  _delay_ms(250);
+		}
 	}
 	
-	return wheel_circumference/(TIMER_overflows_deci - start_time)*131; //speed = distance/(finish_time - start_time)
+	//speed = distance/(finish_time - start_time)
+	//is it really 8 laps until you get  back to same pos? shouldnt you remove some length 
+	//USE CORRECT WHEEL CIRCUM - DIFFERENT DISTANCE!
+	speed = wheel_circumference/(TIMER_overflows_deci - start_time)*131;
+	
+	LCD_Clear();
+	LCD_display_int16(speed);
+	_delay_ms(250);
+	_delay_ms(250);
+	
+	return speed;
 }
 
 void Drive_test()
@@ -419,11 +457,14 @@ void Drive_test()
 	SERVO_ReleaseGrip();
 }
 
-//DORD: Data order. Set to 1 to transmit LSB first, MSB last
-//Spegla det som skkickas !
 
 void Gyro_test()
 {
+	//DORD: Data order. Set to 1 to transmit LSB first, MSB last
+	//OBS: Spegla det som skickas!
+	
+	int16_t result = 0;
+	
 	while (1)
 	{
 		LCD_Clear();
@@ -431,8 +472,7 @@ void Gyro_test()
 		Gyro_StartConversion();
 		result = Gyro_PollResult();
 		result = Get_ADC_value(result);
-		//LCD_display_uint16(adcToAngularRate( result ));
-		LCD_display_int16(adcToAngularRate( result ));
+		LCD_display_int16(adcToAngularRate(result));
 		_delay_ms(250);
 	}
 	
@@ -442,7 +482,8 @@ void Gyro_test()
 
 void Speed_test()
 {
-	LCD_display_int8(PIND2);
+	speed_calculator();
+	//LCD_display_int8(PIND2);
 }
 
 void init_all()
@@ -463,11 +504,8 @@ int main(void)
 {
 	init_all();
 	//int8_t sensor_data[4];
-	_delay_ms(250);		
+	//_delay_ms(250);		
 	
-	int16_t result = 0;
-	int8_t dataH, dataL;
-	Gyro_ActivateADC();
 	
 	while (1)
 	{

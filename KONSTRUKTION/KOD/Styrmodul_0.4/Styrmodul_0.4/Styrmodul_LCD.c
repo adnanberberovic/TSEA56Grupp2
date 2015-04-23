@@ -163,7 +163,7 @@ void LCD_display_int8(int8_t val) {
 	 }
  }
 
-LCD_display_int16(int16_t val) {
+void LCD_display_int16(int16_t val) {
 	unsigned char buf[5];
 	if (val < 0) {
 	  LCD_SendCharacter('-');
