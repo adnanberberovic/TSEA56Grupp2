@@ -20,7 +20,7 @@
 #include "Styrmodul_Servo.c"
 
 
-uint8_t arrSpeed[2] = {93,93}; //array with current speed from manual controll
+uint8_t arrSpeed[] = {0,0,1,1,0}; //speedLeft, SpeedRight, DirLeft, DirRight, grip
 
 //#include <avr/pgmspace.h>
 
@@ -139,14 +139,14 @@ void PWM_SetSpeedLeft(int speed)
 	}
 }
 
-// 0 for forward, 1 for backward
+// 1 for forward, 0 for backward
 void PWM_SetDirLeft(int dir)
 {
-	if (dir == 0)
+	if (dir == 1)
 	{
 		PORTD &= ~(1 << PORTD0);
 	}
-	else if (dir == 1)
+	else if (dir == 0)
 	{
 		PORTD |= 1 << PORTD0;
 	}
@@ -230,12 +230,17 @@ int8_t sensor_value(int8_t val)
 
 void Get_speed_value()
 {
-	SPI_MasterTransmit(1, 'k');
-	_delay_us(40);
-	arrSpeed[0] = SPI_MasterTransmit(0x07,'k'); //Get left speed
-	_delay_us(40);
-	arrSpeed[1] = SPI_MasterTransmit(0x07,'k'); //Get right speed
-	
+	SPI_MasterTransmit(0b00000001, 'k');
+	_delay_us(200);
+	arrSpeed[0] = SPI_MasterTransmit(0x00,'k'); //Get left speed
+	_delay_us(20);
+	arrSpeed[1] = SPI_MasterTransmit(0x00,'k'); //Get right speed
+	_delay_us(20);
+	arrSpeed[2] = SPI_MasterTransmit(0x00,'k'); //Get left dir
+	_delay_us(20);
+	arrSpeed[3] = SPI_MasterTransmit(0x00,'k'); //Get right dir
+	_delay_us(20);
+	arrSpeed[4] = SPI_MasterTransmit(0x00,'k'); //Get gripclaw
 }
 
 ISR(TIMER0_OVF_vect)
@@ -280,22 +285,21 @@ void Gyro_Init()
 {
 
 	SPCR &= ~(1<<DORD);
-	int8_t first_byte1;
+	int8_t high_byte;
 	do{
 		set_GyroSS_Low();
 		SPI_MasterTransmit_Gyro(0b10010100); //Activate adc
 		high_byte = SPI_MasterTransmit_Gyro(0x00); //Byte with EOC and Accepted instr. bit
 		SPI_MasterTransmit_Gyro(0x00); //low byte
 		set_GyroSS_High();
-	} while ( (first_byte1 & 0b10000000) & !(first_byte1 & 0b00100000)); // IF EOC = 0 and acc.instr. = 1 we continue
+	} while ( (high_byte & 0b10000000) & !(high_byte& 0b00100000)); // IF EOC = 0 and acc.instr. = 1 we continue
 	SPCR |= (1<<DORD);
 
 }
 
 void Gyro_StartConversion()
 {
-
-	int8_t first_byte2;
+	int8_t high_byte;	
 	SPCR &= ~(1<<DORD);
 	do{
 		set_GyroSS_Low();
@@ -304,7 +308,7 @@ void Gyro_StartConversion()
 		SPI_MasterTransmit_Gyro(0x00); //low byte
 		set_GyroSS_High();
 
-	} while (first_byte2 & 0b10000000); // IF  acc.instr. = 1 we continue
+	} while (high_byte & 0b10000000); // IF  acc.instr. = 1 we continue
 	SPCR |= (1<<DORD);
 
 }
@@ -534,30 +538,44 @@ void init_all()
 int main(void)
 {
 	init_all();
-	//int8_t sensor_data[4];
-	//_delay_ms(250);		
-	uint16_t i;
 	LCD_Clear();
+	PWM_Init();
+	PWM_SetDirLeft(1);
+	PWM_SetDirRight(1);
+	PWM_SetSpeedLeft(0);
+	PWM_SetSpeedRight(0);
+	
 	while (1)
 	{
 		Get_speed_value();
 		LCD_Clear();
+
 		LCD_SetPosition(0);
-		//arrSpeed[0] = SPI_MasterTransmit(0x00, 'k');
-		i = (uint16_t)arrSpeed[0];
-		LCD_display_uint16(i);
-		LCD_SendCharacter(' ');
-		_delay_ms(250);
-		_delay_ms(250);
-
+		LCD_display_uint16((uint16_t)arrSpeed[0]);
 		LCD_SetPosition(16);
-		
 		LCD_display_uint16((uint16_t)arrSpeed[1]);
-		LCD_SendCharacter(' ');
-		_delay_ms(250);
-		_delay_ms(250);
-
-
+		LCD_SetPosition(8);
+		LCD_display_uint16((uint16_t)arrSpeed[2]);
+		LCD_SetPosition(24);
+		LCD_display_uint16((uint16_t)arrSpeed[3]);
+		LCD_SetPosition(29);
+		LCD_display_uint16((uint16_t)arrSpeed[4]);
+		
+		
+		PWM_SetSpeedLeft(arrSpeed[0]);
+		PWM_SetSpeedRight(arrSpeed[1]);
+		PWM_SetDirLeft(arrSpeed[2]);
+		PWM_SetDirRight(arrSpeed[3]);
+		if (arrSpeed[4] == 1)
+		{
+			SERVO_SetGrip();
+		}
+		else {
+			SERVO_ReleaseGrip();
+		}
+		//_delay_ms(250);
+		//_delay_ms(50);
+		//_delay_ms(50);
 		//Gyro_test();
 		//Drive_test();
 		//Speed_test();
