@@ -7,6 +7,9 @@ int MAP_currentPos[2] = {16, 15}; // NOTE: (y,x) base!!!!!! NOT (x,y)!
 int MAP_currentDir = 1; // 0 = Right, 1 = Up, 2 = Left, 3 = Down 
 int MAP_goalPosition[2];
 int MAP_nextDir = 1;
+int MAP_junctionCount = 0; // The number of junctions discovered
+
+// Structs
 struct MAP_square
 {
 	unsigned int goal :1;
@@ -15,15 +18,25 @@ struct MAP_square
 };
 struct MAP_junction // Contains the distance to every connected junction
 {
-	unsigned int right :5;
-	unsigned int up :5;
-	unsigned int left :5;
-	unsigned int down :5;
+	unsigned int distRight :5;
+	unsigned int distUp :5;
+	unsigned int distLeft :5;
+	unsigned int distDown :5;
+	
+	// eller kanske detta
+	unsigned int hasUnex :1; // Flag if unexplored roads are present
+	unsigned int currentJunction :6; // The number of the previous junction
+	
+	// när man kommit till korsning med bara utforskade vägar, kolla rekursivt om korsningen innan har 
+	// outforskade vägar. När numret på den korsning man ska åka till har hittats - Dijkstra!
+	
 };
-struct MAP_square MAP_array[16][29];
 
-// For optimization: path cost to other junctions.
-struct MAP_junction MAP_junctionArray[32][32]; // Mother fucker too big	
+// Arrays
+struct MAP_square MAP_array[16][29]; // The map square structs
+unsigned int MAP_junctionDistArray[64][64]; // Distance between junctions
+struct MAP_junction MAP_junctionOrderArray[64]; // The junction square structs. Junctions are numbered 0-63, accessed
+	// in this array by their number
 
 // Methods
 void MAP_decideDirection(char);
