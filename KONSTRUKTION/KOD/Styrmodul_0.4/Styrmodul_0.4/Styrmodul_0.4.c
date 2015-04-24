@@ -30,6 +30,8 @@ uint8_t arrSpeed[] = {0,0,1,1,0}; //speedLeft, SpeedRight, DirLeft, DirRight, gr
 // This timer will reset every time it reaches 10.
 int TIMER_overflows;
 
+int TIMER_gyroCounter; // as TIMER_overflows but doesn't reset.
+
 // The following overflow storage corresponds to 131ms. This timer will never reset.
 int TIMER_overflows_deci;
 
@@ -165,51 +167,7 @@ void PWM_SetDirRight(int dir)
 	}
 }
 
-void MOTOR_Forward(int speed)
-{
-	PWM_SetDirRight(1);
-	PWM_SetDirLeft(0);
-	PWM_SetSpeedLeft(speed);
-	PWM_SetSpeedRight(speed);
-}
 
-void MOTOR_Backward(int speed)
-{
-	PWM_SetDirRight(0);
-	PWM_SetDirLeft(1);
-	PWM_SetSpeedLeft(speed);
-	PWM_SetSpeedRight(speed);
-}
-
-void MOTOR_RotateLeft()
-{
-	PWM_SetDirRight(1);
-	PWM_SetDirLeft(1);
-	PWM_SetSpeedLeft(100);
-	PWM_SetSpeedRight(100);
-	for(int i = 0; i <= 8; i++)
-	{
-		_delay_ms(250);
-	}
-}
-
-void MOTOR_RotateRight()
-{
-	PWM_SetDirRight(0);
-	PWM_SetDirLeft(0);	
-	PWM_SetSpeedLeft(100);
-	PWM_SetSpeedRight(100);
-	for(int i = 0; i <= 8; i++)
-	{
-		_delay_ms(250);
-	}
-}
-
-void MOTOR_Stop()
-{
-	PWM_SetSpeedRight(0);
-	PWM_SetSpeedLeft(0);
-}
 
 // Setup a timer. Used by the D regulator.
 void TIMER_init()
@@ -246,6 +204,7 @@ void Get_speed_value()
 ISR(TIMER0_OVF_vect)
 {
 	TIMER_overflows++;
+	TIMER_gyroCounter++;
 	if (TIMER_overflows >= 10)
 	{
 		TIMER_overflows = 0;
@@ -362,38 +321,112 @@ void Gyro_Sleep()
 	SPCR |= (1<<DORD);
 }
 
-// use after decision to turn is made and rotation has began
-// use in functions MOTOR_RotateLeft(), MOTOR_RotateLeft()
-// stop rotating when 90 degrees reached; use only during rotation
-// FUNCTION has not been TESTED! too low angular rate may result in total rotation angle larger than 90 degrees
-void checkAngle90()
+int16_t Gyro_sequence()
 {
 	int16_t result = 0;
-	int16_t temp = 0;
-	int start_time = TIMER_overflows_deci;
+	SPCR &= ~(1<<DORD);
+	Gyro_StartConversion();
+	result = Gyro_PollResult();
+	result = Get_ADC_value(result);
+	result = adcToAngularRate(result);
+	SPCR |= (1<<DORD);
+	return result;
+}
+
+// use only during rotation
+// in functions MOTOR_RotateLeft(), MOTOR_RotateLeft()
+// stop rotating when 90 degrees reached; 
+// FUNCTION NOT adjusted
+void checkAngle90()
+{
+	TIMER_gyroCounter = 0;
+	uint16_t start_time, interval;
+	int16_t result = 0;
+	int16_t values[49];
 	do {
-		start_time = TIMER_overflows_deci;
-		Gyro_StartConversion();
-		result = Gyro_PollResult();
-		result = Get_ADC_value(result);
-		result = adcToAngularRate(result);
-		// sometimes gyro shows 80 deg/s when it is not in rotation, or rotation is too slow
-		// if-satsen kontrollerar att det inte förekommer "stora hopp" i vinkelhastighet
-		if (60 < abs(temp - result)) { // precaution (value "60" can be changed to another)
-			rotation_angle += temp * (TIMER_overflows_deci - start_time) * 131;
+		result = 0;
+		start_time = TIMER_gyroCounter;
+		for (int i = 0; i < 50; i++) // reads 5 values of angular rate
+		{
+			values[i] = Gyro_sequence();
+			if (100 < abs(values[i])) { // precaution
+				values[i] += 124;
+			}
+			
+			LCD_display_int16(values[i]);
+			_delay_ms(10);
 		}
-		else {
-			rotation_angle += result * (TIMER_overflows_deci - start_time) * 131;
-			temp = result;
+		for (int i=0; i<50; i++) {
+			result += values[i];
 		}
-		
-	} while (rotation_angle >= 90);
+		result = result/50;
+		_delay_ms(500);
+		LCD_Clear();
+		LCD_display_int16(result);
+		_delay_ms(500);
+
+		interval = (TIMER_gyroCounter - start_time) * 13;
+// 		if (100 < abs(result)) { // precaution
+// 			rotation_angle += (result+124) * interval;
+// 		}
+
+		/*else {*/
+		rotation_angle += result * interval;
+		//}
+
+		LCD_Clear();
+		LCD_SetPosition(0);
+		LCD_display_int16(result);
+		LCD_SetPosition(16);
+		LCD_display_int16(rotation_angle);
+	} while (abs(rotation_angle) <= 90000);
 	
 	rotation_angle = 0; //reset
 }
 
 //----------------------------GYRO----END-----------------------------
 
+//--MOTOR start
+void MOTOR_Forward(int speed)
+{
+	PWM_SetDirRight(1);
+	PWM_SetDirLeft(1);
+	PWM_SetSpeedLeft(speed);
+	PWM_SetSpeedRight(speed);
+}
+
+void MOTOR_Backward(int speed)
+{
+	PWM_SetDirRight(0);
+	PWM_SetDirLeft(0);
+	PWM_SetSpeedLeft(speed);
+	PWM_SetSpeedRight(speed);
+}
+
+void MOTOR_RotateLeft()
+{
+	PWM_SetDirRight(0);
+	PWM_SetDirLeft(1);
+	PWM_SetSpeedLeft(100);
+	PWM_SetSpeedRight(100);
+	checkAngle90();
+}
+
+void MOTOR_RotateRight()
+{
+	PWM_SetDirRight(1);
+	PWM_SetDirLeft(0);
+	PWM_SetSpeedLeft(100);
+	PWM_SetSpeedRight(100);
+	checkAngle90();
+}
+
+void MOTOR_Stop()
+{
+	PWM_SetSpeedRight(0);
+	PWM_SetSpeedLeft(0);
+}
+//--MOTOR stop
 
 //Returns speed in millimeters/milliseconds = meters/second
 int speed_calculator()
@@ -499,19 +532,25 @@ void Gyro_test()
 	//DORD: Data order. Set to 0 to transmit MSB first, LSB last
 	//OBS: Spegla det som skickas!
 	
-	int16_t result = 0;
-	SPCR &= ~(1<<DORD);
-	while (1)
-	{
-		LCD_Clear();
-		LCD_SetPosition(0);
-		Gyro_StartConversion();
-		result = Gyro_PollResult();
-		result = Get_ADC_value(result);
-		LCD_display_int16(adcToAngularRate(result));
-		_delay_ms(250);
-	}
-	SPCR |= (1<<DORD);
+	checkAngle90();
+// 	int16_t result = 0;
+// 	SPCR &= ~(1<<DORD);
+//  	while (1)
+//  	{
+//  		LCD_Clear();
+//  		LCD_SetPosition(0);
+//  		Gyro_StartConversion();
+//  		result = Gyro_PollResult();
+//  		result = Get_ADC_value(result);
+//  		result = adcToAngularRate(result);
+//    		if(abs(result) > 100)
+//   		{
+//   			result += 124;
+//   		}
+//  		LCD_display_int16(result);
+//  		_delay_ms(250);
+//  	}
+// 	SPCR |= (1<<DORD);
 	return;
 }
 
@@ -535,15 +574,31 @@ void init_all()
 	sei();	// Enable global interrupts
 }
 
+void timer_test()
+{
+	uint16_t start_time = TIMER_gyroCounter;
+	uint16_t interval;
+	while(1)
+	{
+		interval = (TIMER_gyroCounter - start_time) * 13;
+		LCD_Clear();
+		LCD_SetPosition(0);
+		LCD_display_uint16(interval); // ms
+		_delay_ms(1);
+	}
+}
+
 int main(void)
 {
 	init_all();
-	LCD_Clear();
-	PWM_Init();
-	PWM_SetDirLeft(1);
-	PWM_SetDirRight(1);
-	PWM_SetSpeedLeft(0);
-	PWM_SetSpeedRight(0);
+// 	PWM_SetDirLeft(1);
+// 	PWM_SetDirRight(1);
+// 	PWM_SetSpeedLeft(0);
+// 	PWM_SetSpeedRight(0);
+
+	Gyro_test();
+	//Drive_test();
+	//timer_test();
 	
 	while (1)
 	{
