@@ -20,10 +20,7 @@ char outSPDR[BuffSize];
 char inSPDR[BuffSize];
 char *SPI_queue[BuffSize];
 
-uint8_t testbuffer3_[] = {9,8,7,6,5,4,3,2,1,0};
-uint8_t testbuffer2_[] = {9,8,7,6,5,4,3,2,1,0};
-uint8_t testbuffer1_[] = {'1','2','3','4','5','6','7','8','9','0'};
-char testbuffer4_[] = {'a','b','c','d','e','f','g','h','i','j'};		
+	
 volatile uint8_t pos_queue = 0;
 volatile uint8_t *pos_SPIqueue = &pos_queue;
 volatile uint8_t posSPIout = 0;
@@ -46,10 +43,11 @@ volatile uint8_t BT_received_flag = 0;
 volatile uint8_t BT_sent_flag = 0;
 
 
-uint8_t arrSpeed[] = {0,0}; //Array with current speed. From/to PC/master left
+uint8_t arrSpeed[] = {0,0,1,1,0}; //Array with current speed (Left right), direction (1 = forward, 0 = backward) and claw. From/to PC/master left
 uint8_t incomingSpeed_ = 0;
 
 uint8_t sendFlag = 0;
+uint8_t Flag_ = 0;
 
 //*********** BUFFER STRUCT ****************
 
@@ -215,37 +213,19 @@ void send_BT_buffer(uint8_t buffer[BuffSize] )
 // Receive complete - triggered by interrupt
 ISR(USART0_RX_vect) 
 {
-	uint8_t data = (uint8_t)UDR0;
-	uint8_t SpeedFlag_ = 1;
-	if (data /*== SpeedFlag_*/ ) //Incoming speed array, size 2
-	{	
-		if (incomingSpeed_ == 0){
-			incomingSpeed_++; //Set flag of incoming Speedarray
-		}
-		else{
-			arrSpeed[(incomingSpeed_ - 1)] = data; //Load incoming data
-			if (incomingSpeed_ == 2){ //if second byte received
-				incomingSpeed_ = 0; //set incoming speed = 0
-			}
-			else{
-				incomingSpeed_++; //Step up incoming speed
-			}
-		}
-	}
-	else if (data == '2')
+	uint8_t data = UDR0;
+	if ((data == 0x01) && (Flag_ == 0))
 	{
-		send_BT_buffer(testbuffer2_);
+		Flag_ = 1;
 	}
-	else if (data == '3')
+	else if (Flag_ > 0)
 	{
-		send_BT_buffer(testbuffer3_);
-	}
-	else{
-		UDR0 = data;
-		
-		
-		//add_node(head_BTin, data); //Saved received data in list 
-
+		arrSpeed[Flag_ - 1] = data;
+		Flag_++;
+		if (Flag_ == (sizeof(arrSpeed)/sizeof(arrSpeed[0]) + 1))
+		{
+			Flag_ = 0;
+		}
 	}
 	
 	
@@ -272,7 +252,7 @@ void send_SPI_buffer(char *buffer)
 	strncpy(outSPDR, buffer, BuffSize); //Copy what to send into outSPDR
 	(*posBuff_SPIout) = 0; // start reading from beginning
 	ongoing_SPI_transfer = 1; //something to send.
-	while(((ongoing_SPI_transfer == 1) & !(outSPDR[(*posBuff_SPIout)] == '\0'))); //Wait until entire buffer is sent.
+	while(((ongoing_SPI_transfer == 1) && !(outSPDR[(*posBuff_SPIout)] == '\0'))); //Wait until entire buffer is sent.
 	
 }
 
@@ -298,17 +278,15 @@ ISR(SPI_STC_vect)
 	
 	if (data == 1)
 	{
-		SPI_send_arr(arrSpeed,sizeof(arrSpeed)/sizeof(arrSpeed[0]));
-		SPDR = pop_node(&head_SPIout);
+		SPI_send_arr(arrSpeed,(sizeof(arrSpeed)/sizeof(arrSpeed[0])));
+		SPDR =  pop_node(&head_SPIout);
 		return;
 	}
 	
 	//add_node(&head_SPIin, data); // Add received data to in-queue
-	
-	
 	if (head_SPIout == NULL)
 	{
-		uint8_t stop_bit = 255; //0b10000000, cant be shown on lcd as -128 due to limits in print func.
+		uint8_t stop_bit = 255; 
 		SPDR = stop_bit;
 	}
 	else
@@ -320,37 +298,14 @@ ISR(SPI_STC_vect)
 
 
 int main(void)
-{
-
-	//head_SPIout = (buffer_ *)malloc(sizeof(buffer_)); //Define head of list for SPI- values to send and alloc memory.
-	//head_SPIout->next= NULL;
-	//head_SPIout->val = 0;
-	//
-
-	//head_SPIin = (buffer_ *)malloc(sizeof(buffer_)); //Define head of list for SPI- values to receive and alloc memory.
-	//head_SPIin->next= NULL;
-	//head_SPIin->val = 0;
-	//
-	//head_BTin = (buffer_ *)malloc(sizeof(buffer_));
-	//head_BTin->next= NULL;
-	//head_BTin->val = 0;
-	//
-	//head_BTout = (buffer_ *)malloc(sizeof(buffer_));
-	//head_BTout->next= NULL;
-	//head_BTout->val = 0;
-	//
-	
+{	
+	Flag_ = 0;
 	sleep_enable();
 	Komm_InitPortDirections();
 	Komm_InitPortValues();
 	SPI_SlaveInit();
 	BT_init();
 	sei();
-	//flush_list(&head_SPIout);
-	//flush_list(&head_SPIin);
-	//uint8_t array[] ={1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29};
-	//SPI_send_arr(array, (sizeof(array)/sizeof(array[0]))); // sizeof(array)/sizeof(element in array) = lenght of array
-	//SPI_send_arr(testbuffer3_, sizeof(testbuffer3_)/sizeof(testbuffer3_[0]));
 	while(1)
 	{
 		//flush_list(&head_SPIin);
