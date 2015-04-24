@@ -24,12 +24,12 @@
 #include <SDL2/SDL2_mixer.h>
 #endif
 
-#ifdef __WIN32__
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_image.h>
-#include <SDL2/SDL_ttf.h>
-#include <SDL2/SDL_mixer.h>
-#endif
+
+#include <SDL.h>
+#include <SDL_image.h>
+#include <SDL_ttf.h>
+#include <SDL_mixer.h>
+
 
 #include <string>
 #include <vector>
@@ -52,6 +52,7 @@ protected:
     int Texture_Width; // in till konstuktorn
     int Texture_Height; // same bara temp.
     SDL_Rect Rect_;
+	SDL_RendererFlip flip = SDL_FLIP_NONE;
     
 };
 
@@ -87,11 +88,9 @@ public:
 private:
     SDL_Rect dsRect_;
     SDL_Rect srRect_;
-    SDL_RendererFlip flip{};
+   // SDL_RendererFlip flip{};
     int xPos_;
     int yPos_;
-    
-    
 };
 
 //
@@ -112,7 +111,7 @@ private:
     int Speed;
     SDL_Rect dsRect_;
     SDL_Rect srRect_;
-    SDL_RendererFlip flip{};
+    //SDL_RendererFlip flip{};
     int xPos_;
     int yPos_;
     
@@ -149,7 +148,7 @@ protected:
     int Status_;
     SDL_Rect dsRect_;
     SDL_Rect srRect_;
-    SDL_RendererFlip flip{};
+    //SDL_RendererFlip flip{};
     
     
 };

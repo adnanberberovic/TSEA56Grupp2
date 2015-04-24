@@ -44,12 +44,12 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>C:\SDL2\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\SDL2\SDL2_ttf-2.0.12\include;C:\SDL2\SDL2_mixer-2.0.0\include;C:\SDL2\SDL2_image-2.0.0\include;C:\SDL2\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>C:\SDL2\lib\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>SDL2.lib;SDL2main.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\SDL2\SDL2_ttf-2.0.12\lib\x86;C:\SDL2\SDL2_mixer-2.0.0\lib\x86;C:\SDL2\SDL2_image-2.0.0\lib\x86;C:\SDL2\lib\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2_image.lib;SDL2_ttf.lib;SDL2_mixer.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Console</SubSystem>
     </Link>
   </ItemDefinitionGroup>
@@ -68,7 +68,20 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Source.cpp" />
+    <ClCompile Include="..\..\..\..\..\GUI\GUI\Autonomt.cpp" />
+    <ClCompile Include="..\..\..\..\..\GUI\GUI\main.cpp" />
+    <ClCompile Include="..\..\..\..\..\GUI\GUI\Manual.cpp" />
+    <ClCompile Include="..\..\..\..\..\GUI\GUI\Objects.cpp" />
+    <ClCompile Include="..\..\..\..\..\GUI\GUI\SetupSDL.cpp" />
+    <ClCompile Include="..\..\..\..\..\GUI\GUI\State.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\..\..\GUI\GUI\Autonomt.h" />
+    <ClInclude Include="..\..\..\..\..\GUI\GUI\Manual.h" />
+    <ClInclude Include="..\..\..\..\..\GUI\GUI\Objects.h" />
+    <ClInclude Include="..\..\..\..\..\GUI\GUI\SetupSDL.h" />
+    <ClInclude Include="..\..\..\..\..\GUI\GUI\State.h" />
+    <ClInclude Include="Bluetooth.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

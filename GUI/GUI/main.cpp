@@ -14,11 +14,13 @@
 #include <string>
 #include <stdexcept>
 #include <cmath>
+
 using namespace std;
 
-int main(int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
+int main(int argc, char* argv[] )
 {
-    
+	
+
     SetupSDL* sdl_lib;
     sdl_lib = new SetupSDL;
     
@@ -28,7 +30,7 @@ int main(int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
     Manual* Manual_;
     Manual_ = new Manual(sdl_lib);
     
-    string statestring{"Autonom"};
+    string statestring{"Manual"};
     
     bool globalrunning = true;
     
@@ -38,12 +40,12 @@ int main(int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
         {
            if (statestring == "Manual")
            {
-                Manual_ -> run(sdl_lib,statestring);
+                Manual_ -> run(statestring);
            }
             
             if (statestring  == "Autonom")
             {
-                Autonom_ -> run(sdl_lib,statestring);
+                Autonom_ -> run(statestring);
             }
             
             if (statestring  == "quit")
