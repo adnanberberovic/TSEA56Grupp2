@@ -18,25 +18,20 @@
 #include <string.h>
 #include "Styrmodul_LCD.c"
 #include "Styrmodul_Servo.c"
-
-
-uint8_t arrSpeed[] = {0,0,1,1,0}; //speedLeft, SpeedRight, DirLeft, DirRight, grip
-
 //#include <avr/pgmspace.h>
 
-// GLOBAL VARIABLES
 
+
+// GLOBAL VARIABLES --------------------------------------------------------------------
+uint8_t arrSpeed[] = {0,0,1,1,0}; //speedLeft, SpeedRight, DirLeft, DirRight, grip
 // One overflow corresponds to 13.1 ms if the F_CPU is 20 MHz and the defined prescaler.
 // This timer will reset every time it reaches 10.
 int TIMER_overflows;
-
-int TIMER_gyroCounter; // as TIMER_overflows but doesn't reset.
-
 // The following overflow storage corresponds to 131ms. This timer will never reset.
 int TIMER_overflows_deci;
-
 // This variable is used to store robots angle in degrees
 int rotation_angle = 0;
+// --------------------------------------------------------------------------------------
 
 // Setup data direction registers @ ports for out/inputs.
 void Styr_InitPortDirections(void)
@@ -204,7 +199,6 @@ void Get_speed_value()
 ISR(TIMER0_OVF_vect)
 {
 	TIMER_overflows++;
-	TIMER_gyroCounter++;
 	if (TIMER_overflows >= 10)
 	{
 		TIMER_overflows = 0;
@@ -334,73 +328,28 @@ int16_t Gyro_sequence()
 }
 
 // use only during rotation
-// in functions MOTOR_RotateLeft(), MOTOR_RotateLeft()
+// in functions MOTOR_RotateRight(), MOTOR_RotateLeft()
 // stop rotating when 90 degrees reached; 
-// FUNCTION NOT adjusted
 void checkAngle90()
 {
-	//TIMER_gyroCounter = 0;
-	//uint16_t start_time, interval;
-	int16_t result = 0;
-	//int16_t values[49];
+	int16_t result;
+	int16_t before = 0;
 	do {
 		result = 0;
-		//start_time = TIMER_gyroCounter;
-		result = Gyro_sequence();			// 315us
-		if (100 < abs(result)) 
+		result = Gyro_sequence();	// 315us
+		if (abs(result) > 120) 
 		{
-			result += 124;
+			result = before;
 		}
-		
-		//interval = (TIMER_gyroCounter - start_time) * 13;
-		rotation_angle += result/3;
+		before = result;
+		rotation_angle += result/6;  // /6
 		LCD_Clear();
 		LCD_SetPosition(0);
-		LCD_display_uint16(rotation_angle);
-	} while (abs(rotation_angle) <= 600);
+		LCD_display_int16(rotation_angle);
+	} while (abs(rotation_angle) < 410); // 410
 	
 	rotation_angle = 0; //reset
 }
-// 	do {
-// 		result = 0;
-// 		start_time = TIMER_gyroCounter;
-// 		for (int i = 0; i < 50; i++) // reads 5 values of angular rate
-// 		{
-// 			values[i] = Gyro_sequence();
-// 			if (100 < abs(values[i])) { // precaution
-// 				values[i] += 124;
-// 			}
-// 			
-// 			LCD_display_int16(values[i]);
-// 			_delay_ms(10);
-// 		}
-// 		for (int i=0; i<50; i++) {
-// 			result += values[i];
-// 		}
-// 		result = result/50;
-// 		_delay_ms(500);
-// 		LCD_Clear();
-// 		LCD_display_int16(result);
-// 		_delay_ms(500);
-// 
-// 		interval = (TIMER_gyroCounter - start_time) * 13;
-// // 		if (100 < abs(result)) { // precaution
-// // 			rotation_angle += (result+124) * interval;
-// // 		}
-// 
-// 		/*else {*/
-// 		rotation_angle += result * interval;
-// 		//}
-// 
-// 		LCD_Clear();
-// 		LCD_SetPosition(0);
-// 		LCD_display_int16(result);
-// 		LCD_SetPosition(16);
-// 		LCD_display_int16(rotation_angle);
-// 	} while (abs(rotation_angle) <= 90000);
-	
-// 	rotation_angle = 0; //reset
-// }
 
 //----------------------------GYRO----END-----------------------------
 
@@ -473,7 +422,7 @@ int speed_calculator()
 		}
 		else
 		{	
-			 int speed = 0;
+//			 int speed = 0;
 			 LCD_display_int16(PIND2);
 			 _delay_ms(250);
 			 _delay_ms(250);
@@ -559,21 +508,19 @@ void Gyro_test()
 	//checkAngle90();
 	int16_t result = 0;
 	int16_t before = 0;
-	SPCR &= ~(1<<DORD);
  	while (1)
  	{
  		LCD_Clear();
  		LCD_SetPosition(0);
- 		result = Gyro_sequence();
+ 		result = Gyro_sequence(); //data ordningen sätts här
    		if(abs(result) > 120)
   		{
   			result = before;
   		}
 		before = result;
 		rotation_angle += result;
-		LCD_display_int16(rotation_angle/25);
+		LCD_display_int16(rotation_angle/30);
  	}
-	SPCR |= (1<<DORD);
 	return;
 }
 
@@ -597,19 +544,7 @@ void init_all()
 	sei();	// Enable global interrupts
 }
 
-void timer_test()
-{
-	uint16_t start_time = TIMER_gyroCounter;
-	uint16_t interval;
-	while(1)
-	{
-		interval = (TIMER_gyroCounter - start_time) * 13;
-		LCD_Clear();
-		LCD_SetPosition(0);
-		LCD_display_uint16(interval); // ms
-		_delay_ms(1);
-	}
-}
+
 
 int main(void)
 {
@@ -619,13 +554,12 @@ int main(void)
 // 	PWM_SetSpeedLeft(0);
 // 	PWM_SetSpeedRight(0);
 
-	Gyro_test();
+	//Gyro_test();
 	//Drive_test();
-	//timer_test();
 	
 	while (1)
 	{
-		//Drive_test();
+		Drive_test();
 // 		Get_speed_value();
 // 		LCD_Clear();
 // 
