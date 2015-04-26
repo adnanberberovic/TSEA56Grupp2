@@ -339,50 +339,68 @@ int16_t Gyro_sequence()
 // FUNCTION NOT adjusted
 void checkAngle90()
 {
-	TIMER_gyroCounter = 0;
-	uint16_t start_time, interval;
+	//TIMER_gyroCounter = 0;
+	//uint16_t start_time, interval;
 	int16_t result = 0;
-	int16_t values[49];
+	//int16_t values[49];
 	do {
 		result = 0;
-		start_time = TIMER_gyroCounter;
-		for (int i = 0; i < 50; i++) // reads 5 values of angular rate
+		//start_time = TIMER_gyroCounter;
+		result = Gyro_sequence();			// 315us
+		if (100 < abs(result)) 
 		{
-			values[i] = Gyro_sequence();
-			if (100 < abs(values[i])) { // precaution
-				values[i] += 124;
-			}
-			
-			LCD_display_int16(values[i]);
-			_delay_ms(10);
+			result += 124;
 		}
-		for (int i=0; i<50; i++) {
-			result += values[i];
-		}
-		result = result/50;
-		_delay_ms(500);
-		LCD_Clear();
-		LCD_display_int16(result);
-		_delay_ms(500);
-
-		interval = (TIMER_gyroCounter - start_time) * 13;
-// 		if (100 < abs(result)) { // precaution
-// 			rotation_angle += (result+124) * interval;
-// 		}
-
-		/*else {*/
-		rotation_angle += result * interval;
-		//}
-
+		
+		//interval = (TIMER_gyroCounter - start_time) * 13;
+		rotation_angle += result/3;
 		LCD_Clear();
 		LCD_SetPosition(0);
-		LCD_display_int16(result);
-		LCD_SetPosition(16);
-		LCD_display_int16(rotation_angle);
-	} while (abs(rotation_angle) <= 90000);
+		LCD_display_uint16(rotation_angle);
+	} while (abs(rotation_angle) <= 600);
 	
 	rotation_angle = 0; //reset
 }
+// 	do {
+// 		result = 0;
+// 		start_time = TIMER_gyroCounter;
+// 		for (int i = 0; i < 50; i++) // reads 5 values of angular rate
+// 		{
+// 			values[i] = Gyro_sequence();
+// 			if (100 < abs(values[i])) { // precaution
+// 				values[i] += 124;
+// 			}
+// 			
+// 			LCD_display_int16(values[i]);
+// 			_delay_ms(10);
+// 		}
+// 		for (int i=0; i<50; i++) {
+// 			result += values[i];
+// 		}
+// 		result = result/50;
+// 		_delay_ms(500);
+// 		LCD_Clear();
+// 		LCD_display_int16(result);
+// 		_delay_ms(500);
+// 
+// 		interval = (TIMER_gyroCounter - start_time) * 13;
+// // 		if (100 < abs(result)) { // precaution
+// // 			rotation_angle += (result+124) * interval;
+// // 		}
+// 
+// 		/*else {*/
+// 		rotation_angle += result * interval;
+// 		//}
+// 
+// 		LCD_Clear();
+// 		LCD_SetPosition(0);
+// 		LCD_display_int16(result);
+// 		LCD_SetPosition(16);
+// 		LCD_display_int16(rotation_angle);
+// 	} while (abs(rotation_angle) <= 90000);
+	
+// 	rotation_angle = 0; //reset
+// }
 
 //----------------------------GYRO----END-----------------------------
 
@@ -485,46 +503,52 @@ int speed_calculator()
 
 void Drive_test()
 {
-	MOTOR_Forward(80);
-	SERVO_LevelHigh();
-	for(int i = 0; i <= 15; i++)
-	{
-		_delay_ms(250);
-	}
+	//MOTOR_Forward(80);
+// 	SERVO_LevelHigh();
+// 	for(int i = 0; i <= 15; i++)
+// 	{
+// 		_delay_ms(250);
+// 	}
 	MOTOR_RotateRight();
 	MOTOR_Stop();
-	SERVO_SetGrip();
-	for(int i = 0; i <= 5; i++)
-	{
-		_delay_ms(250);
-	}
-	SERVO_LevelMid();
-	MOTOR_Backward(80);
-	for(int i = 0; i <= 15; i++)
-	{
-		_delay_ms(250);
-	}
-	SERVO_ReleaseGrip();
+	
+	_delay_ms(5000);
 	MOTOR_RotateLeft();
 	MOTOR_Stop();
-	for(int i = 0; i <= 5; i++)
-	{
-		_delay_ms(250);
-	}
-	SERVO_LevelLow();
-	MOTOR_Backward(80);
-	for(int i = 0; i <= 32; i++)
-	{
-		_delay_ms(250);
-	}
-	SERVO_LevelMid();
-	SERVO_SetGrip();
-	MOTOR_Stop();
-	for(int i = 0; i <= 5; i++)
-	{
-		_delay_ms(250);
-	}
-	SERVO_ReleaseGrip();
+	_delay_ms(5000);
+	
+// 	SERVO_SetGrip();
+// 	for(int i = 0; i <= 5; i++)
+// 	{
+// 		_delay_ms(250);
+// 	}
+// 	SERVO_LevelMid();
+// 	MOTOR_Backward(80);
+// 	for(int i = 0; i <= 15; i++)
+// 	{
+// 		_delay_ms(250);
+// 	}
+// 	SERVO_ReleaseGrip();
+// 	MOTOR_RotateLeft();
+// 	MOTOR_Stop();
+// 	for(int i = 0; i <= 5; i++)
+// 	{
+// 		_delay_ms(250);
+// 	}
+// 	SERVO_LevelLow();
+// 	MOTOR_Backward(80);
+// 	for(int i = 0; i <= 32; i++)
+// 	{
+// 		_delay_ms(250);
+// 	}
+// 	SERVO_LevelMid();
+// 	SERVO_SetGrip();
+// 	MOTOR_Stop();
+// 	for(int i = 0; i <= 5; i++)
+// 	{
+// 		_delay_ms(250);
+// 	}
+// 	SERVO_ReleaseGrip();
 }
 
 void Gyro_test()
@@ -532,25 +556,24 @@ void Gyro_test()
 	//DORD: Data order. Set to 0 to transmit MSB first, LSB last
 	//OBS: Spegla det som skickas!
 	
-	checkAngle90();
-// 	int16_t result = 0;
-// 	SPCR &= ~(1<<DORD);
-//  	while (1)
-//  	{
-//  		LCD_Clear();
-//  		LCD_SetPosition(0);
-//  		Gyro_StartConversion();
-//  		result = Gyro_PollResult();
-//  		result = Get_ADC_value(result);
-//  		result = adcToAngularRate(result);
-//    		if(abs(result) > 100)
-//   		{
-//   			result += 124;
-//   		}
-//  		LCD_display_int16(result);
-//  		_delay_ms(250);
-//  	}
-// 	SPCR |= (1<<DORD);
+	//checkAngle90();
+	int16_t result = 0;
+	int16_t before = 0;
+	SPCR &= ~(1<<DORD);
+ 	while (1)
+ 	{
+ 		LCD_Clear();
+ 		LCD_SetPosition(0);
+ 		result = Gyro_sequence();
+   		if(abs(result) > 120)
+  		{
+  			result = before;
+  		}
+		before = result;
+		rotation_angle += result;
+		LCD_display_int16(rotation_angle/25);
+ 	}
+	SPCR |= (1<<DORD);
 	return;
 }
 
@@ -602,32 +625,33 @@ int main(void)
 	
 	while (1)
 	{
-		Get_speed_value();
-		LCD_Clear();
-
-		LCD_SetPosition(0);
-		LCD_display_uint16((uint16_t)arrSpeed[0]);
-		LCD_SetPosition(16);
-		LCD_display_uint16((uint16_t)arrSpeed[1]);
-		LCD_SetPosition(8);
-		LCD_display_uint16((uint16_t)arrSpeed[2]);
-		LCD_SetPosition(24);
-		LCD_display_uint16((uint16_t)arrSpeed[3]);
-		LCD_SetPosition(29);
-		LCD_display_uint16((uint16_t)arrSpeed[4]);
-		
-		
-		PWM_SetSpeedLeft(arrSpeed[0]);
-		PWM_SetSpeedRight(arrSpeed[1]);
-		PWM_SetDirLeft(arrSpeed[2]);
-		PWM_SetDirRight(arrSpeed[3]);
-		if (arrSpeed[4] == 1)
-		{
-			SERVO_SetGrip();
-		}
-		else {
-			SERVO_ReleaseGrip();
-		}
+		//Drive_test();
+// 		Get_speed_value();
+// 		LCD_Clear();
+// 
+// 		LCD_SetPosition(0);
+// 		LCD_display_uint16((uint16_t)arrSpeed[0]);
+// 		LCD_SetPosition(16);
+// 		LCD_display_uint16((uint16_t)arrSpeed[1]);
+// 		LCD_SetPosition(8);
+// 		LCD_display_uint16((uint16_t)arrSpeed[2]);
+// 		LCD_SetPosition(24);
+// 		LCD_display_uint16((uint16_t)arrSpeed[3]);
+// 		LCD_SetPosition(29);
+// 		LCD_display_uint16((uint16_t)arrSpeed[4]);
+// 		
+// 		
+// 		PWM_SetSpeedLeft(arrSpeed[0]);
+// 		PWM_SetSpeedRight(arrSpeed[1]);
+// 		PWM_SetDirLeft(arrSpeed[2]);
+// 		PWM_SetDirRight(arrSpeed[3]);
+// 		if (arrSpeed[4] == 1)
+// 		{
+// 			SERVO_SetGrip();
+// 		}
+// 		else {
+// 			SERVO_ReleaseGrip();
+		//}
 		//_delay_ms(250);
 		//_delay_ms(50);
 		//_delay_ms(50);
