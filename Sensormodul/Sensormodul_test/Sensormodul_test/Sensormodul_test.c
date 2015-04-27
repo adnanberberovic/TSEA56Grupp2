@@ -34,7 +34,8 @@ void SPI_SlaveInit()
 {
 	SPSR = 0<<SPI2X;
 	SPCR = 1<<SPIE | 1<<SPE | 1<<DORD | 0<<MSTR | 0<<CPOL | 0<<CPHA | 1<<SPR1 | 1<<SPR0;
-	//SPIE: SPI interrupt enable. Set to 1 to allow interrupts
+	//SPIE: SPI interrupt enable. Set to 1 to allow interrupst
+	
 	//SPE: SPI Enable. Set to 1 to allow SPI communication
 	//DORD: Data order. Set to 1 to transmit LSB first, MSB last.
 	//MSTR: Master select. Set to 1 to set master.

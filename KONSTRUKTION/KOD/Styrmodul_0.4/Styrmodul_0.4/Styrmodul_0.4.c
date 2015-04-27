@@ -355,60 +355,112 @@ int16_t Get_ADC_value(int16_t inval_)
 } 
 
 //----------------------------GYRO----END-----------------------------
+uint16_t speed_start_time;
+uint16_t wheel_marker_counter = 0;
+uint16_t current_speed;
 
+void Speed_Interrupt_Init()
+{
+	EICRA = 1<< ISC00 | 1<<ISC01; //INT0 genererar avbrott på rising flank
+	EIMSK = 1<< INT0; //IINT0?
+	MCUCR = (1<<IVCE); //Boot flash?
+	MCUCR = (1<<IVSEL); //Boot flash?
+}
 
+ISR(INT0_vect)
+{
+	if (wheel_marker_counter == 0)
+	{
+		speed_start_time = TIMER_overflows_deci;
+		wheel_marker_counter++;
+	}
+	else if (wheel_marker_counter < 8)
+	{
+		wheel_marker_counter++;
+	}
+	else
+	{
+		uint16_t wheel_circumference = 79; //Wheel circumference is 79 mm
+		uint16_t time_difference = (TIMER_overflows_deci - speed_start_time) * 131/1000; //Divide by 1000 -> time in us
+		uint16_t current_speed = wheel_circumference / time_difference;
+		wheel_marker_counter = 0; 
+		
+		LCD_Clear();
+		LCD_SetPosition(0);
+		LCD_display_uint16(time_difference);
+		_delay_ms(250);
+		_delay_ms(250);
+		_delay_ms(250);
+		_delay_ms(250);
+		_delay_ms(250);
+		
+		LCD_Clear();
+		LCD_SetPosition(6);
+		LCD_display_uint16(current_speed);
+		_delay_ms(250);
+		_delay_ms(250);
+		_delay_ms(250);
+		_delay_ms(250);
+		_delay_ms(250);
+	}
+}
 
 //Returns speed in millimeters/milliseconds = meters/second
 int speed_calculator()
 {
 	int start_time = TIMER_overflows_deci; //Read start time
-	int wheel_circumference = 204; //Wheel circumference is 204 mm
+	int wheel_circumference = 79; //Wheel circumference is 79 mm
 	int wheel_marker_counter = 0; //Hjulet är uppdelat i 8 svarta och vita 8 sektioner. Öka antal?
 	int speed;
 	
-	while(wheel_marker_counter < 8)
-	{
-		LCD_Clear();
-		if((PIND & 0b00000100) == 4) //PIND2 motsvarar 3 biten = 2^2
-		{ 
-			//When reflex sensor high - increase counter. 
-			wheel_marker_counter++;
-			LCD_Clear();
-			LCD_SendString("OK");
-			_delay_ms(250);
-			_delay_ms(250);
-			_delay_ms(250);
-			LCD_Clear();
-			LCD_display_int16(wheel_marker_counter);
-			_delay_ms(250);
-			_delay_ms(250);	
-		}
-		else
-		{	
-			 int speed = 0;
-			 LCD_display_int16(PIND2);
-			 _delay_ms(250);
-			 _delay_ms(250);
-			 _delay_ms(250);
-			 _delay_ms(250);
-			 LCD_Clear();
-			 LCD_display_int16(PIND&0b00000100);
-			  _delay_ms(250);
-			  _delay_ms(250);
-			  _delay_ms(250);
-			  _delay_ms(250);
-		}
-	}
+	int time_difference;
+	
+	
+ 	while (wheel_marker_counter < 8)
+ 	{
+	 	if((PIND & 0b00000100) == 4)
+	 	wheel_marker_counter++;
+ 	}
+
+//  	while(wheel_marker_counter < 8)
+//  	{
+//  		LCD_Clear();
+//  		if((PIND & 0b00000100) == 4) //PIND2 motsvarar 3 biten = 2^2
+//  		{ 
+//  			//When reflex sensor high - increase counter. 
+//  			wheel_marker_counter++;
+//  			LCD_SetPosition(0);
+//  			LCD_Clear();
+//  			LCD_SendString("OK");
+//  			_delay_ms(250);
+//  			_delay_ms(250);
+//  			_delay_ms(250);
+//  			LCD_SetPosition(16);
+//  			LCD_display_int16(wheel_marker_counter);
+//  			_delay_ms(250);
+//  			_delay_ms(250);	
+//  		}
+//  		else
+//  		{	
+//  			 LCD_SetPosition(0);
+//  			 LCD_Clear();
+//  			 LCD_SendString("else");
+//  			 _delay_ms(250);
+//  			 _delay_ms(250);
+//  			 _delay_ms(250);
+//  			 _delay_ms(250);
+//  		}
+//  	}
 	
 	//speed = distance/(finish_time - start_time)
 	//is it really 8 laps until you get  back to same pos? shouldnt you remove some length 
 	//USE CORRECT WHEEL CIRCUM - DIFFERENT DISTANCE!
-	speed = wheel_circumference/(TIMER_overflows_deci - start_time)*131;
 	
-	LCD_Clear();
-	LCD_display_int16(speed);
-	_delay_ms(250);
-	_delay_ms(250);
+	LCD_SetPosition(0);
+	LCD_Clear(); 
+	time_difference = (TIMER_overflows_deci - start_time) * 131; //131 to get milliseconds
+	LCD_display_int16(time_difference);
+	speed = wheel_circumference/time_difference;
 	
 	return speed;
 }
@@ -482,8 +534,15 @@ void Gyro_test()
 
 void Speed_test()
 {
-	speed_calculator();
-	//LCD_display_int8(PIND2);
+	LCD_Clear();
+	LCD_SetPosition(0);
+	LCD_SendString("Speed: ");
+	LCD_SetPosition(16);
+	LCD_display_uint16(current_speed);
+	_delay_ms(250);
+	_delay_ms(250);
+	_delay_ms(250);
+	_delay_ms(250);
 }
 
 void init_all()
@@ -497,6 +556,7 @@ void init_all()
 	TIMER_init(); // Initiate Timer settings
 	LCD_WelcomeScreen(); // Welcomes the user with a nice message ;^)
 	Gyro_Init();
+	//Speed_Interrupt_Init();
 	sei();	// Enable global interrupts
 }
 
@@ -504,14 +564,24 @@ int main(void)
 {
 	init_all();
 	//int8_t sensor_data[4];
-	//_delay_ms(250);		
+	 
+	EICRA = 1<< ISC00 | 1<<ISC01; //INT0 genererar avbrott på rising flank
+	EIMSK = 1<< INT0; //IINT0?
+	//MCUCR = (1<<IVCE); //Boot flash?
+	//MCUCR = (1<<IVSEL); //Boot flash?
 	
+		LCD_Clear();
+	//MOTOR_Forward(50);
 	
 	while (1)
 	{
+		//LCD_Clear();
+		LCD_SetPosition(16);
+		LCD_display_uint16(PIND & 0b00000100);
+		_delay_ms(75);
 		//Gyro_test();
 		//Drive_test();
-		Speed_test();
+		//Speed_test();
 	}
 	
 }
