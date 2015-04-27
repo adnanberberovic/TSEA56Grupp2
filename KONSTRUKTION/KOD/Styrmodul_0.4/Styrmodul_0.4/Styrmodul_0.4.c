@@ -24,6 +24,7 @@
 
 // GLOBAL VARIABLES --------------------------------------------------------------------
 uint8_t arrSpeed[] = {0,0,1,1,0}; //speedLeft, SpeedRight, DirLeft, DirRight, grip
+int8_t arrSensor[] = {0,0,0,0,0,0,0,0}; //sensor 0-7
 // One overflow corresponds to 13.1 ms if the F_CPU is 20 MHz and the defined prescaler.
 // This timer will reset every time it reaches 10.
 int TIMER_overflows;
@@ -174,11 +175,33 @@ void TIMER_init()
 
 //----------------------------PWM----END-----------------------------
 
-int8_t sensor_value(int8_t val)
+
+void Get_sensor_values() //Load all sensor values into sensor-array
 {
-	SPI_MasterTransmit(val,'s');
-	uint8_t temp = (uint8_t)SPI_MasterTransmit(0,'s');
-	return temp;
+	SPI_MasterTransmit(0,'s'); //value to be returned
+	for (int8_t i = 1; i < 9; i++)
+	{
+		arrSensor[i - 1] = SPI_MasterTransmit(i,'s'); //load all 8 sensorvalues into sensor position [0-7]
+	}
+	
+	//int8_t sensor_value(int8_t val)
+	//{
+	//SPI_MasterTransmit(val,'s');
+	//int8_t temp = (int8_t)SPI_MasterTransmit(0,'s');
+	//return temp;
+	//}
+
+}
+
+void Send_sensor_values() // Can combine with Get speed when in manual mode
+{
+	SPI_MasterTransmit(255,'k');
+	for (int8_t i = 0; i < 8; i++)
+	{
+		SPI_MasterTransmit(arrSensor[i],'k');
+	}
+	
+	
 }
 
 void Get_speed_value()
@@ -544,47 +567,38 @@ void init_all()
 	sei();	// Enable global interrupts
 }
 
-
+void manual_drive()
+{
+	Get_speed_value();
+	LCD_Clear();
+	PWM_SetSpeedLeft(arrSpeed[0]);
+	PWM_SetSpeedRight(arrSpeed[1]);
+	PWM_SetDirLeft(arrSpeed[2]);
+	PWM_SetDirRight(arrSpeed[3]);
+	if (arrSpeed[4] == 1)
+	{
+		SERVO_SetGrip();
+	}
+	else {
+	SERVO_ReleaseGrip();
+	}
+}
 
 int main(void)
 {
 	init_all();
-// 	PWM_SetDirLeft(1);
-// 	PWM_SetDirRight(1);
-// 	PWM_SetSpeedLeft(0);
-// 	PWM_SetSpeedRight(0);
+ 	PWM_SetDirLeft(1);
+ 	PWM_SetDirRight(1);
+ 	PWM_SetSpeedLeft(0);
+ 	PWM_SetSpeedRight(0);
 
 	//Gyro_test();
 	//Drive_test();
 	
 	while (1)
 	{
-		Drive_test();
-// 		Get_speed_value();
-// 		LCD_Clear();
-// 
-// 		LCD_SetPosition(0);
-// 		LCD_display_uint16((uint16_t)arrSpeed[0]);
-// 		LCD_SetPosition(16);
-// 		LCD_display_uint16((uint16_t)arrSpeed[1]);
-// 		LCD_SetPosition(8);
-// 		LCD_display_uint16((uint16_t)arrSpeed[2]);
-// 		LCD_SetPosition(24);
-// 		LCD_display_uint16((uint16_t)arrSpeed[3]);
-// 		LCD_SetPosition(29);
-// 		LCD_display_uint16((uint16_t)arrSpeed[4]);
-// 		
-// 		
-// 		PWM_SetSpeedLeft(arrSpeed[0]);
-// 		PWM_SetSpeedRight(arrSpeed[1]);
-// 		PWM_SetDirLeft(arrSpeed[2]);
-// 		PWM_SetDirRight(arrSpeed[3]);
-// 		if (arrSpeed[4] == 1)
-// 		{
-// 			SERVO_SetGrip();
-// 		}
-// 		else {
-// 			SERVO_ReleaseGrip();
+		//Drive_test();
+		manual_drive();
 		//}
 		//_delay_ms(250);
 		//_delay_ms(50);

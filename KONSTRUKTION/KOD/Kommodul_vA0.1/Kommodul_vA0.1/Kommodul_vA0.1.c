@@ -48,7 +48,7 @@ uint8_t incomingSpeed_ = 0;
 
 uint8_t sendFlag = 0;
 uint8_t Flag_ = 0;
-
+int8_t arrSensor[] = {0,0,0,0,0,0,0,0};
 //*********** BUFFER STRUCT ****************
 
 struct node { // definition of the linked list node
@@ -283,7 +283,16 @@ ISR(SPI_STC_vect)
 		return;
 	}
 	
-	//add_node(&head_SPIin, data); // Add received data to in-queue
+	if (data == 255 && Flag_ != 1) //sensordata coming, startbit from styr
+	{
+		Flag_ = 1;
+	}
+	else if (Flag_ == 1)
+	{
+		add_node(&head_SPIin, data); // Add received data to in-queue
+	}
+	
+	}
 	if (head_SPIout == NULL)
 	{
 		uint8_t stop_bit = 255; 
