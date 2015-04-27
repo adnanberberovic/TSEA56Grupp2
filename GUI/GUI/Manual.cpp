@@ -7,6 +7,7 @@
 //
 
 #include "SetupSDL.h"
+#include "../../KONSTRUKTION/KOD/Datorvisualisering_/SDL2_BT_v0.1/SDL2_BT_v0.1/Bluetooth.h"
 #include "Manual.h"
 #include <iostream>
 #include <sstream>
@@ -19,17 +20,21 @@ Manual::Manual(SetupSDL* sdl_lib)
     //SDL-init
     renderer_ = sdl_lib -> get_renderer();
     mainevent_ = sdl_lib -> get_event();
-    
+	Init_CommPort("COM3"); //Initialize comport
     //Konstuera Bakgrund
-    Bakgrund = new Unmoveable_Object("/Users/Andreas/Skola/KP2/GUI/Bilder/Manual.png", renderer_, 0, 0);
-    Pil1 = new Moveable_Object("/Users/Andreas/Skola/KP2/GUI/Bilder/Pil.png", renderer_, 300, 204);
-    Pil2 = new Moveable_Object("/Users/Andreas/Skola/KP2/GUI/Bilder/Pil.png", renderer_, 300, 345);
+    Bakgrund = new Unmoveable_Object("C:/Users/Måns/Documents/GitHub/TSEA56Grupp2/GUI/Bilder/Manual.png", renderer_, 0, 0);
+    Pil1 = new Moveable_Object("C:/Users/Måns/Documents/GitHub/TSEA56Grupp2/GUI/Bilder/Pil.png", renderer_, 300, 204);
+    Pil2 = new Moveable_Object("C:/Users/Måns/Documents/GitHub/TSEA56Grupp2/GUI/Bilder/Pil.png", renderer_, 300, 345);
 }
 
 Manual::~Manual()
 {
-    renderer_ = nullptr;
+	delete Pil1;
+	delete Pil2;
     delete Bakgrund;
+
+	CloseHandle(hComm);
+	renderer_ = nullptr;
 }
 
 void Manual::event(string& statestring, bool& running)
@@ -60,71 +65,44 @@ void Manual::event(string& statestring, bool& running)
                 running = false;
                 return;
             }
-            
-            if (mainevent_ -> key.keysym.sym == SDLK_RIGHT)
+  			else if (mainevent_->key.keysym.sym == SDLK_1)
             {
-                Speed_Horizont = 1;
-                
-            }
-            if (mainevent_ -> key.keysym.sym == SDLK_LEFT)
-            {
-                Speed_Horizont = -1;
-                
-            }
-            if (mainevent_ -> key.keysym.sym == SDLK_DOWN)
-            {
-                Speed_Vertical = -1;
-                
-                
-            }
-            if (mainevent_ -> key.keysym.sym == SDLK_UP)
-            {
-                Speed_Vertical = 1;
-                
-            }
-            if ( (mainevent_->key.keysym.sym != SDLK_RIGHT) && (mainevent_ -> key.keysym.sym != SDLK_LEFT) && (mainevent_ -> key.keysym.sym != SDLK_DOWN) && (mainevent_ -> key.keysym.sym != SDLK_UP) )
-            {
-                Speed = 0;
-            }
-            
-            if (mainevent_ -> key.keysym.sym == SDLK_1)
-            {
-                Speed = 10/255;
+                Speed = 255*2/10;
                 Pil1->skift_to(0);
             }
             else if (mainevent_ -> key.keysym.sym == SDLK_2)
             {
-                Speed = 100/255*20;
+				Speed = 255*3 / 10;
                 Pil1->skift_to(1);
             }
             else if (mainevent_ -> key.keysym.sym == SDLK_3)
             {
-                Speed = 100/255*30;
+				Speed = 255*4 / 10;
                 Pil1->skift_to(2);
             }
             else if (mainevent_ -> key.keysym.sym == SDLK_4)
             {
-                Speed = 100/255*40;
+				Speed = 255 *5/ 10;
                 Pil1->skift_to(3);
             }
             else if (mainevent_ -> key.keysym.sym == SDLK_5)
             {
-                Speed = 100/255*50;
+				Speed = 255 *6/ 10;
                 Pil1->skift_to(4);
             }
             else if (mainevent_ -> key.keysym.sym == SDLK_6)
             {
-                Speed = 100/255*60;
+				Speed = 255*7/ 10;
                 Pil1->skift_to(5);
             }
             else if (mainevent_ -> key.keysym.sym == SDLK_7)
             {
-                Speed = 100/255*70;
+				Speed = 255*8 / 10;
                 Pil1->skift_to(6);
             }
             else if (mainevent_ -> key.keysym.sym == SDLK_8)
             {
-                Speed = 100/255*80;
+				Speed = 255*9/10 ;
                 Pil1->skift_to(7);
             }
             else if (mainevent_ -> key.keysym.sym == SDLK_9)
@@ -133,7 +111,7 @@ void Manual::event(string& statestring, bool& running)
                 Pil1->skift_to(8);
             }
             
-            if (mainevent_ -> key.keysym.sym == SDLK_q)
+			else if (mainevent_->key.keysym.sym == SDLK_q)
             {
                 agg = 1;
                 Pil2->skift_to(0);
@@ -153,13 +131,44 @@ void Manual::event(string& statestring, bool& running)
                 agg = 4;
                 Pil2->skift_to(3);
             }
+			else if (mainevent_->key.keysym.sym == SDLK_g)
+			{
+				Klo = 1;
+			}
+			else if (mainevent_->key.keysym.sym == SDLK_d)
+			{
+				Klo = 0;
+			}
 
-            
+				
         }
         
     }
-    
-    //Pacman1->change_Speed(Event_xSpeed, Event_ySpeed);  //ändra hastighet Detta ska in i specialklassen för robot
+
+
+	if (currentKeyStates[SDL_SCANCODE_RIGHT])
+	{
+		Speed_Horizont = 1;
+	}
+	else if (currentKeyStates[SDL_SCANCODE_LEFT])
+	{
+		Speed_Horizont = -1;
+	}
+	if (currentKeyStates[SDL_SCANCODE_UP])
+	{
+		Speed_Vertical = 1;
+	}
+	else if (currentKeyStates[SDL_SCANCODE_DOWN])
+	{
+		Speed_Vertical = -1;
+	}
+
+	if (!(currentKeyStates[SDL_SCANCODE_RIGHT]) && !(currentKeyStates[SDL_SCANCODE_LEFT]) && !(currentKeyStates[SDL_SCANCODE_UP]) &&
+		!(currentKeyStates[SDL_SCANCODE_DOWN])) {
+		Speed_Vertical = 0;
+		Speed_Horizont = 0;
+	}
+
     
     return;
 }
@@ -167,7 +176,14 @@ void Manual::event(string& statestring, bool& running)
 void Manual::update(string& statestring, bool& running)
 {
     Set_Speed();
-    
+
+		 
+	uint8_t arrSpeed[] = { 1, Speed_right, Speed_left , Dir_left, Dir_right, Klo}; // Make array to send with start-flag -1
+	if (!WriteFile(hComm, arrSpeed, (sizeof(arrSpeed)/sizeof(arrSpeed[0])), &BytesWritten_, NULL)) // Send array with speed values
+	{
+		cerr << "Writing to file failed!\n";
+	}
+	SDL_Delay(10);
 
 }
 
@@ -180,14 +196,14 @@ void Manual::render()
     Bakgrund->render(renderer_);
     Pil1->render_Moveable(renderer_);
     Pil2->render_Moveable(renderer_);
-    
+  
+
     SDL_RenderPresent(renderer_);
-    SDL_Delay(50);
+    SDL_Delay(10);
 }
 
 
-void Manual::run(SetupSDL* sdl_lib __attribute__((unused))
-                  ,string& statestring) {
+void Manual::run(string& statestring) {
     
     bool running{true};
     
@@ -211,43 +227,77 @@ void Manual::run(SetupSDL* sdl_lib __attribute__((unused))
 void Manual::Set_Speed()
 {
     
-    if (front_ < 15) {
-        Speed_left = 0;
-        Speed_right = 0;
-        return;
-    }
+	Dir_left = 1;
+	Dir_right = 1;
 
-    if(abs(Speed_Horizont) > 0 &&  abs(Speed_Vertical) > 0)
-    {
-        if (Speed_Horizont > 0)
-        {
-            Speed_right = Speed*agg/5;
-            Speed_left = Speed;
-        }
-        else
-        {
-            Speed_left = Speed*agg/5;
-            Speed_right = Speed;
-        }
-    }
-    else if (Speed_Horizont > 0)
-    {
-        Speed_right = Speed;
-        Speed_left = 0;
-    }
-    else if (Speed_Horizont < 0)
-    {
-        Speed_left = Speed;
-        Speed_right = 0;
-    }
-    else
-    {
-        Speed_left = Speed;
-        Speed_right = Speed;
-    }
+	if (abs(Speed_Horizont) > 0 && abs(Speed_Vertical) > 0)
+	{
+		if (Speed_Horizont > 0)
+		{
+			if (Speed_Vertical > 0){
+				Speed_right = Speed*agg / 5;
+				Speed_left = Speed;
+			}
+			else
+			{
+				Speed_right = Speed*agg / 5;
+				Speed_left = Speed;
+				Dir_left = 0;
+				Dir_right = 0;
+			}
+		}
+		else
+		{
+			if (Speed_Vertical > 0){
+				Speed_left = Speed*agg / 5;
+				Speed_right = Speed;
+			}
+			else
+			{
+				Speed_left = Speed*agg / 5;
+				Speed_right = Speed;
+				Dir_left = 0;
+				Dir_right = 0;
+			}
+		}
+	}
+	else if (Speed_Horizont > 0)
+	{
+		Speed_left = Speed;
+		Speed_right = Speed;
+		Dir_left = 1;
+		Dir_right = 0;
+
+	}
+	else if (Speed_Horizont < 0)
+	{
+		Speed_left = Speed;
+		Speed_right = Speed;
+		Dir_left = 0;
+		Dir_right = 1;
+	}
+	else if (Speed_Horizont == 0 && Speed_Vertical == 0)
+	{
+		Speed_left = 0;
+		Speed_right = 0;
+	}
+	else
+	{
+		Speed_left = Speed;
+		Speed_right = Speed;
+	}
+
+	if (Speed_Vertical < 0 && Speed_Horizont == 0 )
+	{
+		Dir_left = 0;
+		Dir_right = 0;
+	}
 
 
 }
+
+
+	
 
 
 

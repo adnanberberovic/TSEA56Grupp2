@@ -202,12 +202,12 @@ void Input_Loop(){
 const int SCREEN_WIDTH = 640;
 const int SCREEN_HEIGHT = 480;
 
-int main(int argc, char* argv[])
-{
-	Init_Welcome();
-	Input_Loop();
-	return 0;
-}
+//int main(int argc, char* argv[])
+//{
+//	Init_Welcome();
+//	Input_Loop();
+//	return 0;
+//}
 
 //
 //using namespace std;

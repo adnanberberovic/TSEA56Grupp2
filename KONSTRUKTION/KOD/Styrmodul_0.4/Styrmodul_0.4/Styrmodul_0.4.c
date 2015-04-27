@@ -1,4 +1,4 @@
-/*
+ï»¿/*
  * pwmpls.c
  *
  * Created: 4/13/2015 12:39:10 PM
@@ -7,6 +7,7 @@
 
 #define F_CPU 20000000UL
 
+#include <stdlib.h>
 #include <avr/io.h>
 #include <avr/interrupt.h>
 #include <avr/sleep.h>
@@ -17,42 +18,21 @@
 #include <string.h>
 #include "Styrmodul_LCD.c"
 #include "Styrmodul_Servo.c"
-
-
-
 //#include <avr/pgmspace.h>
 
-// GLOBAL VARIABLES
 
-// Sets position for cursor on LCD. Argument should be a number in the range of 0-31.
-//void LCD_SetPosition(uint8_t pos)
-//{
-	//LCD_Counter =(int) pos - 1;
-	//while(LCD_Busy())
-	//{
-		//_delay_ms(1);
-	//}
-	//PORTB &= ~(1 << 0); // Clear RS and
-	//PORTB &= ~(1 << 1); // clear R/W bits so that the following commands can be run
-	//
-	//if (pos < 16)
-	//{
-		//LCD_SendCommand(128+pos);
-	//}
-	//else if (pos < 32)
-	//{
-		//LCD_SendCommand(128+64-16+pos);
-	//}
-	//else LCD_SendCommand(0b10000000);
-	//
-//}
 
+// GLOBAL VARIABLES --------------------------------------------------------------------
+uint8_t arrSpeed[] = {0,0,1,1,0}; //speedLeft, SpeedRight, DirLeft, DirRight, grip
+int8_t arrSensor[] = {0,0,0,0,0,0,0,0}; //sensor 0-7
 // One overflow corresponds to 13.1 ms if the F_CPU is 20 MHz and the defined prescaler.
 // This timer will reset every time it reaches 10.
 int TIMER_overflows;
-
 // The following overflow storage corresponds to 131ms. This timer will never reset.
 int TIMER_overflows_deci;
+// This variable is used to store robots angle in degrees
+int rotation_angle = 0;
+// --------------------------------------------------------------------------------------
 
 // Setup data direction registers @ ports for out/inputs.
 void Styr_InitPortDirections(void)
@@ -61,7 +41,7 @@ void Styr_InitPortDirections(void)
 	DDRB = 1<<DDB0 | 1<<DDB1 | 1<<DDB2 | 1<<DDB3 | 1<<DDB4 | 1<<DDB5 | 1<<DDB7;
 	DDRC = 1<<DDC0;
 	DDRD = 1<<DDD0 | 1<<DDD1 | 0<<DDD2 | 1<<DDD3 | 1<<DDD4 | 1<<DDD5 | 1<<DDD6 | 1<<DDD7;
-	//D2 ingång för reflexsensor
+	//D2 ingÐµng fÑ†r reflexsensor
 }
 
 // Setups port values, more specifically puts SS on high.
@@ -75,7 +55,7 @@ void Styr_InitPortValues(void)
 void SPI_MasterInit(void)
 {
 	SPSR = 0<<SPI2X;
-	SPCR = 0<<SPIE | 1<<SPE | 0<<DORD | 1<<MSTR | 0<<CPOL | 0<<CPHA | 1<<SPR1 | 1<<SPR0;
+	SPCR = 0<<SPIE | 1<<SPE | 1<<DORD | 1<<MSTR | 0<<CPOL | 0<<CPHA | 1<<SPR1 | 1<<SPR0;
 	// SPIE: SPI interrupt enable. Set to 1 to allow interrupts
 	// SPE: SPI Enable. Set to 1 to allow SPI communication
 	// DORD: Data order. Set to 1 to transmit LSB first, MSB last.
@@ -87,7 +67,7 @@ void SPI_MasterInit(void)
 }
 
 // Initiates communication with other modules.
-unsigned char SPI_MasterTransmit(unsigned char cData, char target)
+unsigned char SPI_MasterTransmit(uint8_t cData, char target)
 {
 	if (target == 'k') // K as in kommunikation
 	{
@@ -97,11 +77,7 @@ unsigned char SPI_MasterTransmit(unsigned char cData, char target)
 	{
 		PORTB &= ~(1<<PORTB3);
 	}
-	else if (target == 'g') // G as in gyro
-	{
-		PORTC &= ~(1<<PORTC0);
-		
-	}
+	
 	// Load data into SPI data register.
 	SPDR = cData;
 	
@@ -110,30 +86,13 @@ unsigned char SPI_MasterTransmit(unsigned char cData, char target)
 	
 	// Reset SS.
 	PORTB |= 1<<PORTB3 | 1<<PORTB4;
-	//PORTC |= 1<<PORTC0;
+	PORTC |= 1<<PORTC0;
+
 		
 	return SPDR;
 }
 
-void set_GyroSS_Low()
-{
-	PORTC &= ~(1<<PORTC0);
-}
-void set_GyroSS_High()
-{
-	PORTC |= (1<<PORTC0);
-}
 
-unsigned char SPI_MasterTransmit_Gyro(unsigned char cData)
-{
-	// Load data into SPI data register.
-	SPDR = cData;
-	
-	// Wait until transmission completes.
-	while(!(SPSR & (1<<SPIF)));
-	
-	return SPDR;
-}
 
 //----------------------------PWM------------------------------------
 
@@ -178,14 +137,14 @@ void PWM_SetSpeedLeft(int speed)
 	}
 }
 
-// 0 for forward, 1 for backward
+// 1 for forward, 0 for backward
 void PWM_SetDirLeft(int dir)
 {
-	if (dir == 0)
+	if (dir == 1)
 	{
 		PORTD &= ~(1 << PORTD0);
 	}
-	else if (dir == 1)
+	else if (dir == 0)
 	{
 		PORTD |= 1 << PORTD0;
 	}
@@ -204,51 +163,7 @@ void PWM_SetDirRight(int dir)
 	}
 }
 
-void MOTOR_Forward(int speed)
-{
-	PWM_SetDirRight(1);
-	PWM_SetDirLeft(0);
-	PWM_SetSpeedLeft(speed);
-	PWM_SetSpeedRight(speed);
-}
 
-void MOTOR_Backward(int speed)
-{
-	PWM_SetDirRight(0);
-	PWM_SetDirLeft(1);
-	PWM_SetSpeedLeft(speed);
-	PWM_SetSpeedRight(speed);
-}
-
-void MOTOR_RotateLeft()
-{
-	PWM_SetDirRight(1);
-	PWM_SetDirLeft(1);
-	PWM_SetSpeedLeft(100);
-	PWM_SetSpeedRight(100);
-	for(int i = 0; i <= 8; i++)
-	{
-		_delay_ms(250);
-	}
-}
-
-void MOTOR_RotateRight()
-{
-	PWM_SetDirRight(0);
-	PWM_SetDirLeft(0);	
-	PWM_SetSpeedLeft(100);
-	PWM_SetSpeedRight(100);
-	for(int i = 0; i <= 8; i++)
-	{
-		_delay_ms(250);
-	}
-}
-
-void MOTOR_Stop()
-{
-	PWM_SetSpeedRight(0);
-	PWM_SetSpeedLeft(0);
-}
 
 // Setup a timer. Used by the D regulator.
 void TIMER_init()
@@ -260,11 +175,48 @@ void TIMER_init()
 
 //----------------------------PWM----END-----------------------------
 
-int8_t sensor_value(int8_t val)
+
+void Get_sensor_values() //Load all sensor values into sensor-array
 {
-	SPI_MasterTransmit(val,'s');
-	uint8_t temp = (uint8_t)SPI_MasterTransmit(0,'s');
-	return temp;
+	SPI_MasterTransmit(0,'s'); //value to be returned
+	for (int8_t i = 1; i < 9; i++)
+	{
+		arrSensor[i - 1] = SPI_MasterTransmit(i,'s'); //load all 8 sensorvalues into sensor position [0-7]
+	}
+	
+	//int8_t sensor_value(int8_t val)
+	//{
+	//SPI_MasterTransmit(val,'s');
+	//int8_t temp = (int8_t)SPI_MasterTransmit(0,'s');
+	//return temp;
+	//}
+
+}
+
+void Send_sensor_values() // Can combine with Get speed when in manual mode
+{
+	SPI_MasterTransmit(255,'k');
+	for (int8_t i = 0; i < 8; i++)
+	{
+		SPI_MasterTransmit(arrSensor[i],'k');
+	}
+	
+	
+}
+
+void Get_speed_value()
+{
+	SPI_MasterTransmit(0b00000001, 'k');
+	_delay_us(200);
+	arrSpeed[0] = SPI_MasterTransmit(0x00,'k'); //Get left speed
+	_delay_us(20);
+	arrSpeed[1] = SPI_MasterTransmit(0x00,'k'); //Get right speed
+	_delay_us(20);
+	arrSpeed[2] = SPI_MasterTransmit(0x00,'k'); //Get left dir
+	_delay_us(20);
+	arrSpeed[3] = SPI_MasterTransmit(0x00,'k'); //Get right dir
+	_delay_us(20);
+	arrSpeed[4] = SPI_MasterTransmit(0x00,'k'); //Get gripclaw
 }
 
 ISR(TIMER0_OVF_vect)
@@ -282,66 +234,76 @@ ISR(TIMER0_OVF_vect)
 		//LCD_SendString("ALLAHU AKBAR!");
 	//}
 }
-//----------------------------GYRO------------------------------------
-/*
-void sleepGyroADC()
-{
-	unsigned int dataH;
-	SPI_MasterTransmit(0b10010000,'g');
-	// check if instruction received
-	// by sending two dummy bytes:
-	dataH = SPI_MasterTransmit(0x00,'g');
-	_delay_us(200);
-	SPI_MasterTransmit(0x00,'g');
-	_delay_us(200);
 
+//----------------------------GYRO------------------------------------
+
+unsigned char SPI_MasterTransmit_Gyro(unsigned char cData)
+{
+	// Load data into SPI data register.
+	SPDR = cData;
 	
-	// 	if (dataH & 0b10000000) {
-	// 		LCD_SendString("not accepted");
-	// 	}
-	// 	else LCD_SendString("sleep");
+	// Wait until transmission completes.
+	while(!(SPSR & (1<<SPIF)));
+	
+	return SPDR;
 }
-*/
+
+void set_GyroSS_Low() // connect gyro
+{
+	PORTC &= ~(1<<PORTC0);
+}
+void set_GyroSS_High() // disconnect gyro
+{
+	PORTC |= (1<<PORTC0);
+}
 
 void Gyro_Init()
 {
-	int8_t first_byte1;
+
+	SPCR &= ~(1<<DORD);
+	int8_t high_byte;
 	do{
 		set_GyroSS_Low();
 		SPI_MasterTransmit_Gyro(0b10010100); //Activate adc
-		first_byte1 = SPI_MasterTransmit_Gyro(0x00); //Byte with EOC and Accepted instr. bit
-		SPI_MasterTransmit_Gyro(0x00); //Last byte
+		high_byte = SPI_MasterTransmit_Gyro(0x00); //Byte with EOC and Accepted instr. bit
+		SPI_MasterTransmit_Gyro(0x00); //low byte
 		set_GyroSS_High();
-	} while ( (first_byte1 & 0b10000000) & !(first_byte1 & 0b00100000)); // IF EOC = 0 and acc.instr. = 1 we continue
+	} while ( (high_byte & 0b10000000) & !(high_byte& 0b00100000)); // IF EOC = 0 and acc.instr. = 1 we continue
+	SPCR |= (1<<DORD);
+
 }
 
 void Gyro_StartConversion()
 {
-	int8_t first_byte2;
+	int8_t high_byte;	
+	SPCR &= ~(1<<DORD);
 	do{
 		set_GyroSS_Low();
-		SPI_MasterTransmit_Gyro(0b10010100); //Activate adc with angular rate signal
-		first_byte2 = SPI_MasterTransmit_Gyro(0x00); //Byte with EOC and Accepted instr. bit
-		SPI_MasterTransmit_Gyro(0x00); //Last byte
+		SPI_MasterTransmit_Gyro(0b10010100); //Activate adc, select angular rate channel
+		high_byte = SPI_MasterTransmit_Gyro(0x00); //Byte with EOC and Accepted instr. bit
+		SPI_MasterTransmit_Gyro(0x00); //low byte
 		set_GyroSS_High();
-	} while (first_byte2 & 0b10000000); // IF  acc.instr. = 1 we continue
+
+	} while (high_byte & 0b10000000); // IF  acc.instr. = 1 we continue
+	SPCR |= (1<<DORD);
+
 }
 
 int16_t Gyro_PollResult()
 {
-	int8_t first_byte3;
-	int8_t second_byte;
+	int8_t high_byte, low_byte;
 	int16_t return_val;
-	
-		do{
-			set_GyroSS_Low();
-			SPI_MasterTransmit_Gyro(0b10000000); //Activate adc
-			first_byte3 = SPI_MasterTransmit_Gyro(0x00); //Byte with EOC and Accepted instr. bit
-			second_byte = SPI_MasterTransmit_Gyro(0x00); //Last byte
-			set_GyroSS_High();
-		} while ( (first_byte3 & 0b10000000) & !(first_byte3 & 0b00100000)); // IF EOC = 0 and acc.instr. = 1 we continue
-		
-	return_val = ((first_byte3 & 0x00ff) << 8) | (second_byte);
+
+	SPCR &= ~(1<<DORD);
+	do{
+		set_GyroSS_Low();
+		SPI_MasterTransmit_Gyro(0b10000000); //Activate adc
+		high_byte = SPI_MasterTransmit_Gyro(0x00); //Byte with EOC and Accepted instr. bit
+		low_byte = SPI_MasterTransmit_Gyro(0x00); //low byte
+		set_GyroSS_High();
+	} while ((high_byte & 0b10000000) & !(high_byte & 0b00100000)); // IF EOC = 0 and acc.instr. = 1 we continue
+	SPCR |= (1<<DORD);
+	return_val = ((high_byte & 0x00ff) << 8) | (low_byte);
 	return return_val;
 }
 
@@ -350,9 +312,67 @@ int16_t Get_ADC_value(int16_t inval_)
 	int16_t result_;
 	result_ = inval_ & 0x0fff;
 	result_ = result_ >> 1;
-
 	return result_;
-} 
+}
+
+// Converts the adc reading to angles per second
+int16_t adcToAngularRate(int16_t adcValue)
+{
+	int16_t AngularRate = (adcValue * 25/12)+400;  // in mV
+	// from the data sheet, R2 gyroscope sensor version is 26,67 mV/deg
+	// for gyroscope with max angular rate 300 deg/s
+	return (AngularRate - 2500)/26.67;
+}
+
+void Gyro_Sleep()
+{
+	SPCR &= ~(1<<DORD);
+	int8_t dataH;
+	do {
+		set_GyroSS_Low();
+		SPI_MasterTransmit_Gyro(0b10010000);
+		dataH = SPI_MasterTransmit_Gyro(0x00);
+		SPI_MasterTransmit_Gyro(0x00);
+		set_GyroSS_High();
+	} while (dataH & 0b10000000);
+	SPCR |= (1<<DORD);
+}
+
+int16_t Gyro_sequence()
+{
+	int16_t result = 0;
+	SPCR &= ~(1<<DORD);
+	Gyro_StartConversion();
+	result = Gyro_PollResult();
+	result = Get_ADC_value(result);
+	result = adcToAngularRate(result);
+	SPCR |= (1<<DORD);
+	return result;
+}
+
+// use only during rotation
+// in functions MOTOR_RotateRight(), MOTOR_RotateLeft()
+// stop rotating when 90 degrees reached; 
+void checkAngle90()
+{
+	int16_t result;
+	int16_t before = 0;
+	do {
+		result = 0;
+		result = Gyro_sequence();	// 315us
+		if (abs(result) > 120) 
+		{
+			result = before;
+		}
+		before = result;
+		rotation_angle += result/6;  // /6
+		LCD_Clear();
+		LCD_SetPosition(0);
+		LCD_display_int16(rotation_angle);
+	} while (abs(rotation_angle) < 410); // 410
+	
+	rotation_angle = 0; //reset
+}
 
 //----------------------------GYRO----END-----------------------------
 uint16_t speed_start_time;
@@ -361,7 +381,7 @@ uint16_t current_speed;
 
 void Speed_Interrupt_Init()
 {
-	EICRA = 1<< ISC00 | 1<<ISC01; //INT0 genererar avbrott på rising flank
+	EICRA = 1<< ISC00 | 1<<ISC01; //INT0 genererar avbrott pï¿½ rising flank
 	EIMSK = 1<< INT0; //IINT0?
 	MCUCR = (1<<IVCE); //Boot flash?
 	MCUCR = (1<<IVSEL); //Boot flash?
@@ -405,132 +425,121 @@ ISR(INT0_vect)
 	}
 }
 
-//Returns speed in millimeters/milliseconds = meters/second
-int speed_calculator()
+//--MOTOR start
+void MOTOR_Forward(int speed)
 {
-	int start_time = TIMER_overflows_deci; //Read start time
-	int wheel_circumference = 79; //Wheel circumference is 79 mm
-	int wheel_marker_counter = 0; //Hjulet är uppdelat i 8 svarta och vita 8 sektioner. Öka antal?
-	int speed;
-	
-	int time_difference;
-	
-	
- 	while (wheel_marker_counter < 8)
- 	{
-	 	if((PIND & 0b00000100) == 4)
-	 	wheel_marker_counter++;
- 	}
-
-//  	while(wheel_marker_counter < 8)
-//  	{
-//  		LCD_Clear();
-//  		if((PIND & 0b00000100) == 4) //PIND2 motsvarar 3 biten = 2^2
-//  		{ 
-//  			//When reflex sensor high - increase counter. 
-//  			wheel_marker_counter++;
-//  			LCD_SetPosition(0);
-//  			LCD_Clear();
-//  			LCD_SendString("OK");
-//  			_delay_ms(250);
-//  			_delay_ms(250);
-//  			_delay_ms(250);
-//  			LCD_SetPosition(16);
-//  			LCD_display_int16(wheel_marker_counter);
-//  			_delay_ms(250);
-//  			_delay_ms(250);	
-//  		}
-//  		else
-//  		{	
-//  			 LCD_SetPosition(0);
-//  			 LCD_Clear();
-//  			 LCD_SendString("else");
-//  			 _delay_ms(250);
-//  			 _delay_ms(250);
-//  			 _delay_ms(250);
-//  			 _delay_ms(250);
-//  		}
-//  	}
-	
-	//speed = distance/(finish_time - start_time)
-	//is it really 8 laps until you get  back to same pos? shouldnt you remove some length 
-	//USE CORRECT WHEEL CIRCUM - DIFFERENT DISTANCE!
-	
-	LCD_SetPosition(0);
-	LCD_Clear(); 
-	time_difference = (TIMER_overflows_deci - start_time) * 131; //131 to get milliseconds
-	LCD_display_int16(time_difference);
-	speed = wheel_circumference/time_difference;
-	
-	return speed;
+	PWM_SetDirRight(1);
+	PWM_SetDirLeft(1);
+	PWM_SetSpeedLeft(speed);
+	PWM_SetSpeedRight(speed);
 }
+
+void MOTOR_Backward(int speed)
+{
+	PWM_SetDirRight(0);
+	PWM_SetDirLeft(0);
+	PWM_SetSpeedLeft(speed);
+	PWM_SetSpeedRight(speed);
+}
+
+void MOTOR_RotateLeft()
+{
+	PWM_SetDirRight(0);
+	PWM_SetDirLeft(1);
+	PWM_SetSpeedLeft(100);
+	PWM_SetSpeedRight(100);
+	checkAngle90();
+}
+
+void MOTOR_RotateRight()
+{
+	PWM_SetDirRight(1);
+	PWM_SetDirLeft(0);
+	PWM_SetSpeedLeft(100);
+	PWM_SetSpeedRight(100);
+	checkAngle90();
+}
+
+void MOTOR_Stop()
+{
+	PWM_SetSpeedRight(0);
+	PWM_SetSpeedLeft(0);
+}
+//--MOTOR stop
 
 void Drive_test()
 {
-	MOTOR_Forward(80);
-	SERVO_LevelHigh();
-	for(int i = 0; i <= 15; i++)
-	{
-		_delay_ms(250);
-	}
+	//MOTOR_Forward(80);
+// 	SERVO_LevelHigh();
+// 	for(int i = 0; i <= 15; i++)
+// 	{
+// 		_delay_ms(250);
+// 	}
 	MOTOR_RotateRight();
 	MOTOR_Stop();
-	SERVO_SetGrip();
-	for(int i = 0; i <= 5; i++)
-	{
-		_delay_ms(250);
-	}
-	SERVO_LevelMid();
-	MOTOR_Backward(80);
-	for(int i = 0; i <= 15; i++)
-	{
-		_delay_ms(250);
-	}
-	SERVO_ReleaseGrip();
+	
+	_delay_ms(5000);
 	MOTOR_RotateLeft();
 	MOTOR_Stop();
-	for(int i = 0; i <= 5; i++)
-	{
-		_delay_ms(250);
-	}
-	SERVO_LevelLow();
-	MOTOR_Backward(80);
-	for(int i = 0; i <= 32; i++)
-	{
-		_delay_ms(250);
-	}
-	SERVO_LevelMid();
-	SERVO_SetGrip();
-	MOTOR_Stop();
-	for(int i = 0; i <= 5; i++)
-	{
-		_delay_ms(250);
-	}
-	SERVO_ReleaseGrip();
+	_delay_ms(5000);
+	
+// 	SERVO_SetGrip();
+// 	for(int i = 0; i <= 5; i++)
+// 	{
+// 		_delay_ms(250);
+// 	}
+// 	SERVO_LevelMid();
+// 	MOTOR_Backward(80);
+// 	for(int i = 0; i <= 15; i++)
+// 	{
+// 		_delay_ms(250);
+// 	}
+// 	SERVO_ReleaseGrip();
+// 	MOTOR_RotateLeft();
+// 	MOTOR_Stop();
+// 	for(int i = 0; i <= 5; i++)
+// 	{
+// 		_delay_ms(250);
+// 	}
+// 	SERVO_LevelLow();
+// 	MOTOR_Backward(80);
+// 	for(int i = 0; i <= 32; i++)
+// 	{
+// 		_delay_ms(250);
+// 	}
+// 	SERVO_LevelMid();
+// 	SERVO_SetGrip();
+// 	MOTOR_Stop();
+// 	for(int i = 0; i <= 5; i++)
+// 	{
+// 		_delay_ms(250);
+// 	}
+// 	SERVO_ReleaseGrip();
 }
-
 
 void Gyro_test()
 {
-	//DORD: Data order. Set to 1 to transmit LSB first, MSB last
+	//DORD: Data order. Set to 0 to transmit MSB first, LSB last
 	//OBS: Spegla det som skickas!
 	
+	//checkAngle90();
 	int16_t result = 0;
-	
-	while (1)
-	{
-		LCD_Clear();
-		LCD_SetPosition(0);
-		Gyro_StartConversion();
-		result = Gyro_PollResult();
-		result = Get_ADC_value(result);
-		LCD_display_int16(adcToAngularRate(result));
-		_delay_ms(250);
-	}
-	
+	int16_t before = 0;
+ 	while (1)
+ 	{
+ 		LCD_Clear();
+ 		LCD_SetPosition(0);
+ 		result = Gyro_sequence(); //data ordningen sÃ¤tts hÃ¤r
+   		if(abs(result) > 120)
+  		{
+  			result = before;
+  		}
+		before = result;
+		rotation_angle += result;
+		LCD_display_int16(rotation_angle/30);
+ 	}
 	return;
 }
-
 
 void Speed_test()
 {
@@ -560,25 +569,44 @@ void init_all()
 	sei();	// Enable global interrupts
 }
 
+void manual_drive()
+{
+	Get_speed_value();
+	LCD_Clear();
+	PWM_SetSpeedLeft(arrSpeed[0]);
+	PWM_SetSpeedRight(arrSpeed[1]);
+	PWM_SetDirLeft(arrSpeed[2]);
+	PWM_SetDirRight(arrSpeed[3]);
+	if (arrSpeed[4] == 1)
+	{
+		SERVO_SetGrip();
+	}
+	else {
+	SERVO_ReleaseGrip();
+	}
+}
+
 int main(void)
 {
 	init_all();
 	//int8_t sensor_data[4];
 	 
-	EICRA = 1<< ISC00 | 1<<ISC01; //INT0 genererar avbrott på rising flank
+	EICRA = 1<< ISC00 | 1<<ISC01; //INT0 genererar avbrott pï¿½ rising flank
 	EIMSK = 1<< INT0; //IINT0?
 	//MCUCR = (1<<IVCE); //Boot flash?
 	//MCUCR = (1<<IVSEL); //Boot flash?
 	
-		LCD_Clear();
-	//MOTOR_Forward(50);
+
+ 	PWM_SetDirLeft(1);
+ 	PWM_SetDirRight(1);
+ 	PWM_SetSpeedLeft(0);
+ 	PWM_SetSpeedRight(0);
+
 	
 	while (1)
 	{
-		//LCD_Clear();
-		LCD_SetPosition(16);
-		LCD_display_uint16(PIND & 0b00000100);
-		_delay_ms(75);
+		//Drive_test();
+		manual_drive();
 		//Gyro_test();
 		//Drive_test();
 		//Speed_test();

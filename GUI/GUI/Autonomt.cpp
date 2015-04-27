@@ -25,23 +25,23 @@ Autonom::Autonom(SetupSDL* sdl_lib)
     mainevent_ = sdl_lib -> get_event();
     
     //Konstuera Bakgrund
-    Bakgrund = new Unmoveable_Object("/Users/Andreas/Skola/KP2/GUI/Bilder/BG.png", renderer_, 0, 0);
+    Bakgrund = new Unmoveable_Object("C:/Users/Måns/Documents/GitHub/TSEA56Grupp2/GUI/Bilder/BG.png", renderer_, 0, 0);
     
-    Speed_left = new Speed_meter("/Users/Andreas/Skola/KP2/GUI/Bilder/Hastighet.png", renderer_, 150 , 444);
+    Speed_left = new Speed_meter("C:/Users/Måns/Documents/GitHub/TSEA56Grupp2/GUI/Bilder/Hastighet.png", renderer_, 150 , 444);
     
-    Speed_right = new Speed_meter("/Users/Andreas/Skola/KP2/GUI/Bilder/Hastighet.png", renderer_, 274, 444);
+    Speed_right = new Speed_meter("C:/Users/Måns/Documents/GitHub/TSEA56Grupp2/GUI/Bilder/Hastighet.png", renderer_, 274, 444);
 
 
     
     //Konstruera Robotar
-    Robot_angle = new Robot("/Users/Andreas/Skola/KP2/GUI/Bilder/Robot.png", renderer_, 194, 50 );
-    Robot_offset = new Robot("/Users/Andreas/Skola/KP2/GUI/Bilder/Robot.png", renderer_, 192, 250);
-    Robot_Rotaton = new Robot("/Users/Andreas/Skola/KP2/GUI/Bilder/Robot.png", renderer_, 194, 660);
-    Robot_Bana = new Robot("/Users/Andreas/Skola/KP2/GUI/Bilder/Robot.png", renderer_, 814, 670);
+    Robot_angle = new Robot("C:/Users/Måns/Documents/GitHub/TSEA56Grupp2/GUI/Bilder/Robot.png", renderer_, 194, 50 );
+    Robot_offset = new Robot("C:/Users/Måns/Documents/GitHub/TSEA56Grupp2/GUI/Bilder/Robot.png", renderer_, 192, 250);
+    Robot_Rotaton = new Robot("C:/Users/Måns/Documents/GitHub/TSEA56Grupp2/GUI/Bilder/Robot.png", renderer_, 194, 660);
+    Robot_Bana = new Robot("C:/Users/Måns/Documents/GitHub/TSEA56Grupp2/GUI/Bilder/Robot.png", renderer_, 814, 670);
     
     //Text
-    Text_Angle_ = new Text("/Users/Andreas/Library/Fonts/DS-DIGI.TTF", "01", renderer_, 80, 20, 50, 50);
-    Text_Offset_ = new Text("/Users/Andreas/Library/Fonts/DS-DIGI.TTF", "02", renderer_, 80, 224, 50, 50);
+    Text_Angle_ = new Text("C:/Users/Måns/Documents/GitHub/TSEA56Grupp2/GUI/Bilder/ds_digital/DS-DIGI.TTF", "01", renderer_, 80, 20, 50, 50);
+    Text_Offset_ = new Text("C:/Users/Måns/Documents/GitHub/TSEA56Grupp2/GUI/Bilder/ds_digital/DS-DIGI.TTF", "02", renderer_, 80, 224, 50, 50);
     
     //väg/vägg
     init_Tiles();
@@ -228,7 +228,7 @@ void Autonom::init_Tiles()
         for (int j = 0; j <= 14; j++)
         {
             row.insert(row.begin(),
-                               new Tile("/Users/Andreas/Skola/KP2/GUI/Bilder/vag.png",
+                               new Tile("C:/Users/Måns/Documents/GitHub/TSEA56Grupp2/GUI/Bilder/vag.png",
                                            renderer_, 284+40*i, 101+40*j));
         }
     Tile_vector.insert(Tile_vector.begin(), row);
@@ -316,8 +316,7 @@ void Autonom::Change_left_speed()
 
 
 
-void Autonom::run(SetupSDL* sdl_lib __attribute__((unused))
-               ,string& statestring) {
+void Autonom::run(string& statestring) {
     Start_Timer();
     
     bool running{true};
