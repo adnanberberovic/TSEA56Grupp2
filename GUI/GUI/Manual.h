@@ -72,6 +72,11 @@ private:
     uint8_t Speed;
     uint8_t Speed_right;
     uint8_t Speed_left;
+	uint8_t Dir_left;
+	uint8_t Dir_right;
+	uint8_t Klo;
+
+
     int8_t agg;
     
     //Externa IN <-- UT
@@ -81,6 +86,9 @@ private:
     int8_t space_right_;
     int8_t space_left_;
     int8_t front_ = 20;
+
+	const Uint8* currentKeyStates = SDL_GetKeyboardState(NULL);
+
     
     
 };

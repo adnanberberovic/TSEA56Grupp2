@@ -16,7 +16,7 @@
 #include <math.h>
 
 //#include <avr/pgmspace.h>
-
+//testing git
 // GLOBAL VARIABLES
 
 int LCD_Counter;
