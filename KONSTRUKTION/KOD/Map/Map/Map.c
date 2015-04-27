@@ -26,7 +26,7 @@ void MAP_setGoal()
 // 2 = Uncertain
 // 3 = Road
 // 4 = Wall
-// 5 = Intersection
+// 5 = Junction
 void MAP_setSquareDescription(int description, int posY, int posX)
 {
 	if(posY <= 16 && posX <= 29) // Is square within map?
@@ -146,7 +146,7 @@ void MAP_setVisited()
 }
 
 // Count the number of unexplored squares in a 1 square radius (up, down, left, right)
-void MAP_countUnexplored()
+void MAP_countUnexploredSquares()
 {
 	int dir_ = MAP_currentDir;
 	MAP_unexploredSquares = MAP_checkDirDown() + MAP_checkDirLeft() + MAP_checkDirRight() + MAP_checkDirUp();
@@ -159,25 +159,96 @@ void MAP_decideDestination()
 	
 }
 
+// Adds the travelled distance from the last junction to specified junction
+void MAP_addJunctionDist(int junction)
+{
+	if (junction > MAP_currentJunction)
+	{
+		MAP_junctionDistArray[MAP_currentJunction][junction] = MAP_travelledDist;
+	}
+	else
+	{
+		MAP_junctionDistArray[junction][MAP_currentJunction] = MAP_travelledDist;
+	}
+}
+
+// Adds the current square as a junction
+void MAP_addJunction()
+{
+	posY_ = MAP_currentPos[0];
+	posX_ = MAP_currentPos[1];
+
+	// Adds it in the map array
+	MAP_setSquareDescription(5, posY_, posX_);
+
+	// Increments counters
+	MAP_currentJunction++;
+	MAP_junctionCount++;
+	
+	// Adds it in the junction array
+	MAP_junctionOrderArray[MAP_currentJunction].hasUnex = 1;
+	MAP_junctionOrderArray[MAP_currentJunction].posY = posY_;
+	MAP_junctionOrderArray[MAP_currentJunction].posX = posX_;
+
+	// Adds the distance in the distance array
+	if (MAP_currentJunction > 0)
+	{
+		MAP_addJunctionDist(MAP_currentJunction - 1);
+	}
+		
+}
+
+// Returns the last junction with unexplored roads
+// Call with junctionCount
+int MAP_lastUnexJunction(int x)
+{
+	if (x == 0)
+	{
+		/* Kartan är helt utforskad!!! */
+		return -1;
+	}
+	else if (MAP_junctionOrderArray[x - 1].hasUnex == 1)
+	{
+		return x - 1;
+	}
+	else
+	{
+		MAP_lastUnexJunction(x - 1);
+	}
+}
+
+// Kodskelett för kartläggning
+/*
+TODO
+-fallet där korsningen man kommer till har besökts tidigare
+*/
 int main(void)
 {
-	MAP_countUnexplored();
+	MAP_countUnexploredSquares();
     if (MAP_unexploredSquares >= 1)
     {
 		if (MAP_unexploredSquares > 1)
 		{
-			MAP_setSquareDescription(5, MAP_currentPos[0], MAP_currentPos[1]);
+			MAP_addJunction();
 		}
+
     } 
     else
     {
-		// Åk till föregående korsning
+		// Åk till föregående korsning - Egen fas
     }
 	MAP_decideDirection('a'); // Uses random
-	// Åk fram en ruta
+	if (MAP_currentDir != MAP_nextDir)
+	{
+		/* Rotera lämpligt - Egen fas
+			-ändra currentDir*/
+	}
+	/* TODO Åk fram en ruta - Egen fas
+		-räkna upp travelledDist
+		-ändra currentPos*/
 	if (MAP_array[MAP_currentPos[0]][MAP_currentPos[1]].goal == 1)
 	{
-		/*Påbörja undsättningsfas*/
+		// Påbörja undsättning - Egen fas
 		
 	}
 	
