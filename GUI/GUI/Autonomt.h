@@ -24,12 +24,12 @@
 #include <SDL2/SDL_mixer.h>
 #endif
 
-#ifdef __WIN32__
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_image.h>
-#include <SDL2/SDL_ttf.h>
-#include <SDL2/SDL_mixer.h>
-#endif
+
+#include <SDL.h>
+#include <	SDL_image.h>
+#include <SDL_ttf.h>
+#include <SDL_mixer.h>
+
 
 #include <string>
 #include <vector>
@@ -85,8 +85,7 @@ public:
     virtual void      event(string& statestring,bool& running) override;
     virtual void      update(string& statestring,bool& running)  override; //i cc - object_vector -> update()
     virtual void      render()  override; //i cc - object_vector -> render()
-    virtual void      run(SetupSDL* sdl_lib __attribute__((unused))
-                          , string& statestring) override;
+    virtual void      run(string& statestring) override;
     
     const char* Time_to_char(Uint32);
     

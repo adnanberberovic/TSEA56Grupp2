@@ -41,7 +41,12 @@ void Object::init_Rect_Texture(string file_texture, SDL_Renderer* renderer, int 
 {
     
     SDL_Surface* temp = IMG_Load(file_texture.c_str());
-    Texture_Width = temp->w;
+	if (temp == nullptr)
+	{
+		cerr << "Fucka you!\n";
+		return;
+	}
+	Texture_Width = temp->w;
     Texture_Height = temp->h;
     Texture_ = SDL_CreateTextureFromSurface(renderer, temp);
     SDL_FreeSurface(temp);

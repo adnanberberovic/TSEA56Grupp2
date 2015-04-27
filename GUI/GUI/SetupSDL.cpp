@@ -38,6 +38,8 @@ SetupSDL::SetupSDL()
     window = SDL_CreateWindow("ResQ_PL", SDL_WINDOWPOS_UNDEFINED,
                               SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH,
                               SCREEN_HEIGHT, SDL_WINDOW_RESIZABLE);
+
+	SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP);
     
     if (window == nullptr )
     {
