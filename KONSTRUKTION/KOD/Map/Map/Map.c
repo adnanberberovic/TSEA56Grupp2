@@ -148,9 +148,9 @@ void MAP_setVisited()
 // Count the number of unexplored squares in a 1 square radius (up, down, left, right)
 void MAP_countUnexploredSquares()
 {
-	int dir_ = MAP_currentDir;
+	int dir_ = MAP_currentDir; //WHY?
 	MAP_unexploredSquares = MAP_checkDirDown() + MAP_checkDirLeft() + MAP_checkDirRight() + MAP_checkDirUp();
-	MAP_currentDir = dir_;
+	MAP_currentDir = dir_; // WHY?
 }
 
 // Uses Dijkstras algorithm to decide which location to set as a destination
@@ -224,33 +224,36 @@ TODO
 */
 int main(void)
 {
-	MAP_countUnexploredSquares();
-    if (MAP_unexploredSquares >= 1)
-    {
-		if (MAP_unexploredSquares > 1)
-		{
-			MAP_addJunction();
-		}
-
-    } 
-    else
-    {
-		// Åk till föregående korsning - Egen fas
-    }
-	MAP_decideDirection('a'); // Uses random
-	if (MAP_currentDir != MAP_nextDir)
-	{
-		/* Rotera lämpligt - Egen fas
-			-ändra currentDir*/
-	}
-	/* TODO Åk fram en ruta - Egen fas
-		-räkna upp travelledDist
-		-ändra currentPos*/
-	if (MAP_array[MAP_currentPos[0]][MAP_currentPos[1]].goal == 1)
-	{
-		// Påbörja undsättning - Egen fas
+	do {
 		
-	}
+		MAP_countUnexploredSquares();
+		if (MAP_unexploredSquares >= 1)
+		{
+			if (MAP_unexploredSquares > 1)
+			{
+				MAP_addJunction();
+			}
+
+		} 
+	    else
+		{
+			// Åk till föregående korsning - Egen fas
+		
+	    }
+		MAP_decideDirection('a'); // Uses random
+		if (MAP_currentDir != MAP_nextDir)
+		{
+			/* Rotera lämpligt - Egen fas
+				-ändra currentDir*/
+		}
+		/* TODO Åk fram en ruta - Egen fas
+			-räkna upp travelledDist
+			-ändra currentPos*/
+		
+	} while (MAP_array[MAP_currentPos[0]][MAP_currentPos[1]].goal == 0)
 	
+	
+	// Påbörja undsättning - Egen fas
+		
 	return 0;
 }

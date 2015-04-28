@@ -24,7 +24,7 @@
 
 // GLOBAL VARIABLES --------------------------------------------------------------------
 uint8_t arrSpeed[] = {0,0,1,1,0}; //speedLeft, SpeedRight, DirLeft, DirRight, grip
-int8_t arrSensor[] = {0,0,0,0,0,0,0,0}; //sensor 0-7
+int8_t arrSensor[] = {9,8,7,6}; //sensor 0-3
 // One overflow corresponds to 13.1 ms if the F_CPU is 20 MHz and the defined prescaler.
 // This timer will reset every time it reaches 10.
 uint8_t TIMER_overflows;
@@ -180,28 +180,19 @@ void TIMER_init()
 void Get_sensor_values() //Load all sensor values into sensor-array
 {
 	SPI_MasterTransmit(0,'s'); //value to be returned
-	for (int8_t i = 1; i < 9; i++)
+	for (int8_t i = 1; i < 5; i++)
 	{
 		arrSensor[i - 1] = SPI_MasterTransmit(i,'s'); //load all 8 sensorvalues into sensor position [0-7]
 	}
-	
-	//int8_t sensor_value(int8_t val)
-	//{
-	//SPI_MasterTransmit(val,'s');
-	//int8_t temp = (int8_t)SPI_MasterTransmit(0,'s');
-	//return temp;
-	//}
-
 }
 
 void Send_sensor_values() // Can combine with Get speed when in manual mode
 {
 	SPI_MasterTransmit(255,'k');
-	for (int8_t i = 0; i < 8; i++)
+	for (int8_t i = 0; i < 4; i++)
 	{
 		SPI_MasterTransmit(arrSensor[i],'k');
 	}
-	
 	
 }
 
@@ -233,7 +224,6 @@ ISR(TIMER0_OVF_vect)
 }
 
 //----------------------------GYRO------------------------------------
-
 unsigned char SPI_MasterTransmit_Gyro(unsigned char cData)
 {
 	// Load data into SPI data register.
@@ -253,7 +243,6 @@ void set_GyroSS_High() // disconnect gyro
 {
 	PORTC |= (1<<PORTC0);
 }
-
 void Gyro_Init()
 {
 
@@ -269,7 +258,6 @@ void Gyro_Init()
 	SPCR |= (1<<DORD);
 
 }
-
 void Gyro_StartConversion()
 {
 	int8_t high_byte;	
@@ -285,7 +273,6 @@ void Gyro_StartConversion()
 	SPCR |= (1<<DORD);
 
 }
-
 int16_t Gyro_PollResult()
 {
 	int8_t high_byte, low_byte;
@@ -303,7 +290,6 @@ int16_t Gyro_PollResult()
 	return_val = ((high_byte & 0x00ff) << 8) | (low_byte);
 	return return_val;
 }
-
 int16_t Get_ADC_value(int16_t inval_)
 {
 	int16_t result_;
@@ -311,7 +297,6 @@ int16_t Get_ADC_value(int16_t inval_)
 	result_ = result_ >> 1;
 	return result_;
 }
-
 // Converts the adc reading to angles per second
 int16_t adcToAngularRate(int16_t adcValue)
 {
@@ -320,7 +305,6 @@ int16_t adcToAngularRate(int16_t adcValue)
 	// for gyroscope with max angular rate 300 deg/s
 	return (AngularRate - 2500)/26.67;
 }
-
 void Gyro_Sleep()
 {
 	SPCR &= ~(1<<DORD);
@@ -334,7 +318,6 @@ void Gyro_Sleep()
 	} while (dataH & 0b10000000);
 	SPCR |= (1<<DORD);
 }
-
 int16_t Gyro_sequence()
 {
 	int16_t result = 0;
@@ -346,7 +329,6 @@ int16_t Gyro_sequence()
 	SPCR |= (1<<DORD);
 	return result;
 }
-
 // use only during rotation
 // in functions MOTOR_RotateRight(), MOTOR_RotateLeft()
 // stop rotating when 90 degrees reached; 
@@ -370,7 +352,6 @@ void checkAngle90()
 	
 	rotation_angle = 0; //reset
 }
-
 //----------------------------GYRO----END-----------------------------
 uint16_t speed_start_time;
 uint16_t wheel_marker_counter = 0;
@@ -420,7 +401,6 @@ void MOTOR_Forward(int speed)
 	PWM_SetSpeedLeft(speed);
 	PWM_SetSpeedRight(speed);
 }
-
 void MOTOR_Backward(int speed)
 {
 	PWM_SetDirRight(0);
@@ -428,7 +408,6 @@ void MOTOR_Backward(int speed)
 	PWM_SetSpeedLeft(speed);
 	PWM_SetSpeedRight(speed);
 }
-
 void MOTOR_RotateLeft()
 {
 	PWM_SetDirRight(0);
@@ -437,7 +416,6 @@ void MOTOR_RotateLeft()
 	PWM_SetSpeedRight(100);
 	checkAngle90();
 }
-
 void MOTOR_RotateRight()
 {
 	PWM_SetDirRight(1);
@@ -446,14 +424,12 @@ void MOTOR_RotateRight()
 	PWM_SetSpeedRight(100);
 	checkAngle90();
 }
-
 void MOTOR_Stop()
 {
 	PWM_SetSpeedRight(0);
 	PWM_SetSpeedLeft(0);
 }
 //--MOTOR stop
-
 void Drive_test()
 {
 	//MOTOR_Forward(80);
@@ -503,7 +479,6 @@ void Drive_test()
 // 	}
 // 	SERVO_ReleaseGrip();
 }
-
 void Gyro_test()
 {
 	//DORD: Data order. Set to 0 to transmit MSB first, LSB last
@@ -527,7 +502,6 @@ void Gyro_test()
  	}
 	return;
 }
-
 void Speed_test()
 {
 	LCD_Clear();
@@ -536,7 +510,6 @@ void Speed_test()
 	LCD_SetPosition(6);
 	LCD_display_uint16(current_speed);
 }
-
 void init_all()
 {
 	sleep_enable();	// Enable sleep instruction
@@ -551,7 +524,6 @@ void init_all()
 	Speed_Interrupt_Init();
 	sei();	// Enable global interrupts
 }
-
 void manual_drive()
 {
 	Get_speed_value();
@@ -568,7 +540,6 @@ void manual_drive()
 	SERVO_ReleaseGrip();
 	}
 }
-
 int main(void)
 {
 	init_all();
@@ -583,6 +554,15 @@ int main(void)
 //  	PWM_SetDirRight(1);
 //  	PWM_SetSpeedLeft(0);
 //  	PWM_SetSpeedRight(0);
+	 //
+	//EICRA = 1<< ISC00 | 1<<ISC01; //INT0 genererar avbrott p� rising flank
+	//EIMSK = 1<< INT0; //IINT0?
+	//MCUCR = (1<<IVCE); //Boot flash?
+	//MCUCR = (1<<IVSEL); //Boot flash?
+
+	LCD_Clear();
+
+	LCD_SetPosition(0);
 
 	
 	while (1)

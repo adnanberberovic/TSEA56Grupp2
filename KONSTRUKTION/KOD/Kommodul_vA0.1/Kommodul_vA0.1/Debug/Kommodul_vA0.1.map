@@ -251,7 +251,7 @@ END GROUP
 .rela.plt
  *(.rela.plt)
 
-.text           0x00000000      0x568
+.text           0x00000000      0x5dc
  *(.vectors)
  .vectors       0x00000000       0x8c c:/program files (x86)/atmel/atmel toolchain/avr8 gcc/native/3.4.1061/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.8.1/../../../../avr/lib/avr51/crtm1284p.o
                 0x00000000                __vector_default
@@ -368,20 +368,23 @@ END GROUP
  .text.SPI_send_arr
                 0x00000254       0x2a Kommodul_vA0.1.o
                 0x00000254                SPI_send_arr
+ .text.SPI_StartBitCheck
+                0x0000027e       0x22 Kommodul_vA0.1.o
+                0x0000027e                SPI_StartBitCheck
  .text.__vector_19
-                0x0000027e       0x80 Kommodul_vA0.1.o
-                0x0000027e                __vector_19
- .text.main     0x000002fe       0x18 Kommodul_vA0.1.o
-                0x000002fe                main
+                0x000002a0       0xd2 Kommodul_vA0.1.o
+                0x000002a0                __vector_19
+ .text.main     0x00000372       0x18 Kommodul_vA0.1.o
+                0x00000372                main
  .text.avr-libc
-                0x00000316      0x24e c:/program files (x86)/atmel/atmel toolchain/avr8 gcc/native/3.4.1061/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.8.1/../../../../avr/lib/avr51\libc.a(malloc.o)
-                0x00000316                malloc
-                0x00000446                free
-                0x00000564                . = ALIGN (0x2)
+                0x0000038a      0x24e c:/program files (x86)/atmel/atmel toolchain/avr8 gcc/native/3.4.1061/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.8.1/../../../../avr/lib/avr51\libc.a(malloc.o)
+                0x0000038a                malloc
+                0x000004ba                free
+                0x000005d8                . = ALIGN (0x2)
  *(.fini9)
- .fini9         0x00000564        0x0 c:/program files (x86)/atmel/atmel toolchain/avr8 gcc/native/3.4.1061/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.8.1/avr51\libgcc.a(_exit.o)
-                0x00000564                _exit
-                0x00000564                exit
+ .fini9         0x000005d8        0x0 c:/program files (x86)/atmel/atmel toolchain/avr8 gcc/native/3.4.1061/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.8.1/avr51\libgcc.a(_exit.o)
+                0x000005d8                _exit
+                0x000005d8                exit
  *(.fini9)
  *(.fini8)
  *(.fini8)
@@ -400,11 +403,11 @@ END GROUP
  *(.fini1)
  *(.fini1)
  *(.fini0)
- .fini0         0x00000564        0x4 c:/program files (x86)/atmel/atmel toolchain/avr8 gcc/native/3.4.1061/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.8.1/avr51\libgcc.a(_exit.o)
+ .fini0         0x000005d8        0x4 c:/program files (x86)/atmel/atmel toolchain/avr8 gcc/native/3.4.1061/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.8.1/avr51\libgcc.a(_exit.o)
  *(.fini0)
-                0x00000568                _etext = .
+                0x000005dc                _etext = .
 
-.data           0x00800100        0xc load address 0x00000568
+.data           0x00800100       0x10 load address 0x000005dc
                 0x00800100                PROVIDE (__data_start, .)
  *(.data)
  .data          0x00800100        0x6 c:/program files (x86)/atmel/atmel toolchain/avr8 gcc/native/3.4.1061/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.8.1/../../../../avr/lib/avr51\libc.a(malloc.o)
@@ -412,43 +415,54 @@ END GROUP
                 0x00800102                __malloc_heap_start
                 0x00800104                __malloc_margin
  *(.data*)
+ .data.arrSensor
+                0x00800106        0x4 Kommodul_vA0.1.o
+                0x00800106                arrSensor
  .data.arrSpeed
-                0x00800106        0x5 Kommodul_vA0.1.o
-                0x00800106                arrSpeed
+                0x0080010a        0x5 Kommodul_vA0.1.o
+                0x0080010a                arrSpeed
  *(.rodata)
  *(.rodata*)
  *(.gnu.linkonce.d*)
-                0x0080010c                . = ALIGN (0x2)
- *fill*         0x0080010b        0x1 
-                0x0080010c                _edata = .
-                0x0080010c                PROVIDE (__data_end, .)
+                0x00800110                . = ALIGN (0x2)
+ *fill*         0x0080010f        0x1 
+                0x00800110                _edata = .
+                0x00800110                PROVIDE (__data_end, .)
 
-.bss            0x0080010c        0x9
-                0x0080010c                PROVIDE (__bss_start, .)
+.bss            0x00800110        0xc
+                0x00800110                PROVIDE (__bss_start, .)
  *(.bss)
  *(.bss*)
  .bss.head_BTout
-                0x0080010c        0x2 Kommodul_vA0.1.o
-                0x0080010c                head_BTout
+                0x00800110        0x2 Kommodul_vA0.1.o
+                0x00800110                head_BTout
  .bss.head_SPIout
-                0x0080010e        0x2 Kommodul_vA0.1.o
-                0x0080010e                head_SPIout
- .bss.Flag_     0x00800110        0x1 Kommodul_vA0.1.o
-                0x00800110                Flag_
+                0x00800112        0x2 Kommodul_vA0.1.o
+                0x00800112                head_SPIout
+ .bss.counter_  0x00800114        0x1 Kommodul_vA0.1.o
+                0x00800114                counter_
+ .bss.speedFlag_
+                0x00800115        0x1 Kommodul_vA0.1.o
+                0x00800115                speedFlag_
+ .bss.sensorFlag_
+                0x00800116        0x1 Kommodul_vA0.1.o
+                0x00800116                sensorFlag_
+ .bss.Flag_     0x00800117        0x1 Kommodul_vA0.1.o
+                0x00800117                Flag_
  *(COMMON)
- COMMON         0x00800111        0x4 c:/program files (x86)/atmel/atmel toolchain/avr8 gcc/native/3.4.1061/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.8.1/../../../../avr/lib/avr51\libc.a(malloc.o)
-                0x00800111                __brkval
-                0x00800113                __flp
-                0x00800115                PROVIDE (__bss_end, .)
-                0x00000568                __data_load_start = LOADADDR (.data)
-                0x00000574                __data_load_end = (__data_load_start + SIZEOF (.data))
+ COMMON         0x00800118        0x4 c:/program files (x86)/atmel/atmel toolchain/avr8 gcc/native/3.4.1061/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.8.1/../../../../avr/lib/avr51\libc.a(malloc.o)
+                0x00800118                __brkval
+                0x0080011a                __flp
+                0x0080011c                PROVIDE (__bss_end, .)
+                0x000005dc                __data_load_start = LOADADDR (.data)
+                0x000005ec                __data_load_end = (__data_load_start + SIZEOF (.data))
 
-.noinit         0x00800115        0x0
-                0x00800115                PROVIDE (__noinit_start, .)
+.noinit         0x0080011c        0x0
+                0x0080011c                PROVIDE (__noinit_start, .)
  *(.noinit*)
-                0x00800115                PROVIDE (__noinit_end, .)
-                0x00800115                _end = .
-                0x00800115                PROVIDE (__heap_start, .)
+                0x0080011c                PROVIDE (__noinit_end, .)
+                0x0080011c                _end = .
+                0x0080011c                PROVIDE (__heap_start, .)
 
 .eeprom         0x00810000        0x0
  *(.eeprom*)
@@ -508,38 +522,38 @@ END GROUP
 .debug_sfnames
  *(.debug_sfnames)
 
-.debug_aranges  0x00000000       0xa8
+.debug_aranges  0x00000000       0xb0
  *(.debug_aranges)
  .debug_aranges
-                0x00000000       0xa8 Kommodul_vA0.1.o
+                0x00000000       0xb0 Kommodul_vA0.1.o
 
 .debug_pubnames
  *(.debug_pubnames)
 
-.debug_info     0x00000000      0x8b0
+.debug_info     0x00000000      0x953
  *(.debug_info .gnu.linkonce.wi.*)
- .debug_info    0x00000000      0x8b0 Kommodul_vA0.1.o
+ .debug_info    0x00000000      0x953 Kommodul_vA0.1.o
 
-.debug_abbrev   0x00000000      0x2b0
+.debug_abbrev   0x00000000      0x2bf
  *(.debug_abbrev)
- .debug_abbrev  0x00000000      0x2b0 Kommodul_vA0.1.o
+ .debug_abbrev  0x00000000      0x2bf Kommodul_vA0.1.o
 
-.debug_line     0x00000000      0x4b2
+.debug_line     0x00000000      0x535
  *(.debug_line .debug_line.* .debug_line_end)
- .debug_line    0x00000000      0x4b2 Kommodul_vA0.1.o
+ .debug_line    0x00000000      0x535 Kommodul_vA0.1.o
 
-.debug_frame    0x00000000      0x23c
+.debug_frame    0x00000000      0x250
  *(.debug_frame)
- .debug_frame   0x00000000      0x23c Kommodul_vA0.1.o
+ .debug_frame   0x00000000      0x250 Kommodul_vA0.1.o
 
-.debug_str      0x00000000      0x3f2
+.debug_str      0x00000000      0x428
  *(.debug_str)
- .debug_str     0x00000000      0x3f2 Kommodul_vA0.1.o
-                                0x437 (size before relaxing)
+ .debug_str     0x00000000      0x428 Kommodul_vA0.1.o
+                                0x47a (size before relaxing)
 
-.debug_loc      0x00000000      0x6ee
+.debug_loc      0x00000000      0x72a
  *(.debug_loc)
- .debug_loc     0x00000000      0x6ee Kommodul_vA0.1.o
+ .debug_loc     0x00000000      0x72a Kommodul_vA0.1.o
 
 .debug_macinfo
  *(.debug_macinfo)
@@ -559,9 +573,9 @@ END GROUP
 .debug_pubtypes
  *(.debug_pubtypes)
 
-.debug_ranges   0x00000000       0x98
+.debug_ranges   0x00000000       0xa0
  *(.debug_ranges)
- .debug_ranges  0x00000000       0x98 Kommodul_vA0.1.o
+ .debug_ranges  0x00000000       0xa0 Kommodul_vA0.1.o
 
 .debug_macro
  *(.debug_macro)
