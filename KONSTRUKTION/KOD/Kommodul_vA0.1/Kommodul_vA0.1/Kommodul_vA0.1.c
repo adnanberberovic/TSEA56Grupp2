@@ -48,7 +48,11 @@ uint8_t incomingSpeed_ = 0;
 
 uint8_t sendFlag = 0;
 uint8_t Flag_ = 0;
-int8_t arrSensor[] = {0,0,0,0,0,0,0,0};
+int8_t arrSensor[] = {3,5,2,4};
+	
+uint8_t sensorFlag_ = 0;
+uint8_t speedFlag_ = 0;
+uint8_t counter_ = 0;
 //*********** BUFFER STRUCT ****************
 
 struct node { // definition of the linked list node
@@ -209,7 +213,6 @@ void send_BT_buffer(uint8_t buffer[BuffSize] )
 	// maby add while UDRIE0 = 0 here to counter multiple send_BT_buffer in a row
 }
 
-
 // Receive complete - triggered by interrupt
 ISR(USART0_RX_vect) 
 {
@@ -230,7 +233,6 @@ ISR(USART0_RX_vect)
 	
 	
 }
-
 
 // Empty dataregister = send next character
 ISR(USART0_UDRE_vect)
@@ -271,39 +273,83 @@ void SPI_send_arr(uint8_t tosend[], int size) // lenght of array = sizeof(array)
 	}
 }
 
+void SPI_StartBitCheck(uint8_t in_)
+{
+	switch (in_){
+		
+		case 1: 
+		speedFlag_ = 1;
+		counter_ = 0;
+		break;
+		
+		case 255: 
+		sensorFlag_ = 1;
+		counter_ = 0;
+		break; 
+	}
+}
 // Interrupt method runs when SPI transmission/reception is completed.
 ISR(SPI_STC_vect)
 {
 	uint8_t data = SPDR;
 	
-	if (data == 1)
-	{
+	if ( (speedFlag_ == 0) && (sensorFlag_ == 0) ){
+		SPI_StartBitCheck(data);
+		if (sensorFlag_ == 1){
+			return; //first bit is not interesting
+		}
+	}
+	// Speed is to be sent.
+	if (speedFlag_ == 1){
 		SPI_send_arr(arrSpeed,(sizeof(arrSpeed)/sizeof(arrSpeed[0])));
 		SPDR =  pop_node(&head_SPIout);
+		speedFlag_ = 0;
 		return;
 	}
 	
-	if (data == 255 && Flag_ != 1) //sensordata coming, startbit from styr
-	{
-		Flag_ = 1;
-	}
-	else if (Flag_ == 1)
-	{
-		add_node(&head_SPIin, data); // Add received data to in-queue
+	if (sensorFlag_ == 1){
+		arrSensor[counter_] = data; //Load into correct pos of array 0-3
+		counter_++;
+		if (counter_ == (sizeof(arrSensor)/sizeof(arrSensor[0])) ){  //all values in.
+			counter_ = 0;
+			sensorFlag_ = 0;
+		}
 	}
 	
-	}
-	if (head_SPIout == NULL)
-	{
-		uint8_t stop_bit = 255; 
+	if (head_SPIout == NULL){ //Sendback function will always be performed when something is to be sent.
+		uint8_t stop_bit = 255;
 		SPDR = stop_bit;
 	}
-	else
-	{
+	else{
 		SPDR = pop_node(&head_SPIout);
-		
 	}
+	
+	//if (data == 1 && Flag_ == 0)
+	//{
+		//SPI_send_arr(arrSpeed,(sizeof(arrSpeed)/sizeof(arrSpeed[0])));
+		//SPDR =  pop_node(&head_SPIout);
+		//return;
+	//}
+	//
+	//if (data == 255 && Flag_ == 0) //sensordata coming, startbit from styr
+		//{
+			//Flag_ = 1; // Set startbitflag
+		//}
+	//else if (Flag_ > 0) //If startbit is set == first value incoming
+		//{
+			//arrSensor[Flag_ - 1] = data;
+			//if (Flag_ == 4)
+			//{
+				//Flag_ = 0;
+				//SPI_send_arr(arrSensor, sizeof(arrSensor)/sizeof(arrSensor[0])); // ************** TEST ************
+			//}
+			//else
+			//{
+				//Flag_++;
+			//}
+		//}
 }
+
 
 
 int main(void)
@@ -315,9 +361,9 @@ int main(void)
 	SPI_SlaveInit();
 	BT_init();
 	sei();
+	
 	while(1)
 	{
-		//flush_list(&head_SPIin);
 	}
 }
 

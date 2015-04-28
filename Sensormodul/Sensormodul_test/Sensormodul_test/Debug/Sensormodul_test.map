@@ -404,7 +404,7 @@ END GROUP
 .rela.plt
  *(.rela.plt)
 
-.text           0x00000000      0x31a
+.text           0x00000000      0x316
  *(.vectors)
  .vectors       0x00000000       0x8c c:/program files (x86)/atmel/atmel toolchain/avr8 gcc/native/3.4.1061/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.8.1/../../../../avr/lib/avr51/crtm1284p.o
                 0x00000000                __vector_default
@@ -505,19 +505,19 @@ END GROUP
  .text.distance_table_generator
                 0x000000d8       0xf2 Sensormodul_test.o
                 0x000000d8                distance_table_generator
- .text.main     0x000001ca       0x8a Sensormodul_test.o
+ .text.main     0x000001ca       0x86 Sensormodul_test.o
                 0x000001ca                main
  .text.__vector_24
-                0x00000254       0x8a Sensormodul_test.o
-                0x00000254                __vector_24
+                0x00000250       0x8a Sensormodul_test.o
+                0x00000250                __vector_24
  .text.__vector_19
-                0x000002de       0x38 Sensormodul_test.o
-                0x000002de                __vector_19
-                0x00000316                . = ALIGN (0x2)
+                0x000002da       0x38 Sensormodul_test.o
+                0x000002da                __vector_19
+                0x00000312                . = ALIGN (0x2)
  *(.fini9)
- .fini9         0x00000316        0x0 c:/program files (x86)/atmel/atmel toolchain/avr8 gcc/native/3.4.1061/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.8.1/avr51\libgcc.a(_exit.o)
-                0x00000316                _exit
-                0x00000316                exit
+ .fini9         0x00000312        0x0 c:/program files (x86)/atmel/atmel toolchain/avr8 gcc/native/3.4.1061/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.8.1/avr51\libgcc.a(_exit.o)
+                0x00000312                _exit
+                0x00000312                exit
  *(.fini9)
  *(.fini8)
  *(.fini8)
@@ -536,11 +536,11 @@ END GROUP
  *(.fini1)
  *(.fini1)
  *(.fini0)
- .fini0         0x00000316        0x4 c:/program files (x86)/atmel/atmel toolchain/avr8 gcc/native/3.4.1061/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.8.1/avr51\libgcc.a(_exit.o)
+ .fini0         0x00000312        0x4 c:/program files (x86)/atmel/atmel toolchain/avr8 gcc/native/3.4.1061/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.8.1/avr51\libgcc.a(_exit.o)
  *(.fini0)
-                0x0000031a                _etext = .
+                0x00000316                _etext = .
 
-.data           0x00800100        0x0 load address 0x0000031a
+.data           0x00800100        0x0 load address 0x00000316
                 0x00800100                PROVIDE (__data_start, .)
  *(.data)
  *(.data*)
@@ -561,8 +561,8 @@ END GROUP
                 0x00800110                distance_table
                 0x0080030e                send_buffer
                 0x00800312                PROVIDE (__bss_end, .)
-                0x0000031a                __data_load_start = LOADADDR (.data)
-                0x0000031a                __data_load_end = (__data_load_start + SIZEOF (.data))
+                0x00000316                __data_load_start = LOADADDR (.data)
+                0x00000316                __data_load_end = (__data_load_start + SIZEOF (.data))
 
 .noinit         0x00800312        0x0
                 0x00800312                PROVIDE (__noinit_start, .)
