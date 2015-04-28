@@ -29,7 +29,7 @@ int8_t arrSensor[] = {9,8,7,6}; //sensor 0-3
 // This timer will reset every time it reaches 10.
 uint8_t TIMER_overflows;
 // This timer will NOT reset every time it reaches 10.
-uint8_t TIMER_overflows_increasing;
+uint16_t TIMER_overflows_increasing;
 // The following overflow storage corresponds to 131ms. This timer will never reset.
 uint8_t TIMER_overflows_deci;
 // This variable is used to store robots angle in degrees
@@ -169,8 +169,8 @@ void PWM_SetDirRight(int dir)
 // Setup a timer. Used by the D regulator.
 void TIMER_init()
 {
-	TCCR0B = 1<<CS00 | 1<<CS01 | 0<<CS02; // Prescaler set to 64 --> 1 interrupt =  0.8184 ms
-	TCNT0 = 0; // Initialize cunter
+	TCCR0B = 1<<CS00 | 1<<CS01 | 0<<CS02; // Prescaler set to 64 --> 1 interrupt =  0.81875 ms
+	TCNT0 = 0; // Initialize counter
 	TIMSK0 = 1<<TOIE0; // Enable timer interrupts.
 }
 
@@ -356,7 +356,7 @@ void checkAngle90()
 uint16_t speed_start_time;
 uint16_t wheel_marker_counter = 0;
 uint16_t current_speed;
-uint16_t wheel_circumference = 79; //Wheel circumference is 79 mm.
+uint16_t wheel_circumference = 4*100*79; //Wheel circumference is 79 mm.
 uint16_t time_difference;
 uint16_t current_speed;
 
@@ -370,19 +370,18 @@ void Speed_Interrupt_Init()
 
 ISR(INT0_vect)
 {
-	
 	if (wheel_marker_counter == 0)
 	{
 		speed_start_time = TIMER_overflows_increasing;
 		wheel_marker_counter++;
 	}
-	else if (wheel_marker_counter < 8)
+	else if (wheel_marker_counter < 4*8)
 	{
 		wheel_marker_counter++;
 	}
 	else
 	{
-		time_difference = (TIMER_overflows_increasing - speed_start_time); // div by 0.102 -> time in ms
+		time_difference = (TIMER_overflows_increasing - speed_start_time) / 0.8175; // div by 0.8184 -> time in ms
 		current_speed = wheel_circumference / time_difference;
 		LCD_Clear();
 		LCD_SetPosition(0);
@@ -504,6 +503,7 @@ void Gyro_test()
 }
 void Speed_test()
 {
+	MOTOR_Forward(80);
 	LCD_Clear();
 	LCD_SetPosition(0);
 	LCD_SendString("v: ");
@@ -537,34 +537,21 @@ void manual_drive()
 		SERVO_SetGrip();
 	}
 	else {
-	SERVO_ReleaseGrip();
+	//SERVO_ReleaseGrip();
+		SERVO_SetGrip();
 	}
 }
 int main(void)
 {
 	init_all();
 	//int8_t sensor_data[4];
-	
-	//EICRA = 1<< ISC00 | 1<<ISC01; //INT0 genererar avbrott p� rising flank
-	//EIMSK = 1<< INT0; //IINT0?
-	
-	MOTOR_Forward(50);	
- 	
-// 	PWM_SetDirLeft(1);
-//  	PWM_SetDirRight(1);
-//  	PWM_SetSpeedLeft(0);
-//  	PWM_SetSpeedRight(0);
-	 //
-	//EICRA = 1<< ISC00 | 1<<ISC01; //INT0 genererar avbrott p� rising flank
-	//EIMSK = 1<< INT0; //IINT0?
-	//MCUCR = (1<<IVCE); //Boot flash?
-	//MCUCR = (1<<IVSEL); //Boot flash?
+// 	 	
+  	//PWM_SetDirLeft(1);
+  	//PWM_SetDirRight(1);
+  	//PWM_SetSpeedLeft(0);
+  	//PWM_SetSpeedRight(0);
 
-	LCD_Clear();
-
-	LCD_SetPosition(0);
-
-	
+	MOTOR_Forward(120);
 	while (1)
 	{
 		//Drive_test();
