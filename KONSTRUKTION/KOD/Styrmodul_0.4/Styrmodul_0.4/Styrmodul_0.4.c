@@ -29,7 +29,7 @@ int8_t arrSensor[] = {9,8,7,6}; //sensor 0-3
 // This timer will reset every time it reaches 10.
 uint8_t TIMER_overflows;
 // This timer will NOT reset every time it reaches 10.
-uint16_t TIMER_overflows_increasing;
+int16_t TIMER_wheel;
 // The following overflow storage corresponds to 131ms. This timer will never reset.
 uint8_t TIMER_overflows_deci;
 // This variable is used to store robots angle in degrees
@@ -214,7 +214,7 @@ void Get_speed_value()
 ISR(TIMER0_OVF_vect)
 {
 	TIMER_overflows++;
-	TIMER_overflows_increasing++;
+	TIMER_wheel++;
 	
 	if (TIMER_overflows >= 10)
 	{
@@ -353,12 +353,10 @@ void checkAngle90()
 	rotation_angle = 0; //reset
 }
 //----------------------------GYRO----END-----------------------------
-uint16_t speed_start_time;
 uint16_t wheel_marker_counter = 0;
 uint16_t current_speed;
 uint16_t wheel_circumference = 4*100*79; //Wheel circumference is 79 mm.
 uint16_t time_difference;
-uint16_t current_speed;
 
 void Speed_Interrupt_Init()
 {
@@ -370,26 +368,33 @@ void Speed_Interrupt_Init()
 
 ISR(INT0_vect)
 {
+	EIMSK &= ~(1<INT0);
 	if (wheel_marker_counter == 0)
 	{
-		speed_start_time = TIMER_overflows_increasing;
+		TIMER_wheel = 0;
 		wheel_marker_counter++;
+		
 	}
-	else if (wheel_marker_counter < 4*8)
+	else if (wheel_marker_counter < 4*2)
 	{
+		LCD_SetPosition(24);
+		LCD_display_uint16(wheel_marker_counter);
 		wheel_marker_counter++;
 	}
 	else
 	{
-		time_difference = (TIMER_overflows_increasing - speed_start_time) / 0.8175; // div by 0.8184 -> time in ms
+		time_difference = TIMER_wheel / 0.8175; // div by 0.8184 -> time in ms
 		current_speed = wheel_circumference / time_difference;
 		LCD_Clear();
 		LCD_SetPosition(0);
-		LCD_display_uint16(time_difference);
+		LCD_display_int16(time_difference);
 		LCD_SetPosition(8);
-		LCD_display_uint16(current_speed);
+		LCD_display_int16(current_speed);
+		LCD_SetPosition(16);
+		LCD_display_uint16(wheel_marker_counter);
 		wheel_marker_counter = 0; 
 	}
+	EIMSK |= 1<INT0;
 }
 
 //--MOTOR start
@@ -527,7 +532,6 @@ void init_all()
 void manual_drive()
 {
 	Get_speed_value();
-	LCD_Clear();
 	PWM_SetSpeedLeft(arrSpeed[0]);
 	PWM_SetSpeedRight(arrSpeed[1]);
 	PWM_SetDirLeft(arrSpeed[2]);
@@ -545,17 +549,17 @@ int main(void)
 {
 	init_all();
 	//int8_t sensor_data[4];
-// 	 	
-  	//PWM_SetDirLeft(1);
-  	//PWM_SetDirRight(1);
-  	//PWM_SetSpeedLeft(0);
-  	//PWM_SetSpeedRight(0);
+	
+  	PWM_SetDirLeft(1);
+  	PWM_SetDirRight(1);
+  	PWM_SetSpeedLeft(0);
+  	PWM_SetSpeedRight(0);
 
-	MOTOR_Forward(120);
+	MOTOR_Forward(50);
 	while (1)
 	{
+		manual_drive();
 		//Drive_test();
-		//manual_drive();
 		//Gyro_test();
 		//Drive_test();
 		//Speed_test();
