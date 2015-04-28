@@ -53,6 +53,10 @@ int8_t arrSensor[] = {3,5,2,4};
 uint8_t sensorFlag_ = 0;
 uint8_t speedFlag_ = 0;
 uint8_t counter_ = 0;
+
+uint8_t BTsensorFlag_ = 0;
+uint8_t BTspeedFlag_ = 0;
+uint8_t BTcounter_ = 0;
 //*********** BUFFER STRUCT ****************
 
 struct node { // definition of the linked list node
@@ -200,35 +204,63 @@ void flush_list(buffer_ ** lst_head)
 	free(curr_node);
 }
 
-void send_BT_buffer(uint8_t buffer[BuffSize] )
+void send_BT_buffer(uint8_t buffer[], int size)
 {
-	flush_list(&head_BTout);
-
-	//strncpy(outBT, buffer, BuffSize); //Copy buffer to send to outBT
-	for(int i = 0; buffer[i]; i++ )
+	int i = 0;
+	while(i < size)
 	{
 		add_node(&head_BTout, buffer[i]);
+		i++;
 	}
+	//flush_list(&head_BTout);
+	//for(int i = 0; buffer[i]; i++ )
+	//{
+		//add_node(&head_BTout, buffer[i]);
+	//}
+	
 	UCSR0B |= (1<<UDRIE0);	//Enable UDRE interrupt flag -> send when empty dataregister
+	
 	// maby add while UDRIE0 = 0 here to counter multiple send_BT_buffer in a row
 }
-
+void BT_StartBitCheck(uint8_t in_)
+{
+	switch (in_){
+		
+		case 1:
+		BTspeedFlag_ = 1;
+		BTcounter_ = 0;
+		break;
+		
+		case 255:
+		BTsensorFlag_ = 1;
+		BTcounter_ = 0;
+		break;
+	}
+}
 // Receive complete - triggered by interrupt
 ISR(USART0_RX_vect) 
 {
 	uint8_t data = UDR0;
-	if ((data == 0x01) && (Flag_ == 0))
+	
+	if ((BTspeedFlag_ == 0) && (BTsensorFlag_ == 0)) //First time check if it's starbit
 	{
-		Flag_ = 1;
+		BT_StartBitCheck(data);
 	}
-	else if (Flag_ > 0)
+	
+	else if (BTspeedFlag_ == 1) // Speed incoming
 	{
-		arrSpeed[Flag_ - 1] = data;
-		Flag_++;
-		if (Flag_ == (sizeof(arrSpeed)/sizeof(arrSpeed[0]) + 1))
+		arrSpeed[BTcounter_] = data; //Load value into speed array
+		BTcounter_++;
+		if (BTcounter_ == (sizeof(arrSpeed)/sizeof(arrSpeed[0]))) // all values red
 		{
-			Flag_ = 0;
+			BTspeedFlag_ = 0;
+			BTcounter_ = 0;
 		}
+	}
+	else if (BTsensorFlag_ == 1) //Send out sensordata
+	{
+		send_BT_buffer(arrSensor, (sizeof(arrSensor)/sizeof(arrSensor[0])));
+		BTsensorFlag_ = 0;
 	}
 	
 	
