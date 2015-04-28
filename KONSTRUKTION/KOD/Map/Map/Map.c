@@ -177,13 +177,14 @@ void MAP_addJunction()
 {
 	posY_ = MAP_currentPos[0];
 	posX_ = MAP_currentPos[1];
-
-	// Adds it in the map array
-	MAP_setSquareDescription(5, posY_, posX_);
-
+	
 	// Increments counters
 	MAP_currentJunction++;
 	MAP_junctionCount++;
+
+	// Adds it in the map array
+	MAP_setSquareDescription(5, posY_, posX_);
+	MAP_array[posY_][posX_].junctionNumber = MAP_currentJunction;
 	
 	// Adds it in the junction array
 	MAP_junctionOrderArray[MAP_currentJunction].hasUnex = 1;
@@ -214,6 +215,87 @@ int MAP_lastUnexJunction(int x)
 	else
 	{
 		MAP_lastUnexJunction(x - 1);
+	}
+}
+
+// FLAGz man!
+unsigned int operatingMode_; // 0 = normal, 1 = rotating, 2 = moving forward, 3 = return to prev sq, 4 = resQ
+// unsigned int rotating_;
+// unsigned int movingForward_;
+// unsigned int movingToPrevSq_;
+// unsigned int resQActive_;
+
+void MAP_main()
+{
+	posY_ = MAP_currentPos[0];
+	posX_ = MAP_currentPos[1];
+	
+	// Normal searching phase
+	if (!operatingMode_)
+	{
+		MAP_countUnexploredSquares();
+		// If it's visited junction
+		if (MAP_array[posY_][posX_].visited && MAP_array[posY_][posX_].description == 5)
+		{
+			// Has unexplored roads
+			if (MAP_unexploredSquares)
+			{
+				MAP_currentJunction = MAP_array[posY_][posX_].junctionNumber;
+				MAP_junctionOrderArray[MAP_array[posY_][posX_].junctionNumber].hasUnex = 0;
+			} 
+			else
+			{
+				MAP_junctionOrderArray[MAP_array[posY_][posX_].junctionNumber].hasUnex = 0;
+				operatingMode_ = 3;
+				goto mode3; // Go to previous junction
+			}
+		}
+		// If it's a new square
+		else
+		{
+			// Check if it's a junction
+			if (MAP_unexploredSquares > 1)
+			{
+				MAP_addJunction();
+			}
+			// Or if it's a dead end
+			else if (MAP_unexploredSquares == 0)
+			{
+				goto mode3; // Go to previous junction
+			}
+		}
+		MAP_decideDirection('a'); // Uses random
+		if (MAP_currentDir != MAP_nextDir)
+		{
+			operatingMode_ = 1;
+		}
+	}
+	
+	// Rotating phase
+	if (operatingMode_ == 1)
+	{
+		/* Rotera lämpligt - Egen fas
+				-ändra currentDir
+				-hur veta vilken mode ska följa denna???*/
+	}
+	
+	// Moving forward phase
+	if (operatingMode_ == 2)
+	{
+		// åk framåt
+	}
+	
+	// return to prev phase
+	mode3:
+	if (operatingMode_ == 3)
+	{
+		// åk tillbaka till föregående korsning
+	}
+	
+	// ResQ phase
+	if (operatingMode_ == 4)
+	{
+		// Go ResQ.PL, go!
 	}
 }
 

@@ -55,5 +55,6 @@ void MAP_decideDestination();
 void MAP_addJunction();
 void MAP_addJunctionDist(int);
 int MAP_lastUnexJunction();
+void MAP_main();
 
 #endif
