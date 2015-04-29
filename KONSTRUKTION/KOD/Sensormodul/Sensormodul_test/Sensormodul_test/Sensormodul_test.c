@@ -226,10 +226,10 @@ int main(void)
 			
 		//Förhindra avbrott under uppdateringen - höj avbrottsnivån så inga bussavbrott kommer.
 		cli();
-		send_buffer[0] = 1; //angle;     ****************************TESTAR MED FASTA VÄRDEN********************************
-		send_buffer[1] = 2; //offset;    ****************************TESTAR MED FASTA VÄRDEN********************************
-		send_buffer[2] = 3; //front_sensor;****************************TESTAR MED FASTA VÄRDEN********************************
-		send_buffer[3] = 4; //wall_reflex_information;****************************TESTAR MED FASTA VÄRDEN********************************
+		send_buffer[0] = angle;    
+		send_buffer[1] = offset;   
+		send_buffer[2] = front_sensor;
+		send_buffer[3] = wall_reflex_information;
 		sei();
 		
 		//Skicka till Styrmodul via SPI

@@ -20,11 +20,13 @@
 #include "Styrmodul_Servo.c"
 //#include <avr/pgmspace.h>
 
+#define AUTONOM_MODE (((PIND) & (1<<PIND3)) >> 3)
+#define MANUAL_MODE (!AUTONOM_MODE)
 
 
 // GLOBAL VARIABLES --------------------------------------------------------------------
 uint8_t arrSpeed[] = {0,0,1,1,0}; //speedLeft, SpeedRight, DirLeft, DirRight, grip
-int8_t arrSensor[] = {9,8,7,6}; //sensor 0-3
+int8_t arrSensor[] = {-1,0,0,0}; //sensor 0-3
 // One overflow corresponds to 13.1 ms if the F_CPU is 20 MHz and the defined prescaler.
 // This timer will reset every time it reaches 10.
 uint8_t TIMER_overflows;
@@ -34,6 +36,9 @@ int16_t TIMER_wheel;
 uint8_t TIMER_overflows_deci;
 // This variable is used to store robots angle in degrees
 int rotation_angle = 0;
+//KOntrollerar att flaggor sätts korekkt vi Manuell / Autonom loop
+int Manual_Flag = 0;
+
 // --------------------------------------------------------------------------------------
 
 // Setup data direction registers @ ports for out/inputs.
@@ -42,8 +47,11 @@ void Styr_InitPortDirections(void)
 	DDRA = 1<<DDA0 | 1<<DDA1 | 1<<DDA2 | 1<<DDA3 | 1<<DDA4 | 1<<DDA5 | 1<<DDA6 | 1<<DDA7;
 	DDRB = 1<<DDB0 | 1<<DDB1 | 1<<DDB2 | 1<<DDB3 | 1<<DDB4 | 1<<DDB5 | 1<<DDB7;
 	DDRC = 1<<DDC0;
-	DDRD = 1<<DDD0 | 1<<DDD1 | 0<<DDD2 | 1<<DDD3 | 1<<DDD4 | 1<<DDD5 | 1<<DDD6 | 1<<DDD7;
+	DDRD = 1<<DDD0 | 1<<DDD1 | 0<<DDD2 | 0<<DDD3 | 1<<DDD4 | 1<<DDD5 | 1<<DDD6 | 1<<DDD7;
+	DDRD &= ~(1 << DDD3);
 	//D2 ingеng fцr reflexsensor
+	// 0 = input
+	// 1 = output
 }
 
 // Setups port values, more specifically puts SS on high.
@@ -121,7 +129,6 @@ void PWM_Init(void)
 	OCR1A = 0;
 	OCR1B = 0;
 }
-
 void PWM_SetSpeedRight(int speed)
 {
 	if (speed >= 0 && speed <= 255)
@@ -129,7 +136,6 @@ void PWM_SetSpeedRight(int speed)
 		OCR2B = speed;
 	}
 }
-
 void PWM_SetSpeedLeft(int speed)
 {
 	if (speed >= 0 && speed <= 255)
@@ -137,7 +143,6 @@ void PWM_SetSpeedLeft(int speed)
 		OCR2A = speed;
 	}
 }
-
 // 1 for forward, 0 for backward
 void PWM_SetDirLeft(int dir)
 {
@@ -150,7 +155,6 @@ void PWM_SetDirLeft(int dir)
 		PORTD |= 1 << PORTD0;
 	}
 }
-
 // 1 for forward, 0 for backward
 void PWM_SetDirRight(int dir)
 {
@@ -185,17 +189,19 @@ void Get_sensor_values() //Load all sensor values into sensor-array
 		arrSensor[i - 1] = SPI_MasterTransmit(i,'s'); //load all 8 sensorvalues into sensor position [0-7]
 	}
 }
-
 void Send_sensor_values() // Can combine with Get speed when in manual mode
 {
 	SPI_MasterTransmit(255,'k');
-	for (int8_t i = 0; i < 4; i++)
+	for (int8_t i = 0; i < 3; i++)
 	{
 		SPI_MasterTransmit(arrSensor[i],'k');
 	}
-	
+	if (MANUAL_MODE)
+	{
+		SPI_MasterTransmit((arrSensor[3] - 128),'k');
+	}
+	else SPI_MasterTransmit(arrSensor[3],'k');
 }
-
 void Get_speed_value()
 {
 	SPI_MasterTransmit(0b00000001, 'k');
@@ -210,7 +216,6 @@ void Get_speed_value()
 	_delay_us(20);
 	arrSpeed[4] = SPI_MasterTransmit(0x00,'k'); //Get gripclaw
 }
-
 ISR(TIMER0_OVF_vect)
 {
 	TIMER_overflows++;
@@ -239,12 +244,10 @@ void set_GyroSS_Low() // connect gyro
 {
 	PORTC &= ~(1<<PORTC0);
 }
-
 void set_GyroSS_High() // disconnect gyro
 {
 	PORTC |= (1<<PORTC0);
 }
-
 void Gyro_Init()
 {
 
@@ -260,14 +263,13 @@ void Gyro_Init()
 	SPCR |= (1<<DORD);
 
 }
-
 void Gyro_StartConversion()
 {
 	int8_t high_byte;	
 	SPCR &= ~(1<<DORD);
 	do{
 		set_GyroSS_Low();
-		SPI_MasterTransmit_Gyro(0b10010100); //Activate adc, select angular rate channel
+		SPI_MasterTransmit_Gyro(0b10010100); //Activate adc, select angular rate 
 		high_byte = SPI_MasterTransmit_Gyro(0x00); //Byte with EOC and Accepted instr. bit
 		SPI_MasterTransmit_Gyro(0x00); //low byte
 		set_GyroSS_High();
@@ -276,11 +278,10 @@ void Gyro_StartConversion()
 	SPCR |= (1<<DORD);
 
 }
-
 int16_t Gyro_PollResult()
 {
-	int8_t high_byte, low_byte;
-	int16_t return_val;
+	uint8_t high_byte, low_byte;
+	uint16_t return_val;
 
 	SPCR &= ~(1<<DORD);
 	do{
@@ -291,27 +292,24 @@ int16_t Gyro_PollResult()
 		set_GyroSS_High();
 	} while ((high_byte & 0b10000000) & !(high_byte & 0b00100000)); // IF EOC = 0 and acc.instr. = 1 we continue
 	SPCR |= (1<<DORD);
-	return_val = ((high_byte & 0x00ff) << 8) | (low_byte);
+	LCD_Clear();
+	return_val = ((high_byte & 0x000f) << 8);
+	return_val = return_val + low_byte;
+	return_val = return_val >> 1;
 	return return_val;
 }
 
-int16_t Get_ADC_value(int16_t inval_)
-{
-	int16_t result_;
-	result_ = inval_ & 0x0fff;
-	result_ = result_ >> 1;
-	return result_;
-}
 // Converts the adc reading to angles per second
-
-int16_t adcToAngularRate(int16_t adcValue)
+int16_t adcToAngularRate(uint16_t adcValue)
 {
-	int16_t AngularRate = (adcValue * 25/12)+400;  // in mV
+	double AngularRate = (adcValue * 25/12)+400;  // in mV
 	// from the data sheet, R2 gyroscope sensor version is 26,67 mV/deg
 	// for gyroscope with max angular rate 300 deg/s
-	return (AngularRate - 2500)/26.67;
+	//LCD_SetPosition(16);
+	//LCD_display_uint16((uint16_t)AngularRate);
+	int16_t retval_= (AngularRate - 2500)/6.67;
+	return retval_;
 }
-
 void Gyro_Sleep()
 {
 	SPCR &= ~(1<<DORD);
@@ -325,16 +323,15 @@ void Gyro_Sleep()
 	} while (dataH & 0b10000000);
 	SPCR |= (1<<DORD);
 }
-
 int16_t Gyro_sequence()
 {
 	int16_t result = 0;
-	SPCR &= ~(1<<DORD);
 	Gyro_StartConversion();
 	result = Gyro_PollResult();
-	result = Get_ADC_value(result);
 	result = adcToAngularRate(result);
-	SPCR |= (1<<DORD);
+	LCD_SetPosition(0);
+	LCD_display_int16(result);
+	_delay_ms(250);
 	return result;
 }
 // use only during rotation
@@ -498,7 +495,6 @@ void Drive_test()
 // 	}
 // 	SERVO_ReleaseGrip();
 }
-
 void Gyro_test()
 {
 	//DORD: Data order. Set to 0 to transmit MSB first, LSB last
@@ -522,7 +518,6 @@ void Gyro_test()
  	}
 	return;
 }
-
 void Speed_test()
 {
 	MOTOR_Forward(80);
@@ -532,7 +527,6 @@ void Speed_test()
 	LCD_SetPosition(6);
 	LCD_display_uint16(current_speed);
 }
-
 void init_all()
 {
 	sleep_enable();	// Enable sleep instruction
@@ -544,13 +538,13 @@ void init_all()
 	TIMER_init(); // Initiate Timer settings
 	LCD_WelcomeScreen(); // Welcomes the user with a nice message ;^)
 	Gyro_Init();
-	Speed_Interrupt_Init();
+	//Speed_Interrupt_Init(); ****************************************** KOMMENTERA IN, MEN FUNGERAR EJ ATT MANUELLSTYRA DÅ *****************************************
 	sei();	// Enable global interrupts
 }
-
 void manual_drive()
 {
 	Get_speed_value();
+	Get_sensor_values();
 	PWM_SetSpeedLeft(arrSpeed[0]);
 	PWM_SetSpeedRight(arrSpeed[1]);
 	PWM_SetDirLeft(arrSpeed[2]);
@@ -560,25 +554,56 @@ void manual_drive()
 		SERVO_SetGrip();
 	}
 	else {
-	//SERVO_ReleaseGrip();
-		SERVO_SetGrip();
+		SERVO_ReleaseGrip();
 	}
+	Send_sensor_values();
 }
 
 int main(void)
 {
 	init_all();
-	//int8_t sensor_data[4];
-	
-//   	PWM_SetDirLeft(1);
-//   	PWM_SetDirRight(1);
-//   	PWM_SetSpeedLeft(0);
-//   	PWM_SetSpeedRight(0);
 
-	//MOTOR_Forward(50);
+	
+	LCD_Clear();
 	while (1)
 	{
-		//manual_drive();
+	
+		_delay_ms(10);
+		while(AUTONOM_MODE)
+		{
+			Get_sensor_values();
+			Send_sensor_values();
+			LCD_Clear();
+			LCD_SetPosition(2);
+			LCD_SendString("AUTONOM_MODE");
+			_delay_ms(200);
+			
+		}
+		
+		_delay_ms(10);
+		while(MANUAL_MODE)
+		{
+			LCD_Clear();
+			LCD_SetPosition(2);
+			LCD_SendString("MANUAL_MODE");
+			manual_drive();
+			_delay_ms(200);
+			
+		}
+		//Drive_test();
+// 		Get_sensor_values();
+// 		
+// 		LCD_SetPosition(0);
+// 		LCD_display_int8(arrSensor[0]);
+// 		LCD_SetPosition(8);
+// 		LCD_display_int8(arrSensor[1]);
+// 		LCD_SetPosition(16);
+// 		LCD_display_int8(arrSensor[2]);
+// 		LCD_SetPosition(24);
+// 		LCD_display_int8(arrSensor[3]);
+// 		//
+// 		Send_sensor_values();
+// 		manual_drive();
 		//Drive_test();
 		//Gyro_test();
 		//Drive_test();
