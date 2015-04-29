@@ -147,20 +147,24 @@ void Write_ComData(){
 	}
 }
 
-void Get_Sensor_values(int8_t arrTarget[])
+void Get_Sensor_values(int8_t arrTarget[], int size)
 {
-	SDL_Delay(10);
-	uint8_t startSensor[] = { 255 };
-	if (!WriteFile(hComm, startSensor, (sizeof(startSensor) / sizeof(startSensor[0])), &BytesWritten_, NULL)) // Send "get-sensor"
+	uint8_t startSensor[1] = { 87 };
+	if (!WriteFile(hComm, startSensor, 1, &BytesWritten_, NULL)) // Send "get-sensor"
 	{
 		cerr << "Writing to file failed!\n";
 	}
-	SDL_Delay(100);
-	if (!ReadFile(hComm, arrTarget, (sizeof(arrTarget) / sizeof(arrTarget[0])), &BytesRead_, NULL)){
+	if (!ReadFile(hComm, arrTarget, size, &BytesRead_, NULL)){
 		cerr << "Reading from file failed!\n";
 	}
-	if (BytesRead_ != (sizeof(arrTarget) / sizeof(arrTarget[0]))){
-		cerr << "Bytes read did not match arr size!\n" << BytesRead_ << endl;
+	if (BytesRead_ != size){
+		cerr << "Bytes read did not match arr size! :  " << BytesRead_ << "   " << (sizeof(arrTarget) / sizeof(arrTarget[0])) << endl;
+	}
+	//cout << "Bytes re1ad: " << BytesRead_ << "____" << static_cast<int>(arrTarget[0]) << static_cast<int>(arrTarget[1]) << static_cast<int>(arrTarget[2]) << static_cast<int>(arrTarget[3]) << endl;
+
+	if (!ReadFile(hComm, ReadBuff_, 1, &BytesRead_, NULL)) // rid of ninja 0
+	{
+		cerr << "Reading from file failed!\n";
 	}
 }
 

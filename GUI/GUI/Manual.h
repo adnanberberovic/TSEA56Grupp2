@@ -58,6 +58,9 @@ public:
     void Set_Speed();
     void init_gfx_win();
     void init_gfx_mac();
+	void init_text();
+	void render_text();
+	void update_text(int, int, int, int, int, int);
     
 private:
 
@@ -77,13 +80,17 @@ private:
 	uint8_t Dir_left;
 	uint8_t Dir_right;
 	uint8_t Klo;
-	int8_t Sensor_val1 = 1;
-	int8_t Sensor_val2 = 2;
-	int8_t Sensor_val3 = 3;
-	int8_t Sensor_val4 = 4;
+	int8_t arrSensor[4];
 
     int8_t agg;
     
+	Text* Text_Angle_;
+	Text* Text_Offset_;
+	Text* Text_Reflex_;
+	Text* Text_Front;
+	Text* Text_Clear_right_;
+	Text* Text_Clear_left_;
+
     //Externa IN <-- UT
     int8_t angle_;
     int8_t offset_;
@@ -96,14 +103,14 @@ private:
 
     //Plats för texturer
 //    //Mac
-    string Font_ = "/Users/Andreas/Library/Fonts/DS-DIGI.TTF";
-    string Pil_plats = "/Users/Andreas/Skola/KP2/GUI/Bilder/Pil.png";
-    string BG_plats = "/Users/Andreas/Skola/KP2/GUI/Bilder/Manual.png";
+    //string Font_ = "/Users/Andreas/Library/Fonts/DS-DIGI.TTF";
+    //string Pil_plats = "/Users/Andreas/Skola/KP2/GUI/Bilder/Pil.png";
+    //string BG_plats = "/Users/Andreas/Skola/KP2/GUI/Bilder/Manual.png";
     
     //Windows
-//        string Font_ = "/Users/Andreas/Library/Fonts/DS-DIGI.TTF";
-//        string Pil_plats = "/Users/Andreas/Skola/KP2/GUI/Bilder/Pil.png";
-//        string BG_plats = "/Users/Andreas/Skola/KP2/GUI/Bilder/Manual.png";
+	string Font_ = "C:/Users/Måns/Documents/GitHub/TSEA56Grupp2/GUI/Bilder/ds_digital/DS-DIGI.TTF";
+	string Pil_plats = "C:/Users/Måns/Documents/GitHub/TSEA56Grupp2/GUI/Bilder/Pil.png";
+	string BG_plats = "C:/Users/Måns/Documents/GitHub/TSEA56Grupp2/GUI/Bilder/Manual.png";
     
     
 };
