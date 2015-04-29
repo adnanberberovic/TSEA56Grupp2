@@ -142,8 +142,23 @@ void LCD_WelcomeScreen(void)
 	LCD_SendString("  Master Race  ");
 }
 
+// Display an unsigned 8 bit value as up to three decimal characters
+void LCD_display_uint8(uint8_t val) {
+	unsigned char buf[3];
+	int8_t ptr;
+	for(ptr=0;ptr<3;++ptr) {
+		buf[ptr] = (val % 10) + '0';
+		val /= 10;
+	}
+	for(ptr=2;ptr>0;--ptr) {
+		if (buf[ptr] != '0') break;
+	}
+	for(;ptr>=0;--ptr) {
+		LCD_SendCharacter(buf[ptr]);
+	}
+}
+
  //Display a signed 8 bit value as a possible minus character followed by up to three decimal characters
- 
 void LCD_display_int8(int8_t val) {
 	 unsigned char buf[3];
 	 int8_t ptr;

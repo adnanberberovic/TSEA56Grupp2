@@ -43,12 +43,12 @@ volatile uint8_t BT_received_flag = 0;
 volatile uint8_t BT_sent_flag = 0;
 
 
-uint8_t arrSpeed[] = {0,0,1,1,0}; //Array with current speed (Left right), direction (1 = forward, 0 = backward) and claw. From/to PC/master left
+uint8_t arrSpeed[5] = {0,0,1,1,0}; //Array with current speed (Left right), direction (1 = forward, 0 = backward) and claw. From/to PC/master left
 uint8_t incomingSpeed_ = 0;
 
 uint8_t sendFlag = 0;
 uint8_t Flag_ = 0;
-int8_t arrSensor[] = {'a','b','c','d'};
+int8_t arrSensor[] = {9,8,7,6};
 	
 uint8_t sensorFlag_ = 0;
 uint8_t speedFlag_ = 0;
@@ -108,7 +108,7 @@ void BT_init(void)
 	UBRR0H = 0x00; //correct value to change baud rate
 	UBRR0L = 0x07;//^^ same ^^ with a 14.7 mhz, scale with 1111 (7)
 	
-	UCSR0B = (1<<TXEN0) | (1<<RXEN0) | (0<<UCSZ02) | (1<<RXCIE0) | (1<<TXCIE0) | (0<<UDRIE0);
+	UCSR0B = (1<<TXEN0) | (1<<RXEN0) | (0<<UCSZ02) | (1<<RXCIE0) | (0<<TXCIE0) | (0<<UDRIE0);
 	/* RXCI, TXCI Complete transmission and complete interrupt is enabled
 	 * UDRIE0 not set, disabled interrupts due to UDRE0 flag. Data register empty
 	 * TXEN, TXEN, transmission and receiver enable 
@@ -206,18 +206,14 @@ void flush_list(buffer_ ** lst_head)
 
 void send_BT_buffer(uint8_t buffer[], int size)
 {
+	flush_list(&head_BTout);
 	int i = 0;
 	while(i < size)
 	{
 		add_node(&head_BTout, buffer[i]);
 		i++;
 	}
-	//flush_list(&head_BTout);
-	//for(int i = 0; buffer[i]; i++ )
-	//{
-		//add_node(&head_BTout, buffer[i]);
-	//}
-	
+
 	UCSR0B |= (1<<UDRIE0);	//Enable UDRE interrupt flag -> send when empty dataregister
 	
 	// maby add while UDRIE0 = 0 here to counter multiple send_BT_buffer in a row
@@ -228,12 +224,13 @@ void BT_StartBitCheck(uint8_t in_)
 		
 		case 1:
 		BTspeedFlag_ = 1;
+		BTsensorFlag_ = 0;
 		BTcounter_ = 0;
 		break;
 		
-		case 255:
+		case 87:
 		BTsensorFlag_ = 1;
-		BTcounter_ = 0;
+		BTspeedFlag_ = 0;
 		break;
 	}
 }
@@ -241,12 +238,12 @@ void BT_StartBitCheck(uint8_t in_)
 ISR(USART0_RX_vect) 
 {
 	uint8_t data = UDR0;
-	if ((BTspeedFlag_ == 0) && (BTsensorFlag_ == 0)) //First time check if it's starbit
+	if (((BTspeedFlag_ == 0) && (BTsensorFlag_ == 0)) && ((data == 1) || (data == 87)) ) //First time check if it's starbit
 	{
 		BT_StartBitCheck(data);
 	}
 	
-	else if (BTspeedFlag_ == 1) // Speed incoming
+	else if ((BTspeedFlag_ == 1) && (data != 87)) // Speed incoming
 	{
 		arrSpeed[BTcounter_] = data; //Load value into speed array
 		BTcounter_++;
@@ -256,7 +253,7 @@ ISR(USART0_RX_vect)
 			BTcounter_ = 0;
 		}
 	}
-	else if (BTsensorFlag_ == 1) //Send out sensordata
+	if (BTsensorFlag_ == 1) //Send out sensordata
 	{
 		send_BT_buffer(arrSensor, (sizeof(arrSensor)/sizeof(arrSensor[0])));
 		BTsensorFlag_ = 0;
@@ -264,7 +261,6 @@ ISR(USART0_RX_vect)
 	
 	
 }
-
 // Empty dataregister = send next character
 ISR(USART0_UDRE_vect)
 {
@@ -310,13 +306,20 @@ void SPI_StartBitCheck(uint8_t in_)
 		
 		case 1: 
 		speedFlag_ = 1;
+		sensorFlag_ = 0;
 		counter_ = 0;
 		break;
 		
 		case 255: 
 		sensorFlag_ = 1;
+		speedFlag_ = 0;
 		counter_ = 0;
 		break; 
+		
+		default: 
+		sensorFlag_ = 0;
+		speedFlag_ = 0;
+		counter_ = 0;
 	}
 }
 // Interrupt method runs when SPI transmission/reception is completed.
@@ -326,10 +329,21 @@ ISR(SPI_STC_vect)
 	
 	if ( (speedFlag_ == 0) && (sensorFlag_ == 0) ){
 		SPI_StartBitCheck(data);
-		if (sensorFlag_ == 1){
-			return; //first bit is not interesting
+		//if (sensorFlag_ == 1){
+			//return; //first bit is not interesting
+		//}
+	}
+	
+	else if (sensorFlag_ == 1){
+	arrSensor[counter_] = data; //Load into correct pos of array 0-3
+	counter_++;
+		if (counter_ == (sizeof(arrSensor)/sizeof(arrSensor[0])) ){  //all values in.
+				counter_ = 0;
+				sensorFlag_ = 0;
 		}
 	}
+	
+	
 	// Speed is to be sent.
 	if (speedFlag_ == 1){
 		SPI_send_arr(arrSpeed,(sizeof(arrSpeed)/sizeof(arrSpeed[0])));
@@ -338,15 +352,7 @@ ISR(SPI_STC_vect)
 		return;
 	}
 	
-	if (sensorFlag_ == 1){
-		arrSensor[counter_] = data; //Load into correct pos of array 0-3
-		counter_++;
-		if (counter_ == (sizeof(arrSensor)/sizeof(arrSensor[0])) ){  //all values in.
-			counter_ = 0;
-			sensorFlag_ = 0;
-		}
-	}
-	
+
 	if (head_SPIout == NULL){ //Sendback function will always be performed when something is to be sent.
 		uint8_t stop_bit = 255;
 		SPDR = stop_bit;
