@@ -29,7 +29,7 @@ int8_t arrSensor[] = {9,8,7,6}; //sensor 0-3
 // This timer will reset every time it reaches 10.
 uint8_t TIMER_overflows;
 // This timer will NOT reset every time it reaches 10.
-uint16_t TIMER_overflows_increasing;
+int16_t TIMER_wheel;
 // The following overflow storage corresponds to 131ms. This timer will never reset.
 uint8_t TIMER_overflows_deci;
 // This variable is used to store robots angle in degrees
@@ -214,7 +214,7 @@ void Get_speed_value()
 ISR(TIMER0_OVF_vect)
 {
 	TIMER_overflows++;
-	TIMER_overflows_increasing++;
+	TIMER_wheel++;
 	
 	if (TIMER_overflows >= 10)
 	{
@@ -239,10 +239,12 @@ void set_GyroSS_Low() // connect gyro
 {
 	PORTC &= ~(1<<PORTC0);
 }
+
 void set_GyroSS_High() // disconnect gyro
 {
 	PORTC |= (1<<PORTC0);
 }
+
 void Gyro_Init()
 {
 
@@ -258,6 +260,7 @@ void Gyro_Init()
 	SPCR |= (1<<DORD);
 
 }
+
 void Gyro_StartConversion()
 {
 	int8_t high_byte;	
@@ -273,6 +276,7 @@ void Gyro_StartConversion()
 	SPCR |= (1<<DORD);
 
 }
+
 int16_t Gyro_PollResult()
 {
 	int8_t high_byte, low_byte;
@@ -290,6 +294,7 @@ int16_t Gyro_PollResult()
 	return_val = ((high_byte & 0x00ff) << 8) | (low_byte);
 	return return_val;
 }
+
 int16_t Get_ADC_value(int16_t inval_)
 {
 	int16_t result_;
@@ -298,6 +303,7 @@ int16_t Get_ADC_value(int16_t inval_)
 	return result_;
 }
 // Converts the adc reading to angles per second
+
 int16_t adcToAngularRate(int16_t adcValue)
 {
 	int16_t AngularRate = (adcValue * 25/12)+400;  // in mV
@@ -305,6 +311,7 @@ int16_t adcToAngularRate(int16_t adcValue)
 	// for gyroscope with max angular rate 300 deg/s
 	return (AngularRate - 2500)/26.67;
 }
+
 void Gyro_Sleep()
 {
 	SPCR &= ~(1<<DORD);
@@ -318,6 +325,7 @@ void Gyro_Sleep()
 	} while (dataH & 0b10000000);
 	SPCR |= (1<<DORD);
 }
+
 int16_t Gyro_sequence()
 {
 	int16_t result = 0;
@@ -332,6 +340,7 @@ int16_t Gyro_sequence()
 // use only during rotation
 // in functions MOTOR_RotateRight(), MOTOR_RotateLeft()
 // stop rotating when 90 degrees reached; 
+
 void checkAngle90()
 {
 	int16_t result;
@@ -353,12 +362,10 @@ void checkAngle90()
 	rotation_angle = 0; //reset
 }
 //----------------------------GYRO----END-----------------------------
-uint16_t speed_start_time;
 uint16_t wheel_marker_counter = 0;
 uint16_t current_speed;
 uint16_t wheel_circumference = 4*100*79; //Wheel circumference is 79 mm.
 uint16_t time_difference;
-uint16_t current_speed;
 
 void Speed_Interrupt_Init()
 {
@@ -370,26 +377,37 @@ void Speed_Interrupt_Init()
 
 ISR(INT0_vect)
 {
+	cli();
+	LCD_SetPosition(24);
+	LCD_display_uint16(wheel_marker_counter);
+	_delay_ms(250);
+	//EIMSK &= ~(1<INT0);
 	if (wheel_marker_counter == 0)
 	{
-		speed_start_time = TIMER_overflows_increasing;
+		TIMER_wheel = 0;
 		wheel_marker_counter++;
 	}
-	else if (wheel_marker_counter < 4*8)
+	else if (wheel_marker_counter < 8)
 	{
+		LCD_SetPosition(24);
+		LCD_display_uint16(wheel_marker_counter);
 		wheel_marker_counter++;
 	}
 	else
 	{
-		time_difference = (TIMER_overflows_increasing - speed_start_time) / 0.8175; // div by 0.8184 -> time in ms
+		time_difference = TIMER_wheel / 0.8175; // div by 0.8175 -> time in ms
 		current_speed = wheel_circumference / time_difference;
 		LCD_Clear();
-		LCD_SetPosition(0);
-		LCD_display_uint16(time_difference);
-		LCD_SetPosition(8);
-		LCD_display_uint16(current_speed);
+// 		LCD_SetPosition(0);
+// 		LCD_display_int16(time_difference);
+// 		LCD_SetPosition(8);
+// 		LCD_display_int16(current_speed);
+		LCD_SetPosition(24);
+		LCD_display_uint16(wheel_marker_counter);
 		wheel_marker_counter = 0; 
 	}
+	//EIMSK |= 1<INT0;
+	sei();
 }
 
 //--MOTOR start
@@ -423,12 +441,14 @@ void MOTOR_RotateRight()
 	PWM_SetSpeedRight(100);
 	checkAngle90();
 }
+
 void MOTOR_Stop()
 {
 	PWM_SetSpeedRight(0);
 	PWM_SetSpeedLeft(0);
 }
 //--MOTOR stop
+
 void Drive_test()
 {
 	//MOTOR_Forward(80);
@@ -478,6 +498,7 @@ void Drive_test()
 // 	}
 // 	SERVO_ReleaseGrip();
 }
+
 void Gyro_test()
 {
 	//DORD: Data order. Set to 0 to transmit MSB first, LSB last
@@ -501,6 +522,7 @@ void Gyro_test()
  	}
 	return;
 }
+
 void Speed_test()
 {
 	MOTOR_Forward(80);
@@ -510,6 +532,7 @@ void Speed_test()
 	LCD_SetPosition(6);
 	LCD_display_uint16(current_speed);
 }
+
 void init_all()
 {
 	sleep_enable();	// Enable sleep instruction
@@ -524,10 +547,10 @@ void init_all()
 	Speed_Interrupt_Init();
 	sei();	// Enable global interrupts
 }
+
 void manual_drive()
 {
 	Get_speed_value();
-	LCD_Clear();
 	PWM_SetSpeedLeft(arrSpeed[0]);
 	PWM_SetSpeedRight(arrSpeed[1]);
 	PWM_SetDirLeft(arrSpeed[2]);
@@ -541,21 +564,22 @@ void manual_drive()
 		SERVO_SetGrip();
 	}
 }
+
 int main(void)
 {
 	init_all();
 	//int8_t sensor_data[4];
-// 	 	
-  	//PWM_SetDirLeft(1);
-  	//PWM_SetDirRight(1);
-  	//PWM_SetSpeedLeft(0);
-  	//PWM_SetSpeedRight(0);
+	
+//   	PWM_SetDirLeft(1);
+//   	PWM_SetDirRight(1);
+//   	PWM_SetSpeedLeft(0);
+//   	PWM_SetSpeedRight(0);
 
-	MOTOR_Forward(120);
+	//MOTOR_Forward(50);
 	while (1)
 	{
-		//Drive_test();
 		//manual_drive();
+		//Drive_test();
 		//Gyro_test();
 		//Drive_test();
 		//Speed_test();
