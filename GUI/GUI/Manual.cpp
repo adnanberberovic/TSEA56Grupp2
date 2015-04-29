@@ -20,11 +20,10 @@ Manual::Manual(SetupSDL* sdl_lib)
     //SDL-init
     renderer_ = sdl_lib -> get_renderer();
     mainevent_ = sdl_lib -> get_event();
-	Init_CommPort("COM3"); //Initialize comport
-    //Konstuera Bakgrund
-    Bakgrund = new Unmoveable_Object("C:/Users/Måns/Documents/GitHub/TSEA56Grupp2/GUI/Bilder/Manual.png", renderer_, 0, 0);
-    Pil1 = new Moveable_Object("C:/Users/Måns/Documents/GitHub/TSEA56Grupp2/GUI/Bilder/Pil.png", renderer_, 300, 204);
-    Pil2 = new Moveable_Object("C:/Users/Måns/Documents/GitHub/TSEA56Grupp2/GUI/Bilder/Pil.png", renderer_, 300, 345);
+    
+    init_gfx_win();
+    //init_gfx_mac();
+
 }
 
 Manual::~Manual()
@@ -294,6 +293,26 @@ void Manual::Set_Speed()
 	}
 
 
+}
+
+void Manual::init_gfx_win()
+{
+    
+    Init_CommPort("COM3"); //Initialize comport
+    //Konstuera Bakgrund
+    Bakgrund = new Unmoveable_Object("C:/Users/Måns/Documents/GitHub/TSEA56Grupp2/GUI/Bilder/Manual.png", renderer_, 0, 0);
+    Pil1 = new Moveable_Object("C:/Users/Måns/Documents/GitHub/TSEA56Grupp2/GUI/Bilder/Pil.png", renderer_, 300, 204);
+    Pil2 = new Moveable_Object("C:/Users/Måns/Documents/GitHub/TSEA56Grupp2/GUI/Bilder/Pil.png", renderer_, 300, 345);
+    
+}
+
+void Manual::init_gfx_mac();
+{
+
+    Bakgrund = new Unmoveable_Object(BG_plats.c_str(), renderer_, 0, 0);
+    Pil1 = new Moveable_Object(Pil_plats.c_str(), renderer_, 300, 204);
+    Pil2 = new Moveable_Object(Pil_plats.c_str(), renderer_, 300, 345);
+    
 }
 
 
