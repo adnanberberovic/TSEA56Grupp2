@@ -61,6 +61,7 @@ public:
 	void init_text();
 	void render_text();
 	void update_text(int, int, int, int, int, int);
+	void Check_Mode(string&, bool&);
     
 private:
 

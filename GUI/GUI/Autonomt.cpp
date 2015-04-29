@@ -157,7 +157,14 @@ void Autonom::update(string& statestring, bool& running)
 {
     Text_Offset_->Update_Texture( (Robot_offset->get_Offset()) , renderer_);
     Text_Angle_->Update_Texture(Robot_angle->get_Angle(), renderer_);
-    
+	Get_Sensor_values(arrSensor, (sizeof(arrSensor) / sizeof(arrSensor[0])));
+	if (!WriteFile(hComm, arrSpeed, (sizeof(arrSpeed) / sizeof(arrSpeed[0])), &BytesWritten_, NULL)) // Send array with speed values
+	{
+		cerr << "Writing to file failed!\n";
+	}
+	SDL_Delay(10);
+
+	update_text(arrSensor[0], arrSensor[1], arrSensor[2], ((0x40 & arrSensor[3]) >> 6), (0x07 & arrSensor[3]) /*CR*/, ((0x38 & arrSensor[3]) >> 3)/*CL*/);
 }
 
 void Autonom::render()
@@ -318,6 +325,9 @@ void Autonom::run(string& statestring) {
         
         //Update
         this -> update(statestring,running);
+
+		//Mode
+		Check_Mode(statestring, running);
         
         //Render
         this -> render();
@@ -325,4 +335,15 @@ void Autonom::run(string& statestring) {
     }
     
     return;
+}
+
+void Autonom::Check_Mode(string &statestring, bool &running)
+{
+	if (arrSensor[3] < 0)
+	{
+		statestring = "Manual";
+		running = false;
+		return;
+	}
+
 }

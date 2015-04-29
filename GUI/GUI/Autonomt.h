@@ -119,7 +119,7 @@ public:
     void Skift_Tiles_right();
     void Change_left_speed();
     void Change_right_speed();
-    
+	void Check_Mode(string&, bool&);
 };
 
 

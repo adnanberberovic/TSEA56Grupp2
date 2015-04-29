@@ -144,6 +144,8 @@ void Manual::event(string& statestring, bool& running)
         
     }
 
+	Speed_Vertical = 0;
+	Speed_Horizont = 0;
 
 	if (currentKeyStates[SDL_SCANCODE_RIGHT])
 	{
@@ -162,11 +164,6 @@ void Manual::event(string& statestring, bool& running)
 		Speed_Vertical = -1;
 	}
 
-	if (!(currentKeyStates[SDL_SCANCODE_RIGHT]) && !(currentKeyStates[SDL_SCANCODE_LEFT]) && !(currentKeyStates[SDL_SCANCODE_UP]) &&
-		!(currentKeyStates[SDL_SCANCODE_DOWN])) {
-		Speed_Vertical = 0;
-		Speed_Horizont = 0;
-	}
 
     
     return;
@@ -184,8 +181,8 @@ void Manual::update(string& statestring, bool& running)
 		cerr << "Writing to file failed!\n";
 	}
 	SDL_Delay(10);
-
-	update_text(arrSensor[0], arrSensor[1], arrSensor[2], arrSensor[3], 0 /*arrSensor[0]*/, 0/* arrSensor[1]*/);
+	
+	update_text(arrSensor[0], arrSensor[1], arrSensor[2], ((0x40 & arrSensor[3]) >> 6), (0x07 & arrSensor[3]) /*CR*/, ((0x38 & arrSensor[3]) >> 3)/*CL*/);
 }
 
 void Manual::render()
@@ -210,10 +207,13 @@ void Manual::run(string& statestring) {
     {
         //Event
         this -> event(statestring,running);
-        
+
         //Update
         this -> update(statestring,running);
         
+		//Mode
+		Check_Mode(statestring, running);
+
         //Render
         this -> render();
         
@@ -347,6 +347,16 @@ void Manual::update_text(int A, int O, int F, int R, int CR, int CL)
 
 }
 	
+void Manual::Check_Mode(string &statestring, bool &running)
+{
+	if (arrSensor[3] >= 0)
+	{
+		statestring = "Autonom";
+		running = false;
+		return;
+	}
+
+}
 
 
 
