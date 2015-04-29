@@ -184,7 +184,7 @@ void MAP_addJunction()
 
 	// Adds it in the map array
 	MAP_setSquareDescription(5, posY_, posX_);
-	MAP_array[posY_][posX_].junctionNumber = MAP_currentJunction;
+	MAP_array[posY_][posX_].junctionNumber = MAP_currentJunction;   // junction number odefinierat
 	
 	// Adds it in the junction array
 	MAP_junctionOrderArray[MAP_currentJunction].hasUnex = 1;
@@ -328,9 +328,15 @@ int main(void)
 			/* Rotera lämpligt - Egen fas
 				-ändra currentDir*/
 		}
-		/* TODO Åk fram en ruta - Egen fas
-			-räkna upp travelledDist
-			-ändra currentPos*/
+		// TODO ?k fram en ruta - Egen fas
+		MAP_travelledDist++;
+		// ?ndra currentPos:
+		if (!MAP_currentDir) {MAP_currentPos[1]++;} // drove right
+		else if (MAP_currentDir == 1) {MAP_currentPos[0]--;} // drove up
+		else if (MAP_currentDir == 2) {MAP_currentPos[1]--;} // drove left
+		else (MAP_currentDir == 3) {MAP_currentPos[0]++;} // drove down
+		
+		MAP_setVisited();
 		
 	} while (MAP_array[MAP_currentPos[0]][MAP_currentPos[1]].goal == 0)
 	
