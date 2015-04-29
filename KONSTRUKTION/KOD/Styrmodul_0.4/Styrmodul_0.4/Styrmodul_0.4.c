@@ -35,7 +35,7 @@ int16_t TIMER_wheel;
 // The following overflow storage corresponds to 131ms. This timer will never reset.
 uint8_t TIMER_overflows_deci;
 // This variable is used to store robots angle in degrees
-int rotation_angle = 0;
+int16_t rotation_angle = 0;
 //KOntrollerar att flaggor sätts korekkt vi Manuell / Autonom loop
 int Manual_Flag = 0;
 
@@ -292,7 +292,6 @@ int16_t Gyro_PollResult()
 		set_GyroSS_High();
 	} while ((high_byte & 0b10000000) & !(high_byte & 0b00100000)); // IF EOC = 0 and acc.instr. = 1 we continue
 	SPCR |= (1<<DORD);
-	LCD_Clear();
 	return_val = ((high_byte & 0x000f) << 8);
 	return_val = return_val + low_byte;
 	return_val = return_val >> 1;
@@ -303,7 +302,7 @@ int16_t Gyro_PollResult()
 int16_t adcToAngularRate(uint16_t adcValue)
 {
 	double AngularRate = (adcValue * 25/12)+400;  // in mV
-	// from the data sheet, R2 gyroscope sensor version is 26,67 mV/deg
+	// from the data sheet, R2 gyroscope sensor version is 6,67 mV/deg
 	// for gyroscope with max angular rate 300 deg/s
 	//LCD_SetPosition(16);
 	//LCD_display_uint16((uint16_t)AngularRate);
@@ -329,8 +328,8 @@ int16_t Gyro_sequence()
 	Gyro_StartConversion();
 	result = Gyro_PollResult();
 	result = adcToAngularRate(result);
-	LCD_SetPosition(0);
-	LCD_display_int16(result);
+// 	LCD_SetPosition(0);
+// 	LCD_display_int16(result);
 	_delay_ms(250);
 	return result;
 }
@@ -341,20 +340,15 @@ int16_t Gyro_sequence()
 void checkAngle90()
 {
 	int16_t result;
-	int16_t before = 0;
 	do {
-		result = 0;
 		result = Gyro_sequence();	// 315us
-		if (abs(result) > 120) 
-		{
-			result = before;
-		}
-		before = result;
-		rotation_angle += result/6;  // /6
-		LCD_Clear();
-		LCD_SetPosition(0);
-		LCD_display_int16(rotation_angle);
-	} while (abs(rotation_angle) < 410); // 410
+		rotation_angle += result;
+		
+		// 		LCD_Clear();
+		// 		LCD_SetPosition(0);
+		// 		LCD_display_int16(rotation_angle);
+		
+	} while (abs(rotation_angle) < 230);
 	
 	rotation_angle = 0; //reset
 }
@@ -434,11 +428,10 @@ void MOTOR_RotateRight()
 {
 	PWM_SetDirRight(1);
 	PWM_SetDirLeft(0);
-	PWM_SetSpeedLeft(100);
 	PWM_SetSpeedRight(100);
+	PWM_SetSpeedLeft(100);
 	checkAngle90();
 }
-
 void MOTOR_Stop()
 {
 	PWM_SetSpeedRight(0);
@@ -496,25 +489,17 @@ void Drive_test()
 // 	SERVO_ReleaseGrip();
 }
 void Gyro_test()
-{
-	//DORD: Data order. Set to 0 to transmit MSB first, LSB last
-	//OBS: Spegla det som skickas!
-	
+{	
 	//checkAngle90();
-	int16_t result = 0;
-	int16_t before = 0;
+	int16_t result;
  	while (1)
  	{
- 		LCD_Clear();
- 		LCD_SetPosition(0);
- 		result = Gyro_sequence(); //data ordningen sätts här
-   		if(abs(result) > 120)
-  		{
-  			result = before;
-  		}
-		before = result;
+ 		result = Gyro_sequence();		
 		rotation_angle += result;
-		LCD_display_int16(rotation_angle/30);
+		LCD_Clear();
+		LCD_SetPosition(0);
+		LCD_display_int16(result);
+		_delay_ms(100);
  	}
 	return;
 }
@@ -562,34 +547,37 @@ void manual_drive()
 int main(void)
 {
 	init_all();
-
+	//Gyro_test();
+	while (1) {
+		Drive_test();
+	}
 	
-	LCD_Clear();
-	while (1)
-	{
-	
-		_delay_ms(10);
-		while(AUTONOM_MODE)
-		{
-			Get_sensor_values();
-			Send_sensor_values();
-			LCD_Clear();
-			LCD_SetPosition(2);
-			LCD_SendString("AUTONOM_MODE");
-			_delay_ms(200);
-			
-		}
-		
-		_delay_ms(10);
-		while(MANUAL_MODE)
-		{
-			LCD_Clear();
-			LCD_SetPosition(2);
-			LCD_SendString("MANUAL_MODE");
-			manual_drive();
-			_delay_ms(200);
-			
-		}
+// 	LCD_Clear();
+// 	while (1)
+// 	{
+// 	
+// 		_delay_ms(10);
+// 		while(AUTONOM_MODE)
+// 		{
+// 			Get_sensor_values();
+// 			Send_sensor_values();
+// 			LCD_Clear();
+// 			LCD_SetPosition(2);
+// 			LCD_SendString("AUTONOM_MODE");
+// 			_delay_ms(200);
+// 			
+// 		}
+// 		
+// 		_delay_ms(10);
+// 		while(MANUAL_MODE)
+// 		{
+// 			LCD_Clear();
+// 			LCD_SetPosition(2);
+// 			LCD_SendString("MANUAL_MODE");
+// 			manual_drive();
+// 			_delay_ms(200);
+// 			
+// 		}
 		//Drive_test();
 // 		Get_sensor_values();
 // 		
@@ -608,6 +596,6 @@ int main(void)
 		//Gyro_test();
 		//Drive_test();
 		//Speed_test();
-	}
+	//}
 	
 }
