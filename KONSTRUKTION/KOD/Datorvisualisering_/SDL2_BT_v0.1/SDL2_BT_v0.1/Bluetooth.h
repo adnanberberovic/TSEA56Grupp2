@@ -24,6 +24,7 @@ DWORD BytesWritten_ = 0; // how many bytes that were actually written
 DWORD BytesRead_ = 0; // how many bytes that were actually read
 char ReadBuff_[BUFFSIZE];
 char WriteBuff_[BUFFSIZE];
+int flag__ = 0;
 
 bool Command_flag = false;
 
@@ -103,7 +104,7 @@ void Read_ComData(){
 	}
 	cout << "\nReadbuff: ";
 
-	for (int i = 0; i < BytesRead_; i++)
+	for (uint8_t i = 0; i < BytesRead_; i++)
 	{
 		int c = ReadBuff_[i];
 		cout << c;
@@ -143,6 +144,23 @@ void Write_ComData(){
 	{
 		cin >> W_in;
 		cout << "Data written\n> ";
+	}
+}
+
+void Get_Sensor_values(int8_t arrTarget[])
+{
+	SDL_Delay(10);
+	uint8_t startSensor[] = { 255 };
+	if (!WriteFile(hComm, startSensor, (sizeof(startSensor) / sizeof(startSensor[0])), &BytesWritten_, NULL)) // Send "get-sensor"
+	{
+		cerr << "Writing to file failed!\n";
+	}
+	SDL_Delay(100);
+	if (!ReadFile(hComm, arrTarget, (sizeof(arrTarget) / sizeof(arrTarget[0])), &BytesRead_, NULL)){
+		cerr << "Reading from file failed!\n";
+	}
+	if (BytesRead_ != (sizeof(arrTarget) / sizeof(arrTarget[0]))){
+		cerr << "Bytes read did not match arr size!\n" << BytesRead_ << endl;
 	}
 }
 

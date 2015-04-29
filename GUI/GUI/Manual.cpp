@@ -176,14 +176,16 @@ void Manual::update(string& statestring, bool& running)
 {
     Set_Speed();
 
-		 
-	uint8_t arrSpeed[] = { 1, Speed_right, Speed_left , Dir_left, Dir_right, Klo}; // Make array to send with start-flag -1
+	uint8_t arrSpeed[] = { 1, Speed_right, Speed_left, Dir_left, Dir_right, Klo }; // Make array to send with start-flag -1
+	int8_t arrSensor[] = { Sensor_val1, Sensor_val2, Sensor_val3, Sensor_val4 };
+
 	if (!WriteFile(hComm, arrSpeed, (sizeof(arrSpeed)/sizeof(arrSpeed[0])), &BytesWritten_, NULL)) // Send array with speed values
 	{
 		cerr << "Writing to file failed!\n";
 	}
-	SDL_Delay(10);
-
+	SDL_Delay(100);
+	Get_Sensor_values(arrSensor);
+	cout << static_cast<int>(Sensor_val1) << static_cast<int>(Sensor_val2) << static_cast<int>(Sensor_val3) << static_cast<int>(Sensor_val4) << endl;
 }
 
 

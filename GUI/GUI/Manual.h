@@ -77,7 +77,10 @@ private:
 	uint8_t Dir_left;
 	uint8_t Dir_right;
 	uint8_t Klo;
-
+	int8_t Sensor_val1 = 1;
+	int8_t Sensor_val2 = 2;
+	int8_t Sensor_val3 = 3;
+	int8_t Sensor_val4 = 4;
 
     int8_t agg;
     
