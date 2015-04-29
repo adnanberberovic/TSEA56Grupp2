@@ -48,7 +48,7 @@ uint8_t incomingSpeed_ = 0;
 
 uint8_t sendFlag = 0;
 uint8_t Flag_ = 0;
-int8_t arrSensor[] = {3,5,2,4};
+int8_t arrSensor[] = {'a','b','c','d'};
 	
 uint8_t sensorFlag_ = 0;
 uint8_t speedFlag_ = 0;
@@ -241,7 +241,6 @@ void BT_StartBitCheck(uint8_t in_)
 ISR(USART0_RX_vect) 
 {
 	uint8_t data = UDR0;
-	
 	if ((BTspeedFlag_ == 0) && (BTsensorFlag_ == 0)) //First time check if it's starbit
 	{
 		BT_StartBitCheck(data);
@@ -393,7 +392,6 @@ int main(void)
 	SPI_SlaveInit();
 	BT_init();
 	sei();
-	
 	while(1)
 	{
 	}
