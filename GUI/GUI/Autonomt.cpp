@@ -25,38 +25,29 @@ Autonom::Autonom(SetupSDL* sdl_lib)
     mainevent_ = sdl_lib -> get_event();
     
     //Konstuera Bakgrund
-    Bakgrund = new Unmoveable_Object("C:/Users/Måns/Documents/GitHub/TSEA56Grupp2/GUI/Bilder/BG.png", renderer_, 0, 0);
+    Bakgrund = new Unmoveable_Object(BG_plats.c_str(), renderer_, 0, 0);
     
-    Speed_left = new Speed_meter("C:/Users/Måns/Documents/GitHub/TSEA56Grupp2/GUI/Bilder/Hastighet.png", renderer_, 150 , 444);
-    
-    Speed_right = new Speed_meter("C:/Users/Måns/Documents/GitHub/TSEA56Grupp2/GUI/Bilder/Hastighet.png", renderer_, 274, 444);
-
-
+    Speed_left = new Speed_meter(SM_plats.c_str(), renderer_, 150 , 444);
+    Speed_right = new Speed_meter(SM_plats.c_str(), renderer_, 274, 444);
     
     //Konstruera Robotar
-    Robot_angle = new Robot("C:/Users/Måns/Documents/GitHub/TSEA56Grupp2/GUI/Bilder/Robot.png", renderer_, 194, 50 );
-    Robot_offset = new Robot("C:/Users/Måns/Documents/GitHub/TSEA56Grupp2/GUI/Bilder/Robot.png", renderer_, 192, 250);
-    Robot_Rotaton = new Robot("C:/Users/Måns/Documents/GitHub/TSEA56Grupp2/GUI/Bilder/Robot.png", renderer_, 194, 660);
-    Robot_Bana = new Robot("C:/Users/Måns/Documents/GitHub/TSEA56Grupp2/GUI/Bilder/Robot.png", renderer_, 814, 670);
+    Robot_angle = new Robot(Robot_plats.c_str(), renderer_, 194, 50 );
+    Robot_offset = new Robot(Robot_plats.c_str(), renderer_, 192, 250);
+    Robot_Rotaton = new Robot(Robot_plats.c_str(), renderer_, 194, 660);
+    Robot_Bana = new Robot(Robot_plats.c_str(), renderer_, 814, 670);
     
     //Text
-    Text_Angle_ = new Text("C:/Users/Måns/Documents/GitHub/TSEA56Grupp2/GUI/Bilder/ds_digital/DS-DIGI.TTF", "01", renderer_, 80, 20, 50, 50);
-    Text_Offset_ = new Text("C:/Users/Måns/Documents/GitHub/TSEA56Grupp2/GUI/Bilder/ds_digital/DS-DIGI.TTF", "02", renderer_, 80, 224, 50, 50);
+    Text_Angle_ = new Text(Font.c_str(), "01", renderer_, 80, 20, 50, 50);
+    Text_Offset_ = new Text(Font.c_str(), "02", renderer_, 80, 224, 50, 50);
     
     //väg/vägg
     init_Tiles();
     
-
     (Tile_vector[13][0])->make_Wall();
     (Tile_vector[15 ][0])->make_Wall();
     
-    
     Speed_left->Change_speed(140);
     Speed_right->Change_speed(300);
-    
-    
-    
-
     
 }
 
@@ -220,7 +211,6 @@ void Autonom::Update_Timer(){
 }
 
 
-
 void Autonom::init_Tiles()
 {
     for (int i = 0; i <= 28; i ++){
@@ -228,10 +218,10 @@ void Autonom::init_Tiles()
         for (int j = 0; j <= 14; j++)
         {
             row.insert(row.begin(),
-                               new Tile("C:/Users/Måns/Documents/GitHub/TSEA56Grupp2/GUI/Bilder/vag.png",
-                                           renderer_, 284+40*i, 101+40*j));
+                       new Tile(Tiles_plats,
+                                renderer_, 284+40*i, 101+40*j));
         }
-    Tile_vector.insert(Tile_vector.begin(), row);
+        Tile_vector.insert(Tile_vector.begin(), row);
     }
 }
 

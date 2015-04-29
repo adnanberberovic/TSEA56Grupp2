@@ -24,6 +24,7 @@ DWORD BytesWritten_ = 0; // how many bytes that were actually written
 DWORD BytesRead_ = 0; // how many bytes that were actually read
 char ReadBuff_[BUFFSIZE];
 char WriteBuff_[BUFFSIZE];
+int flag__ = 0;
 
 bool Command_flag = false;
 
@@ -103,7 +104,7 @@ void Read_ComData(){
 	}
 	cout << "\nReadbuff: ";
 
-	for (int i = 0; i < BytesRead_; i++)
+	for (uint8_t i = 0; i < BytesRead_; i++)
 	{
 		int c = ReadBuff_[i];
 		cout << c;
@@ -143,6 +144,27 @@ void Write_ComData(){
 	{
 		cin >> W_in;
 		cout << "Data written\n> ";
+	}
+}
+
+void Get_Sensor_values(int8_t arrTarget[], int size)
+{
+	uint8_t startSensor[1] = { 87 };
+	if (!WriteFile(hComm, startSensor, 1, &BytesWritten_, NULL)) // Send "get-sensor"
+	{
+		cerr << "Writing to file failed!\n";
+	}
+	if (!ReadFile(hComm, arrTarget, size, &BytesRead_, NULL)){
+		cerr << "Reading from file failed!\n";
+	}
+	if (BytesRead_ != size){
+		cerr << "Bytes read did not match arr size! :  " << BytesRead_ << "   " << (sizeof(arrTarget) / sizeof(arrTarget[0])) << endl;
+	}
+	//cout << "Bytes re1ad: " << BytesRead_ << "____" << static_cast<int>(arrTarget[0]) << static_cast<int>(arrTarget[1]) << static_cast<int>(arrTarget[2]) << static_cast<int>(arrTarget[3]) << endl;
+
+	if (!ReadFile(hComm, ReadBuff_, 1, &BytesRead_, NULL)) // rid of ninja 0
+	{
+		cerr << "Reading from file failed!\n";
 	}
 }
 

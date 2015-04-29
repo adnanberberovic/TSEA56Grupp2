@@ -72,10 +72,28 @@ private:
     Robot* Robot_Rotaton;
     Robot* Robot_Bana;
 
-    
-    
-    
     vector< vector<Tile*> > Tile_vector;
+    
+    //Platser Texturer
+    //Mac
+//    string Robot_plats = "/Users/Andreas/Skola/KP2/GUI/Bilder/Robot.png";
+//    string Tiles_plats = "/Users/Andreas/Skola/KP2/GUI/Bilder/vag.png";
+//    string Font = "/Users/Andreas/Library/Fonts/DS-DIGI.TTF";
+//    string SM_plats = "/Users/Andreas/Skola/KP2/GUI/Bilder/Hastighet.png";
+//    string BG_plats = "/Users/Andreas/Skola/KP2/GUI/Bilder/BG.png";
+    
+    
+    //Windows
+        string Robot_plats = "C:/Users/Måns/Documents/GitHub/TSEA56Grupp2/GUI/Bilder/Robot.png";
+    
+        string Tiles_plats = "C:/Users/Måns/Documents/GitHub/TSEA56Grupp2/GUI/Bilder/vag.png";
+    
+        string Font = "C:/Users/Måns/Documents/GitHub/TSEA56Grupp2/GUI/Bilder/ds_digital/DS-DIGI.TTF";
+    
+        string SM_plats = "C:/Users/Måns/Documents/GitHub/TSEA56Grupp2/GUI/Bilder/Hastighet.png";
+    
+        string BG_plats = "C:/Users/Måns/Documents/GitHub/TSEA56Grupp2/GUI/Bilder/BG.png";
+    
     
     
 public:

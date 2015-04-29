@@ -20,11 +20,10 @@ Manual::Manual(SetupSDL* sdl_lib)
     //SDL-init
     renderer_ = sdl_lib -> get_renderer();
     mainevent_ = sdl_lib -> get_event();
-	Init_CommPort("COM3"); //Initialize comport
-    //Konstuera Bakgrund
-    Bakgrund = new Unmoveable_Object("C:/Users/Måns/Documents/GitHub/TSEA56Grupp2/GUI/Bilder/Manual.png", renderer_, 0, 0);
-    Pil1 = new Moveable_Object("C:/Users/Måns/Documents/GitHub/TSEA56Grupp2/GUI/Bilder/Pil.png", renderer_, 300, 204);
-    Pil2 = new Moveable_Object("C:/Users/Måns/Documents/GitHub/TSEA56Grupp2/GUI/Bilder/Pil.png", renderer_, 300, 345);
+	init_text();
+    init_gfx_win();
+    //init_gfx_mac();
+
 }
 
 Manual::~Manual()
@@ -175,18 +174,19 @@ void Manual::event(string& statestring, bool& running)
 
 void Manual::update(string& statestring, bool& running)
 {
-    Set_Speed();
 
-		 
-	uint8_t arrSpeed[] = { 1, Speed_right, Speed_left , Dir_left, Dir_right, Klo}; // Make array to send with start-flag -1
-	if (!WriteFile(hComm, arrSpeed, (sizeof(arrSpeed)/sizeof(arrSpeed[0])), &BytesWritten_, NULL)) // Send array with speed values
+	Set_Speed();
+
+	uint8_t arrSpeed[] = { 1, Speed_right, Speed_left, Dir_left, Dir_right, Klo }; // Make array to send with start-flag -1
+	Get_Sensor_values(arrSensor, (sizeof(arrSensor) / sizeof(arrSensor[0])));
+	if (!WriteFile(hComm, arrSpeed, (sizeof(arrSpeed) / sizeof(arrSpeed[0])), &BytesWritten_, NULL)) // Send array with speed values
 	{
 		cerr << "Writing to file failed!\n";
 	}
 	SDL_Delay(10);
 
+	update_text(arrSensor[0], arrSensor[1], arrSensor[2], arrSensor[3], 0 /*arrSensor[0]*/, 0/* arrSensor[1]*/);
 }
-
 
 void Manual::render()
 {
@@ -196,12 +196,11 @@ void Manual::render()
     Bakgrund->render(renderer_);
     Pil1->render_Moveable(renderer_);
     Pil2->render_Moveable(renderer_);
-  
+	render_text();
 
     SDL_RenderPresent(renderer_);
     SDL_Delay(10);
 }
-
 
 void Manual::run(string& statestring) {
     
@@ -222,7 +221,6 @@ void Manual::run(string& statestring) {
     
     return;
 }
-
 
 void Manual::Set_Speed()
 {
@@ -296,7 +294,58 @@ void Manual::Set_Speed()
 
 }
 
+void Manual::init_gfx_win()
+{
+    
+    Init_CommPort("COM3"); //Initialize comport
+    //Konstuera Bakgrund
+    Bakgrund = new Unmoveable_Object("C:/Users/Måns/Documents/GitHub/TSEA56Grupp2/GUI/Bilder/Manual.png", renderer_, 0, 0);
+    Pil1 = new Moveable_Object("C:/Users/Måns/Documents/GitHub/TSEA56Grupp2/GUI/Bilder/Pil.png", renderer_, 300, 204);
+    Pil2 = new Moveable_Object("C:/Users/Måns/Documents/GitHub/TSEA56Grupp2/GUI/Bilder/Pil.png", renderer_, 300, 345);
+    
+}
 
+void Manual::init_gfx_mac()
+{
+
+    Bakgrund = new Unmoveable_Object(BG_plats.c_str(), renderer_, 0, 0);
+    Pil1 = new Moveable_Object(Pil_plats.c_str(), renderer_, 300, 204);
+    Pil2 = new Moveable_Object(Pil_plats.c_str(), renderer_, 300, 345);
+    
+}
+
+void Manual::init_text()
+{
+	Text_Angle_ = new Text(Font_.c_str(), "02", renderer_, 293, 420, 50, 50);
+	Text_Offset_ = new Text(Font_.c_str(), "02", renderer_, 293, 479, 50, 50);
+	Text_Reflex_ = new Text(Font_.c_str(), "02", renderer_, 293, 538, 50, 50);
+	Text_Front = new Text(Font_.c_str(), "02", renderer_, 293, 596, 50, 50);
+	Text_Clear_right_ = new Text(Font_.c_str(), "02", renderer_, 293, 655, 50, 50);
+	Text_Clear_left_ = new Text(Font_.c_str(), "02", renderer_, 293, 713, 50, 50);;
+
+}
+
+void Manual::render_text()
+{
+	Text_Angle_->render(renderer_);
+	Text_Offset_->render(renderer_);
+	Text_Reflex_->render(renderer_);
+	Text_Front->render(renderer_);
+	Text_Clear_right_->render(renderer_);
+	Text_Clear_left_->render(renderer_);
+}
+
+void Manual::update_text(int A, int O, int F, int R, int CR, int CL)
+{
+
+	Text_Angle_->Update_Texture(to_string(A), renderer_);
+	Text_Offset_->Update_Texture(to_string(O), renderer_);
+	Text_Reflex_->Update_Texture(to_string(R), renderer_);
+	Text_Front->Update_Texture(to_string(F), renderer_);
+	Text_Clear_right_->Update_Texture(to_string(CR), renderer_);
+	Text_Clear_left_->Update_Texture(to_string(CL), renderer_);
+
+}
 	
 
 
