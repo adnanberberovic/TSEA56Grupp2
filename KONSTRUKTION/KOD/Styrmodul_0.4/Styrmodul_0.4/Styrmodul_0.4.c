@@ -32,14 +32,15 @@ uint8_t arrSpeedout[] = {0,0,0}; //Speedleft, speedRight, dirleft/right
 // This timer will reset every time it reaches 10.
 uint8_t TIMER_overflows;
 // This timer will NOT reset every time it reaches 10.
-int16_t TIMER_wheel;
-// The following overflow storage corresponds to 131ms. This timer will never reset.
+int16_t TIMER_wheel, TIMER_gyro;
+	// The following overflow storage corresponds to 131ms. This timer will never reset.
 uint8_t TIMER_overflows_deci;
 // This variable is used to store robots angle in degrees
-int16_t rotation_angle = 0;
+float rotation_angle = 0.00;
 //KOntrollerar att flaggor sätts korekkt vi Manuell / Autonom loop
 int Manual_Flag = 0;
 
+int speed_var=125;
 // --------------------------------------------------------------------------------------
 
 // Setup data direction registers @ ports for out/inputs.
@@ -231,6 +232,7 @@ ISR(TIMER0_OVF_vect)
 {
 	TIMER_overflows++;
 	TIMER_wheel++;
+	TIMER_gyro++;
 	
 	if (TIMER_overflows >= 10)
 	{
@@ -339,30 +341,79 @@ int16_t Gyro_sequence()
 	Gyro_StartConversion();
 	result = Gyro_PollResult();
 	result = adcToAngularRate(result);
-// 	LCD_SetPosition(0);
-// 	LCD_display_int16(result);
-	_delay_ms(250);
 	return result;
 }
-// use only during rotation
-// in functions MOTOR_RotateRight(), MOTOR_RotateLeft()
-// stop rotating when 90 degrees reached; 
 
-void checkAngle90()
+// use in function MOTOR_RotateLeft()
+// delay untill 90 degrees reached;
+void checkLeftAngle90()
 {
-	int16_t result;
+	int16_t result=0, sum, start_time;
+	float interval, medel;
+	//int broms = 0;
+	
 	do {
-		result = Gyro_sequence();	// 315us
-		rotation_angle += result;
+		sum=0;
+		start_time = TIMER_gyro;
+		for (int i=1; i<21; i++)
+		{
+			result = Gyro_sequence();
+			if (result < 0) // ignore negative results
+			{
+				result = 0;
+				i--;
+			}
+			sum += result;
+			medel = sum / i;
+		} // zamnogo krutitsia - umenshit
+		interval = (float)(TIMER_gyro - start_time)/1100;
+		rotation_angle += medel*interval;
 		
-		// 		LCD_Clear();
-		// 		LCD_SetPosition(0);
-		// 		LCD_display_int16(rotation_angle);
+		// 		if ((speed_var > 100) & (rotation_angle > 40.00))
+		// 		{
+		// 			broms++;
+		// 			PWM_SetSpeedRight(speed_var*0.8);
+		// 			PWM_SetSpeedLeft(speed_var*0.8);
+		// 		}
 		
-	} while (abs(rotation_angle) < 230);
+	} while (rotation_angle < 90.00);
+	//LCD_display_int8(broms);
+	rotation_angle = 0.00; //reset
+}
+
+// use in function MOTOR_RotateRight()
+// delay untill 90 degrees reached;
+void checkRightAngle90()
+{
+	int16_t result=0, start_time, sum, medel;
+	float interval;
+	
+	do {
+		sum=0;
+		start_time = TIMER_gyro;
+		for (int i=1; i<21; i++)
+		{
+			result = Gyro_sequence();
+			if (result > 0) // ignore positive results
+			{
+				result = 0;
+				i--;
+			}
+			sum += result;
+			medel = sum / i;
+		}
+		interval = (float)(TIMER_gyro - start_time)/1200;
+		rotation_angle += medel*interval;
+		if (rotation_angle < -50.00)
+		{
+			PWM_SetSpeedRight(speed_var*0.9);
+			PWM_SetSpeedLeft(speed_var*0.9);
+		}
+	} while (rotation_angle > -90.00);
 	
 	rotation_angle = 0; //reset
 }
+
 //----------------------------GYRO----END-----------------------------
 uint16_t wheel_marker_counter = 0;
 uint16_t current_speed;
@@ -429,19 +480,19 @@ void MOTOR_Backward(int speed)
 }
 void MOTOR_RotateLeft()
 {
-	PWM_SetDirRight(0);
-	PWM_SetDirLeft(1);
-	PWM_SetSpeedLeft(100);
-	PWM_SetSpeedRight(100);
-	checkAngle90();
+	PWM_SetDirRight(1);
+	PWM_SetDirLeft(0);
+	PWM_SetSpeedLeft(speed_var);
+	PWM_SetSpeedRight(speed_var);
+	checkLeftAngle90();
 }
 void MOTOR_RotateRight()
 {
-	PWM_SetDirRight(1);
-	PWM_SetDirLeft(0);
-	PWM_SetSpeedRight(100);
-	PWM_SetSpeedLeft(100);
-	checkAngle90();
+	PWM_SetDirRight(0);
+	PWM_SetDirLeft(1);
+	PWM_SetSpeedRight(speed_var);
+	PWM_SetSpeedLeft(speed_var);
+	checkRightAngle90();
 }
 void MOTOR_Stop()
 {
@@ -458,13 +509,14 @@ void Drive_test()
 // 	{
 // 		_delay_ms(250);
 // 	}
-	MOTOR_RotateRight();
-	MOTOR_Stop();
-	
-	_delay_ms(5000);
+
+	_delay_ms(2000);
 	MOTOR_RotateLeft();
 	MOTOR_Stop();
-	_delay_ms(5000);
+	
+	_delay_ms(2000);
+	MOTOR_RotateLeft();
+	MOTOR_Stop();
 	
 // 	SERVO_SetGrip();
 // 	for(int i = 0; i <= 5; i++)
