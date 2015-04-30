@@ -325,8 +325,23 @@ int main(void)
 		MAP_decideDirection('a'); // Uses random
 		if (MAP_currentDir != MAP_nextDir)
 		{
-			/* Rotera lämpligt - Egen fas
-				-ändra currentDir*/
+			int delta_dir = MAP_nextDir - MAP_currentDir;
+			// Rotera lämpligt - Egen fas:
+			if (abs(delta_dir) == 2)
+			{
+				// rotera 180 grader ?t vilket h?ll som helst
+			}
+			else if ( (delta_dir == 1) | (delta_dir == -3) )
+			{
+				// rotera 90 grader ?t v?nster
+			}
+			else 
+			{
+				// rotera 90 grader ?t h?ger
+			}
+			
+			// ?ndra currentDir:
+			MAP_currentDir = MAP_nextDir;
 		}
 		// TODO ?k fram en ruta - Egen fas
 		MAP_travelledDist++;
@@ -334,7 +349,7 @@ int main(void)
 		if (!MAP_currentDir) {MAP_currentPos[1]++;} // drove right
 		else if (MAP_currentDir == 1) {MAP_currentPos[0]--;} // drove up
 		else if (MAP_currentDir == 2) {MAP_currentPos[1]--;} // drove left
-		else (MAP_currentDir == 3) {MAP_currentPos[0]++;} // drove down
+		else {MAP_currentPos[0]++;} // drove down
 		
 		MAP_setVisited();
 		
