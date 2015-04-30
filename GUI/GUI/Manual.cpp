@@ -7,14 +7,15 @@
 //
 
 #include "SetupSDL.h"
-#include "../../KONSTRUKTION/KOD/Datorvisualisering_/SDL2_BT_v0.1/SDL2_BT_v0.1/Bluetooth.h"
 #include "Manual.h"
 #include <iostream>
 #include <sstream>
+#include <windows.h>
+
 
 using namespace std;
 
-Manual::Manual(SetupSDL* sdl_lib)
+Manual::Manual(SetupSDL* sdl_lib, void* hComm_)
 {
  
     //SDL-init
@@ -22,6 +23,7 @@ Manual::Manual(SetupSDL* sdl_lib)
     mainevent_ = sdl_lib -> get_event();
 	init_text();
     init_gfx_win();
+	hComm = hComm_;
     //init_gfx_mac();
 
 }
@@ -32,7 +34,6 @@ Manual::~Manual()
 	delete Pil2;
     delete Bakgrund;
 
-	CloseHandle(hComm);
 	renderer_ = nullptr;
 }
 
@@ -173,9 +174,10 @@ void Manual::update(string& statestring, bool& running)
 {
 
 	Set_Speed();
-
+	DWORD BytesWritten_;
+	DWORD BytesRead_;
 	uint8_t arrSpeed[] = { 1, Speed_right, Speed_left, Dir_left, Dir_right, Klo }; // Make array to send with start-flag -1
-	Get_Sensor_values(arrSensor, (sizeof(arrSensor) / sizeof(arrSensor[0])));
+	Get_Sensor_values(arrSensor, (sizeof(arrSensor) / sizeof(arrSensor[0])), 87, hComm, &BytesRead_);
 	if (!WriteFile(hComm, arrSpeed, (sizeof(arrSpeed) / sizeof(arrSpeed[0])), &BytesWritten_, NULL)) // Send array with speed values
 	{
 		cerr << "Writing to file failed!\n";
@@ -297,7 +299,6 @@ void Manual::Set_Speed()
 void Manual::init_gfx_win()
 {
     
-    Init_CommPort("COM3"); //Initialize comport
     //Konstuera Bakgrund
     Bakgrund = new Unmoveable_Object("C:/Users/Måns/Documents/GitHub/TSEA56Grupp2/GUI/Bilder/Manual.png", renderer_, 0, 0);
     Pil1 = new Moveable_Object("C:/Users/Måns/Documents/GitHub/TSEA56Grupp2/GUI/Bilder/Pil.png", renderer_, 300, 204);
@@ -335,12 +336,12 @@ void Manual::render_text()
 	Text_Clear_left_->render(renderer_);
 }
 
-void Manual::update_text(int A, int O, int F, int R, int CR, int CL)
+void Manual::update_text(int A, int O, int F, int Re, int CR, int CL)
 {
 
 	Text_Angle_->Update_Texture(to_string(A), renderer_);
 	Text_Offset_->Update_Texture(to_string(O), renderer_);
-	Text_Reflex_->Update_Texture(to_string(R), renderer_);
+	Text_Reflex_->Update_Texture(to_string(Re), renderer_);
 	Text_Front->Update_Texture(to_string(F), renderer_);
 	Text_Clear_right_->Update_Texture(to_string(CR), renderer_);
 	Text_Clear_left_->Update_Texture(to_string(CL), renderer_);

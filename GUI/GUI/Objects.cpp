@@ -268,7 +268,8 @@ Robot::Robot(std::string file_texture,SDL_Renderer* renderer,int xPos, int yPos)
 
 void Robot::set_angle(int new_angle)
 {
-    angle_ = new_angle;
+	
+    angle_ = new_angle*(-1);
 }
 
 
@@ -329,6 +330,7 @@ void Robot::change_Rect(int x, int y)
 
 void Robot::change_offset(int offset){
     
+	offset = offset - 20;
     if(offset > 10)
         offset = 10;
     if(offset < -10)

@@ -17,19 +17,11 @@
 #include <SDL2_mixer/SDL_mixer.h>
 #endif
 
-#ifdef __linux__
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_image.h>
-#include <SDL2/SDL_ttf.h>
-#include <SDL2/SDL_mixer.h>
-#endif
-
-
 #include <SDL.h>
-#include <	SDL_image.h>
+#include <SDL_image.h>
 #include <SDL_ttf.h>
 #include <SDL_mixer.h>
-
+//#include "../../KONSTRUKTION/KOD/Datorvisualisering_/SDL2_BT_v0.1/SDL2_BT_v0.1/Bluetooth.h"
 
 #include <string>
 #include <vector>
@@ -50,7 +42,12 @@ private:
     SDL_Renderer* renderer_;
     SDL_Event* mainevent_;
     
+	HANDLE hComm;
     
+	int8_t arrSensor[4];
+	int8_t arrSpeed[3];
+
+
     int Event_xSpeed;
     int Event_ySpeed;
     
@@ -97,7 +94,7 @@ private:
     
     
 public:
-    Autonom(SetupSDL* sdl_lib);
+	Autonom(SetupSDL* sdl_lib, void*);
     ~Autonom();
     
     virtual void      event(string& statestring,bool& running) override;
@@ -120,8 +117,9 @@ public:
     void Change_left_speed();
     void Change_right_speed();
 	void Check_Mode(string&, bool&);
+	void update_texture(int, int, int, int, int);
 };
 
 
 
-#endif /* defined(__GUI__Autonomt__) */
+#endif __GUI__Autonomt__

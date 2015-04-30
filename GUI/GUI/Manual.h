@@ -29,7 +29,7 @@
 #include <SDL_image.h>
 #include <SDL_ttf.h>
 #include <SDL_mixer.h>
-
+//#include "../../KONSTRUKTION/KOD/Datorvisualisering_/SDL2_BT_v0.1/SDL2_BT_v0.1/Bluetooth.h"
 
 
 #include <string>
@@ -48,7 +48,7 @@ class Manual: public State
 
 public:
     
-    Manual(SetupSDL* sdl_lib);
+    Manual(SetupSDL* sdl_lib, void*);
     ~Manual();
     
     virtual void      event(string& statestring,bool& running) override;
@@ -67,6 +67,8 @@ private:
 
     SDL_Renderer* renderer_;
     SDL_Event* mainevent_;
+
+	HANDLE hComm;
 
     Unmoveable_Object* Bakgrund;
     Moveable_Object* Pil1;

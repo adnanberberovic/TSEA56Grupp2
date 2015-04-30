@@ -10,6 +10,7 @@
 #include "Autonomt.h"
 #include <iostream>
 #include <sstream>
+#include <windows.h>
 //#include <string.h>
 
 
@@ -17,13 +18,13 @@ using namespace std;
 
 
 //Konstruktor
-Autonom::Autonom(SetupSDL* sdl_lib)
+Autonom::Autonom(SetupSDL* sdl_lib, void* hComm_)
 {
     
     //SDL-init
     renderer_ = sdl_lib -> get_renderer();
     mainevent_ = sdl_lib -> get_event();
-    
+	hComm = hComm_;
     //Konstuera Bakgrund
     Bakgrund = new Unmoveable_Object(BG_plats.c_str(), renderer_, 0, 0);
     
@@ -155,16 +156,12 @@ void Autonom::event(string& statestring, bool& running)
 //Update
 void Autonom::update(string& statestring, bool& running)
 {
-    Text_Offset_->Update_Texture( (Robot_offset->get_Offset()) , renderer_);
-    Text_Angle_->Update_Texture(Robot_angle->get_Angle(), renderer_);
-	Get_Sensor_values(arrSensor, (sizeof(arrSensor) / sizeof(arrSensor[0])));
-	if (!WriteFile(hComm, arrSpeed, (sizeof(arrSpeed) / sizeof(arrSpeed[0])), &BytesWritten_, NULL)) // Send array with speed values
-	{
-		cerr << "Writing to file failed!\n";
-	}
+	DWORD BytesWritten_;
+	DWORD BytesRead_;
+	Get_Sensor_values(arrSensor, (sizeof(arrSensor) / sizeof(arrSensor[0])), 87, hComm, &BytesRead_);
+	Get_Sensor_values(arrSpeed, (sizeof(arrSpeed) / sizeof(arrSpeed[0])), 89, hComm, &BytesRead_);
 	SDL_Delay(10);
-
-	update_text(arrSensor[0], arrSensor[1], arrSensor[2], ((0x40 & arrSensor[3]) >> 6), (0x07 & arrSensor[3]) /*CR*/, ((0x38 & arrSensor[3]) >> 3)/*CL*/);
+	update_texture(arrSensor[0], arrSensor[1], ((0x40 & arrSensor[3]) >> 6), arrSpeed[0], arrSpeed[1]);
 }
 
 void Autonom::render()
@@ -206,7 +203,6 @@ const char* Autonom::Time_to_char(Uint32 ToPrint){
 }
 
 
-
 //Timer
 void Autonom::Start_Timer(){
     StartTime_ = SDL_GetTicks()/1000; //Starttid i sekunder
@@ -216,7 +212,6 @@ void Autonom::Start_Timer(){
 void Autonom::Update_Timer(){
     CurrTime_ = SDL_GetTicks()/1000 - StartTime_;
 }
-
 
 void Autonom::init_Tiles()
 {
@@ -311,8 +306,6 @@ void Autonom::Change_left_speed()
 
 }
 
-
-
 void Autonom::run(string& statestring) {
     Start_Timer();
     
@@ -346,4 +339,14 @@ void Autonom::Check_Mode(string &statestring, bool &running)
 		return;
 	}
 
+}
+
+void Autonom::update_texture(int A, int O, int Re, int L, int R)
+{
+	Text_Offset_->Update_Texture(to_string(O - 20), renderer_);
+	Text_Angle_->Update_Texture(to_string(A), renderer_);
+	Robot_angle->set_angle(A);
+	Robot_offset->change_offset(O);
+	Speed_left->Change_speed(L);
+	Speed_right->Change_speed(R);
 }

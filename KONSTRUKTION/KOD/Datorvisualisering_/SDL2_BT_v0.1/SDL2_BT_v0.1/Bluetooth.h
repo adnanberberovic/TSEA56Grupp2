@@ -1,5 +1,5 @@
-#ifndef __GUI__Bluetooth__
-#define __GUI__Bluetooth__
+#ifndef GUI__Bluetooth__
+#define GUI__Bluetooth__
 
 #include <iostream>
 #include <SDL.h>
@@ -14,23 +14,23 @@
 
 using namespace std;
 
-#define BUFFSIZE 10
-
-HANDLE hComm; //Handle for comport
-DCB dcbSerialParams = { 0 }; //dcb for comport
-COMMTIMEOUTS timeouts = { 0 }; //value for timeoutconfig
-
-DWORD BytesWritten_ = 0; // how many bytes that were actually written
-DWORD BytesRead_ = 0; // how many bytes that were actually read
-char ReadBuff_[BUFFSIZE];
-char WriteBuff_[BUFFSIZE];
-int flag__ = 0;
-
-bool Command_flag = false;
+//#define BUFFSIZE 10
+//
+//HANDLE hComm; //Handle for comport
+//DCB dcbSerialParams = { 0 }; //dcb for comport
+//COMMTIMEOUTS timeouts = { 0 }; //value for timeoutconfig
+//
+//DWORD BytesWritten_ = 0; // how many bytes that were actually written
+//DWORD BytesRead_ = 0; // how many bytes that were actually read
+//char ReadBuff_[BUFFSIZE];
+//char WriteBuff_[BUFFSIZE];
+//int flag__ = 0;
+//
+//bool Command_flag = false;
 
 
 //Initialize commport
-void Init_CommPort(string comport){
+HANDLE Init_CommPort(string comport){
 
 	hComm = CreateFile(
 		comport.c_str(),
@@ -70,9 +70,9 @@ void Init_CommPort(string comport){
 	if (!SetCommTimeouts(hComm, &timeouts))
 	{
 		printf("Error setting time-outs. %d");
-		return;
+		return 0;
 	}
-
+	return hComm;
 }
 
 //Initialize welcome
@@ -147,9 +147,9 @@ void Write_ComData(){
 	}
 }
 
-void Get_Sensor_values(int8_t arrTarget[], int size)
+void Get_Sensor_values(int8_t arrTarget[], int size, uint8_t startbit_)
 {
-	uint8_t startSensor[1] = { 87 };
+	uint8_t startSensor[1] = { startbit_ };
 	if (!WriteFile(hComm, startSensor, 1, &BytesWritten_, NULL)) // Send "get-sensor"
 	{
 		cerr << "Writing to file failed!\n";

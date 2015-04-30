@@ -10,6 +10,7 @@
 #define __GUI__State__
 
 #include <string>
+#include <Windows.h>
 
 class State
 {    
@@ -18,6 +19,7 @@ public:
 	virtual void      update(std::string& statestring, bool& running) = 0;
 	virtual void      render() = 0;
 	virtual void      run(std::string& statestring) = 0;
+	void Get_Sensor_values(int8_t*, int, uint8_t, void*, LPDWORD);
 };
 
 
