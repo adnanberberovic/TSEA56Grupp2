@@ -27,6 +27,7 @@
 // GLOBAL VARIABLES --------------------------------------------------------------------
 uint8_t arrSpeed[] = {0,0,1,1,0}; //speedLeft, SpeedRight, DirLeft, DirRight, grip
 int8_t arrSensor[] = {-1,0,0,0}; //sensor 0-3
+uint8_t arrSpeedout[] = {0,0,0}; //Speedleft, speedRight, dirleft/right
 // One overflow corresponds to 13.1 ms if the F_CPU is 20 MHz and the defined prescaler.
 // This timer will reset every time it reaches 10.
 uint8_t TIMER_overflows;
@@ -101,8 +102,6 @@ unsigned char SPI_MasterTransmit(uint8_t cData, char target)
 	return SPDR;
 }
 
-
-
 //----------------------------PWM------------------------------------
 
 void PWM_Init(void)
@@ -133,6 +132,7 @@ void PWM_SetSpeedRight(int speed)
 {
 	if (speed >= 0 && speed <= 255)
 	{
+		arrSpeedout[1] = (uint8_t)speed;
 		OCR2B = speed;
 	}
 }
@@ -140,12 +140,15 @@ void PWM_SetSpeedLeft(int speed)
 {
 	if (speed >= 0 && speed <= 255)
 	{
+		arrSpeedout[0] = (uint8_t)speed;
 		OCR2A = speed;
 	}
 }
 // 1 for forward, 0 for backward
 void PWM_SetDirLeft(int dir)
 {
+	arrSpeedout[2] &= 0b00000010;
+	arrSpeedout[2] += (uint8_t)dir;
 	if (dir == 1)
 	{
 		PORTD &= ~(1 << PORTD0);
@@ -158,6 +161,9 @@ void PWM_SetDirLeft(int dir)
 // 1 for forward, 0 for backward
 void PWM_SetDirRight(int dir)
 {
+	
+	arrSpeedout[2] &= 0b00000001;
+	arrSpeedout[2] += 2 * (uint8_t)dir;
 	if (dir == 0)
 	{
 		PORTD &= ~(1 << PORTD1);
@@ -168,8 +174,6 @@ void PWM_SetDirRight(int dir)
 	}
 }
 
-
-
 // Setup a timer. Used by the D regulator.
 void TIMER_init()
 {
@@ -179,7 +183,6 @@ void TIMER_init()
 }
 
 //----------------------------PWM----END-----------------------------
-
 
 void Get_sensor_values() //Load all sensor values into sensor-array
 {
@@ -215,6 +218,14 @@ void Get_speed_value()
 	arrSpeed[3] = SPI_MasterTransmit(0x00,'k'); //Get right dir
 	_delay_us(20);
 	arrSpeed[4] = SPI_MasterTransmit(0x00,'k'); //Get gripclaw
+}
+void Send_speed_value()
+{
+	SPI_MasterTransmit(254,'k');
+	for (int8_t i = 0; i < 3; i++)
+	{
+		SPI_MasterTransmit(arrSpeedout[i],'k');
+	}
 }
 ISR(TIMER0_OVF_vect)
 {
@@ -559,6 +570,13 @@ void manual_drive()
 	Send_sensor_values();
 }
 
+void autonom_get_send()
+{
+	Get_sensor_values();
+	Send_sensor_values();
+	Send_speed_value();
+}
+
 int main(void)
 {
 	init_all();
@@ -569,45 +587,26 @@ int main(void)
 	{
 	
 		_delay_ms(10);
+		LCD_Clear();
+		LCD_SetPosition(2);
+		LCD_SendString("AUTONOM_MODE");
 		while(AUTONOM_MODE)
 		{
-			Get_sensor_values();
-			Send_sensor_values();
-			LCD_Clear();
-			LCD_SetPosition(2);
-			LCD_SendString("AUTONOM_MODE");
-			_delay_ms(200);
+			autonom_get_send();
 			
 		}
 		
 		_delay_ms(10);
+		LCD_Clear();
+		LCD_SetPosition(2);
+		LCD_SendString("MANUAL_MODE");
 		while(MANUAL_MODE)
 		{
-			LCD_Clear();
-			LCD_SetPosition(2);
-			LCD_SendString("MANUAL_MODE");
 			manual_drive();
-			_delay_ms(200);
-			
 		}
-		//Drive_test();
-// 		Get_sensor_values();
-// 		
-// 		LCD_SetPosition(0);
-// 		LCD_display_int8(arrSensor[0]);
-// 		LCD_SetPosition(8);
-// 		LCD_display_int8(arrSensor[1]);
-// 		LCD_SetPosition(16);
-// 		LCD_display_int8(arrSensor[2]);
-// 		LCD_SetPosition(24);
-// 		LCD_display_int8(arrSensor[3]);
-// 		//
-// 		Send_sensor_values();
-// 		manual_drive();
-		//Drive_test();
-		//Gyro_test();
-		//Drive_test();
-		//Speed_test();
+		
+		PWM_SetSpeedLeft(0);
+		PWM_SetSpeedRight(0);
 	}
 	
 }

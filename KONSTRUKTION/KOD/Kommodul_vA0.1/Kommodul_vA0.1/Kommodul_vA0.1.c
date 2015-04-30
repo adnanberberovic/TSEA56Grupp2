@@ -44,6 +44,7 @@ volatile uint8_t BT_sent_flag = 0;
 
 
 uint8_t arrSpeed[5] = {0,0,1,1,0}; //Array with current speed (Left right), direction (1 = forward, 0 = backward) and claw. From/to PC/master left
+uint8_t arrSpeedout[3] = {10, 10, 1}; //Speed left, speed right, dirleft & right
 uint8_t incomingSpeed_ = 0;
 
 uint8_t sendFlag = 0;
@@ -52,10 +53,12 @@ int8_t arrSensor[] = {9,8,7,6};
 	
 uint8_t sensorFlag_ = 0;
 uint8_t speedFlag_ = 0;
+uint8_t speedoutFlag_ = 0;
 uint8_t counter_ = 0;
 
 uint8_t BTsensorFlag_ = 0;
 uint8_t BTspeedFlag_ = 0;
+uint8_t BTspeedoutFlag_ = 0;
 uint8_t BTcounter_ = 0;
 //*********** BUFFER STRUCT ****************
 
@@ -121,7 +124,6 @@ void BT_init(void)
 	 * UCSZ01:0 = 1, char size = 8
 	 */
 }
-
 void add_node(buffer_** lst_head, uint8_t val)
 {
 	if (*lst_head == 0)
@@ -143,7 +145,6 @@ void add_node(buffer_** lst_head, uint8_t val)
 	curr->next->next = 0; // Add node last.
 
 }
-
 void Write_Buffer(char *buffer, char data, volatile uint8_t *position)
 {
 	if ((*position) == (BuffSize - 2)) // If end of buffer restart from first pos, done with read.
@@ -155,14 +156,12 @@ void Write_Buffer(char *buffer, char data, volatile uint8_t *position)
 	(*position)++;
 	
 }
-
 char Read_Buffer(char *buffer, volatile uint8_t *pos_read)
 {
 	char data = buffer[(*pos_read)]; //return next value in queue
 	(*pos_read)++;
 	return data;
 }
-
 uint8_t pop_node(buffer_ ** lst_head)
 {
 	buffer_* next_node = NULL;
@@ -180,13 +179,11 @@ uint8_t pop_node(buffer_ ** lst_head)
 	return retval;
 	
 }
-
 void BT_send(uint8_t val)
 {
 	add_node(&head_BTout, val);
 	UCSR0B |= (1<<UDRIE0); // activate interrupt
 }
-
 void flush_list(buffer_ ** lst_head)
 {
 	if (*lst_head == NULL)
@@ -203,7 +200,6 @@ void flush_list(buffer_ ** lst_head)
 	}
 	free(curr_node);
 }
-
 void send_BT_buffer(uint8_t buffer[], int size)
 {
 	flush_list(&head_BTout);
@@ -225,20 +221,27 @@ void BT_StartBitCheck(uint8_t in_)
 		case 1:
 		BTspeedFlag_ = 1;
 		BTsensorFlag_ = 0;
+		BTspeedoutFlag_ = 0;
 		BTcounter_ = 0;
 		break;
 		
 		case 87:
+		BTspeedoutFlag_ = 0;
 		BTsensorFlag_ = 1;
 		BTspeedFlag_ = 0;
 		break;
+		
+		case 89:
+		BTspeedoutFlag_ = 1;
+		BTsensorFlag_ = 0;
+		BTspeedFlag_ = 0;
 	}
 }
 // Receive complete - triggered by interrupt
 ISR(USART0_RX_vect) 
 {
 	uint8_t data = UDR0;
-	if (((BTspeedFlag_ == 0) && (BTsensorFlag_ == 0)) && ((data == 1) || (data == 87)) ) //First time check if it's starbit
+	if ((BTspeedFlag_ == 0) && (BTsensorFlag_ == 0) && (BTspeedoutFlag_ == 0)) //First time check if it's starbit
 	{
 		BT_StartBitCheck(data);
 	}
@@ -258,6 +261,11 @@ ISR(USART0_RX_vect)
 		send_BT_buffer(arrSensor, (sizeof(arrSensor)/sizeof(arrSensor[0])));
 		BTsensorFlag_ = 0;
 	}
+	if(BTspeedoutFlag_ == 1)
+	{
+		send_BT_buffer(arrSpeedout, (sizeof(arrSpeedout)/sizeof(arrSpeedout[0])));
+		BTspeedoutFlag_ = 0;
+	}
 	
 	
 }
@@ -276,7 +284,6 @@ ISR(USART0_UDRE_vect)
 
 void send_SPI_buffer(char *buffer)
 {
-	
 	memset(outSPDR, '\0', BuffSize);
 	strncpy(outSPDR, buffer, BuffSize); //Copy what to send into outSPDR
 	(*posBuff_SPIout) = 0; // start reading from beginning
@@ -284,12 +291,10 @@ void send_SPI_buffer(char *buffer)
 	while(((ongoing_SPI_transfer == 1) && !(outSPDR[(*posBuff_SPIout)] == '\0'))); //Wait until entire buffer is sent.
 	
 }
-
 void SPI_send(uint8_t tosend)
 {
 	add_node(&head_SPIout, tosend); //Add node with tosend-value to desired list
 }
-
 void SPI_send_arr(uint8_t tosend[], int size) // lenght of array = sizeof(array)/sizeof(element in array)
 {
 	int i = 0;
@@ -299,24 +304,33 @@ void SPI_send_arr(uint8_t tosend[], int size) // lenght of array = sizeof(array)
 		i++;
 	}
 }
-
 void SPI_StartBitCheck(uint8_t in_)
 {
 	switch (in_){
 		
 		case 1: 
 		speedFlag_ = 1;
+		speedoutFlag_ = 0;
 		sensorFlag_ = 0;
 		counter_ = 0;
 		break;
 		
 		case 255: 
 		sensorFlag_ = 1;
+		speedoutFlag_ = 0;
 		speedFlag_ = 0;
 		counter_ = 0;
 		break; 
 		
+		case 254:
+		speedoutFlag_ = 1;
+		sensorFlag_ = 0;
+		speedFlag_ = 0;
+		counter_ = 0;
+		break;
+		
 		default: 
+		speedoutFlag_ = 0;
 		sensorFlag_ = 0;
 		speedFlag_ = 0;
 		counter_ = 0;
@@ -327,11 +341,8 @@ ISR(SPI_STC_vect)
 {
 	uint8_t data = SPDR;
 	
-	if ( (speedFlag_ == 0) && (sensorFlag_ == 0) ){
+	if ( (speedFlag_ == 0) && (sensorFlag_ == 0) && (speedoutFlag_ == 0)){
 		SPI_StartBitCheck(data);
-		//if (sensorFlag_ == 1){
-			//return; //first bit is not interesting
-		//}
 	}
 	
 	else if (sensorFlag_ == 1){
@@ -342,7 +353,14 @@ ISR(SPI_STC_vect)
 				sensorFlag_ = 0;
 		}
 	}
-	
+	else if (speedoutFlag_ == 1){
+		arrSpeedout[counter_] = data; //Load into correct pos of array 0-3
+		counter_++;
+		if (counter_ == (sizeof(arrSpeedout)/sizeof(arrSpeedout[0])) ){  //all values in.
+			counter_ = 0;
+			speedoutFlag_ = 0;
+		}
+	}
 	
 	// Speed is to be sent.
 	if (speedFlag_ == 1){
