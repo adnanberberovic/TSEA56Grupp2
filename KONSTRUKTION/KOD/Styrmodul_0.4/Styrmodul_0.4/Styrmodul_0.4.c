@@ -365,7 +365,7 @@ void checkLeftAngle90()
 			}
 			sum += result;
 			medel = sum / i;
-		} // zamnogo krutitsia - umenshit
+		}
 		interval = (float)(TIMER_gyro - start_time)/1100;
 		rotation_angle += medel*interval;
 		
