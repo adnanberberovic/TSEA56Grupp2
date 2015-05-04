@@ -111,7 +111,7 @@ int8_t offset_generator(int angle, int back, int front)
 	int hyp;
 	int cath;
 	
-	hyp = (front + back)/2 + 80; //100 är avståndet mellan sensorerna
+	hyp = (front + back)/2 + 160/2; //160 är avståndet mellan sensorerna
 	cath = hyp * cos(angle*M_PI/180);
 	
 	return (int8_t)(cath/10);

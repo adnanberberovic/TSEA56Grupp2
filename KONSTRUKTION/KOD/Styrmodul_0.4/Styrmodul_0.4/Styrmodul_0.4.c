@@ -33,6 +33,7 @@ uint8_t arrSpeedout[] = {0,0,0}; //Speedleft, speedRight, dirleft/right
 uint8_t TIMER_overflows;
 // This timer will NOT reset every time it reaches 10.
 int16_t TIMER_wheel, TIMER_gyro;
+int16_t TIMER_PD = 0;
 	// The following overflow storage corresponds to 131ms. This timer will never reset.
 uint8_t TIMER_overflows_deci;
 // This variable is used to store robots angle in degrees
@@ -40,7 +41,7 @@ float rotation_angle = 0.00;
 //KOntrollerar att flaggor sätts korekkt vi Manuell / Autonom loop
 int Manual_Flag = 0;
 
-int speed_var=125;
+int speed_var=200;
 // --------------------------------------------------------------------------------------
 
 // Setup data direction registers @ ports for out/inputs.
@@ -48,10 +49,9 @@ void Styr_InitPortDirections(void)
 {
 	DDRA = 1<<DDA0 | 1<<DDA1 | 1<<DDA2 | 1<<DDA3 | 1<<DDA4 | 1<<DDA5 | 1<<DDA6 | 1<<DDA7;
 	DDRB = 1<<DDB0 | 1<<DDB1 | 1<<DDB2 | 1<<DDB3 | 1<<DDB4 | 1<<DDB5 | 1<<DDB7;
-	DDRC = 1<<DDC0;
+	DDRC = 1<<DDC0 | 1<<DDC7; 
 	DDRD = 1<<DDD0 | 1<<DDD1 | 0<<DDD2 | 0<<DDD3 | 1<<DDD4 | 1<<DDD5 | 1<<DDD6 | 1<<DDD7;
 	DDRD &= ~(1 << DDD3);
-	//D2 ingеng fцr reflexsensor
 	// 0 = input
 	// 1 = output
 }
@@ -233,6 +233,7 @@ ISR(TIMER0_OVF_vect)
 	TIMER_overflows++;
 	TIMER_wheel++;
 	TIMER_gyro++;
+	TIMER_PD++;
 	
 	if (TIMER_overflows >= 10)
 	{
@@ -346,70 +347,88 @@ int16_t Gyro_sequence()
 
 // use in function MOTOR_RotateLeft()
 // delay untill 90 degrees reached;
-void checkLeftAngle90()
+void checkLeftAngle(float target_angle)
 {
-	int16_t result=0, sum, start_time;
+	int16_t result=0, start_time, sum;
 	float interval, medel;
-	//int broms = 0;
-	
+	int speed_var_local = speed_var;
 	do {
 		sum=0;
-		start_time = TIMER_gyro;
-		for (int i=1; i<21; i++)
+		//start_time = TIMER_gyro;
+		TIMER_gyro = 0; // ** starta om tiden
+		
+		for (int i=0; i<20; i++)  //for (int i=1; i<21; i++) 
 		{
 			result = Gyro_sequence();
-			if (result < 0) // ignore negative results
-			{
-				result = 0;
-				i--;
-			}
+			//if (result > 0) // ignore positive results
+			//{
+				//result = 0;
+				//i--;
+			//}
 			sum += result;
-			medel = sum / i;
+			//medel = sum / i; // *****  Läggas utanför för att undvika float-fel? *****
 		}
-		interval = (float)(TIMER_gyro - start_time)/1100;
+		
+		medel = sum / 20;
+		interval = (float)(TIMER_gyro)/1220.7; //(float)(TIMER_gyro - start_time)/1200;
 		rotation_angle += medel*interval;
-		
-		// 		if ((speed_var > 100) & (rotation_angle > 40.00))
-		// 		{
-		// 			broms++;
-		// 			PWM_SetSpeedRight(speed_var*0.8);
-		// 			PWM_SetSpeedLeft(speed_var*0.8);
-		// 		}
-		
-	} while (rotation_angle < 90.00);
-	//LCD_display_int8(broms);
+		if ((rotation_angle > ((target_angle - 60)*(255/speed_var))) && (speed_var_local > 70))
+		{
+			speed_var_local = speed_var_local * 0.95; //** eller liknande, för att minska hastigheten gradvis när den närmar sig färdig
+			PWM_SetSpeedLeft(speed_var_local);
+			PWM_SetSpeedRight(speed_var_local);
+		}
+	}while (rotation_angle < (target_angle - 2));
 	rotation_angle = 0.00; //reset
+	//TIMER_gyro = 0;
+	//for (int i=0; i<100; i++)
+	//{
+		//result = Gyro_sequence();
+		//sum += result;
+	//}
+	//medel = sum / 100;
+	//interval = (float)(TIMER_gyro)/1220.7; //(float)(TIMER_gyro - start_time)/1200;
+	//rotation_angle += medel*interval;
+	//LCD_Clear();
+	//LCD_SetPosition(0);
+	//LCD_display_int16((int16_t)rotation_angle);
+
 }
 
 // use in function MOTOR_RotateRight()
 // delay untill 90 degrees reached;
-void checkRightAngle90()
+void checkRightAngle(float target_angle)
 {
-	int16_t result=0, start_time, sum, medel;
-	float interval;
-	
+	int16_t result=0, start_time, sum;
+	float interval, medel;
+	int speed_var_local = speed_var;
 	do {
 		sum=0;
-		start_time = TIMER_gyro;
-		for (int i=1; i<21; i++)
+		//start_time = TIMER_gyro;
+		TIMER_gyro = 0; // ** starta om tiden
+		
+		for (int i=0; i<20; i++)  //for (int i=1; i<21; i++) 
 		{
 			result = Gyro_sequence();
-			if (result > 0) // ignore positive results
-			{
-				result = 0;
-				i--;
-			}
+			//if (result > 0) // ignore positive results
+			//{
+				//result = 0;
+				//i--;
+			//}
 			sum += result;
-			medel = sum / i;
+			//medel = sum / i; // *****  Läggas utanför för att undvika float-fel? *****
 		}
-		interval = (float)(TIMER_gyro - start_time)/1200;
+		
+		medel = sum / 20;
+		interval = (float)(TIMER_gyro)/1220.7; //(float)(TIMER_gyro - start_time)/1200;
 		rotation_angle += medel*interval;
-		if (rotation_angle < -50.00)
+		if ((rotation_angle < (-(target_angle - 60)*(255/speed_var))) && (speed_var_local > 70))
 		{
-			PWM_SetSpeedRight(speed_var*0.9);
-			PWM_SetSpeedLeft(speed_var*0.9);
+			speed_var_local = speed_var_local * 0.95; //** eller liknande, för att minska hastigheten gradvis när den närmar sig färdig
+			PWM_SetSpeedLeft(speed_var_local);
+			PWM_SetSpeedRight(speed_var_local);
 		}
-	} while (rotation_angle > -90.00);
+	} while (rotation_angle > -(target_angle - 6)); // -6 due to delay from stop of loop until wheels stop and slideing
 	
 	rotation_angle = 0; //reset
 }
@@ -430,6 +449,8 @@ void Speed_Interrupt_Init()
 
 ISR(INT0_vect)
 {
+//Kontrollerar schmitt-resistorn via PC7 (=pin 29)
+//Pinne 26 är för övrigt dåligt virad!!
 	cli();
 	LCD_SetPosition(24);
 	LCD_display_uint16(wheel_marker_counter);
@@ -478,28 +499,31 @@ void MOTOR_Backward(int speed)
 	PWM_SetSpeedLeft(speed);
 	PWM_SetSpeedRight(speed);
 }
-void MOTOR_RotateLeft()
-{
-	PWM_SetDirRight(1);
-	PWM_SetDirLeft(0);
-	PWM_SetSpeedLeft(speed_var);
-	PWM_SetSpeedRight(speed_var);
-	checkLeftAngle90();
-}
-void MOTOR_RotateRight()
-{
-	PWM_SetDirRight(0);
-	PWM_SetDirLeft(1);
-	PWM_SetSpeedRight(speed_var);
-	PWM_SetSpeedLeft(speed_var);
-	checkRightAngle90();
-}
+
 void MOTOR_Stop()
 {
 	PWM_SetSpeedRight(0);
 	PWM_SetSpeedLeft(0);
 }
 //--MOTOR stop
+void MOTOR_RotateLeft(float angle)
+{
+	PWM_SetDirRight(1);
+	PWM_SetDirLeft(0);
+	PWM_SetSpeedLeft(speed_var);
+	PWM_SetSpeedRight(speed_var);
+	checkLeftAngle(angle);
+	MOTOR_Stop();
+}
+void MOTOR_RotateRight(float angle)
+{
+	PWM_SetDirRight(0);
+	PWM_SetDirLeft(1);
+	PWM_SetSpeedRight(speed_var);
+	PWM_SetSpeedLeft(speed_var);
+	checkRightAngle(angle);
+	MOTOR_Stop();
+}
 
 void Drive_test()
 {
@@ -510,13 +534,13 @@ void Drive_test()
 // 		_delay_ms(250);
 // 	}
 
-	_delay_ms(2000);
-	MOTOR_RotateLeft();
-	MOTOR_Stop();
-	
-	_delay_ms(2000);
-	MOTOR_RotateLeft();
-	MOTOR_Stop();
+	//_delay_ms(2000);
+	//MOTOR_RotateLeft();
+	//MOTOR_Stop();
+	//
+	//_delay_ms(2000);
+	//MOTOR_RotateLeft();
+	//MOTOR_Stop();
 	
 // 	SERVO_SetGrip();
 // 	for(int i = 0; i <= 5; i++)
@@ -614,36 +638,206 @@ void autonom_get_send()
 	Send_speed_value();
 }
 
+void autonom_manula_loop()
+{
+	while (1) {
+			_delay_ms(10);
+			LCD_Clear();
+			LCD_SetPosition(2);
+			LCD_SendString("AUTONOM_MODE");
+			while(AUTONOM_MODE)
+			{
+				autonom_get_send();
+			
+			}
+		
+			_delay_ms(10);
+			LCD_Clear();
+			LCD_SetPosition(2);
+			LCD_SendString("MANUAL_MODE");
+			while(MANUAL_MODE)
+			{
+				manual_drive();
+			}
+		
+			PWM_SetSpeedLeft(0);
+			PWM_SetSpeedRight(0);
+	}	
+}
+
+//____________________________________PD CONTROL_________________________________________
+
+// Y = PD*G/(1+PD*G) * R
+
+// Reference value = 0
+// Error value e = r-y.
+// We want to regulate the robot to drive in the middle of the corridor,
+// So the reference value r should correspond to 20 cm.
+
+int reference_ = 20;// Reference value for where we want to place the robot.
+int offset_;		// Compared to reference.
+int current_error_;	// Current error
+int prev_error_ = 0;// Used to compare the errors when computing the "derivative".
+int time_diff_;		// Useful for comparing time, used for the "derivative".
+int time_new_ = 0;	// Useful for comparing time, used for the "derivative".
+int prev_time_ = 0;	// Useful for comparing time, used for the "derivative".
+int angle_;			// The angle of the robot with respect to the corridor.
+int K_d = 1;		// K (constant) for D regulation.
+int K_p = 5;		// K (proportion) for P regulation.
+char control_mode = 'r';	/*if control_mode == r, then the robot will make a rapid angle
+							/ change in angle to steer itself towards the middle lane.
+							/ if control_mode == c, then the robot will carefully
+							/ steer itself in a forward direction within the middle lane.
+							/ The middle lane is around 4 cm wide according to us.
+							*/
+// P-control function
+int P_Control()
+{
+	int newSignal_P = K_p*(current_error_); // Calculate regulated value
+	return newSignal_P;
+}
+// D-control function
+int D_control()
+{
+	time_new_ = TIMER_PD; // Retrieve the current time
+	int newSignal_D = 0;
+	time_diff_ = time_new_ - prev_time_;
+	newSignal_D = K_d*(current_error_ - prev_error_)/time_diff_;
+	
+	if(prev_error_ != current_error_)
+	{
+	prev_error_ = current_error_; // Save the current error for next computation
+	prev_time_ = time_new_; // Save the current time for next use
+	}
+	return newSignal_D;
+	
+}
+// Total control.
+int PD_Control()
+{
+	int newSignal;
+	if(control_mode == 'r')
+	{
+		current_error_ = reference_ - offset_;
+		if (angle_ != 0)
+		{
+			newSignal = /*abs(angle_)**/(P_Control()+D_control());
+		}
+		else newSignal = P_Control()+D_control();
+		
+	}
+	else if(control_mode == 'c')
+	{
+		current_error_ = angle_;
+		newSignal = P_Control() + D_control();
+// 		if(angle_>0)
+// 		{	
+// 			newSignal = -newSignal;
+// 		}
+	}
+	else
+	{
+		current_error_ = 0;
+		newSignal = 0;
+	}
+	return newSignal;
+}
+// Call this function to perform automatic control.
+void PD_All()
+{
+	//TIMER_PD = 0;
+	Get_sensor_values();
+	angle_ = arrSensor[0];
+	offset_ = arrSensor[1];
+	if(abs(offset_-20) <= 2)
+	{
+		control_mode = 'c';		
+		LCD_SetPosition(8);
+		LCD_SendString("Mode: c");
+	}
+	else
+	{
+		control_mode = 'r';
+		LCD_SetPosition(8);
+		LCD_SendString("Mode: r");
+	}
+	int speed__ = PD_Control();
+	LCD_SendString("   ");
+	PWM_SetSpeedRight(100 /*OCR2B*/ + speed__);
+	PWM_SetSpeedLeft(100 /*OCR2A*/ - speed__);
+}
+//____________________________________PD CONTROL END______________________________________
+
 int main(void)
 {
 	init_all();
-	//Gyro_test();
-	while (1) {
-		Drive_test();
-	}
-	
-		_delay_ms(10);
-		LCD_Clear();
-		LCD_SetPosition(2);
-		LCD_SendString("AUTONOM_MODE");
-		while(AUTONOM_MODE)
-		{
-			autonom_get_send();
-			
-		}
-		
-		_delay_ms(10);
-		LCD_Clear();
-		LCD_SetPosition(2);
-		LCD_SendString("MANUAL_MODE");
-		while(MANUAL_MODE)
-		{
-			manual_drive();
-		}
-		
-		PWM_SetSpeedLeft(0);
-		PWM_SetSpeedRight(0);
-	}
+ 
+//   	while (1)
+//   	{
+//    		SERVO_LevelHigh();
+//    		_delay_ms(250);
+//    		_delay_ms(250);
+//    		_delay_ms(250);
+//   		_delay_ms(250);
+//   		
+//   		SERVO_SetGrip();
+// 		_delay_ms(250);	
+//   		_delay_ms(250);
+//   		_delay_ms(250);
+//   		_delay_ms(250);
+// 
+//   		SERVO_LevelLow();
+//  		_delay_ms(250);
+//    		_delay_ms(250);
+//    		_delay_ms(250);
+//    		_delay_ms(250);
+//    		
+//  		SERVO_ReleaseGrip();
+//  		_delay_ms(250);
+//    		_delay_ms(250);
+//    		_delay_ms(250);
+//    		_delay_ms(250);
+//   		
+//   	}
+
+  	while (1) {
+  		_delay_ms(10);
+  		LCD_Clear();
+  		LCD_SetPosition(2);
+  		LCD_SendString("AUTONOM_MODE");
+  		PWM_SetDirRight(1);
+  		PWM_SetDirLeft(1);
+  		PWM_SetSpeedLeft(80);
+  		PWM_SetSpeedRight(80);
+  LCD_Clear();
+  		while(AUTONOM_MODE)
+  		{
+  			PD_All();
+  			LCD_SetPosition(0);
+  			LCD_display_uint8(OCR2B);
+  			LCD_SendString("  ");
+  			LCD_SetPosition(16);
+  			LCD_display_uint8(OCR2A);
+  			LCD_SendString("  ");
+  			LCD_SetPosition(24);
+  			LCD_display_int8(angle_);
+  			LCD_SendString("  ");
+  			_delay_ms(100);
+  		}
+  		
+  		_delay_ms(10);
+  		LCD_Clear();
+  		LCD_SetPosition(2);
+  		LCD_SendString("MANUAL_MODE");
+  		while(MANUAL_MODE)
+  		{
+  			manual_drive();
+  		}
+  		
+  		PWM_SetSpeedLeft(0);
+  		PWM_SetSpeedRight(0);
+  	}
+}
 
 	
-}
+
