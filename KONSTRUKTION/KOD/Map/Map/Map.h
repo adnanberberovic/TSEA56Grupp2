@@ -3,7 +3,7 @@
 
 // Variables
 unsigned int MAP_unexploredSquares = 0;
-unsigned int MAP_currentPos[2] = {16, 15}; // NOTE: (y,x) base!!!!!! NOT (x,y)!
+unsigned int MAP_currentPos[2] = {15, 15}; // NOTE: (y,x) base!!!!!! NOT (x,y)!
 unsigned int MAP_currentDir = 1; // 0 = Right, 1 = Up, 2 = Left, 3 = Down 
 unsigned int MAP_goalPosition[2]; // The (y,x) pos of the goal
 unsigned int MAP_nextDir = 1; // Tells which direction we should face before moving forward again
@@ -13,6 +13,8 @@ unsigned int MAP_travelledDist = 0; // Number of squares travelled from the prev
 unsigned int MAP_lastJunctionDir = 0; // Direction out of the last junction
 unsigned int MAP_nextJunctionShort = 0; // The immediate next desired junction
 unsigned int MAP_nextJunctionLong = 0; // The long-term desired junction
+
+FILE *fp;
 
 // Structs
 struct MAP_square
@@ -61,7 +63,7 @@ void MAP_decideDestination();
 void MAP_addJunction();
 void MAP_addJunctionDist(int);
 void MAP_addJunctionDir(int, int, int);
-int MAP_lastUnexJunction();
+int MAP_lastUnexJunction(int);
 void MAP_rotate();
 void MAP_moveForward();
 int MAP_getDirection(int, int);
