@@ -1,8 +1,6 @@
 ﻿/*
- * pwmpls.c
- *
- * Created: 4/13/2015 12:39:10 PM
- *  Author: robop806
+ * Styrmodul_0.4.c
+ * Author: TSEA56 Grupp 2
  */ 
 
 #define F_CPU 20000000UL
@@ -349,7 +347,7 @@ int16_t Gyro_sequence()
 // delay untill 90 degrees reached;
 void checkLeftAngle(float target_angle)
 {
-	int16_t result=0, start_time, sum;
+	int16_t result=0, sum;
 	float interval, medel;
 	int speed_var_local = speed_var;
 	do {
@@ -399,7 +397,7 @@ void checkLeftAngle(float target_angle)
 // delay untill 90 degrees reached;
 void checkRightAngle(float target_angle)
 {
-	int16_t result=0, start_time, sum;
+	int16_t result=0, sum;
 	float interval, medel;
 	int speed_var_local = speed_var;
 	do {
@@ -434,6 +432,8 @@ void checkRightAngle(float target_angle)
 }
 
 //----------------------------GYRO----END-----------------------------
+
+//__________________________SPEEDOMETER_______________________________
 uint16_t wheel_marker_counter = 0;
 uint16_t current_speed;
 uint16_t wheel_circumference = 4*100*79; //Wheel circumference is 79 mm.
@@ -483,6 +483,7 @@ ISR(INT0_vect)
 	//EIMSK |= 1<INT0;
 	sei();
 }
+//__________________________SPEEDOMETER END____________________________
 
 //--MOTOR start
 void MOTOR_Forward(int speed)
@@ -500,12 +501,14 @@ void MOTOR_Backward(int speed)
 	PWM_SetSpeedRight(speed);
 }
 
+//--MOTOR stop
 void MOTOR_Stop()
 {
 	PWM_SetSpeedRight(0);
 	PWM_SetSpeedLeft(0);
 }
-//--MOTOR stop
+
+//--MOTOR rotate
 void MOTOR_RotateLeft(float angle)
 {
 	PWM_SetDirRight(1);
@@ -525,95 +528,8 @@ void MOTOR_RotateRight(float angle)
 	MOTOR_Stop();
 }
 
-void Drive_test()
-{
-	//MOTOR_Forward(80);
-// 	SERVO_LevelHigh();
-// 	for(int i = 0; i <= 15; i++)
-// 	{
-// 		_delay_ms(250);
-// 	}
-
-	//_delay_ms(2000);
-	//MOTOR_RotateLeft();
-	//MOTOR_Stop();
-	//
-	//_delay_ms(2000);
-	//MOTOR_RotateLeft();
-	//MOTOR_Stop();
-	
-// 	SERVO_SetGrip();
-// 	for(int i = 0; i <= 5; i++)
-// 	{
-// 		_delay_ms(250);
-// 	}
-// 	SERVO_LevelMid();
-// 	MOTOR_Backward(80);
-// 	for(int i = 0; i <= 15; i++)
-// 	{
-// 		_delay_ms(250);
-// 	}
-// 	SERVO_ReleaseGrip();
-// 	MOTOR_RotateLeft();
-// 	MOTOR_Stop();
-// 	for(int i = 0; i <= 5; i++)
-// 	{
-// 		_delay_ms(250);
-// 	}
-// 	SERVO_LevelLow();
-// 	MOTOR_Backward(80);
-// 	for(int i = 0; i <= 32; i++)
-// 	{
-// 		_delay_ms(250);
-// 	}
-// 	SERVO_LevelMid();
-// 	SERVO_SetGrip();
-// 	MOTOR_Stop();
-// 	for(int i = 0; i <= 5; i++)
-// 	{
-// 		_delay_ms(250);
-// 	}
-// 	SERVO_ReleaseGrip();
-}
-void Gyro_test()
-{	
-	//checkAngle90();
-	int16_t result;
- 	while (1)
- 	{
- 		result = Gyro_sequence();		
-		rotation_angle += result;
-		LCD_Clear();
-		LCD_SetPosition(0);
-		LCD_display_int16(result);
-		_delay_ms(100);
- 	}
-	return;
-}
-void Speed_test()
-{
-	MOTOR_Forward(80);
-	LCD_Clear();
-	LCD_SetPosition(0);
-	LCD_SendString("v: ");
-	LCD_SetPosition(6);
-	LCD_display_uint16(current_speed);
-}
-void init_all()
-{
-	sleep_enable();	// Enable sleep instruction
-	Styr_InitPortDirections();	// Initiate Port directions for the styrmodul.
-	Styr_InitPortValues();	// Initiate Port Values for the styrmodul.
-	SPI_MasterInit();	// Initiate the styrmodul as the SPI master.
-	LCD_Init(); // Initiate the LCD.
-	PWM_Init(); // Initiate PWM for motor
-	TIMER_init(); // Initiate Timer settings
-	LCD_WelcomeScreen(); // Welcomes the user with a nice message ;^)
-	Gyro_Init();
-	//Speed_Interrupt_Init(); ****************************************** KOMMENTERA IN, MEN FUNGERAR EJ ATT MANUELLSTYRA DÅ *****************************************
-	sei();	// Enable global interrupts
-}
-void manual_drive()
+//--Called to enable manual driving.
+void MANUAL_DRIVE()
 {
 	Get_speed_value();
 	Get_sensor_values();
@@ -631,6 +547,7 @@ void manual_drive()
 	Send_sensor_values();
 }
 
+// ????
 void autonom_get_send()
 {
 	Get_sensor_values();
@@ -638,6 +555,7 @@ void autonom_get_send()
 	Send_speed_value();
 }
 
+// ????
 void autonom_manula_loop()
 {
 	while (1) {
@@ -657,13 +575,24 @@ void autonom_manula_loop()
 			LCD_SendString("MANUAL_MODE");
 			while(MANUAL_MODE)
 			{
-				manual_drive();
+				MANUAL_DRIVE();
 			}
 		
 			PWM_SetSpeedLeft(0);
 			PWM_SetSpeedRight(0);
 	}	
 }
+
+//________________________________REFLEX SENSOR______________________________
+
+char REFLEX_GetMarker()
+{
+	Get_sensor_values();
+	int marker_ = ((arrSensor[3] >> 6) & (0b00000001));
+	return marker_;
+}
+
+//______________________________REFLEX SENSOR END____________________________
 
 //________________________________AUTOMATIC CONTROL_____________________________________
 
@@ -683,7 +612,7 @@ int time_new_ = 0;	// Useful for comparing time, used for the "derivative".
 int prev_time_ = 0;	// Useful for comparing time, used for the "derivative".
 int angle_;			// The angle of the robot with respect to the corridor.
 int K_d = 1;		// K (constant) for D regulation.
-int K_p = 5;		// K (proportion) for P regulation.
+int K_p = 1;		// K (proportion) for P regulation.
 int8_t front_sensor__;	// Stores the value of the front sensor.
 int standard_speed_ = 100;	// Keeps track of standard speed.
 char control_mode = 'r';	/*if control_mode == r, then the robot will make a rapid angle
@@ -711,7 +640,7 @@ int D_control()
 		prev_error_ = current_error_; // Save the current error for next computation
 		prev_time_ = time_new_; // Save the current time for next use
 	}
-	return newSignal_D;
+	return newSignal_D;   
 	
 }
 // Total control.
@@ -751,10 +680,6 @@ int PD_Control()
 			current_error_ = -angle_;	
 		}
 		newSignal = P_Control() + D_control();
-// 		if(angle_>0)
-// 		{	
-// 			newSignal = -newSignal;
-// 		}
 	}
 	else
 	{
@@ -766,7 +691,7 @@ int PD_Control()
 // Call this function to perform automatic control.
 void PD_AutomaticControl()
 {
-	//TIMER_PD = 0;
+	TIMER_PD = 0;
 	Get_sensor_values();
 	angle_ = arrSensor[0];
 	offset_ = arrSensor[1];
@@ -817,9 +742,26 @@ void PD_AutomaticControl()
 }
 //________________________________AUTOMATIC CONTROL END_____________________________________
 
+
+// This method is very important to call at the start of the program.
+void INIT_ALL()
+{
+	sleep_enable();	// Enable sleep instruction
+	Styr_InitPortDirections();	// Initiate Port directions for the styrmodul.
+	Styr_InitPortValues();	// Initiate Port Values for the styrmodul.
+	SPI_MasterInit();	// Initiate the styrmodul as the SPI master.
+	LCD_Init(); // Initiate the LCD.
+	PWM_Init(); // Initiate PWM for motor
+	TIMER_init(); // Initiate Timer settings
+	LCD_WelcomeScreen(); // Welcomes the user with a nice message ;^)
+	Gyro_Init();
+	//Speed_Interrupt_Init(); //KOMMENTERA IN, MEN FUNGERAR EJ ATT MANUELLSTYRA DÅ 
+	sei();	// Enable global interrupts
+}
+
 int main(void)
 {
-	init_all();
+	INIT_ALL();
 
   	while (1) {
   		_delay_ms(10);
@@ -844,9 +786,17 @@ int main(void)
   			LCD_display_int8(angle_);
   			LCD_SendString("  ");
 			LCD_SetPosition(28);
-			LCD_display_int8(front_sensor__);
+			LCD_display_int8(REFLEX_GetMarker());
   			LCD_SendString("  ");
   			_delay_ms(100);
+			if(REFLEX_GetMarker())
+			{
+				MOTOR_RotateLeft(360);
+				_delay_ms(250);
+				_delay_ms(250);
+				_delay_ms(250);
+				_delay_ms(250);
+			}
   		}
   		
   		_delay_ms(10);
@@ -855,7 +805,7 @@ int main(void)
   		LCD_SendString("MANUAL_MODE");
   		while(MANUAL_MODE)
   		{
-  			manual_drive();
+  			MANUAL_DRIVE();
   		}
   		
   		PWM_SetSpeedLeft(0);
