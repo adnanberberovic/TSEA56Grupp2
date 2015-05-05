@@ -665,7 +665,7 @@ void autonom_manula_loop()
 	}	
 }
 
-//____________________________________PD CONTROL_________________________________________
+//________________________________AUTOMATIC CONTROL_____________________________________
 
 // Y = PD*G/(1+PD*G) * R
 
@@ -684,6 +684,8 @@ int prev_time_ = 0;	// Useful for comparing time, used for the "derivative".
 int angle_;			// The angle of the robot with respect to the corridor.
 int K_d = 1;		// K (constant) for D regulation.
 int K_p = 5;		// K (proportion) for P regulation.
+int8_t front_sensor__;	// Stores the value of the front sensor.
+int standard_speed_ = 100;	// Keeps track of standard speed.
 char control_mode = 'r';	/*if control_mode == r, then the robot will make a rapid angle
 							/ change in angle to steer itself towards the middle lane.
 							/ if control_mode == c, then the robot will carefully
@@ -706,8 +708,8 @@ int D_control()
 	
 	if(prev_error_ != current_error_)
 	{
-	prev_error_ = current_error_; // Save the current error for next computation
-	prev_time_ = time_new_; // Save the current time for next use
+		prev_error_ = current_error_; // Save the current error for next computation
+		prev_time_ = time_new_; // Save the current time for next use
 	}
 	return newSignal_D;
 	
@@ -718,17 +720,36 @@ int PD_Control()
 	int newSignal;
 	if(control_mode == 'r')
 	{
+		standard_speed_ = 80;
+		K_p = 5;
+		K_d = 4;
 		current_error_ = reference_ - offset_;
-		if (angle_ != 0)
+		if(offset_-20 > 0)
 		{
-			newSignal = /*abs(angle_)**/(P_Control()+D_control());
+			newSignal = P_Control()+D_control()+angle_;
 		}
-		else newSignal = P_Control()+D_control();
-		
+		else
+		{
+			newSignal = P_Control()+D_control()-angle_;	
+		}
+		if(angle_ > 1)
+		{
+			newSignal=0;
+		}
 	}
 	else if(control_mode == 'c')
 	{
-		current_error_ = angle_;
+		standard_speed_ = 100;
+		K_p = 4;
+		K_d = 3;
+		if(offset_-20 > 0)
+		{
+			current_error_ = angle_;
+		}
+		else
+		{
+			current_error_ = -angle_;	
+		}
 		newSignal = P_Control() + D_control();
 // 		if(angle_>0)
 // 		{	
@@ -743,15 +764,36 @@ int PD_Control()
 	return newSignal;
 }
 // Call this function to perform automatic control.
-void PD_All()
+void PD_AutomaticControl()
 {
 	//TIMER_PD = 0;
 	Get_sensor_values();
 	angle_ = arrSensor[0];
 	offset_ = arrSensor[1];
+	front_sensor__ = arrSensor[2];
+	if((front_sensor__ <= 18) && (front_sensor__ > 3))
+	{
+		LCD_Clear();
+  		LCD_SetPosition(2);
+  		LCD_SendString("FRONT STOPP");
+		LCD_SetPosition(28);
+		LCD_display_int8(front_sensor__);
+  		LCD_SendString("  ");
+		MOTOR_Stop();
+		_delay_ms(250);
+		MOTOR_RotateLeft(180);
+		_delay_ms(250);
+		_delay_ms(250);
+		_delay_ms(250);
+		_delay_ms(250);
+		_delay_ms(250);
+		_delay_ms(250);
+		MOTOR_Forward(standard_speed_);
+	}
+	
 	if(abs(offset_-20) <= 2)
 	{
-		control_mode = 'c';		
+		control_mode = 'c';
 		LCD_SetPosition(8);
 		LCD_SendString("Mode: c");
 	}
@@ -761,44 +803,23 @@ void PD_All()
 		LCD_SetPosition(8);
 		LCD_SendString("Mode: r");
 	}
-	int speed__ = PD_Control();
+	int new_speed_ = PD_Control();
 	LCD_SendString("   ");
-	PWM_SetSpeedRight(100 /*OCR2B*/ + speed__);
-	PWM_SetSpeedLeft(100 /*OCR2A*/ - speed__);
+	if(new_speed_ > 120)
+	{
+		MOTOR_Stop();
+	}
+	else
+	{
+		PWM_SetSpeedRight(standard_speed_ + new_speed_);
+		PWM_SetSpeedLeft(standard_speed_ - new_speed_);		
+	}
 }
-//____________________________________PD CONTROL END______________________________________
+//________________________________AUTOMATIC CONTROL END_____________________________________
 
 int main(void)
 {
 	init_all();
- 
-//   	while (1)
-//   	{
-//    		SERVO_LevelHigh();
-//    		_delay_ms(250);
-//    		_delay_ms(250);
-//    		_delay_ms(250);
-//   		_delay_ms(250);
-//   		
-//   		SERVO_SetGrip();
-// 		_delay_ms(250);	
-//   		_delay_ms(250);
-//   		_delay_ms(250);
-//   		_delay_ms(250);
-// 
-//   		SERVO_LevelLow();
-//  		_delay_ms(250);
-//    		_delay_ms(250);
-//    		_delay_ms(250);
-//    		_delay_ms(250);
-//    		
-//  		SERVO_ReleaseGrip();
-//  		_delay_ms(250);
-//    		_delay_ms(250);
-//    		_delay_ms(250);
-//    		_delay_ms(250);
-//   		
-//   	}
 
   	while (1) {
   		_delay_ms(10);
@@ -809,10 +830,10 @@ int main(void)
   		PWM_SetDirLeft(1);
   		PWM_SetSpeedLeft(80);
   		PWM_SetSpeedRight(80);
-  LCD_Clear();
+		LCD_Clear();
   		while(AUTONOM_MODE)
   		{
-  			PD_All();
+  			PD_AutomaticControl();
   			LCD_SetPosition(0);
   			LCD_display_uint8(OCR2B);
   			LCD_SendString("  ");
@@ -821,6 +842,9 @@ int main(void)
   			LCD_SendString("  ");
   			LCD_SetPosition(24);
   			LCD_display_int8(angle_);
+  			LCD_SendString("  ");
+			LCD_SetPosition(28);
+			LCD_display_int8(front_sensor__);
   			LCD_SendString("  ");
   			_delay_ms(100);
   		}
