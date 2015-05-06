@@ -16,6 +16,7 @@
 #include <string.h>
 #include "Styrmodul_LCD.c"
 #include "Styrmodul_Servo.c"
+//#include "Map.h"
 //#include <avr/pgmspace.h>
 
 #define AUTONOM_MODE (((PIND) & (1<<PIND3)) >> 3)
@@ -36,7 +37,7 @@ int16_t TIMER_PD = 0;
 uint8_t TIMER_overflows_deci;
 // This variable is used to store robots angle in degrees
 float rotation_angle = 0.00;
-//KOntrollerar att flaggor sätts korekkt vi Manuell / Autonom loop
+// Checks if flags are correctly set in manual/auto loop.
 int Manual_Flag = 0;
 
 int speed_var=200;
@@ -583,16 +584,31 @@ void autonom_manula_loop()
 	}	
 }
 
-//________________________________REFLEX SENSOR______________________________
+//_______________________REFLEX SENSOR AND WALL COUNTER_____________________________
 
 char REFLEX_GetMarker()
 {
 	Get_sensor_values();
-	int marker_ = ((arrSensor[3] >> 6) & (0b00000001));
+	int8_t marker_ = ((arrSensor[3] >> 6) & (0b00000001));
 	return marker_;
 }
 
-//______________________________REFLEX SENSOR END____________________________
+int8_t WALLCOUNT_Left()
+{
+	Get_sensor_values();
+	int8_t walls_ = ((arrSensor[3] >> 3) & (0b000000111));
+	return walls_;
+}
+
+int8_t WALLCOUNT_Right()
+{
+	Get_sensor_values();
+	int8_t walls_ = (arrSensor[3] & (0b00000111));
+	return walls_;
+}
+
+
+//_____________________REFLEX SENSOR AND WALL COUNTER END____________________________
 
 //________________________________AUTOMATIC CONTROL_____________________________________
 
@@ -613,7 +629,6 @@ int prev_time_ = 0;	// Useful for comparing time, used for the "derivative".
 int angle_;			// The angle of the robot with respect to the corridor.
 int K_d = 1;		// K (constant) for D regulation.
 int K_p = 1;		// K (proportion) for P regulation.
-int8_t front_sensor__;	// Stores the value of the front sensor.
 int standard_speed_ = 100;	// Keeps track of standard speed.
 char control_mode = 'r';	/*if control_mode == r, then the robot will make a rapid angle
 							/ change in angle to steer itself towards the middle lane.
@@ -621,6 +636,8 @@ char control_mode = 'r';	/*if control_mode == r, then the robot will make a rapi
 							/ steer itself in a forward direction within the middle lane.
 							/ The middle lane is around 4 cm wide according to us.
 							*/
+int8_t front_sensor__;	// Stores the value of the front sensor.
+
 // P-control function
 int P_Control()
 {
@@ -689,32 +706,33 @@ int PD_Control()
 	return newSignal;
 }
 // Call this function to perform automatic control.
-void PD_AutomaticControl()
+void DeadEnd()
+{	
+	if(	(front_sensor__ <= 18) && (front_sensor__ > 3) &&
+	(WALLCOUNT_Right()==0) && (WALLCOUNT_Left()==0))
+	{
+		LCD_Clear();
+		LCD_SetPosition(2);
+		LCD_SendString("FRONT STOPP");
+		LCD_SetPosition(28);
+		LCD_display_int8(front_sensor__);
+		LCD_SendString("  ");
+		MOTOR_Stop();
+		_delay_ms(250);
+		MOTOR_RotateLeft(180);
+		_delay_ms(250);
+		MOTOR_Forward(standard_speed_);
+	}
+}
+void AutomaticControl()
 {
 	TIMER_PD = 0;
 	Get_sensor_values();
 	angle_ = arrSensor[0];
 	offset_ = arrSensor[1];
 	front_sensor__ = arrSensor[2];
-	if((front_sensor__ <= 18) && (front_sensor__ > 3))
-	{
-		LCD_Clear();
-  		LCD_SetPosition(2);
-  		LCD_SendString("FRONT STOPP");
-		LCD_SetPosition(28);
-		LCD_display_int8(front_sensor__);
-  		LCD_SendString("  ");
-		MOTOR_Stop();
-		_delay_ms(250);
-		MOTOR_RotateLeft(180);
-		_delay_ms(250);
-		_delay_ms(250);
-		_delay_ms(250);
-		_delay_ms(250);
-		_delay_ms(250);
-		_delay_ms(250);
-		MOTOR_Forward(standard_speed_);
-	}
+	
+	DeadEnd();
 	
 	if(abs(offset_-20) <= 2)
 	{
@@ -775,7 +793,7 @@ int main(void)
 		LCD_Clear();
   		while(AUTONOM_MODE)
   		{
-  			PD_AutomaticControl();
+  			AutomaticControl();
   			LCD_SetPosition(0);
   			LCD_display_uint8(OCR2B);
   			LCD_SendString("  ");

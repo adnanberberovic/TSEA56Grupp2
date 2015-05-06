@@ -137,9 +137,9 @@ void LCD_SendString(char *text)
 
 void LCD_WelcomeScreen(void)
 {
-	LCD_SendString("    ResQ.Pl    ");
+	LCD_SendString("     ResQ.Pl    ");
 	LCD_SetRow(2);
-	LCD_SendString("  Master Race  ");
+	LCD_SendString("   Master Race  ");
 }
 
 // Display an unsigned 8 bit value as up to three decimal characters
