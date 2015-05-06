@@ -714,7 +714,8 @@ int PD_Control()
 	}
 	return newSignal;
 }
-// Call this function to perform automatic control.
+
+// Performs a 180 degree turn in the event of a dead end.
 void DEAD_END()
 {	
 	LCD_Clear();
@@ -730,6 +731,7 @@ void DEAD_END()
 	MOTOR_Forward(standard_speed_);
 }
 
+// Stops and rotates left 90 degrees.
 void TURN_Right()
 {
 		MOTOR_Stop();
@@ -739,6 +741,7 @@ void TURN_Right()
 		MOTOR_Forward(standard_speed_);	
 }
 
+// Stops and rotates right 90 degrees.
 void TURN_Left()
 {
 		MOTOR_Stop();
@@ -767,6 +770,9 @@ void DISCOVERY_SetRandom()
 		discovery_mode = 'f';
 	}
 }
+
+// One of the following three methods are called in the event of a 
+// three way junction described by the ASCII art above each method.
 /*  |
   ->--- ONE is used in junctions of this type.
 */
@@ -832,6 +838,7 @@ void JUNCTION_ThreeWayTHREE()
 	}
 }
 
+// Called in the event of a four way junction.
 void JUNCTION_FourWay()
 {
 	if(discovery_mode == 'r')
@@ -856,6 +863,7 @@ void JUNCTION_FourWay()
 	}
 }
 
+// Call this function to perform automatic control.
 void AutomaticControl()
 {
 	TIMER_PD = 0;
@@ -938,11 +946,11 @@ void INIT_ALL()
 	Styr_InitPortDirections();	// Initiate Port directions for the styrmodul.
 	Styr_InitPortValues();	// Initiate Port Values for the styrmodul.
 	SPI_MasterInit();	// Initiate the styrmodul as the SPI master.
-	LCD_Init(); // Initiate the LCD.
-	PWM_Init(); // Initiate PWM for motor
-	TIMER_init(); // Initiate Timer settings
-	LCD_WelcomeScreen(); // Welcomes the user with a nice message ;^)
-	Gyro_Init();
+	LCD_Init();	// Initiate the LCD.
+	PWM_Init();	// Initiate PWM for motor
+	TIMER_init();	// Initiate Timer settings
+	LCD_WelcomeScreen();	// Welcomes the user with a nice message ;^)
+	Gyro_Init();	// Initiate gyro settings
 	//Speed_Interrupt_Init(); //KOMMENTERA IN, MEN FUNGERAR EJ ATT MANUELLSTYRA DÅ 
 	sei();	// Enable global interrupts
 }
@@ -995,6 +1003,3 @@ int main(void)
   		PWM_SetSpeedRight(0);
   	}
 }
-
-	
-
