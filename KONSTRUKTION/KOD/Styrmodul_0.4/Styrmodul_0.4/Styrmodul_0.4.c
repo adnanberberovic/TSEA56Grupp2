@@ -607,7 +607,6 @@ int8_t WALLCOUNT_Right()
 	return walls_;
 }
 
-
 //_____________________REFLEX SENSOR AND WALL COUNTER END____________________________
 
 //________________________________AUTOMATIC CONTROL_____________________________________
@@ -631,12 +630,22 @@ int K_d = 1;		// K (constant) for D regulation.
 int K_p = 1;		// K (proportion) for P regulation.
 int standard_speed_ = 100;	// Keeps track of standard speed.
 char control_mode = 'r';	/*if control_mode == r, then the robot will make a rapid angle
-							/ change in angle to steer itself towards the middle lane.
-							/ if control_mode == c, then the robot will carefully
-							/ steer itself in a forward direction within the middle lane.
-							/ The middle lane is around 4 cm wide according to us.
+							 change in angle to steer itself towards the middle lane.
+							 if control_mode == c, then the robot will carefully
+							 steer itself in a forward direction within the middle lane.
+							 The middle lane is around 4 cm wide according to us.
 							*/
 int8_t front_sensor__;	// Stores the value of the front sensor.
+char discovery_mode = 'r';	/*if discovery_mode == r, then the robot will follow the 
+							"right hand on the wall" rule, i.e. always make right turns
+							whenever possible in junctions.
+							for discovery_mode == l, the same goes as above but left 
+							instead of right.
+							for discovery_mode == f, the robot will just keep moving
+							forward.
+							if discovery_mode == ?, then the robot will take a random
+							path through a junction.
+							*/
 
 // P-control function
 int P_Control()
@@ -706,24 +715,147 @@ int PD_Control()
 	return newSignal;
 }
 // Call this function to perform automatic control.
-void DeadEnd()
+void DEAD_END()
 {	
-	if(	(front_sensor__ <= 18) && (front_sensor__ > 3) &&
-	(WALLCOUNT_Right()==0) && (WALLCOUNT_Left()==0))
-	{
-		LCD_Clear();
-		LCD_SetPosition(2);
-		LCD_SendString("FRONT STOPP");
-		LCD_SetPosition(28);
-		LCD_display_int8(front_sensor__);
-		LCD_SendString("  ");
+	LCD_Clear();
+	LCD_SetPosition(2);
+	LCD_SendString("DEAD END");
+	LCD_SetPosition(28);
+	LCD_display_int8(front_sensor__);
+	LCD_SendString("  ");
+	MOTOR_Stop();
+	_delay_ms(200);
+	MOTOR_RotateLeft(180);
+	_delay_ms(200);
+	MOTOR_Forward(standard_speed_);
+}
+
+void TURN_Right()
+{
 		MOTOR_Stop();
-		_delay_ms(250);
-		MOTOR_RotateLeft(180);
-		_delay_ms(250);
+		_delay_ms(200);
+		MOTOR_RotateRight(90);
+		_delay_ms(200);
+		MOTOR_Forward(standard_speed_);	
+}
+
+void TURN_Left()
+{
+		MOTOR_Stop();
+		_delay_ms(200);
+		MOTOR_RotateLeft(90);
+		_delay_ms(200);
 		MOTOR_Forward(standard_speed_);
+}
+
+// Sets a random discovery mode to actually decide which way to go.
+// Remember to reset the discovery mode back to '?' after calling this
+// function and deciding on a turn.
+void DISCOVERY_SetRandom()
+{
+	uint8_t random_mode = rand() % 3;
+	if (random_mode == 0)
+	{
+		discovery_mode = 'r';
+	}
+	if (random_mode == 1)
+	{
+		discovery_mode = 'l';
+	}
+	else
+	{
+		discovery_mode = 'f';
 	}
 }
+/*  |
+  ->--- ONE is used in junctions of this type.
+*/
+void JUNCTION_ThreeWayONE()
+{
+	if ((discovery_mode == 'r') || (discovery_mode == 'f'))
+	{
+		// Keep going forward
+	}
+	else if (discovery_mode == 'l')
+	{
+		// Turn left
+		TURN_Left();
+	}
+	else if (discovery_mode == '?')
+	{
+		DISCOVERY_SetRandom();
+		JUNCTION_ThreeWayONE();
+		discovery_mode = '?';
+	}
+}
+/*  v
+  ----- TWO is used in junctions of this type.
+*/
+void JUNCTION_ThreeWayTWO()
+{
+	if ((discovery_mode == 'l') || (discovery_mode == 'f'))
+	{
+		// Turn Left. Forward becomes left due to right-forward-left cycle.
+		TURN_Left();
+	}
+	else if (discovery_mode == 'r')
+	{
+		// Turn right
+		TURN_Right();
+	}
+	else if (discovery_mode == '?')
+	{
+		DISCOVERY_SetRandom();
+		JUNCTION_ThreeWayTWO();
+		discovery_mode = '?';
+	}
+}
+/*  |
+  ---<- THREE is used in junctions of this type.
+*/
+void JUNCTION_ThreeWayTHREE()
+{
+	if ((discovery_mode == 'l') || (discovery_mode == 'f'))
+	{
+		// Keep going forward
+	}
+	else if (discovery_mode == 'r')
+	{
+		// Turn left
+		TURN_Right();
+	}
+	else if (discovery_mode == '?')
+	{
+		DISCOVERY_SetRandom();
+		JUNCTION_ThreeWayTHREE();
+		discovery_mode = '?';
+	}
+}
+
+void JUNCTION_FourWay()
+{
+	if(discovery_mode == 'r')
+	{
+		//turn right
+		TURN_Right();
+	}
+	else if(discovery_mode == 'l')
+	{
+		//turn left
+		TURN_Left();
+	}
+	else if(discovery_mode == 'f')
+	{
+		//keep going forward
+	}
+	else if(discovery_mode == '?')
+	{
+		DISCOVERY_SetRandom();
+		JUNCTION_FourWay();
+		discovery_mode = '?';
+	}
+}
+
 void AutomaticControl()
 {
 	TIMER_PD = 0;
@@ -732,14 +864,51 @@ void AutomaticControl()
 	offset_ = arrSensor[1];
 	front_sensor__ = arrSensor[2];
 	
-	DeadEnd();
+	// Junction, turn, and dead end handling.
+	if(	(WALLCOUNT_Right()==0) && (WALLCOUNT_Left()==0) &&
+		(front_sensor__ <= 18) && (front_sensor__ > 3))
+		{
+			DEAD_END();
+		}		
+	else if((WALLCOUNT_Left() > 0) && (WALLCOUNT_Right() > 0) &&
+			!((front_sensor__ <= 18) && (front_sensor__ > 3)))
+		{
+			JUNCTION_FourWay();
+		}		
+	else if((WALLCOUNT_Right() > 0) && (WALLCOUNT_Left() == 0) &&
+			(front_sensor__ <= 18) && (front_sensor__ > 3))
+		{
+			TURN_Right();
+		}
+	else if((WALLCOUNT_Right() == 0) && (WALLCOUNT_Left() > 0) &&
+			(front_sensor__ <= 18) && (front_sensor__ > 3))
+		{
+			TURN_Left();
+		}
+	else if((WALLCOUNT_Right() == 0) && (WALLCOUNT_Left() > 0) &&
+			!((front_sensor__ <= 18) && (front_sensor__ > 3)))
+		{
+			JUNCTION_ThreeWayONE();
+		}
+	else if((WALLCOUNT_Right() > 0) && (WALLCOUNT_Left() > 0) &&
+			(front_sensor__ <= 18) && (front_sensor__ > 3))
+		{
+			JUNCTION_ThreeWayTWO();
+		}
+	else if((WALLCOUNT_Right() > 0) && (WALLCOUNT_Left() == 0) &&
+			!((front_sensor__ <= 18) && (front_sensor__ > 3)))
+		{
+			JUNCTION_ThreeWayTHREE();
+		}
 	
+	// Puts the automatic control in careful mode, keep the robot on track.
 	if(abs(offset_-20) <= 2)
 	{
 		control_mode = 'c';
 		LCD_SetPosition(8);
 		LCD_SendString("Mode: c");
 	}
+	// Puts the automatic control in rapid mode, push the robot to the middle lane.
 	else
 	{
 		control_mode = 'r';
@@ -748,7 +917,8 @@ void AutomaticControl()
 	}
 	int new_speed_ = PD_Control();
 	LCD_SendString("   ");
-	if(new_speed_ > 120)
+	// Makes sure that the motors don't burn out (i.e go on max velocity)
+	if(new_speed_ > (254-standard_speed_))
 	{
 		MOTOR_Stop();
 	}
@@ -785,11 +955,12 @@ int main(void)
   		_delay_ms(10);
   		LCD_Clear();
   		LCD_SetPosition(2);
-  		LCD_SendString("AUTONOM_MODE");
+  		LCD_SendString("AUTOMATIC_MODE");
   		PWM_SetDirRight(1);
   		PWM_SetDirLeft(1);
   		PWM_SetSpeedLeft(80);
   		PWM_SetSpeedRight(80);
+		MOTOR_Stop();
 		LCD_Clear();
   		while(AUTONOM_MODE)
   		{
@@ -804,17 +975,11 @@ int main(void)
   			LCD_display_int8(angle_);
   			LCD_SendString("  ");
 			LCD_SetPosition(28);
-			LCD_display_int8(REFLEX_GetMarker());
+			LCD_display_int8(WALLCOUNT_Right());
   			LCD_SendString("  ");
+			LCD_display_int8(WALLCOUNT_Left());
+			
   			_delay_ms(100);
-			if(REFLEX_GetMarker())
-			{
-				MOTOR_RotateLeft(360);
-				_delay_ms(250);
-				_delay_ms(250);
-				_delay_ms(250);
-				_delay_ms(250);
-			}
   		}
   		
   		_delay_ms(10);
