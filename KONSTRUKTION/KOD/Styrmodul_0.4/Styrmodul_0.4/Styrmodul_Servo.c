@@ -36,7 +36,7 @@ void SERVO_SetSpeedGrip(int speed)
 
 void SERVO_SetGrip()
 {
-	OCR1B = 42;
+	OCR1B = 44; //Öka för att greppa bättre! Vågar inte skicka in för stora värden.
 }
 
 void SERVO_ReleaseGrip()
