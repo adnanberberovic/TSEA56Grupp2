@@ -1,8 +1,6 @@
 ﻿/*
- * pwmpls.c
- *
- * Created: 4/13/2015 12:39:10 PM
- *  Author: robop806
+ * Styrmodul_0.4.c
+ * Author: TSEA56 Grupp 2
  */ 
 
 #define F_CPU 20000000UL
@@ -18,6 +16,7 @@
 #include <string.h>
 #include "Styrmodul_LCD.c"
 #include "Styrmodul_Servo.c"
+//#include "Map.h"
 //#include <avr/pgmspace.h>
 
 #define AUTONOM_MODE (((PIND) & (1<<PIND3)) >> 3)
@@ -28,20 +27,20 @@
 uint8_t arrSpeed[] = {0,0,1,1,0}; //speedLeft, SpeedRight, DirLeft, DirRight, grip
 int8_t arrSensor[] = {-1,0,0,0}; //sensor 0-3
 uint8_t arrSpeedout[] = {0,0,0}; //Speedleft, speedRight, dirleft/right
-	
 // One overflow corresponds to 13.1 ms if the F_CPU is 20 MHz and the defined prescaler.
 // This timer will reset every time it reaches 10.
 uint8_t TIMER_overflows;
 // This timer will NOT reset every time it reaches 10.
-int16_t TIMER_wheel, TIMER_gyro, TIMER_PD;
+int16_t TIMER_wheel, TIMER_gyro;
+int16_t TIMER_PD = 0;
 	// The following overflow storage corresponds to 131ms. This timer will never reset.
 uint8_t TIMER_overflows_deci;
 // This variable is used to store robots angle in degrees
 float rotation_angle = 0.00;
-//Kontrollerar att flaggor sätts korrekt vid Manuell / Autonom loop
+// Checks if flags are correctly set in manual/auto loop.
 int Manual_Flag = 0;
 
-int speed_var=125;
+int speed_var=200;
 // --------------------------------------------------------------------------------------
 
 // Setup data direction registers @ ports for out/inputs.
@@ -49,10 +48,9 @@ void Styr_InitPortDirections(void)
 {
 	DDRA = 1<<DDA0 | 1<<DDA1 | 1<<DDA2 | 1<<DDA3 | 1<<DDA4 | 1<<DDA5 | 1<<DDA6 | 1<<DDA7;
 	DDRB = 1<<DDB0 | 1<<DDB1 | 1<<DDB2 | 1<<DDB3 | 1<<DDB4 | 1<<DDB5 | 1<<DDB7;
-	DDRC = 1<<DDC0 | 1<<DDC7;
+	DDRC = 1<<DDC0 | 1<<DDC7; 
 	DDRD = 1<<DDD0 | 1<<DDD1 | 0<<DDD2 | 0<<DDD3 | 1<<DDD4 | 1<<DDD5 | 1<<DDD6 | 1<<DDD7;
 	DDRD &= ~(1 << DDD3);
-	//D2 ingеng fцr reflexsensor, pin29 är schmittriggergrejen
 	// 0 = input
 	// 1 = output
 }
@@ -130,7 +128,6 @@ void PWM_Init(void)
 	OCR1A = 0;
 	OCR1B = 0;
 }
-
 void PWM_SetSpeedRight(int speed)
 {
 	if (speed >= 0 && speed <= 255)
@@ -139,7 +136,6 @@ void PWM_SetSpeedRight(int speed)
 		OCR2B = speed;
 	}
 }
-
 void PWM_SetSpeedLeft(int speed)
 {
 	if (speed >= 0 && speed <= 255)
@@ -148,7 +144,6 @@ void PWM_SetSpeedLeft(int speed)
 		OCR2A = speed;
 	}
 }
-
 // 1 for forward, 0 for backward
 void PWM_SetDirLeft(int dir)
 {
@@ -163,7 +158,6 @@ void PWM_SetDirLeft(int dir)
 		PORTD |= 1 << PORTD0;
 	}
 }
-
 // 1 for forward, 0 for backward
 void PWM_SetDirRight(int dir)
 {
@@ -198,7 +192,6 @@ void Get_sensor_values() //Load all sensor values into sensor-array
 		arrSensor[i - 1] = SPI_MasterTransmit(i,'s'); //load all 8 sensorvalues into sensor position [0-7]
 	}
 }
-
 void Send_sensor_values() // Can combine with Get speed when in manual mode
 {
 	SPI_MasterTransmit(255,'k');
@@ -212,7 +205,6 @@ void Send_sensor_values() // Can combine with Get speed when in manual mode
 	}
 	else SPI_MasterTransmit(arrSensor[3],'k');
 }
-
 void Get_speed_value()
 {
 	SPI_MasterTransmit(0b00000001, 'k');
@@ -227,7 +219,6 @@ void Get_speed_value()
 	_delay_us(20);
 	arrSpeed[4] = SPI_MasterTransmit(0x00,'k'); //Get gripclaw
 }
-
 void Send_speed_value()
 {
 	SPI_MasterTransmit(254,'k');
@@ -236,19 +227,18 @@ void Send_speed_value()
 		SPI_MasterTransmit(arrSpeedout[i],'k');
 	}
 }
-
 ISR(TIMER0_OVF_vect)
 {
-	//TIMER_overflows++;
+	TIMER_overflows++;
 	TIMER_wheel++;
 	TIMER_gyro++;
 	TIMER_PD++;
 	
-// 	if (TIMER_overflows >= 10)
-// 	{
-// 		TIMER_overflows = 0;
-// 		TIMER_overflows_deci++; 
-// 	}
+	if (TIMER_overflows >= 10)
+	{
+		TIMER_overflows = 0;
+		TIMER_overflows_deci++; 
+	}
 }
 
 //----------------------------GYRO------------------------------------
@@ -267,12 +257,10 @@ void set_GyroSS_Low() // connect gyro
 {
 	PORTC &= ~(1<<PORTC0);
 }
-
 void set_GyroSS_High() // disconnect gyro
 {
 	PORTC |= (1<<PORTC0);
 }
-
 void Gyro_Init()
 {
 
@@ -288,7 +276,6 @@ void Gyro_Init()
 	SPCR |= (1<<DORD);
 
 }
-
 void Gyro_StartConversion()
 {
 	int8_t high_byte;	
@@ -304,7 +291,6 @@ void Gyro_StartConversion()
 	SPCR |= (1<<DORD);
 
 }
-
 int16_t Gyro_PollResult()
 {
 	uint8_t high_byte, low_byte;
@@ -336,7 +322,6 @@ int16_t adcToAngularRate(uint16_t adcValue)
 	int16_t retval_= (AngularRate - 2500)/6.67;
 	return retval_;
 }
-
 void Gyro_Sleep()
 {
 	SPCR &= ~(1<<DORD);
@@ -350,7 +335,6 @@ void Gyro_Sleep()
 	} while (dataH & 0b10000000);
 	SPCR |= (1<<DORD);
 }
-
 int16_t Gyro_sequence()
 {
 	int16_t result = 0;
@@ -362,88 +346,103 @@ int16_t Gyro_sequence()
 
 // use in function MOTOR_RotateLeft()
 // delay untill 90 degrees reached;
-void checkLeftAngle90()
+void checkLeftAngle(float target_angle)
 {
-	int16_t result=0, sum, start_time;
+	int16_t result=0, sum;
 	float interval, medel;
-	//int broms = 0;
-	
+	int speed_var_local = speed_var;
 	do {
 		sum=0;
-		start_time = TIMER_gyro;
-		for (int i=1; i<21; i++)
+		//start_time = TIMER_gyro;
+		TIMER_gyro = 0; // ** starta om tiden
+		
+		for (int i=0; i<20; i++)  //for (int i=1; i<21; i++) 
 		{
 			result = Gyro_sequence();
-			if (result < 0) // ignore negative results
-			{
-				result = 0;
-				i--;
-			}
+			//if (result > 0) // ignore positive results
+			//{
+				//result = 0;
+				//i--;
+			//}
 			sum += result;
-			medel = sum / i;
+			//medel = sum / i; // *****  Läggas utanför för att undvika float-fel? *****
 		}
-		interval = (float)(TIMER_gyro - start_time)/1100; //(1397.14 - speed_var*2.42);
+		
+		medel = sum / 20;
+		interval = (float)(TIMER_gyro)/1220.7; //(float)(TIMER_gyro - start_time)/1200;
 		rotation_angle += medel*interval;
-		
-		// 		if ((speed_var > 100) & (rotation_angle > 40.00))
-		// 		{
-		// 			broms++;
-		// 			PWM_SetSpeedRight(speed_var*0.8);
-		// 			PWM_SetSpeedLeft(speed_var*0.8);
-		// 		}
-		
-	} while (rotation_angle < 90.00);
-	//LCD_display_int8(broms);
+		if ((rotation_angle > ((target_angle - 60)*(255/speed_var))) && (speed_var_local > 70))
+		{
+			speed_var_local = speed_var_local * 0.95; //** eller liknande, för att minska hastigheten gradvis när den närmar sig färdig
+			PWM_SetSpeedLeft(speed_var_local);
+			PWM_SetSpeedRight(speed_var_local);
+		}
+	}while (rotation_angle < (target_angle - 2));
 	rotation_angle = 0.00; //reset
+	//TIMER_gyro = 0;
+	//for (int i=0; i<100; i++)
+	//{
+		//result = Gyro_sequence();
+		//sum += result;
+	//}
+	//medel = sum / 100;
+	//interval = (float)(TIMER_gyro)/1220.7; //(float)(TIMER_gyro - start_time)/1200;
+	//rotation_angle += medel*interval;
+	//LCD_Clear();
+	//LCD_SetPosition(0);
+	//LCD_display_int16((int16_t)rotation_angle);
+
 }
 
 // use in function MOTOR_RotateRight()
 // delay untill 90 degrees reached;
-void checkRightAngle90()
+void checkRightAngle(float target_angle)
 {
-	int16_t result=0, start_time, sum, medel;
-	float interval;
-	
+	int16_t result=0, sum;
+	float interval, medel;
+	int speed_var_local = speed_var;
 	do {
 		sum=0;
-		TIMER_gyro = 0;
-		start_time = TIMER_gyro;
-		for (int i=1; i<21; i++)
+		//start_time = TIMER_gyro;
+		TIMER_gyro = 0; // ** starta om tiden
+		
+		for (int i=0; i<20; i++)  //for (int i=1; i<21; i++) 
 		{
 			result = Gyro_sequence();
-			if (result > 0) // ignore positive results
-			{
-				result = 0;
-				i--;
-			}
+			//if (result > 0) // ignore positive results
+			//{
+				//result = 0;
+				//i--;
+			//}
 			sum += result;
-			medel = sum / i;
+			//medel = sum / i; // *****  Läggas utanför för att undvika float-fel? *****
 		}
-		interval = (float)(TIMER_gyro - start_time)/1200;
+		
+		medel = sum / 20;
+		interval = (float)(TIMER_gyro)/1220.7; //(float)(TIMER_gyro - start_time)/1200;
 		rotation_angle += medel*interval;
-		if (rotation_angle < -50.00)
+		if ((rotation_angle < (-(target_angle - 60)*(255/speed_var))) && (speed_var_local > 70))
 		{
-			PWM_SetSpeedRight(speed_var*0.9);
-			PWM_SetSpeedLeft(speed_var*0.9);
+			speed_var_local = speed_var_local * 0.95; //** eller liknande, för att minska hastigheten gradvis när den närmar sig färdig
+			PWM_SetSpeedLeft(speed_var_local);
+			PWM_SetSpeedRight(speed_var_local);
 		}
-	} while (rotation_angle > -90.00);
+	} while (rotation_angle > -(target_angle - 6)); // -6 due to delay from stop of loop until wheels stop and slideing
 	
 	rotation_angle = 0; //reset
 }
 
 //----------------------------GYRO----END-----------------------------
-//uint8_t wheel_marker_counter = 0;
-uint16_t speed_send;
-uint16_t speed_send_new;
-uint16_t ss1;
-uint16_t ss2;
-float current_speed;
-float  wheel_circumference = 20.4/2; //Wheel circumference is 204 mm.
-float time_difference;
+
+//__________________________SPEEDOMETER_______________________________
+uint16_t wheel_marker_counter = 0;
+uint16_t current_speed;
+uint16_t wheel_circumference = 4*100*79; //Wheel circumference is 79 mm.
+uint16_t time_difference;
 
 void Speed_Interrupt_Init()
 {
-	EICRA = 1<< ISC00 | 0 <<ISC01; //INT0 genererar avbrott p� båda flanker
+	EICRA = 1<< ISC00 | 1<<ISC01; //INT0 genererar avbrott p� rising flank
 	EIMSK = 1<< INT0; //IINT0?
 	//MCUCR = (1<<IVCE); //Boot flash?
 	//MCUCR = (1<<IVSEL); //Boot flash?
@@ -451,51 +450,41 @@ void Speed_Interrupt_Init()
 
 ISR(INT0_vect)
 {
-
-	if ((PIND & 0b00000100) == 4)
-		{
-			ss2 = ss1;
-			ss1 = speed_send;	
-			PORTC &= ~(1 <<PORTC7); //lower reference = do stuff to portc7
-			time_difference = (float)TIMER_wheel / 0.8175 /1000; // div by 0.8175 -> time in ms
-			if (TIMER_wheel > 20)
-			{
-			current_speed = wheel_circumference / time_difference;
-			speed_send = (uint16_t)current_speed;
-			
-			speed_send_new = (ss1+ss2+2*speed_send)/4;
-			
-			LCD_SetPosition(0);
- 			LCD_display_uint16(TIMER_wheel);
- 			LCD_SetPosition(16);
- 			LCD_display_uint16(speed_send_new);
- 			TIMER_wheel = 0;
-			}
-				 
-// 			if (wheel_marker_counter == 0)
-// 			{
-// 				TIMER_wheel = 0;
-// 				wheel_marker_counter++;
-// 			}
-// 			else if (wheel_marker_counter < 7)
-// 			{
-// 				wheel_marker_counter++;
-// 			}
-// 			else
-// 			{
-// 				time_difference = (float)TIMER_wheel / 0.8175; // div by 0.8175 -> time in ms
-// 				current_speed = wheel_circumference / time_difference;
-// 				speed_send = (uint16_t)current_speed;
-// 				LCD_SetPosition(0);
-// 				LCD_display_uint16(speed_send);
-// 				wheel_marker_counter = 0;
-// 			}
-		}
-		else
-		{
-			PORTC |= 1<<PORTC7; //higher reference = do stuff to portc7
-		}
+//Kontrollerar schmitt-resistorn via PC7 (=pin 29)
+//Pinne 26 är för övrigt dåligt virad!!
+	cli();
+	LCD_SetPosition(24);
+	LCD_display_uint16(wheel_marker_counter);
+	_delay_ms(250);
+	//EIMSK &= ~(1<INT0);
+	if (wheel_marker_counter == 0)
+	{
+		TIMER_wheel = 0;
+		wheel_marker_counter++;
+	}
+	else if (wheel_marker_counter < 8)
+	{
+		LCD_SetPosition(24);
+		LCD_display_uint16(wheel_marker_counter);
+		wheel_marker_counter++;
+	}
+	else
+	{
+		time_difference = TIMER_wheel / 0.8175; // div by 0.8175 -> time in ms
+		current_speed = wheel_circumference / time_difference;
+		LCD_Clear();
+// 		LCD_SetPosition(0);
+// 		LCD_display_int16(time_difference);
+// 		LCD_SetPosition(8);
+// 		LCD_display_int16(current_speed);
+		LCD_SetPosition(24);
+		LCD_display_uint16(wheel_marker_counter);
+		wheel_marker_counter = 0; 
+	}
+	//EIMSK |= 1<INT0;
+	sei();
 }
+//__________________________SPEEDOMETER END____________________________
 
 //--MOTOR start
 void MOTOR_Forward(int speed)
@@ -505,7 +494,6 @@ void MOTOR_Forward(int speed)
 	PWM_SetSpeedLeft(speed);
 	PWM_SetSpeedRight(speed);
 }
-
 void MOTOR_Backward(int speed)
 {
 	PWM_SetDirRight(0);
@@ -514,124 +502,35 @@ void MOTOR_Backward(int speed)
 	PWM_SetSpeedRight(speed);
 }
 
-void MOTOR_RotateLeft()
-{
-	PWM_SetDirRight(1);
-	PWM_SetDirLeft(0);
-	PWM_SetSpeedLeft(speed_var);
-	PWM_SetSpeedRight(speed_var);
-	checkLeftAngle90();
-}
-
-void MOTOR_RotateRight()
-{
-	PWM_SetDirRight(0);
-	PWM_SetDirLeft(1);
-	PWM_SetSpeedRight(speed_var);
-	PWM_SetSpeedLeft(speed_var);
-	checkRightAngle90();
-}
-
+//--MOTOR stop
 void MOTOR_Stop()
 {
 	PWM_SetSpeedRight(0);
 	PWM_SetSpeedLeft(0);
 }
-//--MOTOR stop
 
-void Drive_test()
+//--MOTOR rotate
+void MOTOR_RotateLeft(float angle)
 {
-	//MOTOR_Forward(80);
-// 	SERVO_LevelHigh();
-// 	for(int i = 0; i <= 15; i++)
-// 	{
-// 		_delay_ms(250);
-// 	}
-
-	_delay_ms(2000);
-	MOTOR_RotateLeft();
+	PWM_SetDirRight(1);
+	PWM_SetDirLeft(0);
+	PWM_SetSpeedLeft(speed_var);
+	PWM_SetSpeedRight(speed_var);
+	checkLeftAngle(angle);
 	MOTOR_Stop();
-	
-	_delay_ms(2000);
-	MOTOR_RotateLeft();
+}
+void MOTOR_RotateRight(float angle)
+{
+	PWM_SetDirRight(0);
+	PWM_SetDirLeft(1);
+	PWM_SetSpeedRight(speed_var);
+	PWM_SetSpeedLeft(speed_var);
+	checkRightAngle(angle);
 	MOTOR_Stop();
-	
-// 	SERVO_SetGrip();
-// 	for(int i = 0; i <= 5; i++)
-// 	{
-// 		_delay_ms(250);
-// 	}
-// 	SERVO_LevelMid();
-// 	MOTOR_Backward(80);
-// 	for(int i = 0; i <= 15; i++)
-// 	{
-// 		_delay_ms(250);
-// 	}
-// 	SERVO_ReleaseGrip();
-// 	MOTOR_RotateLeft();
-// 	MOTOR_Stop();
-// 	for(int i = 0; i <= 5; i++)
-// 	{
-// 		_delay_ms(250);
-// 	}
-// 	SERVO_LevelLow();
-// 	MOTOR_Backward(80);
-// 	for(int i = 0; i <= 32; i++)
-// 	{
-// 		_delay_ms(250);
-// 	}
-// 	SERVO_LevelMid();
-// 	SERVO_SetGrip();
-// 	MOTOR_Stop();
-// 	for(int i = 0; i <= 5; i++)
-// 	{
-// 		_delay_ms(250);
-// 	}
-// 	SERVO_ReleaseGrip();
 }
 
-void Gyro_test()
-{	
-	//checkAngle90();
-	int16_t result;
- 	while (1)
- 	{
- 		result = Gyro_sequence();		
-		rotation_angle += result;
-		LCD_Clear();
-		LCD_SetPosition(0);
-		LCD_display_int16(result);
-		_delay_ms(100);
- 	}
-	return;
-}
-
-void Speed_test()
-{
-	MOTOR_Forward(80);
-	LCD_Clear();
-	LCD_SetPosition(0);
-	LCD_SendString("v: ");
-	LCD_SetPosition(6);
-	LCD_display_uint16(current_speed);
-}
-
-void init_all()
-{
-	sleep_enable();	// Enable sleep instruction
-	Styr_InitPortDirections();	// Initiate Port directions for the styrmodul.
-	Styr_InitPortValues();	// Initiate Port Values for the styrmodul.
-	SPI_MasterInit();	// Initiate the styrmodul as the SPI master.
-	LCD_Init(); // Initiate the LCD.
-	PWM_Init(); // Initiate PWM for motor
-	TIMER_init(); // Initiate Timer settings
-	LCD_WelcomeScreen(); // Welcomes the user with a nice message ;^)
-	Gyro_Init();
-	Speed_Interrupt_Init(); //****************************************** KOMMENTERA IN, MEN FUNGERAR EJ ATT MANUELLSTYRA DÅ *****************************************
-	sei();	// Enable global interrupts
-}
-
-void manual_drive()
+//--Called to enable manual driving.
+void MANUAL_DRIVE()
 {
 	Get_speed_value();
 	Get_sensor_values();
@@ -649,152 +548,458 @@ void manual_drive()
 	Send_sensor_values();
 }
 
+// ????
 void autonom_get_send()
 {
 	Get_sensor_values();
 	Send_sensor_values();
-	//Send_speed_value();
+	Send_speed_value();
 }
 
-//____________________________________PD CONTROL_________________________________________
+// ????
+void autonom_manula_loop()
+{
+	while (1) {
+			_delay_ms(10);
+			LCD_Clear();
+			LCD_SetPosition(2);
+			LCD_SendString("AUTONOM_MODE");
+			while(AUTONOM_MODE)
+			{
+				autonom_get_send();
+			
+			}
+		
+			_delay_ms(10);
+			LCD_Clear();
+			LCD_SetPosition(2);
+			LCD_SendString("MANUAL_MODE");
+			while(MANUAL_MODE)
+			{
+				MANUAL_DRIVE();
+			}
+		
+			PWM_SetSpeedLeft(0);
+			PWM_SetSpeedRight(0);
+	}	
+}
 
-/*	PD-control for ResQ.PL
-/		Author:	Adnan Berberovic
-/			Robert Oprea
-/		Date: 	2015-03-30
-*/
+//_______________________REFLEX SENSOR AND WALL COUNTER_____________________________
+
+char REFLEX_GetMarker()
+{
+	Get_sensor_values();
+	int8_t marker_ = ((arrSensor[3] >> 6) & (0b00000001));
+	return marker_;
+}
+
+int8_t WALLCOUNT_Left()
+{
+	Get_sensor_values();
+	int8_t walls_ = ((arrSensor[3] >> 3) & (0b000000111));
+	return walls_;
+}
+
+int8_t WALLCOUNT_Right()
+{
+	Get_sensor_values();
+	int8_t walls_ = (arrSensor[3] & (0b00000111));
+	return walls_;
+}
+
+//_____________________REFLEX SENSOR AND WALL COUNTER END____________________________
+
+//________________________________AUTOMATIC CONTROL_____________________________________
 
 // Y = PD*G/(1+PD*G) * R
 
 // Reference value = 0
 // Error value e = r-y.
-// We want to regulate the vehicle to drive in the middle of the corridor,
+// We want to regulate the robot to drive in the middle of the corridor,
 // So the reference value r should correspond to 20 cm.
 
 int reference_ = 20;// Reference value for where we want to place the robot.
 int offset_;		// Compared to reference.
+int current_error_;	// Current error
 int prev_error_ = 0;// Used to compare the errors when computing the "derivative".
 int time_diff_;		// Useful for comparing time, used for the "derivative".
 int time_new_ = 0;	// Useful for comparing time, used for the "derivative".
 int prev_time_ = 0;	// Useful for comparing time, used for the "derivative".
-int angle_;			// 
-int K_d = 1; // K (constant) for D regulation.
-int K_p = 1; // K (proportion) for P regulation.
+int angle_;			// The angle of the robot with respect to the corridor.
+int K_d = 1;		// K (constant) for D regulation.
+int K_p = 1;		// K (proportion) for P regulation.
+int standard_speed_ = 100;	// Keeps track of standard speed.
 char control_mode = 'r';	/*if control_mode == r, then the robot will make a rapid angle
-							/ change in angle to steer itself towards the middle lane.
-							/ if control_mode == c, then the robot will carefully
-							/ steer itself in a forward direction within the middle lane.
-							/ The middle lane is around 4 cm wide according to us.
+							 change in angle to steer itself towards the middle lane.
+							 if control_mode == c, then the robot will carefully
+							 steer itself in a forward direction within the middle lane.
+							 The middle lane is around 4 cm wide according to us.
 							*/
+int8_t front_sensor__;	// Stores the value of the front sensor.
+char discovery_mode = 'r';	/*if discovery_mode == r, then the robot will follow the 
+							"right hand on the wall" rule, i.e. always make right turns
+							whenever possible in junctions.
+							for discovery_mode == l, the same goes as above but left 
+							instead of right.
+							for discovery_mode == f, the robot will just keep moving
+							forward.
+							if discovery_mode == ?, then the robot will take a random
+							path through a junction.
+							*/
+
 // P-control function
 int P_Control()
 {
-	int newSignal_P = K_p*(reference_ - offset_); // Calculate regulated value
-	
+	int newSignal_P = K_p*(current_error_); // Calculate regulated value
 	return newSignal_P;
 }
-
 // D-control function
 int D_control()
 {
-	time_new_ = TIMER_PD/1220; // Retrieve the current time
+	time_new_ = TIMER_PD; // Retrieve the current time
+	int newSignal_D = 0;
 	time_diff_ = time_new_ - prev_time_;
-	int newSignal_D = K_d*(reference_ - offset_ - prev_error_)/time_diff_;
-	prev_error_ = reference_ - offset_; // Save the current error for next computation
-	prev_time_ = time_new_; // Save the current time for next use.
+	newSignal_D = K_d*(current_error_ - prev_error_)/time_diff_;
 	
-	return newSignal_D;
+	if(prev_error_ != current_error_)
+	{
+		prev_error_ = current_error_; // Save the current error for next computation
+		prev_time_ = time_new_; // Save the current time for next use
+	}
+	return newSignal_D;   
+	
 }
-
 // Total control.
 int PD_Control()
 {
-	TIMER_PD = 0;
 	int newSignal;
 	if(control_mode == 'r')
 	{
-		newSignal = angle_*(P_Control()+D_control());
+		standard_speed_ = 80;
+		K_p = 5;
+		K_d = 4;
+		current_error_ = reference_ - offset_;
+		if(offset_-20 > 0)
+		{
+			newSignal = P_Control()+D_control()+angle_;
+		}
+		else
+		{
+			newSignal = P_Control()+D_control()-angle_;	
+		}
+		if(angle_ > 1)
+		{
+			newSignal=0;
+		}
 	}
 	else if(control_mode == 'c')
 	{
-		newSignal = 1;
+		standard_speed_ = 100;
+		K_p = 4;
+		K_d = 3;
+		if(offset_-20 > 0)
+		{
+			current_error_ = angle_;
+		}
+		else
+		{
+			current_error_ = -angle_;	
+		}
+		newSignal = P_Control() + D_control();
 	}
 	else
 	{
-		newSignal = 1;
+		current_error_ = 0;
+		newSignal = 0;
 	}
-
 	return newSignal;
 }
 
-void PD_All()
+// Performs a 180 degree turn in the event of a dead end.
+void DEAD_END()
+{	
+	LCD_Clear();
+	LCD_SetPosition(2);
+	LCD_SendString("DEAD END");
+	LCD_SetPosition(28);
+	LCD_display_int8(front_sensor__);
+	LCD_SendString("  ");
+	MOTOR_Stop();
+	_delay_ms(200);
+	MOTOR_RotateLeft(180);
+	_delay_ms(200);
+	MOTOR_Forward(standard_speed_);
+}
+
+// Stops and rotates left 90 degrees.
+void TURN_Right()
 {
-	Get_sensor_values();
-	offset_ = arrSensor[1];
-	if(abs(offset_) < 2)
+		MOTOR_Stop();
+		_delay_ms(200);
+		MOTOR_RotateRight(90);
+		_delay_ms(200);
+		MOTOR_Forward(standard_speed_);	
+}
+
+// Stops and rotates right 90 degrees.
+void TURN_Left()
+{
+		MOTOR_Stop();
+		_delay_ms(200);
+		MOTOR_RotateLeft(90);
+		_delay_ms(200);
+		MOTOR_Forward(standard_speed_);
+}
+
+// Sets a random discovery mode to actually decide which way to go.
+// Remember to reset the discovery mode back to '?' after calling this
+// function and deciding on a turn.
+void DISCOVERY_SetRandom()
+{
+	uint8_t random_mode = rand() % 3;
+	if (random_mode == 0)
 	{
-		control_mode = 'c';		
+		discovery_mode = 'r';
+	}
+	if (random_mode == 1)
+	{
+		discovery_mode = 'l';
 	}
 	else
 	{
-		control_mode = 'r';
+		discovery_mode = 'f';
 	}
-	PWM_SetSpeedRight(OCR2B - PD_Control(offset_));
-	PWM_SetSpeedLeft(OCR2A + PD_Control(offset_));
 }
-//____________________________________PD CONTROL END______________________________________
+
+// One of the following three methods are called in the event of a 
+// three way junction described by the ASCII art above each method.
+/*  |
+  ->--- ONE is used in junctions of this type.
+*/
+void JUNCTION_ThreeWayONE()
+{
+	if ((discovery_mode == 'r') || (discovery_mode == 'f'))
+	{
+		// Keep going forward
+	}
+	else if (discovery_mode == 'l')
+	{
+		// Turn left
+		TURN_Left();
+	}
+	else if (discovery_mode == '?')
+	{
+		DISCOVERY_SetRandom();
+		JUNCTION_ThreeWayONE();
+		discovery_mode = '?';
+	}
+}
+/*  v
+  ----- TWO is used in junctions of this type.
+*/
+void JUNCTION_ThreeWayTWO()
+{
+	if ((discovery_mode == 'l') || (discovery_mode == 'f'))
+	{
+		// Turn Left. Forward becomes left due to right-forward-left cycle.
+		TURN_Left();
+	}
+	else if (discovery_mode == 'r')
+	{
+		// Turn right
+		TURN_Right();
+	}
+	else if (discovery_mode == '?')
+	{
+		DISCOVERY_SetRandom();
+		JUNCTION_ThreeWayTWO();
+		discovery_mode = '?';
+	}
+}
+/*  |
+  ---<- THREE is used in junctions of this type.
+*/
+void JUNCTION_ThreeWayTHREE()
+{
+	if ((discovery_mode == 'l') || (discovery_mode == 'f'))
+	{
+		// Keep going forward
+	}
+	else if (discovery_mode == 'r')
+	{
+		// Turn left
+		TURN_Right();
+	}
+	else if (discovery_mode == '?')
+	{
+		DISCOVERY_SetRandom();
+		JUNCTION_ThreeWayTHREE();
+		discovery_mode = '?';
+	}
+}
+
+// Called in the event of a four way junction.
+void JUNCTION_FourWay()
+{
+	if(discovery_mode == 'r')
+	{
+		//turn right
+		TURN_Right();
+	}
+	else if(discovery_mode == 'l')
+	{
+		//turn left
+		TURN_Left();
+	}
+	else if(discovery_mode == 'f')
+	{
+		//keep going forward
+	}
+	else if(discovery_mode == '?')
+	{
+		DISCOVERY_SetRandom();
+		JUNCTION_FourWay();
+		discovery_mode = '?';
+	}
+}
+
+// Call this function to perform automatic control.
+void AutomaticControl()
+{
+	TIMER_PD = 0;
+	Get_sensor_values();
+	angle_ = arrSensor[0];
+	offset_ = arrSensor[1];
+	front_sensor__ = arrSensor[2];
+	
+	// Junction, turn, and dead end handling.
+	if(	(WALLCOUNT_Right()==0) && (WALLCOUNT_Left()==0) &&
+		(front_sensor__ <= 18) && (front_sensor__ > 3))
+		{
+			DEAD_END();
+		}		
+	else if((WALLCOUNT_Left() > 0) && (WALLCOUNT_Right() > 0) &&
+			!((front_sensor__ <= 18) && (front_sensor__ > 3)))
+		{
+			JUNCTION_FourWay();
+		}		
+	else if((WALLCOUNT_Right() > 0) && (WALLCOUNT_Left() == 0) &&
+			(front_sensor__ <= 18) && (front_sensor__ > 3))
+		{
+			TURN_Right();
+		}
+	else if((WALLCOUNT_Right() == 0) && (WALLCOUNT_Left() > 0) &&
+			(front_sensor__ <= 18) && (front_sensor__ > 3))
+		{
+			TURN_Left();
+		}
+	else if((WALLCOUNT_Right() == 0) && (WALLCOUNT_Left() > 0) &&
+			!((front_sensor__ <= 18) && (front_sensor__ > 3)))
+		{
+			JUNCTION_ThreeWayONE();
+		}
+	else if((WALLCOUNT_Right() > 0) && (WALLCOUNT_Left() > 0) &&
+			(front_sensor__ <= 18) && (front_sensor__ > 3))
+		{
+			JUNCTION_ThreeWayTWO();
+		}
+	else if((WALLCOUNT_Right() > 0) && (WALLCOUNT_Left() == 0) &&
+			!((front_sensor__ <= 18) && (front_sensor__ > 3)))
+		{
+			JUNCTION_ThreeWayTHREE();
+		}
+	
+	// Puts the automatic control in careful mode, keep the robot on track.
+	if(abs(offset_-20) <= 2)
+	{
+		control_mode = 'c';
+		LCD_SetPosition(8);
+		LCD_SendString("Mode: c");
+	}
+	// Puts the automatic control in rapid mode, push the robot to the middle lane.
+	else
+	{
+		control_mode = 'r';
+		LCD_SetPosition(8);
+		LCD_SendString("Mode: r");
+	}
+	int new_speed_ = PD_Control();
+	LCD_SendString("   ");
+	// Makes sure that the motors don't burn out (i.e go on max velocity)
+	if(new_speed_ > (254-standard_speed_))
+	{
+		MOTOR_Stop();
+	}
+	else
+	{
+		PWM_SetSpeedRight(standard_speed_ + new_speed_);
+		PWM_SetSpeedLeft(standard_speed_ - new_speed_);		
+	}
+}
+//________________________________AUTOMATIC CONTROL END_____________________________________
+
+
+// This method is very important to call at the start of the program.
+void INIT_ALL()
+{
+	sleep_enable();	// Enable sleep instruction
+	Styr_InitPortDirections();	// Initiate Port directions for the styrmodul.
+	Styr_InitPortValues();	// Initiate Port Values for the styrmodul.
+	SPI_MasterInit();	// Initiate the styrmodul as the SPI master.
+	LCD_Init();	// Initiate the LCD.
+	PWM_Init();	// Initiate PWM for motor
+	TIMER_init();	// Initiate Timer settings
+	LCD_WelcomeScreen();	// Welcomes the user with a nice message ;^)
+	Gyro_Init();	// Initiate gyro settings
+	//Speed_Interrupt_Init(); //KOMMENTERA IN, MEN FUNGERAR EJ ATT MANUELLSTYRA DÅ 
+	sei();	// Enable global interrupts
+}
 
 int main(void)
 {
-	init_all();
-	LCD_Clear();
-	
-	
-	
-	while (1)
-	{
-		
- 		MOTOR_Forward(50);
- 		for(int i = 0; i < 25; i++)
- 		 {_delay_ms(250);}
- 			 
- 		MOTOR_Forward(75);
- 		for(int i = 0; i <25; i++)
- 		 {_delay_ms(250);}
- 			
- 		MOTOR_Forward(100);
- 		for(int i = 0; i < 25; i++)
- 		 {_delay_ms(250);}
- 	
- 		MOTOR_Forward(150);
- 		for(int i = 0; i < 25; i++)
- 	 {_delay_ms(250);}
+	INIT_ALL();
 
-// 		LCD_Clear();
-// 		LCD_SetPosition(2);
-// 		LCD_SendString("AUTONOM_MODE");
-// 		while(AUTONOM_MODE)
-// 		{
-// 			LCD_Clear();
-// 			LCD_SetPosition(2);
-// 			LCD_SendString("AUTONOM_MODE");
-// 			_delay_ms(200);
-// 			autonom_get_send();
-// 		}
-// 	
-// 		_delay_ms(10);
-// 		LCD_Clear();
-// 		LCD_SetPosition(2);
-// 		LCD_SendString("MANUAL_MODE");
-// 		while(MANUAL_MODE)
-// 		{
-// 			LCD_Clear();
-// 			LCD_SetPosition(2);
-// 			LCD_SendString("MANUAL_MODE");
-// 			manual_drive();
-// 			_delay_ms(200);
-		
-		//}
-	
-	}
+  	while (1) {
+  		_delay_ms(10);
+  		LCD_Clear();
+  		LCD_SetPosition(2);
+  		LCD_SendString("AUTOMATIC_MODE");
+  		PWM_SetDirRight(1);
+  		PWM_SetDirLeft(1);
+  		PWM_SetSpeedLeft(80);
+  		PWM_SetSpeedRight(80);
+		MOTOR_Stop();
+		LCD_Clear();
+  		while(AUTONOM_MODE)
+  		{
+  			AutomaticControl();
+  			LCD_SetPosition(0);
+  			LCD_display_uint8(OCR2B);
+  			LCD_SendString("  ");
+  			LCD_SetPosition(16);
+  			LCD_display_uint8(OCR2A);
+  			LCD_SendString("  ");
+  			LCD_SetPosition(24);
+  			LCD_display_int8(angle_);
+  			LCD_SendString("  ");
+			LCD_SetPosition(28);
+			LCD_display_int8(WALLCOUNT_Right());
+  			LCD_SendString("  ");
+			LCD_display_int8(WALLCOUNT_Left());
+			
+  			_delay_ms(100);
+  		}
+  		
+  		_delay_ms(10);
+  		LCD_Clear();
+  		LCD_SetPosition(2);
+  		LCD_SendString("MANUAL_MODE");
+  		while(MANUAL_MODE)
+  		{
+  			MANUAL_DRIVE();
+  		}
+  		
+  		PWM_SetSpeedLeft(0);
+  		PWM_SetSpeedRight(0);
+  	}
 }
