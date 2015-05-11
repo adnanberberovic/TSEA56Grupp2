@@ -12,18 +12,18 @@
 #include "Map.h"
 
 // FLAGz man!
-int operatingMode_ = 0; // 0 = normal, 3 = return to prev sq, 4 = resQ
-int rotating_ = 0;
-int movingForward_ = 0;
+unsigned int operatingMode_ = 0; // 0 = normal, 3 = return to prev sq, 4 = resQ
+unsigned int rotating_ = 0;
+unsigned int movingForward_ = 0;
 // unsigned int movingToPrevSq_;
 // unsigned int resQActive_;
- int LOOPer = 1;
+unsigned int LOOPer = 1;
 
 // Sets the position of the goal in the map
 void MAP_setGoal()
 {
-	int posY = MAP_currentPos[0];
-	int posX = MAP_currentPos[1];
+	unsigned int posY = MAP_currentPos[0];
+	unsigned int posX = MAP_currentPos[1];
 	MAP_array[posY][posX].goal = 1;
 	MAP_goalPosition[0] = posY;
 	MAP_goalPosition[1] = posX;
@@ -36,7 +36,7 @@ void MAP_setGoal()
 // 3 = Road
 // 4 = Wall
 // 5 = Junction
-void MAP_setSquareDescription(int description, int posY, int posX)
+void MAP_setSquareDescription(unsigned int description, unsigned int posY, unsigned int posX)
 {
 	if(posY <= 16 && posX <= 29) // Is square within map?
 	{
@@ -45,10 +45,12 @@ void MAP_setSquareDescription(int description, int posY, int posX)
 }
 
 // Check if the square is an unexplored road and sets the next direction to face it, send with 0 if exploring
-int MAP_checkDirDown(int exploring)
+unsigned int MAP_checkDirDown(unsigned int exploring)
 {
-	if ((MAP_array[MAP_currentPos[0] + 1][MAP_currentPos[1]].description == 3) && (!MAP_array[MAP_currentPos[0] + 1][MAP_currentPos[1]].visited || exploring))
-	{
+    if (((MAP_array[MAP_currentPos[0] + 1][MAP_currentPos[1]].description == 3) &&
+    (!MAP_array[MAP_currentPos[0] + 1][MAP_currentPos[1]].visited || exploring))||
+    (MAP_array[MAP_currentPos[0] + 1][MAP_currentPos[1]].description == 5))
+    {
 		MAP_nextDir = 3;
 		return 1;
 	}
@@ -59,10 +61,12 @@ int MAP_checkDirDown(int exploring)
 }
 
 // Check if the square is an unexplored road and sets the next direction to face it, send with 0 if exploring
-int MAP_checkDirUp(int exploring)
+unsigned int MAP_checkDirUp(unsigned int exploring)
 {
-	if ((MAP_array[MAP_currentPos[0] - 1][MAP_currentPos[1]].description == 3) && (!MAP_array[MAP_currentPos[0] - 1][MAP_currentPos[1]].visited || exploring))
-	{
+	if (((MAP_array[MAP_currentPos[0] - 1][MAP_currentPos[1]].description == 3) &&
+    (!MAP_array[MAP_currentPos[0] - 1][MAP_currentPos[1]].visited || exploring)) ||
+    (MAP_array[MAP_currentPos[0] - 1][MAP_currentPos[1]].description == 5))
+    {
 		MAP_nextDir = 1;
 		return 1;
 	}
@@ -73,9 +77,11 @@ int MAP_checkDirUp(int exploring)
 }
 
 // Check if the square is an unexplored road and sets the next direction to face it, send with 0 if exploring
-int MAP_checkDirLeft(int exploring)
+unsigned int MAP_checkDirLeft(unsigned int exploring)
 {
-	if ((MAP_array[MAP_currentPos[0]][MAP_currentPos[1] - 1].description == 3) && (!MAP_array[MAP_currentPos[0]][MAP_currentPos[1] - 1].visited || exploring))
+	if (((MAP_array[MAP_currentPos[0]][MAP_currentPos[1] - 1].description == 3) &&
+    (!MAP_array[MAP_currentPos[0]][MAP_currentPos[1] - 1].visited || exploring)) ||
+    (MAP_array[MAP_currentPos[0]][MAP_currentPos[1] - 1].description == 5))
 	{
 		MAP_nextDir = 2;
 		return 1;
@@ -87,9 +93,11 @@ int MAP_checkDirLeft(int exploring)
 }
 
 // Check if the square is an unexplored road and sets the next direction to face it, send with 0 if exploring
-int MAP_checkDirRight(int exploring)
+unsigned int MAP_checkDirRight(unsigned int exploring)
 {
-	if ((MAP_array[MAP_currentPos[0]][MAP_currentPos[1] + 1].description == 3) && (!MAP_array[MAP_currentPos[0]][MAP_currentPos[1] + 1].visited || exploring))
+	if (((MAP_array[MAP_currentPos[0]][MAP_currentPos[1] + 1].description == 3) &&
+    (!MAP_array[MAP_currentPos[0]][MAP_currentPos[1] + 1].visited || exploring)) ||
+    (MAP_array[MAP_currentPos[0]][MAP_currentPos[1] + 1].description == 5))
 	{
 		MAP_nextDir = 0;
 		return 1;
@@ -101,7 +109,7 @@ int MAP_checkDirRight(int exploring)
 }
 
 // Chechks given direction
-int MAP_checkDir(int dir)
+unsigned int MAP_checkDir(unsigned int dir)
 {
 	if (dir == 0)
 	{
@@ -130,7 +138,7 @@ int MAP_checkDir(int dir)
 void MAP_decideDirection(char mode)
 {
 	char mode_ = mode;
-	int robotDir = MAP_currentDir;
+	unsigned int robotDir = MAP_currentDir;
 	
 	// Randomizes the direction and mode, thus making the decisions (pseudo) random
 	if (mode == 'a')
@@ -180,34 +188,58 @@ void MAP_setVisited()
 }
 
 // Count the number of unexplored squares in a 1 square radius (up, down, left, right)
-void MAP_countUnexploredSquares()
+void MAP_countSquares()
 {
-	int dir_ = MAP_currentDir; //WHY?
+	unsigned int dir_ = MAP_currentDir; // The following lines change currentDir which we don't want
 	MAP_unexploredSquares = MAP_checkDirDown(0) + MAP_checkDirLeft(0) + MAP_checkDirRight(0) + MAP_checkDirUp(0);
+	MAP_exploredSquares = MAP_checkDirDown(1) + MAP_checkDirLeft(1) + MAP_checkDirRight(1) + MAP_checkDirUp(1);
 	fprintf(fp,"Down=%d, Left=%d, Right=%d, Up=%d\n",MAP_checkDirDown(0),MAP_checkDirLeft(0),MAP_checkDirRight(0),MAP_checkDirUp(0));
-	MAP_currentDir = dir_; // WHY?
+	MAP_currentDir = dir_;
 }
 
 // Uses Dijkstras algorithm to decide which location to set as a destination
 void MAP_decideDestination()
 {
 	// Simpleton variant
-	MAP_nextJunctionLong = MAP_lastUnexJunction(MAP_junctionCount);
-	fprintf(fp,"nJl decided\n");
+	//MAP_nextJunctionLong = MAP_lastUnexJunction(MAP_junctionCount);
+	MAP_lastUnexJunction(MAP_junctionCount);
+    fprintf(fp,"\nDecided nJl=%u\n",MAP_nextJunctionLong);
 	fflush(fp);
-	if (MAP_nextJunctionLong == 420) {}
+	if (MAP_nextJunctionLong == 420) {LOOPer = 0;}
 	else if (MAP_nextJunctionLong < MAP_currentJunction)
 	{
-		MAP_nextJunctionShort = MAP_currentJunction - 1;
+         MAP_nextJunctionShort = MAP_currentJunction - 1;
+         }
+    else if (MAP_nextJunctionLong > MAP_currentJunction)
+	{
+         MAP_nextJunctionShort = MAP_currentJunction + 1;
+         }
+/*	else //if (MAP_nextJunctionLong < MAP_currentJunction)
+	{
+         if (MAP_currentJunction == MAP_junctionCount)
+         {
+            MAP_nextJunctionShort = ;
+            }
+         else
+         {
+             MAP_nextJunctionShort = MAP_currentJunction + 1;
+             }
 	}
 	else if (MAP_nextJunctionLong > MAP_currentJunction)
 	{
-		MAP_nextJunctionShort = MAP_currentJunction + 1;
-	}
+		if (MAP_currentJunction != 0)
+         {
+            MAP_nextJunctionShort = MAP_junctionCount + 1;
+            }
+         else
+        {
+             MAP_nextJunctionShort = MAP_currentJunction + 1;
+             }
+	}*/
 }
 
 // Adds the travelled distance from the last junction to specified junction
-void MAP_addJunctionDist(int junction)
+void MAP_addJunctionDist(unsigned int junction)
 {
 	if (junction > MAP_currentJunction)
 	{
@@ -220,7 +252,7 @@ void MAP_addJunctionDist(int junction)
 }
 
 // Adds the direction between two junctions, assuming j1 is the last visited and j2 the current one
-void MAP_addJunctionDir(int j1, int j2, int direction)
+void MAP_addJunctionDir(unsigned int j1, unsigned int j2, unsigned int direction)
 {
 	if (direction == 0)
 	{
@@ -243,12 +275,14 @@ void MAP_addJunctionDir(int j1, int j2, int direction)
 // Adds the current square as a junction
 void MAP_addJunction()
 {
-	int posY_ = MAP_currentPos[0];
-	int posX_ = MAP_currentPos[1];
+	unsigned int posY_ = MAP_currentPos[0];
+	unsigned int posX_ = MAP_currentPos[1];
 
 	// Adds directions between last junction and this one
 	MAP_addJunctionDir(MAP_currentJunction, MAP_junctionCount, MAP_lastJunctionDir);
 	MAP_addJunctionDir(MAP_junctionCount, MAP_currentJunction, (MAP_currentDir - 2) % 4);
+	printDir(MAP_currentJunction);
+	printDir(MAP_junctionCount);
 	
 	// Increments counters
 	MAP_currentJunction = MAP_junctionCount++;
@@ -272,15 +306,25 @@ void MAP_addJunction()
 
 // Returns the last junction with unexplored roads
 // Call with junctionCount
-int MAP_lastUnexJunction(int x)
+unsigned int MAP_lastUnexJunction(unsigned int x)
 {
+    /*int q = 0;
+    while (MAP_junctionOrderArray[q].hasUnex == 0)
+    {
+          q++;
+    }
+    return q;*/
+    
+    fprintf(fp," %d",x);
+    fflush(fp);
 	if (x <= 0)
 	{
-		/* Kartan är helt utforskad!!! */
+		// Kartan är helt utforskad!!! 
 		return 420;
 	}
 	else if (MAP_junctionOrderArray[x - 1].hasUnex == 1)
 	{
+         MAP_nextJunctionLong = x - 1;
 		return x - 1;
 	}
 	else
@@ -321,7 +365,7 @@ void MAP_moveForward()
 	// Simulation code ends here
 }
 
-int MAP_getDirection(int j1, int j2)
+unsigned int MAP_getDirection(unsigned int j1, unsigned int j2)
 {
 	if (MAP_junctionOrderArray[j1].right == j2)
 	{
@@ -341,10 +385,25 @@ int MAP_getDirection(int j1, int j2)
 	}
 }
 
+void MAP_checkIfDone()
+{
+     int i = 0;
+     int done_ = 0;
+          while (i < MAP_junctionCount)
+          {
+                done_ += MAP_junctionOrderArray[i].hasUnex;
+                i++;
+          }
+     if (!done_ && MAP_junctionCount)
+     {
+                LOOPer = 0;
+     }
+     }
+
 void MAP_main()
 {
-	int posY_ = MAP_currentPos[0];
-	int posX_ = MAP_currentPos[1];
+	unsigned int posY_ = MAP_currentPos[0];
+	unsigned int posX_ = MAP_currentPos[1];
 	
 //	fprintf(fp,"Op mode: %d ",operatingMode_);
 //	fprintf(fp,"Rot=%d ",rotating_);
@@ -357,16 +416,23 @@ void MAP_main()
                         fprintf(fp,"Normal mode start\n");
                         fflush(fp);
                         
-		MAP_countUnexploredSquares();
+		MAP_countSquares();
 		// If it's a visited junction
 		if (MAP_array[posY_][posX_].visited && (MAP_array[posY_][posX_].description == 5))
 		{
                                             fprintf(fp,"Entered visited junction\n");
                                             fflush(fp);
                                             
-			// Add the distance between this and the last junction
-			MAP_addJunctionDir(MAP_currentJunction, MAP_array[posY_][posX_].junctionNumber, MAP_lastJunctionDir);
+			// Add the directions between this and the last junction
 			MAP_addJunctionDir(MAP_array[posY_][posX_].junctionNumber, MAP_currentJunction, (MAP_currentDir - 2) % 4);
+			if (MAP_array[posY_][posX_].junctionNumber != MAP_currentJunction)
+            {
+                 MAP_addJunctionDir(MAP_currentJunction, MAP_array[posY_][posX_].junctionNumber, MAP_lastJunctionDir);
+            }
+            printDir(MAP_currentJunction);
+			printDir(MAP_array[posY_][posX_].junctionNumber);
+			fprintf(fp,"Sent dir=%u\n", (MAP_currentDir - 2) % 4);
+			fflush(fp);
 			
 
 			// Has unexplored roads
@@ -379,12 +445,17 @@ void MAP_main()
 			} 
 			else
 			{
-                
+                fprintf(fp,"Fully explored junction\n");
+                fflush(fp);
+                MAP_currentJunction = MAP_array[posY_][posX_].junctionNumber;
+                fprintf(fp,"WTF CurJunction = %u\n",MAP_currentJunction);
+                fflush(fp);
 				MAP_junctionOrderArray[MAP_array[posY_][posX_].junctionNumber].hasUnex = 0;
 				//MAP_nextDir = (MAP_currentDir - 2) % 4;
 				//rotating_ = 1;
 				//movingForward_ = 1;
-				operatingMode_ = 3;
+				MAP_decideDestination();
+				operatingMode_ = 2;
 				goto afterNormal; // Go to previous junction
 			}
 		}
@@ -395,7 +466,7 @@ void MAP_main()
             fflush(fp);
             
 			// Check if it's a junction
-			if (MAP_unexploredSquares > 1)
+			if (MAP_exploredSquares > 2)
 			{
 				fprintf(fp,"Has unex roads, UnexSQ=%d\n",MAP_unexploredSquares);
 				fflush(fp);
@@ -411,10 +482,11 @@ void MAP_main()
 				rotating_ = 1;
 				movingForward_ = 1;
 				operatingMode_ = 3;
+				MAP_nextJunctionShort = MAP_currentJunction;
 				goto afterNormal; // Go to previous junction
 			}
 		}
-		MAP_decideDirection('a'); // Uses a = random, r = right-first, l = left-first
+		MAP_decideDirection('r'); // Uses a = random, r = right-first, l = left-first
 		if (MAP_currentDir != MAP_nextDir)
 		{
 			rotating_ = 1;
@@ -443,7 +515,8 @@ void MAP_main()
 		// Simulation code starts here
 		MAP_rotate();
 		// Simulation code ends here
-		fprintf(fp,"Rotating mode ends\n");
+		
+		fprintf(fp,"curDir=%d \n Rotating mode ends\n",MAP_currentDir);
 		fflush(fp);
 	}
 	
@@ -461,9 +534,13 @@ void MAP_main()
 		// åk framåt
 
 		// Simulation code starts here
+		if (MAP_array[posY_][posX_].description == 5)
+		{
+           MAP_lastJunctionDir = MAP_currentDir;
+           }
 		MAP_moveForward();
 		// Simulation code ends here
-		fprintf(fp,"Moving forward mode ends\n");
+		fprintf(fp,"curPos=(%d,%d) \n Moving forward mode ends\n",MAP_currentPos[0],MAP_currentPos[1]);
 		fflush(fp);
 	}
 	
@@ -479,7 +556,7 @@ void MAP_main()
                        fflush(fp);
 		// åk tillbaka till föregående korsning
 		// ändrar direction om det behövs
-		MAP_nextJunctionShort = MAP_currentJunction;
+		//MAP_nextJunctionShort = MAP_currentJunction;
 		
         if (MAP_checkDir((MAP_currentDir - 1) % 4))
 		{
@@ -489,7 +566,7 @@ void MAP_main()
 		}
 		else if (MAP_checkDir((MAP_currentDir + 1) % 4))
 		{
-			fprintf(fp,"ROT=1");
+			fprintf(fp,"ROT=1\n");
             MAP_nextDir = (MAP_currentDir + 1) % 4;
 			rotating_ = 1;
 		}
@@ -498,8 +575,25 @@ void MAP_main()
 		if ((MAP_currentPos[0] == MAP_junctionOrderArray[MAP_nextJunctionShort].posY) &&
 		   (MAP_currentPos[1] == MAP_junctionOrderArray[MAP_nextJunctionShort].posX))
 		{
-			operatingMode_ = 2;
-			movingForward_ = 0;
+			fprintf(fp,"curJ=nJs!!\n");
+			fflush(fp);
+            MAP_countSquares();
+            MAP_currentJunction = MAP_nextJunctionShort;
+            if (MAP_unexploredSquares >= 1)
+            {
+               fprintf(fp,"UnexSq exist!!\n");
+               fflush(fp);
+               rotating_ = 0;
+               movingForward_ = 0;
+               operatingMode_ = 0;
+               }
+            else
+            {
+                
+                MAP_decideDestination();
+                operatingMode_ = 2;
+                movingForward_ = 0;
+                }
 		}
 		fprintf(fp,"Go to junction mode ends\n");
 		fflush(fp);
@@ -514,9 +608,10 @@ fprintf(fp,"Op mode: %d ",operatingMode_);
 	if ((operatingMode_ == 2) && !rotating_ && !movingForward_)
 	{
                        fprintf(fp,"Far junction mode starts\n");
+                       fprintf(fp,"In lastUnexJunction x =");
                        fflush(fp);
-		MAP_decideDestination();
-		fprintf(fp,"Destination decided, nJl=%d\n",MAP_nextJunctionLong);
+		//MAP_decideDestination();
+		fprintf(fp,"Destination decided, nJl=%u\n",MAP_nextJunctionLong);
 		fflush(fp);
 		if ((MAP_currentPos[0] == MAP_junctionOrderArray[MAP_nextJunctionLong].posY) &&
 		   (MAP_currentPos[1] == MAP_junctionOrderArray[MAP_nextJunctionLong].posX))
@@ -534,13 +629,17 @@ fprintf(fp,"Op mode: %d ",operatingMode_);
 		else
 		{
             fprintf(fp,"Åk mot nJs\n");
+            fprintf(fp,"nDir=%u, cJ=%u, nJs=%u\n",MAP_nextDir,MAP_currentJunction,MAP_nextJunctionShort);
             fflush(fp);
 			MAP_nextDir = MAP_getDirection(MAP_currentJunction, MAP_nextJunctionShort);
+			fprintf(fp,"nDir=%u, cJ=%u, nJs=%u\n",MAP_nextDir,MAP_currentJunction,MAP_nextJunctionShort);
+			fflush(fp);
 			if (!(MAP_currentDir == MAP_nextDir))
 			{
 				rotating_ = 1;
 			}
 			movingForward_ = 1;
+			operatingMode_ = 3;
 		}
 		fprintf(fp,"Far junction mode ends\n");
 		fflush(fp);
@@ -556,6 +655,8 @@ fprintf(fp,"Op mode: %d ",operatingMode_);
 	{
 		// Go ResQ.PL, go!
 	}
+	
+	MAP_checkIfDone();
 }
 
 // Kodskelett för kartläggning
@@ -566,7 +667,7 @@ TODO
 
 //------------------------------SIM--SIM--SIM-----------------------------------
 
-int karta[15][15] = { {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+unsigned int karta[15][15] = { {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
                       {0,1,0,0,0,1,1,1,1,0,1,1,1,0,0},
                       {0,1,1,1,0,0,0,0,1,0,0,0,1,1,0},
                       {0,1,0,1,1,1,1,1,1,1,0,0,1,0,0},
@@ -585,10 +686,10 @@ int karta[15][15] = { {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
                       
 void printMap()
 {
-     int i;
+     unsigned int i;
      for (i=0; i < 16; i++)
      {
-         int j;
+         unsigned int j;
          for (j=0; j < 29; j++)
          {
              if (MAP_currentPos[0] == i && MAP_currentPos[1] == j)
@@ -603,7 +704,11 @@ void printMap()
              }
              else if (MAP_array[i][j].description == 3)
              {
-                  fprintf(fp,".");
+                  //fprintf(fp,".");
+                  if (MAP_array[i][j].visited == 1)
+                     fprintf(fp,":");
+                  else
+                      fprintf(fp,".");
                   fflush(fp);
              }
              else if (MAP_array[i][j].description == 4)
@@ -630,27 +735,29 @@ void printMap()
 //     fflush(fp);
 }
 
-void setDescr(int y, int x, int start)
+void setDescr(unsigned int y, unsigned int x, unsigned int start)
 {
      int y_ = y - 1;
      int x_ = x - start;
      
      if (karta[y_][x_] == 0)
      {
-        MAP_array[y][x].description = 4;
-        }
+        if (MAP_array[y][x].description == 0)
+           MAP_array[y][x].description = 4;
+     }
      else if (karta[y_][x_] == 1)
      {
-          MAP_array[y][x].description = 3;
+          if (MAP_array[y][x].description == 0)
+             MAP_array[y][x].description = 3;
      }
 }
 
 void updateMap()
 {
      unsigned int dirr_ = MAP_currentDir + 1;
-     int y_ = MAP_currentPos[0];
-     int x_ = MAP_currentPos[1];
-     int i;
+     unsigned int y_ = MAP_currentPos[0];
+     unsigned int x_ = MAP_currentPos[1];
+     unsigned int i;
      for (i=0; i <= 2; i++)
      {
          if ((dirr_ - i) % 4 == 0)
@@ -670,6 +777,13 @@ void updateMap()
               setDescr(y_ + 1, x_, 12);
          }
      }
+}
+
+void printDir(unsigned int n)
+{
+     fprintf(fp,"J#=%u, right=%u, up=%u, left=%u, down=%u\n",n,MAP_junctionOrderArray[n].right,MAP_junctionOrderArray[n].up,
+                        MAP_junctionOrderArray[n].left, MAP_junctionOrderArray[n].down);
+     fflush(fp);
 }
 
 //------------------------------SIM--SIM--SIM-----------------------------------
@@ -730,32 +844,44 @@ int main(void)
 	
 	// Påbörja undsättning - Egen fas*/
 	
-	unsigned int kkk = 0;
-	--kkk;
-    fprintf(fp,"START %u\n",kkk);
+    fprintf(fp,"START %u\n", -1);
 	fflush(fp);
        MAP_array[15][15].description = 3;
        MAP_setVisited();
-       int i = 0;
-	while (LOOPer)
+       unsigned int i = 0;
+	while (LOOPer && (i < 250))
 	{
           fprintf(fp,"%d",i);
           i++;
           fprintf(fp,"\n");
-          fprintf(fp,"CurPos=(%u,%u)\n",MAP_currentPos[0],MAP_currentPos[1]);
-          fprintf(fp,"CurJ=%u, JCon=%u, lJDir=%u, nJs=%u, nJl=%u\n",MAP_currentJunction, MAP_junctionCount,
+          fprintf(fp,"cPos=(%u,%u)\n",MAP_currentPos[0],MAP_currentPos[1]);
+          fprintf(fp,"cJ=%u, JCon=%u, lJDir=%u, nJs=%u, nJl=%u\n",MAP_currentJunction, MAP_junctionCount,
                                MAP_lastJunctionDir, MAP_nextJunctionShort, MAP_nextJunctionLong);
+          fprintf(fp,"cDir=%u, nDir=%u\n",MAP_currentDir,MAP_nextDir);
           //fprintf(fp,"(3,25) visited = %d\n",MAP_array[3][25].visited);
           //fprintf(fp,"(4,24) visited = %d\n",MAP_array[4][24].visited);
+          int ii = 0;
+          while (ii < MAP_junctionCount)
+          {
+                fprintf(fp,"%u:%u, ",ii,MAP_junctionOrderArray[ii].hasUnex);
+                ii++;
+          }
+          fprintf(fp,"\n");
           fflush(fp);
           updateMap();
           printMap();
           fflush(fp);
         MAP_main();
-        fprintf(fp,"CurPos=(%d,%d)\n",MAP_currentPos[0],MAP_currentPos[1]);
+        //fprintf(fp,"CurPos=(%d,%d)\n",MAP_currentPos[0],MAP_currentPos[1]);
         fprintf(fp,"\n\n\n");
         fflush(fp);
 	}
+	if (LOOPer != 1)
+	{
+               printf("GREAT SUCCES!!\nMAP COMPLETED!!\n");
+               int qw = 0;
+               while (qw >=0) {qw++;}
+               }
 	fprintf(fp,"SLUT");
 	fflush(fp);
 	
