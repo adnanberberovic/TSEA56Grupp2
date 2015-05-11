@@ -13,7 +13,7 @@
 #include<stdio.h>
 #include<util/delay.h>
 
-int sensor_data [8]; //Skapa en array med 8 element.
+volatile int sensor_data [8]; //Skapa en array med 8 element.
 int8_t send_buffer [4];
 int distance_table[255]; 
 int buffer_flag = 0;
@@ -24,6 +24,9 @@ void Sensor_InitPortDirections()
 {
 	DDRB = 1<<DDB6;
 	DDRA = 0;
+	DDRD = 1<<DDD5 | 1<<DDD6 | 1<<DDD7;
+	// 0 = input
+	// 1 = output
 }
 void Sensor_InitPortValues()
 {
@@ -182,31 +185,33 @@ int main(void)
 		//Skicka ut hur många väggar vi ser från tabell.
 
 			//Vänster långsensor
-			if (sensor_data[0] > 170|| sensor_data[1] > 170)
+			if (sensor_data[0] > 170 || sensor_data[1] > 170)
 			{			
-				if(sensor_data[2] > 51) 
+				if(sensor_data[2] >= 80) 
 					left_wall_counter = 0;
-				else if(50 > sensor_data[2] && sensor_data[2] > 40) 
+				else if(80 > sensor_data[2] && sensor_data[2] >= 45) 
 					left_wall_counter = 1;
-				else if (40 > sensor_data[2] && sensor_data[2] > 22)
+				else if (45 > sensor_data[2] && sensor_data[2] >= 35)
 					left_wall_counter = 2;
 				else
 					left_wall_counter = 3;	
 			}
 			else
-				{
-					left_wall_counter = 0;
-				}
-			if(sensor_data[3] > 170|| sensor_data[4] > 170){
-				
-			if(sensor_data[5] > 51)
-				right_wall_counter = 0;
-			else if(50 > sensor_data[5] && sensor_data[5] > 40)
-				right_wall_counter = 1;
-			else if (40 > sensor_data[5] && sensor_data[5] > 22)
-				right_wall_counter = 2;
-			else
-				right_wall_counter = 3;
+			{
+				left_wall_counter = 0;
+			}
+			
+			//Höger långsensor
+			if(sensor_data[3] > 170|| sensor_data[4] > 170)
+			{
+				if(sensor_data[5] >= 65)
+					right_wall_counter = 0;
+				else if(65 > sensor_data[5] && sensor_data[5] >= 25)
+					right_wall_counter = 1;
+				else if (25 > sensor_data[5] && sensor_data[5] >= 10)
+					right_wall_counter = 2;
+				else
+					right_wall_counter = 3;
 			}
 			else
 			{

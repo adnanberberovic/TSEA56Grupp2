@@ -40,7 +40,7 @@ float rotation_angle = 0.00;
 // Checks if flags are correctly set in manual/auto loop.
 int Manual_Flag = 0;
 
-int speed_var=200;
+int speed_var = 200;
 // --------------------------------------------------------------------------------------
 
 // Setup data direction registers @ ports for out/inputs.
@@ -593,18 +593,18 @@ char REFLEX_GetMarker()
 	return marker_;
 }
 
-int8_t WALLCOUNT_Left()
+uint8_t WALLCOUNT_Left()
 {
 	Get_sensor_values();
-	int8_t walls_ = ((arrSensor[3] >> 3) & (0b000000111));
-	return walls_;
+	uint8_t walls_left = ((arrSensor[3]/8) & (0b00000011));
+	return walls_left;
 }
 
-int8_t WALLCOUNT_Right()
+uint8_t WALLCOUNT_Right()
 {
 	Get_sensor_values();
-	int8_t walls_ = (arrSensor[3] & (0b00000111));
-	return walls_;
+	uint8_t walls_right = (arrSensor[3] & (0b00000011));
+	return walls_right;
 }
 
 //_____________________REFLEX SENSOR AND WALL COUNTER END____________________________
@@ -635,7 +635,7 @@ char control_mode = 'r';	/*if control_mode == r, then the robot will make a rapi
 							 steer itself in a forward direction within the middle lane.
 							 The middle lane is around 4 cm wide according to us.
 							*/
-int8_t front_sensor__;	// Stores the value of the front sensor.
+int8_t front_sensor_;	// Stores the value of the front sensor.
 char discovery_mode = 'r';	/*if discovery_mode == r, then the robot will follow the 
 							"right hand on the wall" rule, i.e. always make right turns
 							whenever possible in junctions.
@@ -694,7 +694,7 @@ int PD_Control()
 	}
 	else if(control_mode == 'c')
 	{
-		standard_speed_ = 100;
+		standard_speed_ = 140;
 		K_p = 4;
 		K_d = 3;
 		if(offset_-20 > 0)
@@ -718,12 +718,6 @@ int PD_Control()
 // Performs a 180 degree turn in the event of a dead end.
 void DEAD_END()
 {	
-	LCD_Clear();
-	LCD_SetPosition(2);
-	LCD_SendString("DEAD END");
-	LCD_SetPosition(28);
-	LCD_display_int8(front_sensor__);
-	LCD_SendString("  ");
 	MOTOR_Stop();
 	_delay_ms(200);
 	MOTOR_RotateLeft(180);
@@ -734,21 +728,21 @@ void DEAD_END()
 // Stops and rotates left 90 degrees.
 void TURN_Right()
 {
-		MOTOR_Stop();
-		_delay_ms(200);
-		MOTOR_RotateRight(90);
-		_delay_ms(200);
-		MOTOR_Forward(standard_speed_);	
+	MOTOR_Stop();
+	_delay_ms(200);
+	MOTOR_RotateRight(90);
+	_delay_ms(200);
+	MOTOR_Forward(standard_speed_);	
 }
 
 // Stops and rotates right 90 degrees.
 void TURN_Left()
 {
-		MOTOR_Stop();
-		_delay_ms(200);
-		MOTOR_RotateLeft(90);
-		_delay_ms(200);
-		MOTOR_Forward(standard_speed_);
+	MOTOR_Stop();
+	_delay_ms(200);
+	MOTOR_RotateLeft(90);
+	_delay_ms(200);
+	MOTOR_Forward(standard_speed_);
 }
 
 // Sets a random discovery mode to actually decide which way to go.
@@ -827,7 +821,7 @@ void JUNCTION_ThreeWayTHREE()
 	}
 	else if (discovery_mode == 'r')
 	{
-		// Turn left
+		// Turn right
 		TURN_Right();
 	}
 	else if (discovery_mode == '?')
@@ -870,44 +864,75 @@ void AutomaticControl()
 	Get_sensor_values();
 	angle_ = arrSensor[0];
 	offset_ = arrSensor[1];
-	front_sensor__ = arrSensor[2];
+	front_sensor_ = arrSensor[2];
 	
 	// Junction, turn, and dead end handling.
-	if(	(WALLCOUNT_Right()==0) && (WALLCOUNT_Left()==0) &&
-		(front_sensor__ <= 18) && (front_sensor__ > 3))
+	
+	
+	// Make a decision based on discovery mode upon entering a 4-way junction.
+	if((offset_ > 32) && !((front_sensor_ <= 18) && (front_sensor_ > 3)))
+		{
+			JUNCTION_FourWay();
+			for(uint8_t i = 0; i<3; i++)
+			{
+				_delay_ms(250);
+			}
+		}		
+	// Turn right in a corner.
+	else if((WALLCOUNT_Right() > 0) && (WALLCOUNT_Left() == 0) &&
+			(front_sensor_ <= 18) && (front_sensor_ > 3))
+		{
+			TURN_Right();
+			for(uint8_t i = 0; i<2; i++)
+			{
+				_delay_ms(250);
+			}
+		}
+	// Turn left in a corner.
+	else if((WALLCOUNT_Right() == 0) && (WALLCOUNT_Left() > 0) &&
+			(front_sensor_ <= 18) && (front_sensor_ > 3))
+		{
+			TURN_Left();
+			for(uint8_t i = 0; i<2; i++)
+			{
+				_delay_ms(250);
+			}
+		}
+	// Three 3-way junction modes, decision depends on entrance to junction
+	// and discovery mode.
+// 	else if((WALLCOUNT_Right() == 0) && (WALLCOUNT_Left() > 0) &&
+// 			!((front_sensor_ <= 18) && (front_sensor_ > 3)))
+// 		{
+// 			JUNCTION_ThreeWayONE();
+// 			for(uint8_t i = 0; i<6; i++)
+// 			{
+// 				_delay_ms(250);
+// 			}
+// 		}
+// 	else if((WALLCOUNT_Right() > 0) && (WALLCOUNT_Left() > 0) &&
+// 			(front_sensor_ <= 18) && (front_sensor_ > 3))
+// 		{
+// 			JUNCTION_ThreeWayTWO();
+// 			for(uint8_t i = 0; i<6; i++)
+// 			{
+// 				_delay_ms(250);
+// 			}
+// 		}
+// 	else if((WALLCOUNT_Right() > 0) && (WALLCOUNT_Left() == 0) &&
+// 			!((front_sensor_ <= 18) && (front_sensor_ > 3)))
+// 		{
+// 			JUNCTION_ThreeWayTHREE();
+// 			for(uint8_t i = 0; i<6; i++)
+// 			{
+// 				_delay_ms(250);
+// 			}
+// 		}
+// 		// Turn 180 deg in a dead end.
+	else if((WALLCOUNT_Right()==0) && (WALLCOUNT_Left()==0) &&
+		(front_sensor_ <= 18) && (front_sensor_ > 3))
 		{
 			DEAD_END();
 		}		
-	else if((WALLCOUNT_Left() > 0) && (WALLCOUNT_Right() > 0) &&
-			!((front_sensor__ <= 18) && (front_sensor__ > 3)))
-		{
-			JUNCTION_FourWay();
-		}		
-	else if((WALLCOUNT_Right() > 0) && (WALLCOUNT_Left() == 0) &&
-			(front_sensor__ <= 18) && (front_sensor__ > 3))
-		{
-			TURN_Right();
-		}
-	else if((WALLCOUNT_Right() == 0) && (WALLCOUNT_Left() > 0) &&
-			(front_sensor__ <= 18) && (front_sensor__ > 3))
-		{
-			TURN_Left();
-		}
-	else if((WALLCOUNT_Right() == 0) && (WALLCOUNT_Left() > 0) &&
-			!((front_sensor__ <= 18) && (front_sensor__ > 3)))
-		{
-			JUNCTION_ThreeWayONE();
-		}
-	else if((WALLCOUNT_Right() > 0) && (WALLCOUNT_Left() > 0) &&
-			(front_sensor__ <= 18) && (front_sensor__ > 3))
-		{
-			JUNCTION_ThreeWayTWO();
-		}
-	else if((WALLCOUNT_Right() > 0) && (WALLCOUNT_Left() == 0) &&
-			!((front_sensor__ <= 18) && (front_sensor__ > 3)))
-		{
-			JUNCTION_ThreeWayTHREE();
-		}
 	
 	// Puts the automatic control in careful mode, keep the robot on track.
 	if(abs(offset_-20) <= 2)
@@ -928,7 +953,7 @@ void AutomaticControl()
 	// Makes sure that the motors don't burn out (i.e go on max velocity)
 	if(new_speed_ > (254-standard_speed_))
 	{
-		MOTOR_Stop();
+		new_speed_ = 254 - standard_speed_;
 	}
 	else
 	{
@@ -958,7 +983,7 @@ void INIT_ALL()
 int main(void)
 {
 	INIT_ALL();
-
+	
   	while (1) {
   		_delay_ms(10);
   		LCD_Clear();
@@ -997,8 +1022,12 @@ int main(void)
   		while(MANUAL_MODE)
   		{
   			MANUAL_DRIVE();
+			LCD_SetPosition(0);
+			LCD_SendString("RW: ");
+			LCD_display_uint8(WALLCOUNT_Right());
+			LCD_SendString(" | LW: ");
+			LCD_display_uint8(WALLCOUNT_Left());
   		}
-  		
   		PWM_SetSpeedLeft(0);
   		PWM_SetSpeedRight(0);
   	}
