@@ -864,15 +864,21 @@ void AutomaticControl()
 	front_sensor_ = arrSensor[2];
 	
 	// Junction, turn, and dead end handling.
-	
-	
+
+	// Turn 180 deg in a dead end.
+	if((WALLCOUNT_Right()==0) && (WALLCOUNT_Left()==0) &&
+		(front_sensor_ <= 18) && (front_sensor_ > 3))
+		{
+			DEAD_END();
+		}
+		
 	// Make a decision based on discovery mode upon entering a 4-way junction.
-	if((offset_ > 32) && !((front_sensor_ <= 18) && (front_sensor_ > 3)))
+	else if((offset_ > 32) && !((front_sensor_ <= 18) && (front_sensor_ > 3)))
 		{
 			JUNCTION_FourWay();
 			for(uint8_t i = 0; i<3; i++)
 			{
-				_delay_ms(250);
+				_delay_ms(200);
 			}
 		}		
 	// Turn right in a corner.
@@ -880,7 +886,7 @@ void AutomaticControl()
 			(front_sensor_ <= 18) && (front_sensor_ > 3))
 		{
 			TURN_Right();
-			for(uint8_t i = 0; i<2; i++)
+			for(uint8_t i = 0; i<3; i++)
 			{
 				_delay_ms(250);
 			}
@@ -890,46 +896,41 @@ void AutomaticControl()
 			(front_sensor_ <= 18) && (front_sensor_ > 3))
 		{
 			TURN_Left();
-			for(uint8_t i = 0; i<2; i++)
+			for(uint8_t i = 0; i<3; i++)
 			{
 				_delay_ms(250);
 			}
 		}
+		
 	// Three 3-way junction modes, decision depends on entrance to junction
 	// and discovery mode.
-// 	else if((WALLCOUNT_Right() == 0) && (WALLCOUNT_Left() > 0) &&
-// 			!((front_sensor_ <= 18) && (front_sensor_ > 3)))
-// 		{
-// 			JUNCTION_ThreeWayONE();
-// 			for(uint8_t i = 0; i<6; i++)
-// 			{
-// 				_delay_ms(250);
-// 			}
-// 		}
-// 	else if((WALLCOUNT_Right() > 0) && (WALLCOUNT_Left() > 0) &&
-// 			(front_sensor_ <= 18) && (front_sensor_ > 3))
-// 		{
-// 			JUNCTION_ThreeWayTWO();
-// 			for(uint8_t i = 0; i<6; i++)
-// 			{
-// 				_delay_ms(250);
-// 			}
-// 		}
-// 	else if((WALLCOUNT_Right() > 0) && (WALLCOUNT_Left() == 0) &&
-// 			!((front_sensor_ <= 18) && (front_sensor_ > 3)))
-// 		{
-// 			JUNCTION_ThreeWayTHREE();
-// 			for(uint8_t i = 0; i<6; i++)
-// 			{
-// 				_delay_ms(250);
-// 			}
-// 		}
-// 		// Turn 180 deg in a dead end.
-	else if((WALLCOUNT_Right()==0) && (WALLCOUNT_Left()==0) &&
-		(front_sensor_ <= 18) && (front_sensor_ > 3))
+	else if((WALLCOUNT_Right() == 0) && (WALLCOUNT_Left() > 0) &&
+			!((front_sensor_ <= 18) && (front_sensor_ > 3)))
 		{
-			DEAD_END();
-		}		
+			JUNCTION_ThreeWayONE();
+			for(uint8_t i = 0; i<4; i++)
+			{
+				_delay_ms(210); //DELAYEN PÅVERKAS AV BATTERISPÄNNINGEN.
+			}
+		}
+	else if((WALLCOUNT_Right() > 0) && (WALLCOUNT_Left() > 0) &&
+			(front_sensor_ <= 18) && (front_sensor_ > 3))
+		{
+			JUNCTION_ThreeWayTWO();
+			for(uint8_t i = 0; i<4; i++)
+			{
+				_delay_ms(210);
+			}
+		}
+	else if((WALLCOUNT_Right() > 0) && (WALLCOUNT_Left() == 0) &&
+			!((front_sensor_ <= 18) && (front_sensor_ > 3)))
+		{
+			JUNCTION_ThreeWayTHREE();
+			for(uint8_t i = 0; i<4; i++)
+			{
+				_delay_ms(210);
+			}
+		}
 	
 	// Puts the automatic control in careful mode, keep the robot on track.
 	if(abs(offset_-20) <= 2)
@@ -1009,7 +1010,7 @@ int main(void)
   			LCD_SendString("  ");
 			LCD_display_int8(WALLCOUNT_Left());
 			
-  			_delay_ms(100);
+  			_delay_ms(50);
   		}
   		
   		_delay_ms(10);
@@ -1019,11 +1020,6 @@ int main(void)
   		while(MANUAL_MODE)
   		{
   			MANUAL_DRIVE();
-			LCD_SetPosition(0);
-			LCD_SendString("RW: ");
-			LCD_display_uint8(WALLCOUNT_Right());
-			LCD_SendString(" | LW: ");
-			LCD_display_uint8(WALLCOUNT_Left());
   		}
   		PWM_SetSpeedLeft(0);
   		PWM_SetSpeedRight(0);
