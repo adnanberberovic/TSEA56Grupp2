@@ -435,54 +435,50 @@ void checkRightAngle(float target_angle)
 //----------------------------GYRO----END-----------------------------
 
 //__________________________SPEEDOMETER_______________________________
-uint16_t wheel_marker_counter = 0;
-uint16_t current_speed;
-uint16_t wheel_circumference = 4*100*79; //Wheel circumference is 79 mm.
-uint16_t time_difference;
+uint16_t speed_send;
+uint16_t speed_send_new;
+uint16_t ss1;
+uint16_t ss2;
+float current_speed;
+float  wheel_circumference = 20.4/2; //Wheel circumference is 204 mm.
+float time_difference;
+
 
 void Speed_Interrupt_Init()
 {
-	EICRA = 1<< ISC00 | 1<<ISC01; //INT0 genererar avbrott p� rising flank
-	EIMSK = 1<< INT0; //IINT0?
-	//MCUCR = (1<<IVCE); //Boot flash?
-	//MCUCR = (1<<IVSEL); //Boot flash?
+	EICRA = 1<< ISC00 | 0 <<ISC01; //INT0 genererar avbrott p� båda flanker
+	EIMSK = 1<< INT0;
 }
 
 ISR(INT0_vect)
 {
-//Kontrollerar schmitt-resistorn via PC7 (=pin 29)
-//Pinne 26 är för övrigt dåligt virad!!
-	cli();
-	LCD_SetPosition(24);
-	LCD_display_uint16(wheel_marker_counter);
-	_delay_ms(250);
-	//EIMSK &= ~(1<INT0);
-	if (wheel_marker_counter == 0)
+	if ((PIND & 0b00000100) == 4)
 	{
-		TIMER_wheel = 0;
-		wheel_marker_counter++;
-	}
-	else if (wheel_marker_counter < 8)
-	{
-		LCD_SetPosition(24);
-		LCD_display_uint16(wheel_marker_counter);
-		wheel_marker_counter++;
+		ss2 = ss1;
+		ss1 = speed_send;
+		PORTC &= ~(1 <<PORTC7); 
+		//Decrease reference voltage
+		time_difference = (float)TIMER_wheel / 0.8175 /1000;
+		// div by 0.8175 -> time in ms
+		if (TIMER_wheel > 20)
+		{
+			current_speed = wheel_circumference / time_difference;
+			speed_send = (uint16_t)current_speed;
+			
+			speed_send_new = (ss1+ss2+2*speed_send)/4;
+			
+			LCD_SetPosition(0);
+			LCD_display_uint16(TIMER_wheel);
+			LCD_SetPosition(16);
+			LCD_display_uint16(speed_send_new);
+			TIMER_wheel = 0;
+		}
 	}
 	else
 	{
-		time_difference = TIMER_wheel / 0.8175; // div by 0.8175 -> time in ms
-		current_speed = wheel_circumference / time_difference;
-		LCD_Clear();
-// 		LCD_SetPosition(0);
-// 		LCD_display_int16(time_difference);
-// 		LCD_SetPosition(8);
-// 		LCD_display_int16(current_speed);
-		LCD_SetPosition(24);
-		LCD_display_uint16(wheel_marker_counter);
-		wheel_marker_counter = 0; 
-	}
-	//EIMSK |= 1<INT0;
-	sei();
+		PORTC |= 1<<PORTC7;
+		//Increase reference voltage
+	}	
 }
 //__________________________SPEEDOMETER END____________________________
 
