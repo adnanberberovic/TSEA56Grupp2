@@ -4,7 +4,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectVersion>6.2</ProjectVersion>
     <ToolchainName>com.Atmel.AVRGCC8.C</ToolchainName>
-    <ProjectGuid>{9d846282-563c-4c1c-acd7-33ca8f7cf2c7}</ProjectGuid>
+    <ProjectGuid>{24eea02b-c411-48c6-ac9e-fe0a968b5c83}</ProjectGuid>
     <avrdevice>ATmega1284P</avrdevice>
     <avrdeviceseries>none</avrdeviceseries>
     <OutputType>Executable</OutputType>
@@ -12,9 +12,9 @@
     <OutputFileName>$(MSBuildProjectName)</OutputFileName>
     <OutputFileExtension>.elf</OutputFileExtension>
     <OutputDirectory>$(MSBuildProjectDirectory)\$(Configuration)</OutputDirectory>
-    <AssemblyName>Styrmodul_A_V0.2</AssemblyName>
-    <Name>Styrmodul_A_V0.2</Name>
-    <RootNamespace>Styrmodul_A_V0.2</RootNamespace>
+    <AssemblyName>Sensormodul_V1.0</AssemblyName>
+    <Name>Sensormodul_V1.0</Name>
+    <RootNamespace>Sensormodul_V1.0</RootNamespace>
     <ToolchainFlavour>Native</ToolchainFlavour>
     <KeepTimersRunning>true</KeepTimersRunning>
     <OverrideVtor>false</OverrideVtor>
@@ -98,7 +98,7 @@
     </ToolchainSettings>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Styrmodul_A_V0.2.c">
+    <Compile Include="Sensormodul_V1.0.c">
       <SubType>compile</SubType>
     </Compile>
   </ItemGroup>

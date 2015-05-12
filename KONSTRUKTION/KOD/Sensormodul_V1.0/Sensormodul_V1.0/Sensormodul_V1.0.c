@@ -1,8 +1,8 @@
 /*
- * Sensormodul_test.c 
+ * Sensor module Version 1.0 
  *
  * Created: 3/23/2015 12:46:10 PM
- *  Author: frefr166
+ * Author: Grupp 2 TSEA56 2015 
  */ 
 #define F_CPU 20000000UL
 #include<avr/io.h>
@@ -137,7 +137,7 @@ int main(void)
 	SPI_SlaveInit();
 	
 	sei(); //Aktiverar globala avbrott
-	ADCSRA = 143; //Aktivera ADC, ADC-interrupt, Sätt division factor till 128. 20 MHz/128 = 156,25 kHz
+	ADCSRA = 0x87; //Aktivera ADC, ADC-interrupt, Sätt division factor till 128. 20 MHz/128 = 156,25 kHz
 		
 	while(1)
 	{
@@ -151,6 +151,13 @@ int main(void)
 		while(ADCSRA & 1<<ADSC)
 			{
 			} //Delay så att inte ADMUX-inläsningarna hamnar i oordning
+	if ( (i == 7) || (i == 2) || (i == 5) ){
+	sensor_data[i] = ADCH; // Ifall det är långa sensorn eller reflex ska den inte konverteras.
+	}
+	else
+	{
+	sensor_data[i] = distance_table[ADCH];
+	}	
 		}
 
 
@@ -187,11 +194,11 @@ int main(void)
 			//Vänster långsensor
 			if (sensor_data[0] > 170 || sensor_data[1] > 170)
 			{			
-				if(sensor_data[2] >= 80) 
+				if(sensor_data[2] >= 85) 
 					left_wall_counter = 0;
-				else if(80 > sensor_data[2] && sensor_data[2] >= 45) 
+				else if(85 > sensor_data[2] && sensor_data[2] >= 45) 
 					left_wall_counter = 1;
-				else if (45 > sensor_data[2] && sensor_data[2] >= 35)
+				else if (45 > sensor_data[2] && sensor_data[2] >= 32)
 					left_wall_counter = 2;
 				else
 					left_wall_counter = 3;	
@@ -202,13 +209,13 @@ int main(void)
 			}
 			
 			//Höger långsensor
-			if(sensor_data[3] > 170|| sensor_data[4] > 170)
+			if (sensor_data[3] > 170 || sensor_data[4] > 170)
 			{
-				if(sensor_data[5] >= 65)
+				if(sensor_data[5] >= 90)
 					right_wall_counter = 0;
-				else if(65 > sensor_data[5] && sensor_data[5] >= 25)
+				else if(90 > sensor_data[5] && sensor_data[5] >= 50)
 					right_wall_counter = 1;
-				else if (25 > sensor_data[5] && sensor_data[5] >= 10)
+				else if (50 > sensor_data[5] && sensor_data[5] >= 37)
 					right_wall_counter = 2;
 				else
 					right_wall_counter = 3;

@@ -99,30 +99,6 @@ void LCD_SetPosition(uint8_t pos)
 	
 }
 
-// Sets position for cursor on LCD. Argument should be a number in the range of 0-31.
-void LCD_SetPosition(uint8_t pos)
-{
-	LCD_Counter =(int) pos - 1;
-	while(LCD_Busy())
-	{
-		_delay_ms(1);
-	}
-	PORTB &= ~(1 << 0); // Clear RS and
-	PORTB &= ~(1 << 1); // clear R/W bits so that the following commands can be run
-	
-	if (pos < 16)
-	{
-		LCD_SendCommand(128+pos);
-	}
-	else if (pos < 32)
-	{
-		LCD_SendCommand(128+64-16+pos);
-	}
-	else LCD_SendCommand(0b10000000);
-	
-}
-
-
 void LCD_SendCharacter(char symbol)
 {
 	LCD_Counter++;
@@ -161,13 +137,29 @@ void LCD_SendString(char *text)
 
 void LCD_WelcomeScreen(void)
 {
-	LCD_SendString("    ResQ.Pl    ");
+	LCD_SendString("     ResQ.Pl    ");
 	LCD_SetRow(2);
-	LCD_SendString("  Master Race  ");
+	LCD_SendString("   Master Race  ");
+}
+
+// Display an unsigned 8 bit value as up to three decimal characters
+void LCD_display_uint8(uint8_t val) {
+	unsigned char buf[3];
+	int8_t ptr;
+	for(ptr=0;ptr<3;++ptr) {
+		buf[ptr] = (val % 10) + '0';
+		val /= 10;
+	}
+	for(ptr=2;ptr>0;--ptr) {
+		if (buf[ptr] != '0') break;
+	}
+	for(;ptr>=0;--ptr) {
+		LCD_SendCharacter(buf[ptr]);
+	}
 }
 
  //Display a signed 8 bit value as a possible minus character followed by up to three decimal characters
- void LCD_display_int8(int8_t val) {
+void LCD_display_int8(int8_t val) {
 	 unsigned char buf[3];
 	 int8_t ptr;
 	 if (val < 0) {
@@ -185,6 +177,41 @@ void LCD_WelcomeScreen(void)
 		 LCD_SendCharacter(buf[ptr]);
 	 }
  }
+
+void LCD_display_int16(int16_t val) {
+	unsigned char buf[5];
+	if (val < 0) {
+	  LCD_SendCharacter('-');
+	  val *= -1;
+	}
+	int8_t ptr;
+	for(ptr=0;ptr<5;++ptr) {
+		buf[ptr] = (val % 10) + '0';
+		val /= 10;
+	}
+	for(ptr=4;ptr>0;--ptr) {
+		if (buf[ptr] != '0') break;
+	}
+	for(;ptr>=0;--ptr) {
+		LCD_SendCharacter(buf[ptr]);
+	}
+}
+
+// Display an unsigned 16 bit value as up to five decimal characters
+void LCD_display_uint16(uint16_t val) {
+	unsigned char buf[5];
+	int8_t ptr;
+	for(ptr=0;ptr<5;++ptr) {
+		buf[ptr] = (val % 10) + '0';
+		val /= 10;
+	}
+	for(ptr=4;ptr>0;--ptr) {
+		if (buf[ptr] != '0') break;
+	}
+	for(;ptr>=0;--ptr) {
+		LCD_SendCharacter(buf[ptr]);
+	}
+}
 
 void LCD_Clear()
 {
