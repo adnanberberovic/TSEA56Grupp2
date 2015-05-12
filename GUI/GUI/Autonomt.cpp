@@ -49,7 +49,7 @@ Autonom::Autonom(SetupSDL* sdl_lib, void* hComm_)
     
     Speed_left->Change_speed(140);
     Speed_right->Change_speed(300);
-    
+  
 }
 
 //Destruktor (INTE KLAR)

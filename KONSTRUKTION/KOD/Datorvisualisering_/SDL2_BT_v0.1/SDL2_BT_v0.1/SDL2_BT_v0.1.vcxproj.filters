@@ -53,5 +53,8 @@
     <ClInclude Include="Bluetooth.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\..\..\..\..\..\..\..\SDL2\include\SDL.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
