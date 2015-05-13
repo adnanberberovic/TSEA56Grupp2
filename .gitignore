@@ -2,7 +2,6 @@
 ###################
 *.com
 *.class
-*.dll
 *.o
 *.so
 
@@ -31,7 +30,7 @@ Thumbs.db
 # Build results
 [Dd]ebug/
 [Dd]ebugPublic/
-[Rr]elease/
+#[Rr]elease/
 [Rr]eleases/
 x64/
 x86/
