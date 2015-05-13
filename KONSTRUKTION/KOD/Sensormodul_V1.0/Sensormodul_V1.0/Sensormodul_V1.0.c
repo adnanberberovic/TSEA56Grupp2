@@ -14,7 +14,7 @@
 #include<util/delay.h>
 
 volatile int sensor_data [8]; //Skapa en array med 8 element.
-int8_t send_buffer [4];
+int8_t send_buffer [5];
 int distance_table[255]; 
 int buffer_flag = 0;
 
@@ -124,11 +124,16 @@ int main(void)
 { 
 	int8_t angle;
 	int8_t offset;
-	int8_t front_sensor;
+	uint8_t front_sensor;
 	int8_t wall_reflex_information;
+	int8_t can_see_information;
 	int reflex_bool;
 	int8_t left_wall_counter;
 	int8_t right_wall_counter;
+	int left_see_path;
+	int right_see_path;
+	int left_see_wall;
+	int right_see_wall;
 	
 	distance_table_generator(); //Skapa avståndstabellen
 	
@@ -137,7 +142,7 @@ int main(void)
 	SPI_SlaveInit();
 	
 	sei(); //Aktiverar globala avbrott
-	ADCSRA = 0x87; //Aktivera ADC, ADC-interrupt, Sätt division factor till 128. 20 MHz/128 = 156,25 kHz
+	ADCSRA = 0x87; //Aktivera ADC, Sätt division factor till 128. 20 MHz/128 = 156,25 kHz
 		
 	while(1)
 	{
@@ -148,16 +153,17 @@ int main(void)
 			ADMUX = 32 + i; //Öka admux, sätt ADLAR (bit 5 = 32)
 			ADCSRA |= (1<<6); //Börja ADC
 			
-		while(ADCSRA & 1<<ADSC)
+			while(ADCSRA & 1<<ADSC)
+				{
+				} //Delay så att inte ADMUX-inläsningarna hamnar i oordning
+			if ( (i == 7) || (i == 2) || (i == 5) || (i == 6))
 			{
-			} //Delay så att inte ADMUX-inläsningarna hamnar i oordning
-	if ( (i == 7) || (i == 2) || (i == 5) ){
-	sensor_data[i] = ADCH; // Ifall det är långa sensorn eller reflex ska den inte konverteras.
-	}
-	else
-	{
-	sensor_data[i] = distance_table[ADCH];
-	}	
+				sensor_data[i] = ADCH; // Ifall det är långa sensorn eller reflex ska den inte konverteras.
+			}
+			else
+			{
+				sensor_data[i] = distance_table[ADCH];
+			}	
 		}
 
 
@@ -175,12 +181,48 @@ int main(void)
 				angle= angle_generator(sensor_data[0],sensor_data[1]);
 				offset = offset_generator(angle,sensor_data[0],sensor_data[1]);
 			}
+			
+			
+		if((sensor_data[0] > 200) && (sensor_data[1] > 200))
+		{
+			left_see_path = 1;
+		}
+		else
+		{
+			left_see_path = 0;
+		}
 		
+		if((sensor_data[3] > 200) && (sensor_data[4] > 200))
+		{
+			right_see_path = 1;
+		}
+		else
+		{
+			right_see_path = 0;
+		}
+		
+		if((sensor_data[0] > 200) || (sensor_data[1] > 200))
+		{
+			left_see_wall = 1;
+		}
+		else
+		{
+			left_see_wall = 0;
+		}
+	
+		if((sensor_data[3] > 200) || (sensor_data[4] > 200))
+		{
+			right_see_wall = 1;
+		}
+		else
+		{
+			right_see_wall = 0;
+		}
 //_________________________________________Frontsensor________________________________________
-		//Dividera resultatet med 10 för att det ska bli centimeter
 
-		front_sensor = (int8_t)(sensor_data[6]/10);
-				
+		//Dividera resultatet med 10 för att det ska bli centimeter
+		front_sensor = (int8_t)(sensor_data[6]);
+
 //_________________________________________Reflexsensor________________________________________
 		if((sensor_data[7] > 127))
 			reflex_bool = 1;
@@ -234,35 +276,31 @@ int main(void)
 		//Lägg vänster vägg på 4 och 5 biten, lägg höger vägg på 1 och 2 biten.
 		//För avläsning - and:a bort de ointressanta bitarna och dividera med rätt faktor.
 		
-		wall_reflex_information = ( (reflex_bool * 64) + (left_wall_counter * 8) + (right_wall_counter) );
-			
+		wall_reflex_information = ( (reflex_bool * 64) + 
+									(left_wall_counter * 4) + (right_wall_counter) );
+		//	WRI =	ur mom	REFLEX	-	-	LW1 LW0 RW1 RW0
+		//			128		64		32	16	8	4	2	1		
+		
+		can_see_information = ( (left_see_wall * 8) + (right_see_wall * 4) +
+								(left_see_path * 2) + right_see_path );
+		
+		//	CSI	=	ur mom	weed	420	69	LSW	RSW	LSP	RSP
+		//			128		64		32	16	8	4	2	1
 		//Förhindra avbrott under uppdateringen - höj avbrottsnivån så inga bussavbrott kommer.
 		cli();
 		send_buffer[0] = angle;    
 		send_buffer[1] = offset;   
 		send_buffer[2] = front_sensor;
-		send_buffer[3] = wall_reflex_information;
+		send_buffer[3] = can_see_information;
+		send_buffer[4] = wall_reflex_information;
 		sei();
 		
-		//Skicka till Styrmodul via SPI
-		
-		
+		//Skicka till Styrmodul via SPI		
 		//_________________________________________TEST________________________________________
 		//_delay_ms(250);
 	}			
 }
 
-ISR(ADC_vect)
-{
-	if ( (ADMUX-32 == 7) || (ADMUX-32 == 2) || (ADMUX-32 == 5) ){
-	sensor_data[ADMUX-32] = ADCH; // Ifall det är långa sensorn eller reflex ska den inte konverteras.
-	}
-	else
-	{
-	sensor_data[ADMUX-32] = distance_table[ADCH];
-	}	
-		
-}
 
 ISR(SPI_STC_vect)
 {
@@ -281,7 +319,5 @@ ADMUX 3 = Kort höger bak
 ADMUX 4 = Kort höger fram
 ADMUX 5 = Lång höger
 ADMUX 6 = Kort framåt
-
-Är riktningen OK?!
+ADMUX 7 = Reflex
 */
-
