@@ -20,7 +20,7 @@ typedef struct tree_el node;
 //--------------------------------------------------------
 
 struct list_el {
-   unsigned int cost;
+   unsigned int cost, nr;
    struct list_el * next;
 };
 typedef struct list_el item;
