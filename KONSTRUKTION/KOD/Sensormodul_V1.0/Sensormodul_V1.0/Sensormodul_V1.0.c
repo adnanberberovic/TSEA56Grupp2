@@ -14,7 +14,9 @@
 #include<util/delay.h>
 
 volatile int sensor_data [8]; //Skapa en array med 8 element.
-int8_t send_buffer [5];
+int8_t send_buffer_1 [5];
+int8_t send_buffer_2 [5];
+int8_t send_buffer_3 [5];
 int distance_table[255]; 
 int buffer_flag = 0;
 
@@ -130,10 +132,10 @@ int main(void)
 	int reflex_bool;
 	int8_t left_wall_counter;
 	int8_t right_wall_counter;
-	int left_see_path;
-	int right_see_path;
-	int left_see_wall;
-	int right_see_wall;
+	int left_path_both;
+	int right_path_both;
+	int left_path_one;
+	int right_path_one;
 	
 	distance_table_generator(); //Skapa avståndstabellen
 	
@@ -156,6 +158,7 @@ int main(void)
 			while(ADCSRA & 1<<ADSC)
 				{
 				} //Delay så att inte ADMUX-inläsningarna hamnar i oordning
+				
 			if ( (i == 7) || (i == 2) || (i == 5) || (i == 6))
 			{
 				sensor_data[i] = ADCH; // Ifall det är långa sensorn eller reflex ska den inte konverteras.
@@ -183,47 +186,52 @@ int main(void)
 			}
 			
 			
+			
+//_________________________________________Skapa bools för styrbeslut______________________________________
 		if((sensor_data[0] > 200) && (sensor_data[1] > 200))
 		{
-			left_see_path = 1;
+			left_path_both = 1;
 		}
 		else
 		{
-			left_see_path = 0;
+			left_path_both = 0;
 		}
 		
 		if((sensor_data[3] > 200) && (sensor_data[4] > 200))
 		{
-			right_see_path = 1;
+			right_path_both = 1;
 		}
 		else
 		{
-			right_see_path = 0;
+			right_path_both = 0;
 		}
 		
 		if((sensor_data[0] > 200) || (sensor_data[1] > 200))
 		{
-			left_see_wall = 1;
+			left_path_one = 1;
 		}
 		else
 		{
-			left_see_wall = 0;
+			left_path_one = 0;
 		}
 	
 		if((sensor_data[3] > 200) || (sensor_data[4] > 200))
 		{
-			right_see_wall = 1;
+			right_path_one = 1;
 		}
 		else
 		{
-			right_see_wall = 0;
+			right_path_one = 0;
 		}
 //_________________________________________Frontsensor________________________________________
 
-		//Dividera resultatet med 10 för att det ska bli centimeter
+		//Skickar spänning till styrmodulen. Gör om?
 		front_sensor = (int8_t)(sensor_data[6]);
+		
+		
 
 //_________________________________________Reflexsensor________________________________________
+	
 		if((sensor_data[7] > 127))
 			reflex_bool = 1;
 		else
@@ -269,8 +277,6 @@ int main(void)
 			
 		
 		
-		
-		
 //_________________________________________Uppdatera buffer________________________________________
 		//Samla ihop väggarna och reflexen i en binär talföljd. Lägg reflex_bool på 7 biten
 		//Lägg vänster vägg på 4 och 5 biten, lägg höger vägg på 1 och 2 biten.
@@ -278,26 +284,27 @@ int main(void)
 		
 		wall_reflex_information = ( (reflex_bool * 64) + 
 									(left_wall_counter * 4) + (right_wall_counter) );
-		//	WRI =	ur mom	REFLEX	-	-	LW1 LW0 RW1 RW0
-		//			128		64		32	16	8	4	2	1		
+		//	WRI =	x	REFLEX	x	LW1 LW0 RW1 RW0
+		//			128		64	32	16	8	4	2	1		
 		
-		can_see_information = ( (left_see_wall * 8) + (right_see_wall * 4) +
-								(left_see_path * 2) + right_see_path );
+		can_see_information = ( (left_path_one * 8) + (right_path_one * 4) +
+								(left_path_both * 2) + right_path_both );
 		
-		//	CSI	=	ur mom	weed	420	69	LSW	RSW	LSP	RSP
+		//	CSI	=	x	x	x	x	LP1	RP1	LPB	RPB
 		//			128		64		32	16	8	4	2	1
 		//Förhindra avbrott under uppdateringen - höj avbrottsnivån så inga bussavbrott kommer.
 		cli();
-		send_buffer[0] = angle;    
+	
+		//send_buffer_3 = send_buffer_2; SKAPA EN MEDIAN/MEDELVÄRDE SOM MAN SKICKAR IVÄG!
+		//send_buffer_2 = send_buffer_1;
+		send_buffer[0] = angle;
 		send_buffer[1] = offset;   
 		send_buffer[2] = front_sensor;
 		send_buffer[3] = can_see_information;
 		send_buffer[4] = wall_reflex_information;
 		sei();
 		
-		//Skicka till Styrmodul via SPI		
-		//_________________________________________TEST________________________________________
-		//_delay_ms(250);
+		//Skicka till Styrmodul via SPI
 	}			
 }
 
@@ -318,6 +325,6 @@ ADMUX 2 = Lång vänster
 ADMUX 3 = Kort höger bak
 ADMUX 4 = Kort höger fram
 ADMUX 5 = Lång höger
-ADMUX 6 = Kort framåt
+ADMUX 6 = Lång framåt
 ADMUX 7 = Reflex
 */

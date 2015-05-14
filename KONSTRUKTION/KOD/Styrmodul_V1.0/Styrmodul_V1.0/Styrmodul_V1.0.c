@@ -40,7 +40,6 @@ uint8_t TIMER_overflows_deci;
 float rotation_angle = 0.00;
 // Checks if flags are correctly set in manual/auto loop.
 int Manual_Flag = 0;
-
 int speed_var = 200;
 // --------------------------------------------------------------------------------------
 
@@ -441,8 +440,9 @@ uint16_t speed_send_new;
 uint16_t ss1;
 uint16_t ss2;
 float current_speed;
-float  wheel_circumference = 20.4/2; //Wheel circumference is 204 mm.
+float  wheel_circumference = 20.4/4; //Wheel circumference is 204 mm. 8 black sectors
 float time_difference;
+uint8_t wheel_counter;
 
 
 void Speed_Interrupt_Init()
@@ -455,30 +455,25 @@ ISR(INT0_vect)
 {
 	if ((PIND & 0b00000100) == 4)
 	{
-		ss2 = ss1;
-		ss1 = speed_send;
-		PORTC &= ~(1 <<PORTC7); 
-		//Decrease reference voltage
-		time_difference = (float)TIMER_wheel / 0.8175 /1000;
-		// div by 0.8175 -> time in ms
-		if (TIMER_wheel > 20)
-		{
-			current_speed = wheel_circumference / time_difference;
-			speed_send = (uint16_t)current_speed;
-			
-			speed_send_new = (ss1+ss2+2*speed_send)/4;
-			
-			LCD_SetPosition(0);
-			LCD_display_uint16(TIMER_wheel);
-			LCD_SetPosition(16);
-			LCD_display_uint16(speed_send_new);
-			TIMER_wheel = 0;
-		}
+		PORTC &= ~(1 <<PORTC7);
 	}
 	else
 	{
-		PORTC |= 1<<PORTC7;
-		//Increase reference voltage
+		PORTC |= 1<<PORTC7; //Increase reference voltage
+		
+// 		ss2 = ss1;
+// 		ss1 = speed_send;
+// 		//Decrease reference voltage
+// 		time_difference = (float)TIMER_wheel / 0.8175 /1000;
+// 		// div by 0.8175 -> time in ms
+// 		if (TIMER_wheel > 20)
+// 		{
+// 			current_speed = wheel_circumference / time_difference;
+// 			speed_send = (uint16_t)current_speed;
+//			speed_send_new = (ss1+ss2+2*speed_send)/4;
+// 			TIMER_wheel = 0;
+// 		}
+		wheel_counter++;
 	}	
 }
 //__________________________SPEEDOMETER END____________________________
@@ -570,9 +565,22 @@ uint8_t FRONT_SENSOR_VALUE()
 	Get_sensor_values();
 	return arrSensor[2];
 }
-uint8_t CANSEEWALL_Front()
+
+uint8_t PATH_AHEAD()
 {
-	if(FRONT_SENSOR_VALUE() > 120)
+	if (FRONT_SENSOR_VALUE() < 40)
+	{
+		return 1;
+	}
+	else
+	{
+		return 0;	
+	}
+}
+
+uint8_t WALL_AHEAD()
+{
+	if (FRONT_SENSOR_VALUE() > 100)
 	{
 		return 1;
 	}
@@ -580,47 +588,34 @@ uint8_t CANSEEWALL_Front()
 	{
 		return 0;
 	}
-	
 }
 
-uint8_t CANSEEPATH_Left()
-{
-	Get_sensor_values();
-	uint8_t canseepath_left = ((arrSensor[3]/2) & (0b00000001));
-	return canseepath_left;
-}
-
-uint8_t CANSEEPATH_Right()
-{
-	Get_sensor_values();
-	uint8_t canseepath_right = ((arrSensor[3]) & (0b00000001));
-	return canseepath_right;
-}
-
-uint8_t CANSEEWALL_Left()
+uint8_t LEFTPATHONE()
 {
 	Get_sensor_values();
 	uint8_t canseewall_left = ((arrSensor[3])/8 & (0b00000001));
 	return canseewall_left;
 }
 
-uint8_t CANSEEWALL_Right()
+uint8_t RIGHTPATHONE()
 {
 	Get_sensor_values();
 	uint8_t canseewall_right = ((arrSensor[3])/4 & (0b00000001));
 	return canseewall_right;
 }
 
-uint8_t CANSEEPATH()
+uint8_t LEFTPATHBOTH()
 {
-	if (CANSEEPATH_Left() && CANSEEPATH_Right())
-	{
-		return 1;
-	}
-	else
-	{
-		return 0;
-	}
+	Get_sensor_values();
+	uint8_t canseepath_left = ((arrSensor[3]/2) & (0b00000001));
+	return canseepath_left;
+}
+
+uint8_t RIGHTPATHBOTH()
+{
+	Get_sensor_values();
+	uint8_t canseepath_right = ((arrSensor[3]) & (0b00000001));
+	return canseepath_right;
 }
 
 uint8_t WALLCOUNT_Left()
@@ -637,17 +632,6 @@ uint8_t WALLCOUNT_Right()
 	return walls_right;
 }
 
-uint8_t ALW_FOURWAY()
-{
-	if (FRONT_SENSOR_VALUE() < 80)
-	{
-		return 1;
-	}
-	else
-	{
-		return 0;
-	}
-}
 
 
 //_____________________REFLEX SENSOR AND WALL COUNTER END____________________________
@@ -671,7 +655,7 @@ int prev_time_ = 0;	// Useful for comparing time, used for the "derivative".
 int angle_;			// The angle of the robot with respect to the corridor.
 int K_d = 1;		// K (constant) for D regulation.
 int K_p = 1;		// K (proportion) for P regulation.
-int standard_speed_ = 100;	// Keeps track of standard speed.
+int standard_speed_ = 150;	// Keeps track of standard speed.
 char control_mode = 'r';	/*if control_mode == r, then the robot will make a rapid angle
 							 change in angle to steer itself towards the middle lane.
 							 if control_mode == c, then the robot will carefully
@@ -712,6 +696,33 @@ int D_control()
 	return newSignal_D;   
 	
 }
+
+int Front_Control()
+{
+
+		if(FRONT_SENSOR_VALUE() > 65 )
+		{
+			return 60;
+		}
+		else if(FRONT_SENSOR_VALUE() > 55)
+		{
+			return 80;
+		}
+		else 
+		{
+			return standard_speed_;
+		}
+}
+
+int Side_Control()
+{
+	if (LEFTPATHONE() || RIGHTPATHONE())
+	{
+		return 100;
+	}
+	return standard_speed_;
+}
+
 // Total control.
 int PD_Control()
 {
@@ -719,7 +730,13 @@ int PD_Control()
 	if(control_mode == 'r')
 	{
 		standard_speed_ = 80;
-		K_p = 5;
+		
+		if(FRONT_SENSOR_VALUE() > 45) //Slow down when approaching wall
+		{
+			standard_speed_ = Front_Control();
+		}
+		
+		K_p = 6;
 		K_d = 4;
 		current_error_ = reference_ - offset_;
 		if(offset_-20 > 0)
@@ -737,9 +754,15 @@ int PD_Control()
 	}
 	else if(control_mode == 'c')
 	{
-		standard_speed_ = 140;
+		standard_speed_ = 120;
+		standard_speed_ = Side_Control();
+		if(FRONT_SENSOR_VALUE() > 45) //Slow down when approaching wall
+		{
+		standard_speed_ = Front_Control();
+		}
+		
 		K_p = 4;
-		K_d = 3;
+		K_d =  3;
 		if(offset_-20 > 0)
 		{
 			current_error_ = angle_;
@@ -755,6 +778,9 @@ int PD_Control()
 		current_error_ = 0;
 		newSignal = 0;
 	}
+
+	
+	
 	return newSignal;
 }
 
@@ -763,7 +789,14 @@ void DEAD_END()
 {	
 	MOTOR_Stop();
 	_delay_ms(200);
-	MOTOR_RotateLeft(180);
+	if (offset_ - 20 > 0)
+	{
+		MOTOR_RotateLeft(180);
+	}
+	else
+	{
+		MOTOR_RotateRight(180);
+	}
 	_delay_ms(200);
 	MOTOR_Forward(standard_speed_);
 }
@@ -776,6 +809,14 @@ void TURN_Right()
 	MOTOR_RotateRight(90);
 	_delay_ms(200);
 	MOTOR_Forward(standard_speed_);	
+	
+	while(LEFTPATHONE() || RIGHTPATHONE())
+	//TESTA ATT LÄGGA SEMIKOLON PÅ WHILEN.
+	//OM DET BALLAR UR - ANDA ISTÄLLET FÖR ELSA
+	{
+		_delay_us(1);
+		//Wait until robot reaches walls again
+	}
 }
 
 // Stops and rotates right 90 degrees.
@@ -786,6 +827,14 @@ void TURN_Left()
 	MOTOR_RotateLeft(90);
 	_delay_ms(200);
 	MOTOR_Forward(standard_speed_);
+	
+	while(LEFTPATHONE() || RIGHTPATHONE())
+	//TESTA ATT LÄGGA SEMIKOLON PÅ WHILEN.
+	//OM DET BALLAR UR - ANDA ISTÄLLET FÖR ELSA
+	{
+		_delay_us(1);
+		//Wait until robot reaches walls again
+	}
 }
 
 // Sets a random discovery mode to actually decide which way to go.
@@ -808,6 +857,15 @@ void DISCOVERY_SetRandom()
 	}
 }
 
+void JUNCTION_delay(int delay)
+{
+	wheel_counter = 0;
+	while (wheel_counter < delay)
+	{
+		_delay_us(1);
+	}
+	
+}
 // One of the following three methods are called in the event of a 
 // three way junction described by the ASCII art above each method.
 /*  |
@@ -818,10 +876,15 @@ void JUNCTION_ThreeWayONE()
 	if ((discovery_mode == 'r') || (discovery_mode == 'f'))
 	{
 		// Keep going forward
+		while(LEFTPATHONE())
+		{
+		_delay_us(1);
+		}
 	}
 	else if (discovery_mode == 'l')
 	{
 		// Turn left
+		JUNCTION_delay(2);
 		TURN_Left();
 	}
 	else if (discovery_mode == '?')
@@ -831,6 +894,7 @@ void JUNCTION_ThreeWayONE()
 		discovery_mode = '?';
 	}
 }
+
 /*  v
   ----- TWO is used in junctions of this type.
 */
@@ -844,6 +908,7 @@ void JUNCTION_ThreeWayTWO()
 	else if (discovery_mode == 'r')
 	{
 		// Turn right
+		
 		TURN_Right();
 	}
 	else if (discovery_mode == '?')
@@ -857,40 +922,52 @@ void JUNCTION_ThreeWayTWO()
   ---<- THREE is used in junctions of this type.
 */
 void JUNCTION_ThreeWayTHREE()
-{
-	if ((discovery_mode == 'l') || (discovery_mode == 'r'))
+{	
+	if (discovery_mode == 'r')
 	{
 		// Turn right
+		JUNCTION_delay(2);
 		TURN_Right();
 	}
-	else if (discovery_mode == 'f')
+	else if ((discovery_mode == 'f') || (discovery_mode == 'l'))
 	{
 		// Keep going forward
+		while(RIGHTPATHONE())
+		{
+			_delay_us(1);
+		}
 	}
 	else if (discovery_mode == '?')
 	{
 		DISCOVERY_SetRandom();
 		JUNCTION_ThreeWayTHREE();
 		discovery_mode = '?';
-	}
+	}	
 }
 
 // Called in the event of a four way junction.
 void JUNCTION_FourWay()
 {
+	
 	if(discovery_mode == 'r')
 	{
 		//turn right
+		JUNCTION_delay(3);
 		TURN_Right();
 	}
 	else if(discovery_mode == 'l')
 	{
 		//turn left
+		JUNCTION_delay(3);
 		TURN_Left();
 	}
 	else if(discovery_mode == 'f')
 	{
 		//keep going forward
+		while (LEFTPATHONE() || RIGHTPATHONE())
+		{
+			_delay_us(1);
+		}
 	}
 	else if(discovery_mode == '?')
 	{
@@ -901,6 +978,7 @@ void JUNCTION_FourWay()
 }
 
 // Call this function to perform automatic control.
+
 void AutomaticControl()
 {
 	TIMER_PD = 0;
@@ -911,108 +989,65 @@ void AutomaticControl()
 	// Junction, turn, and dead end handling.
 	
 	// Turn 180 deg in a dead end.
-	if( !(CANSEEPATH_Left() || CANSEEPATH_Right()) && (FRONT_SENSOR_VALUE() > 135))
+	if( !(LEFTPATHBOTH() || RIGHTPATHBOTH()) && WALL_AHEAD())
 		{
 			DEAD_END();
 		}
-		
-	// Make a decision based on discovery mode upon entering a 4-way junction.
-	else if(CANSEEPATH() && ALW_FOURWAY())
-		{
-			JUNCTION_FourWay();
-			while(CANSEEWALL_Left() && CANSEEWALL_Right())
-			{
-				//Wait until robot reaches walls again
-			}
-		}		
-	// Turn right in a corner.
-	else if(CANSEEPATH_Right() && !CANSEEPATH_Left() &&
-			CANSEEWALL_Front())
-		{
-			TURN_Right();
 
-			while(CANSEEWALL_Left())
-			{
-				//Wait until robot reaches walls again
-			}
-		}
-	// Turn left in a corner.
-	else if(!CANSEEPATH_Right() && CANSEEPATH_Left() &&
-			CANSEEWALL_Front())
-		{
-			TURN_Left();
-			
-			while(CANSEEWALL_Right())
-			{
-				//Wait until robot reaches walls again
-			}
-		}
-		
-	// Three 3-way junction modes, decision depends on entrance to junction
-	// and discovery mode.
-		/*  |
-		  ->--- ONE is used in junctions of this type.
-		*/
-	else if(!CANSEEPATH_Right() && CANSEEPATH_Left() &&
-			!CANSEEWALL_Front())
-		{
-			JUNCTION_ThreeWayONE();
- 			
-			if(discovery_mode == 'r' || discovery_mode == 'f')
-			{
-				while(CANSEEWALL_Left())
-				{
-				}
-			}
-			else if(discovery_mode == 'l')
-			{
-				while(CANSEEWALL_Left() && CANSEEWALL_Right())
-				{
-				}
-			}
-		}
 		/*  v
 		  ----- TWO is used in junctions of this type.
 		*/
-	else if(CANSEEPATH() && CANSEEWALL_Front())
-		{			
-			JUNCTION_ThreeWayTWO();
-			 
-			if(discovery_mode == 'l' || discovery_mode == 'f')
-			{
-				while(CANSEEWALL_Left())
+		else if ((LEFTPATHBOTH() || RIGHTPATHBOTH()) && (PATH_AHEAD() == 0))
+		{
+			if( (LEFTPATHBOTH() && RIGHTPATHONE()) || (RIGHTPATHBOTH() && LEFTPATHONE()))
+				//Denna if-sats ser till att vi förstår att det är en trevägs även om robot är sned
 				{
+					JUNCTION_delay(1);
+					JUNCTION_ThreeWayTWO();
 				}
-			}
-			else if(discovery_mode == 'r')
-			{
-				while(CANSEEWALL_Right())
-				{
-				}
-			}
-		}
-
-		/*  |
-		  ---<- THREE is used in junctions of this type.
-		*/
-	else if(CANSEEPATH_Right() && !CANSEEPATH_Left() &&
-			!CANSEEWALL_Front())
-		{			
-			JUNCTION_ThreeWayTHREE();
 			
-			if(discovery_mode == 'r' || discovery_mode == 'l')
-			{
-				while(CANSEEWALL_Left() && CANSEEWALL_Right())
-				{
-				}
-			}
-			else if(discovery_mode == 'f')
-			{
-				while(CANSEEWALL_Right())
-				{
-				}
-			}
+				// Turn right in a corner.
+				else if(RIGHTPATHBOTH() && !LEFTPATHONE() && WALL_AHEAD())
+					{
+						TURN_Right();
+					}
+			
+				// Turn left in a corner.
+				else if(!RIGHTPATHONE() && LEFTPATHBOTH() && WALL_AHEAD())
+					{
+						TURN_Left();
+					}
 		}
+		
+	// Make a decision based on discovery mode upon entering a 4-way junction.
+	else if((LEFTPATHBOTH() || RIGHTPATHBOTH()) && PATH_AHEAD())
+			{
+				if( (LEFTPATHBOTH() && RIGHTPATHONE()) || (RIGHTPATHBOTH() && LEFTPATHONE() ))
+					//Denna if-sats ser till att vi förstår att det är en fyrvägs även om robot är sned
+					{
+						JUNCTION_FourWay();
+					}
+					
+					// Three 3-way junction modes, decision depends on entrance to junction
+					// and discovery mode.
+		
+							/*  |
+					->--- ONE is used in junctions of this type.
+				*/
+					else if(!RIGHTPATHBOTH() && LEFTPATHBOTH())
+						{
+							JUNCTION_ThreeWayONE();
+						}
+					
+							/*  |
+					---<- THREE is used in junctions of this type.
+				*/
+					else if(RIGHTPATHBOTH() && !LEFTPATHBOTH())
+						{			
+							JUNCTION_ThreeWayTHREE();
+						}
+			}
+			
 	
 	// Puts the automatic control in careful mode, keep the robot on track.
 	if(abs(offset_-20) <= 3)
@@ -1056,7 +1091,7 @@ void INIT_ALL()
 	TIMER_init();	// Initiate Timer settings
 	LCD_WelcomeScreen();	// Welcomes the user with a nice message ;^)
 	Gyro_Init();	// Initiate gyro settings
-	//Speed_Interrupt_Init(); //KOMMENTERA IN, MEN FUNGERAR EJ ATT MANUELLSTYRA DÅ 
+	Speed_Interrupt_Init(); //KOMMENTERA IN, MEN FUNGERAR EJ ATT MANUELLSTYRA DÅ 
 	sei();	// Enable global interrupts
 }
 
@@ -1064,61 +1099,60 @@ int main(void)
 {
 	INIT_ALL();
 	
-  	while (1) {
-  		_delay_ms(10);
+   	while (1)
+	   {
+    		_delay_ms(10);
+    		LCD_Clear();
+    		LCD_SetPosition(2);
+    		LCD_SendString("AUTOMATIC_MODE");
+    		PWM_SetDirRight(1);
+    		PWM_SetDirLeft(1);
+    		PWM_SetSpeedLeft(80);
+    		PWM_SetSpeedRight(80);
+  		MOTOR_Stop();
   		LCD_Clear();
-  		LCD_SetPosition(2);
-  		LCD_SendString("AUTOMATIC_MODE");
-  		PWM_SetDirRight(1);
-  		PWM_SetDirLeft(1);
-  		PWM_SetSpeedLeft(80);
-  		PWM_SetSpeedRight(80);
-		MOTOR_Stop();
-		LCD_Clear();
-  		while(AUTONOM_MODE)
-  		{
-  			AutomaticControl();
-  			LCD_SetPosition(0);
-  			LCD_display_uint8(OCR2B);
-  			LCD_SendString("  ");
-  			LCD_SetPosition(16);
-  			LCD_display_uint8(OCR2A);
-  			LCD_SendString("  ");
-  			LCD_SetPosition(24);
-  			LCD_display_int8(angle_);
-  			LCD_SendString("  ");
-			LCD_SetPosition(28);
-			LCD_display_int8(WALLCOUNT_Right());
-  			LCD_SendString("  ");
-			LCD_display_int8(WALLCOUNT_Left());
-  		}
-  		
-  		_delay_ms(10);
-  		LCD_Clear();
-  		LCD_SetPosition(2);
-  		LCD_SendString("MANUAL_MODE");
-  		while(MANUAL_MODE)
-  		{
-  			MANUAL_DRIVE();
-			LCD_SetPosition(0);
-			LCD_SendString("AF: ");
-			LCD_display_int8(ALW_FOURWAY());
-			LCD_SendString(" ");
-			LCD_SendString("SP: ");
-			LCD_display_uint8(CANSEEPATH());
-			LCD_SendString(" F");
-			LCD_SetPosition(16);
-			LCD_SendString("LW:");
-			LCD_display_int8(CANSEEWALL_Left());
-  			LCD_SendString(" ");
-			LCD_SendString("RW:");
-			LCD_display_int8(CANSEEWALL_Right());
-  			LCD_SendString(" ");
-			LCD_SetPosition(29);
-			LCD_display_uint8(FRONT_SENSOR_VALUE());
-			LCD_SendCharacter(' ');
-  		}
-  		PWM_SetSpeedLeft(0);
-  		PWM_SetSpeedRight(0);
+    		while(AUTONOM_MODE)
+    		{
+    			AutomaticControl();
+    			LCD_SetPosition(0);
+    			LCD_display_uint8(OCR2B);
+    			LCD_SendString("  ");
+    			LCD_SetPosition(16);
+    			LCD_display_uint8(OCR2A);
+    			LCD_SendString("  ");
+    			LCD_SetPosition(24);
+    			LCD_display_int8(angle_);
+    			LCD_SendString("  ");
+  				LCD_SetPosition(28);
+  				LCD_display_int8(WALLCOUNT_Right());
+    			LCD_SendString("  ");
+  				LCD_display_int8(WALLCOUNT_Left());
+    		}
+    		
+    		_delay_ms(10);
+    		LCD_Clear();
+    		LCD_SetPosition(2);
+    		LCD_SendString("MANUAL_MODE");
+    		while(MANUAL_MODE)
+    		{
+    			MANUAL_DRIVE();
+  				LCD_SetPosition(0);
+  				LCD_SendString("AF: ");
+  				LCD_SendString(" ");
+  				LCD_SendString("SP: ");
+  				LCD_SendString(" F");
+  				LCD_SetPosition(16);
+  				LCD_SendString("LW:");
+  				LCD_display_int8(LEFTPATHONE());
+    			LCD_SendString(" ");
+  				LCD_SendString("RW:");
+  				LCD_display_int8(RIGHTPATHONE());
+    			LCD_SendString(" ");
+  				LCD_SetPosition(29);
+  				LCD_display_uint8(FRONT_SENSOR_VALUE());
+  				LCD_SendCharacter(' ');
+    		}
+    		PWM_SetSpeedLeft(0);
+    		PWM_SetSpeedRight(0);
   	}
 }
