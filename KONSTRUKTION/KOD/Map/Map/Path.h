@@ -1,6 +1,14 @@
+/*
+ * Path.h
+ *
+ * Created: 10/5/2015
+ * Last modified: 14/5/2015
+ * Author: nikag669
+ *
+ */
+
 #ifndef PATH_H
 #define PATH_H
-
 
 struct tree_el {
    unsigned int cost, nr;
@@ -20,7 +28,7 @@ typedef struct list_el item;
 //-------------------------------------------------------
 
 unsigned int MAP_startJunction = 0; //startrutan
-node * nodeArray[7];
+node * nodeArray[7]; // all junctions and also start/destination squares
 
 // create two path-lists
 item * head1 = NULL, * head2 = NULL;

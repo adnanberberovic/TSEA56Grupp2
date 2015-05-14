@@ -1,7 +1,20 @@
+/*
+ * path.c
+ *
+ * Created: 5/5/2015
+ * Last modified: 14/5/2015
+ * Author: nikag669
+ *
+ */
+
 #include<stdlib.h>
 #include<stdio.h>
 #include "Path.h"
 #include "Map.h"
+
+/* the shortest path will be saved
+either in head1 or head2 */
+
 
 // allocate memory to every node in nodeArray[i]
 void initNodeArray() {
@@ -156,6 +169,10 @@ void main() {
 }
 
 // TO DO:
+// - change max value for index i in all functions to MAP_junctionCount +/-1 (?)
+// - MAP_junctionCount should count start/destination squares as junctions (med Robert)
+// - MAP_junctionDistArray do for start/destination squares also (med Robert)
+// - MAP_startJunction needed or not? maybe can just set to 0 instead (med Robert)
 // - free memory where tree nodes are when path is found /done
 // - set node numbers /done
 // - initialize the nodeArray /done
