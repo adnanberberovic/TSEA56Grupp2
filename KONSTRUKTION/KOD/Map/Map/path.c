@@ -3,6 +3,27 @@
 #include "Path.h"
 #include "Map.h"
 
+// allocate memory to every node in nodeArray[i]
+void initNodeArray() {
+	unsigned int i;
+	for (i=0; i<6; i++) {
+		nodeArray[i] = (node *)malloc(sizeof(node));
+		nodeArray[i]->left = nodeArray[i]->middle = nodeArray[i]->right = nodeArray[i]->parent = NULL;
+		nodeArray[i]->nr = i;
+		nodeArray[i]->cost = 0;
+	}
+}
+
+// frees memory the nodes in nodeArray occupies
+void flushNodeArray() {
+	unsigned int i;
+	for (i=0; i<6; i++) {
+		nodeArray[i]->left = nodeArray[i]->middle = nodeArray[i]->right = nodeArray[i]->parent = NULL;
+		nodeArray[i] = NULL;
+		free(nodeArray[i]);
+	}
+}
+
 // initiate two path-lists
 void initPaths() {
 	head1 = (item *)malloc(sizeof(item));
@@ -72,7 +93,7 @@ int node_exists(node ** tree, unsigned int nodeNr) {
 void insert(node ** tree) {
 	//stop growing branch if reached desired leaf
 	if ((*tree)->nr == MAP_startJunction) { //0
-		// TO DO: save this path to a list(?) nr1, with cost
+		// TO DO: save this path to a list(?) with cost /done
 		if (!head1) { // if list head1 is empty
 			// save path to head1
 			buildList(tree, 1);
@@ -118,23 +139,28 @@ void insert(node ** tree) {
 
 
 void main() {
+	initNodeArray();
 	initPaths();
 
-	/* behöver göras för varje nod i nodeArray[i] */
 	node * root;
-	root = (node *)malloc(sizeof(node));
+	root = nodeArray[MAP_currentJunction];
+	root->nr = MAP_currentJunction;
+	insert(&root); // eventually the path is saved in a list
+
+	// the tree nodes point to nodeArray (left, middle, right, parent)
+	// should be enough to flush this array to free memory
+	flushNodeArray();
 	root->left = root->middle = root->right = root->parent = NULL;
-	///////////////////////////////////////////////////////
-	root->cost = 0;
-	root->nr = MAP_currentJunction; // eventuellt ändras
-	insert(&root);
+	root = NULL;
+	free(root);
 }
 
 // TO DO:
-// - set node numbers
-// - initialize the nodeArray
+// - free memory where tree nodes are when path is found /done
+// - set node numbers /done
+// - initialize the nodeArray /done
 // - parent control: to avoid infinite loops /done
 // - cost /done
 // - create a list (or smth else, mb array) to save the shortest path /done
-// - memory allocation for every node: /done for path-lists (DO for tree nodes)
+// - memory allocation for every node: /done
 // - new log
