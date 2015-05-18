@@ -14,9 +14,7 @@
 #include<util/delay.h>
 
 volatile int sensor_data [8]; //Skapa en array med 8 element.
-int8_t send_buffer_1 [5];
-int8_t send_buffer_2 [5];
-int8_t send_buffer_3 [5];
+int8_t send_buffer [7];
 int distance_table[255]; 
 int buffer_flag = 0;
 
@@ -53,7 +51,7 @@ void distance_table_generator()
 {
 	for (int i = 0; i < 38; i++)
 	{
-		distance_table[i] = 255;
+		distance_table[i] = 210;
 	}
 	
 	distance_table[38] = 170;
@@ -101,7 +99,7 @@ void distance_table_generator()
 
 int8_t angle_generator(int back, int front)
 {
-	int angle;
+	float angle;
 	double length_quotient;
 	double length_difference;
 	
@@ -113,8 +111,8 @@ int8_t angle_generator(int back, int front)
 
 int8_t offset_generator(int angle, int back, int front)
 {
-	int hyp;
-	int cath;
+	float hyp;
+	float cath;
 	
 	hyp = (front + back)/2 + 160/2; //160 är avståndet mellan sensorerna
 	cath = hyp * cos(angle*M_PI/180);
@@ -124,8 +122,10 @@ int8_t offset_generator(int angle, int back, int front)
 
 int main(void)
 { 
-	int8_t angle;
-	int8_t offset;
+	int8_t angle_left;
+	int8_t offset_left;
+	int8_t angle_right;
+	int8_t offset_right;
 	uint8_t front_sensor;
 	int8_t wall_reflex_information;
 	int8_t can_see_information;
@@ -150,7 +150,8 @@ int main(void)
 	{
 		
 //_________________________________________Avläsning________________________________________
-		for(int i = 0; i < 8; i++)
+	
+	for(int i = 0; i < 8; i++) // Addera in värden i arrayen
 		{
 			ADMUX = 32 + i; //Öka admux, sätt ADLAR (bit 5 = 32)
 			ADCSRA |= (1<<6); //Börja ADC
@@ -159,70 +160,28 @@ int main(void)
 				{
 				} //Delay så att inte ADMUX-inläsningarna hamnar i oordning
 				
-			if ( (i == 7) || (i == 2) || (i == 5) || (i == 6))
+			if (
+			 (i == 7) || (i == 2) || (i == 5) || (i == 6))
 			{
-				sensor_data[i] = ADCH; // Ifall det är långa sensorn eller reflex ska den inte konverteras.
+				sensor_data[i] = ADCH;
 			}
 			else
 			{
 				sensor_data[i] = distance_table[ADCH];
 			}	
 		}
-
+		
 
 //_______________________________________Offset och angle______________________________________
 		//Välj den sida som är närmast väggen - den är mest noggrann!
 		//Är höger < vänster? Använd isf höger och vice versa.
 		
-		if((sensor_data[3] + sensor_data[4]) < (sensor_data[0]+sensor_data[1])) 
-			{
-				angle= angle_generator(sensor_data[3],sensor_data[4]);
-				offset = 40 - offset_generator(angle,sensor_data[3],sensor_data[4]);
-			}
-		else
-			{
-				angle= angle_generator(sensor_data[0],sensor_data[1]);
-				offset = offset_generator(angle,sensor_data[0],sensor_data[1]);
-			}
-			
-			
-			
-//_________________________________________Skapa bools för styrbeslut______________________________________
-		if((sensor_data[0] > 200) && (sensor_data[1] > 200))
-		{
-			left_path_both = 1;
-		}
-		else
-		{
-			left_path_both = 0;
-		}
+		angle_right= angle_generator(sensor_data[3],sensor_data[4]);
+		offset_right = 40 - offset_generator(angle_right,sensor_data[3],sensor_data[4]);
 		
-		if((sensor_data[3] > 200) && (sensor_data[4] > 200))
-		{
-			right_path_both = 1;
-		}
-		else
-		{
-			right_path_both = 0;
-		}
-		
-		if((sensor_data[0] > 200) || (sensor_data[1] > 200))
-		{
-			left_path_one = 1;
-		}
-		else
-		{
-			left_path_one = 0;
-		}
-	
-		if((sensor_data[3] > 200) || (sensor_data[4] > 200))
-		{
-			right_path_one = 1;
-		}
-		else
-		{
-			right_path_one = 0;
-		}
+		angle_left= angle_generator(sensor_data[0],sensor_data[1]);
+		offset_left = offset_generator(angle_left,sensor_data[0],sensor_data[1]);
+					
 //_________________________________________Frontsensor________________________________________
 
 		//Skickar spänning till styrmodulen. Gör om?
@@ -275,33 +234,74 @@ int main(void)
 				right_wall_counter = 0;
 			}
 			
-		
+					
+//_________________________________________Skapa bools för styrbeslut______________________________________
+			if((sensor_data[0] > 200) && (sensor_data[1] > 200)
+				&& left_wall_counter > 0)
+			{
+				left_path_both = 1;
+			}
+			else
+			{
+				left_path_both = 0;
+			}
+					
+			if((sensor_data[3] > 200) && (sensor_data[4] > 200)
+				&& right_wall_counter > 0)
+			{
+				right_path_both = 1;
+			}
+			else
+			{
+				right_path_both = 0;
+			}
+					
+			if((sensor_data[0] > 200) || (sensor_data[1] > 200))
+			{
+				left_path_one = 1;
+			}
+			else
+			{
+				left_path_one = 0;
+			}
+					
+			if((sensor_data[3] > 200) || (sensor_data[4] > 200))
+			{
+				right_path_one = 1;
+			}
+			else
+			{
+				right_path_one = 0;
+			}
 		
 //_________________________________________Uppdatera buffer________________________________________
 		//Samla ihop väggarna och reflexen i en binär talföljd. Lägg reflex_bool på 7 biten
 		//Lägg vänster vägg på 4 och 5 biten, lägg höger vägg på 1 och 2 biten.
 		//För avläsning - and:a bort de ointressanta bitarna och dividera med rätt faktor.
-		
-		wall_reflex_information = ( (reflex_bool * 64) + 
-									(left_wall_counter * 4) + (right_wall_counter) );
-		//	WRI =	x	REFLEX	x	LW1 LW0 RW1 RW0
-		//			128		64	32	16	8	4	2	1		
-		
+				
 		can_see_information = ( (left_path_one * 8) + (right_path_one * 4) +
 								(left_path_both * 2) + right_path_both );
 		
-		//	CSI	=	x	x	x	x	LP1	RP1	LPB	RPB
+		//	CSI	=	x		x		x	x	LP1	RP1	LPB	RPB
 		//			128		64		32	16	8	4	2	1
+		
+		wall_reflex_information = ( (reflex_bool * 64) + (left_wall_counter * 4) +
+									(right_wall_counter) );
+		
+		//	WRI =	!!	REFLEX	x	LW1 LW0 RW1 RW0
+		//			128		64	32	16	8	4	2	1
+		
 		//Förhindra avbrott under uppdateringen - höj avbrottsnivån så inga bussavbrott kommer.
 		cli();
 	
-		//send_buffer_3 = send_buffer_2; SKAPA EN MEDIAN/MEDELVÄRDE SOM MAN SKICKAR IVÄG!
-		//send_buffer_2 = send_buffer_1;
-		send_buffer[0] = angle;
-		send_buffer[1] = offset;   
-		send_buffer[2] = front_sensor;
-		send_buffer[3] = can_see_information;
-		send_buffer[4] = wall_reflex_information;
+		send_buffer[0] = angle_right;
+		send_buffer[1] = offset_right;
+		send_buffer[2] = angle_left;
+		send_buffer[3] = offset_left;
+		send_buffer[4] = front_sensor;
+		send_buffer[5] = can_see_information;
+		send_buffer[6] = wall_reflex_information;
+		
 		sei();
 		
 		//Skicka till Styrmodul via SPI
