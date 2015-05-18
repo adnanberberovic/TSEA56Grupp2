@@ -19,12 +19,9 @@ uint8_t MAP_lastJunctionDir = 0; // Direction out of the last junction
 uint8_t MAP_nextJunctionShort = 0; // The immediate next desired junction
 uint8_t MAP_nextJunctionLong = 0; // The long-term desired junction
 
-FILE *fp;
-
 // Structs
 struct MAP_square
 {
-	uint8_t goal :1;
 	uint8_t visited :1;
 	uint8_t description :3;
 	uint8_t junctionNumber :6;
@@ -36,22 +33,17 @@ struct MAP_junction // Contains the distance to every connected junction
 	uint8_t up :6;
 	uint8_t left :6;
 	uint8_t down :6;
-	
-	// eller kanske detta
 	uint8_t hasUnex :1; // Flag if unexplored roads are present
 	uint8_t posY :4;
 	uint8_t posX :5;
-	
-	// när man kommit till korsning med bara utforskade vägar, kolla rekursivt om korsningen innan har 
-	// outforskade vägar. När numret på den korsning man ska åka till har hittats - Dijkstra!
-	
+	uint8_t goal :1; // Flag if this junction is the goal
 };
 
 // Arrays
 struct MAP_square MAP_array[16][29]; // The map square structs
 uint8_t MAP_junctionDistArray[64][64]; // Distance between junctions
 struct MAP_junction MAP_junctionOrderArray[64]; // The junction square structs. Junctions are numbered 0-63, accessed
-	// in this array by their number
+												// in this array by their number
 
 // Methods
 void MAP_decideDirection(char);
