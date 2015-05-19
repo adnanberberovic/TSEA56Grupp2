@@ -2,7 +2,7 @@
  * path.c
  *
  * Created: 5/5/2015
- * Last modified: 14/5/2015
+ * Last modified: 19/5/2015
  * Author: nikag669
  *
  */
@@ -17,6 +17,7 @@ either in head1 or head2 */
 
 
 void printPath() {
+	printf("shortest path:\n");
 	item * curr;
 	if (head1) {
 		curr = head1;
@@ -30,10 +31,29 @@ void printPath() {
 	}
 }
 
+//för felsökning. tas bort sen
+void printPathsTest() {
+	item * curr1, * curr2;
+	curr1 = head1;
+	curr2 = head2;
+
+	printf("path1:\n");
+	while(curr1) {
+      printf("%d\n", curr1->nr);
+      curr1 = curr1->next;
+	}
+	printf("path2:\n");
+	while(curr2) {
+      printf("%d\n", curr2->nr);
+      curr2 = curr2->next;
+	}
+	printf("-------------\n");
+}
+
 // allocate memory to every node in nodeArray[i]
 void initNodeArray() {
 	unsigned int i;
-	for (i=0; i<6; i++) {
+	for (i=0; i<7; i++) {
 		nodeArray[i] = (node *)malloc(sizeof(node));
 		nodeArray[i]->left = nodeArray[i]->middle = nodeArray[i]->right = nodeArray[i]->parent = NULL;
 		nodeArray[i]->nr = i;
@@ -41,10 +61,10 @@ void initNodeArray() {
 	}
 }
 
-// frees memory the nodes in nodeArray occupies
+// free memory the nodes in nodeArray occupy
 void flushNodeArray() {
 	unsigned int i;
-	for (i=0; i<6; i++) {
+	for (i=0; i<7; i++) {
 		nodeArray[i]->left = nodeArray[i]->middle = nodeArray[i]->right = nodeArray[i]->parent = NULL;
 		nodeArray[i] = NULL;
 		free(nodeArray[i]);
@@ -55,12 +75,15 @@ void flushNodeArray() {
 void initPaths() {
 	head1 = (item *)malloc(sizeof(item));
 	head2 = (item *)malloc(sizeof(item));
+	head1->cost = head2->cost = 0;
 	head1 = head2 = NULL;
 }
 
-// inserts an item in front of a list
+// builds a list using nodes from tree
+// items are inserted in front of a list
 void buildList(node ** tree, int isFirst) {
 	node * curr_node = *tree;
+	unsigned int total_cost = curr_node->cost;
 	if (isFirst) {
 		while (curr_node) {
 			item * curr_item;
@@ -70,7 +93,7 @@ void buildList(node ** tree, int isFirst) {
 			head1 = curr_item;
 			curr_node = curr_node->parent;
 		}
-		printPath();
+			head1->cost = total_cost;
 	}
 	else {
 		while (curr_node) {
@@ -81,11 +104,11 @@ void buildList(node ** tree, int isFirst) {
 			head2 = curr_item;
 			curr_node = curr_node->parent;
 		}
-		printPath();
+			head2->cost = total_cost;
 	}
 }
 
-// deletes the list (except: doesn't free the head node)
+// deletes the list
 void flushList(item ** head) {
 	if (!(*head)) { //empty
 		return;
@@ -97,13 +120,24 @@ void flushList(item ** head) {
 	if (curr->next != NULL)
 	{
 		flushList(&(curr->next));
-		free(curr); //move outside of if{} to free the first node also
 	}
+	free(curr);
 }
 
 // compares the two path-lists and flushes the more expensive one
 void choosePath() {
-	if (&(head1->cost) >= &(head2->cost)) {
+	unsigned int cost1=999, cost2=999; // cost sets to infinity (high value)
+	if (head1) {
+		cost1=head1->cost;
+		//printf("cost1=");
+		//printf("%u\n", cost1);
+	}
+	if (head2) {
+		cost2=head2->cost;
+		//printf("cost2=");
+		//printf("%u\n", cost2);
+		}
+	if (cost2 >= cost1) {
 		flushList(&head2);
 	}
 	else {
@@ -119,7 +153,7 @@ int node_exists(node ** tree, unsigned int nodeNr) {
 			return 1;
 		}
 		curr = curr->parent;
-	} while (curr != 0); //segmentation fault (curr->parent != 0)
+	} while (curr != 0);
 
 	return 0;
 }
@@ -136,28 +170,38 @@ void insert(node ** tree) {
 			// save path to head2
 			buildList(tree, 0);
 		}
+		//printPathsTest();
 		// flushes expensive path-list
 		choosePath();
+		//printPathsTest();
 		return;
 	}
-	unsigned int i, dist, child=1; // osäker om child kan överskrivas eller ej, i olika nivåer
-	for (i=0; i<6; i++) {
+	unsigned int i, dist, child=1; // child shows the branch to insert in
+	for (i=0; i<7; i++) {
+//			printf("i=");
+//			printf("%d\n", i);
 		if (!node_exists(tree, i)) { // parent control
 			dist = MAP_junctionDistArray[(*tree)->nr][i];
 			if (dist > 0) {
+//				printf("parent=");
+//				printf("%d\n", (*tree)->nr);
+//				printf("kidNR=");
+//				printf("%d\n", child);
+//				printf("kid=");
+//				printf("%d\n", i);
 				if (child == 1) {
 					nodeArray[i]->cost = (*tree)->cost + dist;
 					nodeArray[i]->parent = *tree;
 					(*tree)->left = nodeArray[i]; //connect nodes
 					insert(&(*tree)->left);
-					child = 2; //går inte med child++ !
+					child++;// = 2;
 				}
 				else if (child == 2) {
 					nodeArray[i]->cost = (*tree)->cost + dist;
 					nodeArray[i]->parent = *tree;
 					(*tree)->middle = nodeArray[i]; //connect nodes
 					insert(&(*tree)->middle);
-					child = 3; //går inte med child++ !
+					child++;// = 3;
 				}
 				else if (child == 3) {
 					nodeArray[i]->cost = (*tree)->cost + dist;
@@ -177,6 +221,7 @@ void main() {
 	MAP_junctionDistArray[1][2] = 4;	MAP_junctionDistArray[2][1] = 4;
 	MAP_junctionDistArray[2][3] = 5;	MAP_junctionDistArray[3][2] = 5;
 	MAP_junctionDistArray[3][5] = 7;	MAP_junctionDistArray[5][3] = 7;
+	MAP_junctionDistArray[3][4] = 3;	MAP_junctionDistArray[4][3] = 3;
 	MAP_junctionDistArray[5][0] = 13;	MAP_junctionDistArray[0][5] = 13;
 	MAP_junctionDistArray[5][6] = 2;	MAP_junctionDistArray[6][5] = 2;
 	MAP_junctionDistArray[6][0] = 7;	MAP_junctionDistArray[0][6] = 7;
@@ -212,7 +257,6 @@ void main() {
 // - cost /done
 // - create a list (or smth else, mb array) to save the shortest path /done
 // - memory allocation for every node: /done
-// - print result
-// - number items in path-lists
-// - new log
-// - segmentation fault in function nodeExists
+// - print result /done
+// - number items in path-lists /done
+// - segmentation fault in function nodeExists /fixed
