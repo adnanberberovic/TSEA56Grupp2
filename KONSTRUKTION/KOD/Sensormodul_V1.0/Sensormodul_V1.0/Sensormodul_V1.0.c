@@ -129,6 +129,7 @@ int main(void)
 	uint8_t front_sensor;
 	int8_t wall_reflex_information;
 	int8_t can_see_information;
+	int reflex_value_floor;
 	int reflex_bool;
 	int8_t left_wall_counter;
 	int8_t right_wall_counter;
@@ -145,6 +146,18 @@ int main(void)
 	
 	sei(); //Aktiverar globala avbrott
 	ADCSRA = 0x87; //Aktivera ADC, Sätt division factor till 128. 20 MHz/128 = 156,25 kHz
+		
+
+	ADMUX = 32 + 7; //Öka admux, sätt ADLAR (bit 5 = 32)
+	ADCSRA |= (1<<6); //Börja ADC
+
+	while(ADCSRA & 1<<ADSC)
+	{
+		_delay_us(1);
+	} //Delay så att inte ADMUX-inläsningarna hamnar i oordning
+
+
+	reflex_value_floor= ADCH+10;
 		
 	while(1)
 	{
@@ -191,7 +204,7 @@ int main(void)
 
 //_________________________________________Reflexsensor________________________________________
 	
-		if((sensor_data[7] > 127))
+		if((sensor_data[7] > reflex_value_floor))
 			reflex_bool = 1;
 		else
 			reflex_bool = 0;
@@ -285,8 +298,7 @@ int main(void)
 		//	CSI	=	x		x		x	x	LP1	RP1	LPB	RPB
 		//			128		64		32	16	8	4	2	1
 		
-		wall_reflex_information = ( (reflex_bool * 64) + (left_wall_counter * 4) +
-									(right_wall_counter) );
+		wall_reflex_information = ( (reflex_bool * 64) + (left_wall_counter * 4) + (right_wall_counter) );
 		
 		//	WRI =	!!	REFLEX	x	LW1 LW0 RW1 RW0
 		//			128		64	32	16	8	4	2	1

@@ -553,10 +553,10 @@ void autonom_get_send()
 
 //_______________________REFLEX SENSOR AND WALL COUNTER_____________________________
 
-char REFLEX_GetMarker()
+uint8_t REFLEX_GetMarker()
 {
 	Get_sensor_values();
-	int8_t marker_ = ((arrSensor[6]/64) & (0b00000001));
+	uint8_t marker_ = ( (arrSensor[6]/64) && (0b00000001) );
 	return marker_;
 }
 
@@ -592,7 +592,7 @@ uint8_t WALL_AHEAD()
 
 uint8_t WALL_CLOSE_AHEAD()
 {
-	if (FRONT_SENSOR_VALUE() > 105)
+	if (FRONT_SENSOR_VALUE() > 100)
 	{
 		return 1;
 	}
@@ -645,8 +645,6 @@ uint8_t PATHCOUNT_Right()
 }
 
 
-
-
 //_____________________REFLEX SENSOR AND WALL COUNTER END____________________________
 
 //________________________________AUTOMATIC CONTROL_____________________________________
@@ -675,7 +673,7 @@ char control_mode = 'r';	/*if control_mode == r, then the robot will make a rapi
 							 steer itself in a forward direction within the middle lane.
 							 The middle lane is around 4 cm wide according to us.
 							*/
-char discovery_mode = 'r';	/*if discovery_mode == r, then the robot will follow the 
+char discovery_mode = 'l';	/*if discovery_mode == r, then the robot will follow the 
 							"right hand on the wall" rule, i.e. always make right turns
 							whenever possible in junctions.
 							for discovery_mode == l, the same goes as above but left 
@@ -686,6 +684,11 @@ char discovery_mode = 'r';	/*if discovery_mode == r, then the robot will follow 
 							path through a junction.
 							Priority order: r -> f -> l.
 							*/
+char resque_mode = 'd'; /*if resque_mode == d, then the robot will search according to
+						discovery_mode. 
+						if resque_mode == q, then the robot has found the mark and will
+						start resquing.
+						*/
 
 // P-control function
 int P_Control()
@@ -700,6 +703,7 @@ int D_control()
 	int newSignal_D = 0;
 	time_diff_ = time_new_ - prev_time_;
 	newSignal_D = K_d*(current_error_ - prev_error_)/time_diff_;
+	TIMER_PD = 0;
 	
 	if(prev_error_ != current_error_)
 	{
@@ -803,8 +807,7 @@ int PD_Control()
 void DEAD_END()
 {	
 	MOTOR_Stop();
-	_delay_ms(200);
-	
+	_delay_ms(100);
 	
 	if (offset_ - 20 > 0)
 	{
@@ -817,7 +820,32 @@ void DEAD_END()
 	{
 		MOTOR_RotateRight(180 - angle_);
 	}
-	_delay_ms(200);
+	
+	Get_sensor_values();
+	if ( ( (arrSensor[1]  + arrSensor[3]) / 2) - 20 > 0)
+	{
+		if (arrSensor[0] < 0)
+		{
+			MOTOR_RotateLeft(- arrSensor[0]);
+		}
+		else
+		{
+			MOTOR_RotateRight(arrSensor[0]);
+		}
+	}
+	else
+	{
+		if (arrSensor[2] < 0)
+		{
+			MOTOR_RotateRight(- arrSensor[2]);
+		}
+		else
+		{
+			MOTOR_RotateLeft(arrSensor[2]);
+		}
+	}
+	
+	_delay_ms(100);
 	MOTOR_Forward(standard_speed_);
 }
 
@@ -827,8 +855,6 @@ void JUNCTION_delay(int delay)
 	while (wheel_counter < delay)
 	{
 		_delay_us(1);
-		//LCD_SetPosition(1);
-		//LCD_SendString("Junction delay");
 	}
 	
 }
@@ -836,16 +862,18 @@ void JUNCTION_delay(int delay)
 // Stops and rotates left 90 degrees.
 void TURN_Right(int mode)
 {
-
 	MOTOR_Stop();
-	_delay_ms(200);
+	_delay_ms(100);
 	
 	if (mode == 0)
 	{
-		MOTOR_RotateRight(90);
-		_delay_ms(200);
 		Get_sensor_values();
 		int angle_left =  arrSensor[2];
+		MOTOR_RotateRight(90 - angle_left);
+		_delay_ms(100);
+		
+		Get_sensor_values();
+		angle_left =  arrSensor[2];
 		
 		if (angle_left < 0)
 		{
@@ -856,7 +884,9 @@ void TURN_Right(int mode)
 			MOTOR_RotateLeft(angle_left);
 		}
 		
+		_delay_ms(100);
 		MOTOR_Forward(standard_speed_);
+		
 	}
 	else if ( mode == 1)
 	{
@@ -864,11 +894,15 @@ void TURN_Right(int mode)
 		int angle_left =  arrSensor[2];
 		
 		MOTOR_RotateRight(90 - angle_left);
-		_delay_ms(200);
+		_delay_ms(100);
 		MOTOR_Forward(standard_speed_);
 	}
 	else if ( mode == 2)
 	{
+		if (abs(angle_) < 10)
+		{
+			angle_ = angle_ / 2;
+		}
 		
 		if( offset_ > 20)
 		{
@@ -879,32 +913,36 @@ void TURN_Right(int mode)
 			MOTOR_RotateRight(90 + angle_);
 		}
 		
-		_delay_ms(200);
+		_delay_ms(100);
 		MOTOR_Forward(standard_speed_);
 	}
 		
-	while((PATHCOUNT_Left() > 0) && (PATHCOUNT_Right() > 0))
+	while((PATHCOUNT_Left() > 0) || (PATHCOUNT_Right() > 0))
 		{
 			_delay_us(1);
 			LCD_SetPosition(1);
 			LCD_SendString("Turn right");
 			//Wait until robot reaches walls again
 		}
-		JUNCTION_delay(2);
+	JUNCTION_delay(3);
 }
 
 // Stops and rotates right 90 degrees.
 void TURN_Left(int mode)
 {
 	MOTOR_Stop();
-	_delay_ms(200);
+	_delay_ms(100);
 	
 	if (mode == 0)
 	{
-		MOTOR_RotateLeft(90);
-		_delay_ms(200);
+		
 		Get_sensor_values();
 		int angle_right =  arrSensor[0];
+		MOTOR_RotateLeft(90 - angle_right);
+		_delay_ms(100);
+
+		Get_sensor_values();
+		angle_right =  arrSensor[0];
 		
 		if (angle_right < 0)
 		{
@@ -914,16 +952,18 @@ void TURN_Left(int mode)
 		{
 			MOTOR_RotateRight(angle_right);
 		}
-		
+	
+		_delay_ms(100);
 		MOTOR_Forward(standard_speed_);
 	} 
+	
 	else if ( mode == 1)
 	{
 		Get_sensor_values();
 		int angle_right =  arrSensor[0];
 	
 		MOTOR_RotateLeft(90 - angle_right);	
-		_delay_ms(200);
+		_delay_ms(100);
 		MOTOR_Forward(standard_speed_);
 	}
 	else if ( mode == 2)
@@ -938,18 +978,18 @@ void TURN_Left(int mode)
 				MOTOR_RotateLeft(90 + angle_);
 			}
 				
-		_delay_ms(200);
+		_delay_ms(100);
 		MOTOR_Forward(standard_speed_);
 	}
 	
-	while((PATHCOUNT_Left() > 0) && (PATHCOUNT_Right() > 0))
+	while((PATHCOUNT_Left() > 0) || (PATHCOUNT_Right() > 0))
 	{
 		_delay_us(1);
 		LCD_SetPosition(1);
 		LCD_SendString("Turn left");
 		//Wait until robot reaches walls again
 	}
-	JUNCTION_delay(2);
+	JUNCTION_delay(3);
 }
 
 // Sets a random discovery mode to actually decide which way to go.
@@ -1023,15 +1063,11 @@ void JUNCTION_ThreeWayONE()
 				LCD_SetPosition(1);
 				LCD_SendString("Threeway One");
 			}
-			JUNCTION_delay(2);
+			JUNCTION_delay(3);
 	}
 	else if (discovery_mode == 'l')
 	{
 		// Turn left
-		while(!WALL_CLOSE_AHEAD())
-		{
-			_delay_us(1);
-		}
 		TURN_Left(1);
 	}
 	else if (discovery_mode == '?')
@@ -1050,7 +1086,7 @@ void JUNCTION_ThreeWayTWO()
 	if ((discovery_mode == 'l') || (discovery_mode == 'f'))
 	{
 		//Turn Left. Forward becomes left due to right-forward-left cycle.
-		//JUNCTION_delay(2);
+		//JUNCTION_delay(3);
 		TURN_Left(0);
 	}
 	else if (discovery_mode == 'r')
@@ -1077,19 +1113,53 @@ void JUNCTION_ThreeWayTHREE()
 	if (discovery_mode == 'r')
 	{
 		// Turn right
-		//JUNCTION_delay(2);
+		//JUNCTION_delay(3);
 		TURN_Right(1);
 	}
 	else if ((discovery_mode == 'f') || (discovery_mode == 'l'))
 	{
 		// Keep going forward
-		while(RIGHTPATHONE() || (PATHCOUNT_Right() > 0))
-		{
-			_delay_us(1);
-			LCD_SetPosition(1);
-			LCD_SendString("Threeway three");
-		}
+		while(PATHCOUNT_Right() > 0 )
+			{
+				Get_sensor_values();
+				angle_ =  arrSensor[2];
+				offset_ =  arrSensor[3];
+
+				if(abs(offset_-20) <= 2)
+				{
+					control_mode = 'c';
+					LCD_Clear();
+					LCD_SetPosition(8);
+					LCD_SendString("Mode: c");
+				}
+				// Puts the automatic control in rapid mode, push the robot to the middle lane.
+				else
+				{
+					control_mode = 'r';
+					LCD_Clear();
+					LCD_SetPosition(8);
+					LCD_SendString("Mode: r");
+				}
+				
+				int new_speed_ = PD_Control();
+
+				// Makes sure that the motors don't burn out (i.e go on max velocity)
+				if(new_speed_ > (254-standard_speed_))
+				{
+					new_speed_ = 254 - standard_speed_;
+				}
+				else
+				{
+					PWM_SetSpeedRight(standard_speed_ + new_speed_);
+					PWM_SetSpeedLeft(standard_speed_ - new_speed_);
+				}
+				_delay_us(1);
+				LCD_SetPosition(1);
+				LCD_SendString("Threeway Three");
+			}
+		JUNCTION_delay(3);
 	}
+		
 	else if (discovery_mode == '?')
 	{
 		DISCOVERY_SetRandom();
@@ -1104,13 +1174,13 @@ void JUNCTION_FourWay()
 	if(discovery_mode == 'r')
 	{
 		//turn right
-		//JUNCTION_delay(2);
+		//JUNCTION_delay(3);
 		TURN_Right(2);
 	}
 	else if(discovery_mode == 'l')
 	{
 		//turn left
-		//JUNCTION_delay(2);
+		//JUNCTION_delay(3);
 		TURN_Left(2);
 	}
 	else if(discovery_mode == 'f')
@@ -1238,23 +1308,30 @@ void AutomaticControl()
 } 
 */
 //________________________________AUTOMATIC CONTROL END_____________________________________
-void AutomaticControl_2()
+void AutomaticControl()
 {
-	TIMER_PD = 0;
-	Get_sensor_values();
 
+	if (REFLEX_GetMarker())
+	{
+		LCD_SetPosition(10);
+		resque_mode = 'q';
+		LCD_SendString("GOLD");
+		JUNCTION_delay(2);
+		DEAD_END();
+		DEAD_END();
+		JUNCTION_delay(2);
+	}
+	
 	if( (PATHCOUNT_Left() > 0) || (PATHCOUNT_Right() > 0) ) //Path to left or right
 	{
 		
 		while (!LEFTPATHBOTH() && !RIGHTPATHBOTH() && !WALL_CLOSE_AHEAD()) //Keep going until center of intersect
 		{
-			JUNCTION_delay(1);
-    		LCD_SetPosition(2);
-    		LCD_SendString("AUTOMATIC_MODE");
+			_delay_us(250);
 		} 
 		// Now in intersect. Determine what type:
 		LCD_Clear();
-		JUNCTION_delay(1);
+		JUNCTION_delay(2);
 			
 		if ((PATHCOUNT_Left() > 0) && (PATHCOUNT_Right() > 0)) // 4-way or 3-way-2
 		{
@@ -1381,8 +1458,8 @@ int main(void)
   			LCD_Clear();
     		while(AUTONOM_MODE)
     		{
-    			AutomaticControl_2();
-				LCD_Clear();
+    			AutomaticControl();
+			
     			LCD_SetPosition(0);
 				LCD_SendString("RS:");
 				LCD_display_uint16(OCR2B);
@@ -1399,59 +1476,23 @@ int main(void)
     		LCD_SetPosition(2);
     		LCD_SendString("MANUAL_MODE");
 			LCD_Clear();
+
     		while(MANUAL_MODE)
     		{
 				//LCD_Clear();
     			MANUAL_DRIVE();
 				LCD_SetPosition(0);
-				LCD_SendString("L:");
-    			LCD_display_uint8(LEFTPATHONE());
-				
-    			LCD_SendString(" ");
-    			LCD_SendString("LB:");
-    			LCD_display_uint8(LEFTPATHBOTH());
-    			LCD_SendString(" ");
+				LCD_SendString("REflex: ");
+    			LCD_display_uint8(REFLEX_GetMarker());
+				LCD_SendString("   resq:");
+				LCD_SendCharacter(resque_mode);
+				PWM_SetSpeedLeft(0);
+    			PWM_SetSpeedRight(0);
 				LCD_SetPosition(16);
-				LCD_SendString("R:");
-    			LCD_display_uint8(RIGHTPATHONE());
-				
-    			LCD_SendString(" ");
-    			LCD_SendString("RB:");
-    			LCD_display_uint8(RIGHTPATHBOTH());
-				
-    			LCD_SendString(" ");
-    			LCD_SendString("a:");
-				Get_sensor_values();
-				if( ((arrSensor[1] + arrSensor[3]) / 2) < 20)
-				{
-					angle_ =  arrSensor[2];
-					offset_ =  arrSensor[3];
-				}
-				else
-				{
-					angle_ =  arrSensor[0];
-					offset_ =  arrSensor[1];
-				}
-				
-				
-    			LCD_display_int8(angle_);
-				LCD_SendString("  ");
-				LCD_SetPosition(9);
-				LCD_SendString("o:");
-				LCD_display_uint8(offset_);
-				LCD_SendString("  ");
-  				//LCD_SetPosition(0);
-  				//LCD_SendString("LA:");
-				//LCD_display_int8(arrSensor[2]);
-  				//LCD_SendString(" ");
-				//LCD_SendString("LO:");
-  				//LCD_display_int8(arrSensor[3]);
-  				//
-  				//LCD_SetPosition(16);
-  				//LCD_SendString("RA:");
-				//LCD_display_int8(arrSensor[0]);
-				//LCD_SendString(" RO:");
-				//LCD_display_int8(arrSensor[1]);
+				LCD_SendString("PCL:");
+    			LCD_display_uint8(PATHCOUNT_Left());
+				LCD_SendString(" PCR:");
+				LCD_display_uint8(PATHCOUNT_Right());
     		}
     		PWM_SetSpeedLeft(0);
     		PWM_SetSpeedRight(0);
