@@ -19,6 +19,12 @@ uint8_t MAP_lastJunctionDir = 0; // Direction out of the last junction
 uint8_t MAP_nextJunctionShort = 0; // The immediate next desired junction
 uint8_t MAP_nextJunctionLong = 0; // The long-term desired junction
 
+// Flags used to navigate between the different phases in the main function
+uint8_t MAP_operatingMode_ = 0; // 0 = normal, 2 = go to next junction long, 3 = go to next junction short, 4 = goal discovered
+uint8_t MAP_rotating_ = 0;
+uint8_t MAP_movingForward_ = 0;
+uint8_t MAP_LOOPer = 1;
+
 // Structs
 struct MAP_square
 {
@@ -60,12 +66,11 @@ void MAP_decideDestination();
 void MAP_addJunction();
 uint8_t MAP_addJunctionDist(uint8_t, uint8_t);
 void MAP_addJunctionDir(uint8_t, uint8_t, uint8_t);
-uint8_t MAP_lastUnexJunction(uint8_t);
+void MAP_lastUnexJunction(uint8_t);
 void MAP_rotate();
 void MAP_moveForward();
 uint8_t MAP_getDirection(uint8_t, uint8_t);
 void MAP_main();
-void printDir(uint8_t);
 void MAP_checkIfDone();
 
 #endif
