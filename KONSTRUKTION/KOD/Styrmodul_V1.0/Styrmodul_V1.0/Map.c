@@ -9,8 +9,8 @@
 #include <avr/io.h>
 #include "Map.h"
 
-// FLAGz man!
-uint8_t operatingMode_ = 0; // 0 = normal, 2 = go to next junction long, 3 = return to prev sq, 4 = resQ
+// Flags used to navigate between the different phases in the main function
+uint8_t operatingMode_ = 0; // 0 = normal, 2 = go to next junction long, 3 = go to next junction short, 4 = goal discovered
 uint8_t rotating_ = 0;
 uint8_t movingForward_ = 0;
 uint8_t LOOPer = 1;
@@ -20,7 +20,7 @@ void MAP_setGoal()
 {
 	uint8_t posY = MAP_currentPos[0];
 	uint8_t posX = MAP_currentPos[1];
-	MAP_array[posY][posX].goal = 1;
+	MAP_junctionOrderArray[MAP_currentJunction].goal = 1;
 	MAP_goalPosition[0] = posY;
 	MAP_goalPosition[1] = posX;
 }
@@ -44,7 +44,7 @@ void MAP_setSquareDescription(uint8_t description, uint8_t posY, uint8_t posX)
 uint8_t MAP_checkDirDown(uint8_t exploring)
 {
 	if (((MAP_array[MAP_currentPos[0] + 1][MAP_currentPos[1]].description == 3) &&
-		(!MAP_array[MAP_currentPos[0] + 1][MAP_currentPos[1]].visited || exploring))||
+		(!MAP_array[MAP_currentPos[0] + 1][MAP_currentPos[1]].visited || exploring)) ||
 		(MAP_array[MAP_currentPos[0] + 1][MAP_currentPos[1]].description == 5))
 	{
 		MAP_nextDir = 3;
@@ -104,7 +104,7 @@ uint8_t MAP_checkDirRight(uint8_t exploring)
 	}
 }
 
-// Chechks given direction
+// Checks given direction
 uint8_t MAP_checkDir(uint8_t dir)
 {
 	if (dir == 0)
@@ -169,7 +169,7 @@ void MAP_setVisited()
 	MAP_array[MAP_currentPos[0]][MAP_currentPos[1]].visited = 1;
 }
 
-// Count the number of unexplored squares in a 1 square radius (up, down, left, right)
+// Counts the number of unexplored squares in a 1 square radius (up, down, left, right)
 void MAP_countSquares()
 {
 	uint8_t dir_ = MAP_currentDir; // The following lines change currentDir which we don't want
@@ -179,6 +179,8 @@ void MAP_countSquares()
 }
 
 // Uses Dijkstras algorithm to decide which location to set as a destination
+// This function sets the nextJunctionShort
+// SIM
 void MAP_decideDestination()
 {
 	// Simpleton variant
@@ -195,21 +197,23 @@ void MAP_decideDestination()
 	}
 }
 
-// Adds the travelled distance from the last junction to specified junction
+// Adds the travelled distance from the last junction to specified junction in the junctionDistArray
 uint8_t MAP_addJunctionDist(uint8_t j1, uint8_t j2)
 {
 	uint8_t returner_ = 0;
+
 	if ((MAP_junctionDistArray[j1][j2] == 0 || MAP_junctionDistArray[j1][j2] > MAP_travelledDist) && j1 != j2 && MAP_travelledDist != 0)
 	{
 		MAP_junctionDistArray[j1][j2] = MAP_travelledDist;
 		MAP_junctionDistArray[j2][j1] = MAP_travelledDist;
 		returner_ = 1;
 	}
+
 	MAP_travelledDist = 0;
 	return returner_;
 }
 
-// Adds the direction between two junctions, assuming j1 is the last visited and j2 the current one
+// Adds the direction between two junctions, adds it in j1
 void MAP_addJunctionDir(uint8_t j1, uint8_t j2, uint8_t direction)
 {
 	if (direction == 0)
@@ -235,14 +239,15 @@ void MAP_addJunction()
 {
 	uint8_t posY_ = MAP_currentPos[0];
 	uint8_t posX_ = MAP_currentPos[1];
+
 	// Adds directions between last junction and this one
 	if (MAP_addJunctionDist(MAP_currentJunction, MAP_junctionCount) || MAP_addJunctionDist(MAP_junctionCount, MAP_currentJunction))
 	{
+		// Only adds the direction if the distance is shorter than before, thus onnly the shortest direction
+		// between two junctions is marked
 		MAP_addJunctionDir(MAP_currentJunction, MAP_junctionCount, MAP_lastJunctionDir);
 		MAP_addJunctionDir(MAP_junctionCount, MAP_currentJunction, (MAP_currentDir + 2) % 4);
 	}
-	printDir(MAP_currentJunction);
-	printDir(MAP_junctionCount);
 
 	// Increments counters
 	MAP_currentJunction = MAP_junctionCount++;
@@ -259,17 +264,18 @@ void MAP_addJunction()
 
 // Returns the last junction with unexplored roads
 // Call with junctionCount
+// SIM
 uint8_t MAP_lastUnexJunction(uint8_t x)
 {
 	if (x <= 0)
 	{
-		// Kartan är helt utforskad!!! 
+		// The map is fully explored
 		return 255;
 	}
 	else if (MAP_junctionOrderArray[x - 1].hasUnex == 1)
 	{
-	MAP_nextJunctionLong = x - 1;
-	return x - 1;
+		MAP_nextJunctionLong = x - 1;
+		return x - 1;
 	}
 	else
 	{
@@ -277,6 +283,8 @@ uint8_t MAP_lastUnexJunction(uint8_t x)
 	}
 }
 
+// Rotates the robot to face nextDir
+// SIM
 void MAP_rotate()
 {
 	// Simulation code starts here
@@ -285,6 +293,8 @@ void MAP_rotate()
 	// Simulation code ends here
 }
 
+// Moves the robot one square forward
+// SIM
 void MAP_moveForward()
 {
 	// Simulation code starts here
@@ -310,6 +320,7 @@ void MAP_moveForward()
 	// Simulation code ends here
 }
 
+// Returns the direction from j1 to j2
 uint8_t MAP_getDirection(uint8_t j1, uint8_t j2)
 {
 	if (MAP_junctionOrderArray[j1].right == j2)
@@ -330,29 +341,36 @@ uint8_t MAP_getDirection(uint8_t j1, uint8_t j2)
 	}
 }
 
+// Checks if all squares have been explored, and if so, quits the main loop
 void MAP_checkIfDone()
 {
 	uint8_t i = 0;
 	uint8_t done_ = 0;
+
 	while (i < MAP_junctionCount)
 	{
 		done_ += MAP_junctionOrderArray[i].hasUnex;
 		i++;
 	}
+
 	if (!done_ && MAP_junctionCount)
 	{
 		LOOPer = 0;
 	}
 }
 
+// The main searching function. Makes all the decisions
 void MAP_main()
 {
+	// Save these under more convenient names
 	uint8_t posY_ = MAP_currentPos[0];
 	uint8_t posX_ = MAP_currentPos[1];
+	
 	// Normal searching phase
 	if (!operatingMode_ && !rotating_ && !movingForward_)
 	{
 		MAP_countSquares();
+
 		// If it's a visited junction
 		if (MAP_array[posY_][posX_].visited && (MAP_array[posY_][posX_].description == 5))
 		{
@@ -366,16 +384,15 @@ void MAP_main()
 					MAP_addJunctionDir(MAP_currentJunction, MAP_array[posY_][posX_].junctionNumber, MAP_lastJunctionDir);
 				}
 			}
-			printDir(MAP_currentJunction);
-			printDir(MAP_array[posY_][posX_].junctionNumber);
 			
+			// And if it has unexplored roads
+			// Else go to far junction phase
 			int fatIf_;
 			fatIf_ = MAP_unexploredSquares -
 					(MAP_array[posY_ - 1][posX_].description == 5 && !MAP_junctionOrderArray[MAP_array[posY_ - 1][posX_].junctionNumber].hasUnex) -
 					(MAP_array[posY_ + 1][posX_].description == 5 && !MAP_junctionOrderArray[MAP_array[posY_ + 1][posX_].junctionNumber].hasUnex) -
 					(MAP_array[posY_][posX_ - 1].description == 5 && !MAP_junctionOrderArray[MAP_array[posY_][posX_ - 1].junctionNumber].hasUnex) -
 					(MAP_array[posY_][posX_ + 1].description == 5 && !MAP_junctionOrderArray[MAP_array[posY_][posX_ + 1].junctionNumber].hasUnex);
-			// Has unexplored roads
 			if (fatIf_ >= 1)
 			{
 				MAP_currentJunction = MAP_array[posY_][posX_].junctionNumber;
@@ -387,18 +404,18 @@ void MAP_main()
 				MAP_junctionOrderArray[MAP_currentJunction].hasUnex = 0;
 				MAP_decideDestination();
 				operatingMode_ = 2;
-				goto afterNormal; // Go to previous junction
+				goto afterNormal; // Exit this phase
 			}
 		}
-		// If it's a new square
+		// Or if it's a new square
 		else
 		{
-			// Check if it's a junction
+			// If it's a junction, add it
+			// Else if it's a dead end, trace the way back to the previous junction
 			if (MAP_exploredSquares > 2)
 			{
 				MAP_addJunction();
 			}
-			// Or if it's a dead end
 			else if (MAP_unexploredSquares == 0)
 			{
 				MAP_nextDir = (MAP_currentDir + 2) % 4;
@@ -406,9 +423,11 @@ void MAP_main()
 				movingForward_ = 1;
 				operatingMode_ = 3;
 				MAP_nextJunctionShort = MAP_currentJunction;
-				goto afterNormal; // Go to previous junction
+				goto afterNormal; // Exit this phase
 			}
 		}
+
+		// Decide the next direction
 		MAP_decideDirection('l'); // Uses a = random, r = right-first, l = left-first
 		if (MAP_currentDir != MAP_nextDir)
 		{
@@ -417,8 +436,8 @@ void MAP_main()
 		movingForward_ = 1;
 	}
 	
-	
 	// Rotating phase
+	// SIM
 	afterNormal:
 	if (rotating_)
 	{
@@ -426,29 +445,30 @@ void MAP_main()
 				MAP_rotate();
 		// Simulation code ends here
 	}
+
 	// Moving forward phase
+	// SIM
 	if (movingForward_ && !rotating_)
 	{
-		// åk framåt
-
 		// Simulation code starts here
 		if (MAP_array[posY_][posX_].description == 5)
 		{
 			MAP_lastJunctionDir = MAP_currentDir;
 		}
+
 		MAP_moveForward();
+
+		// Update the position variables
 		posY_ = MAP_currentPos[0];
 		posX_ = MAP_currentPos[1];
 		// Simulation code ends here
 	}
 
-	// Go until next junction phase
+	// Go until nextJunctionShort phase
+	// This phase is meant to navigate through an explored corridor between two junctions
 	if ((operatingMode_ == 3) && !rotating_ && !movingForward_)
 	{
-		// åk tillbaka till föregående korsning
-		// ändrar direction om det behövs
-		//MAP_nextJunctionShort = MAP_currentJunction;
-
+		// Checks if we can move right or left, then rotate accordingly, otherwise move forward
 		if (MAP_checkDir((MAP_currentDir + 3) % 4))
 		{
 			MAP_nextDir = (MAP_currentDir + 3) % 4;
@@ -460,12 +480,17 @@ void MAP_main()
 			rotating_ = 1;
 		}
 		movingForward_ = 1;
+
+		// If we have arriwed to the desired junction
 		if ((MAP_currentPos[0] == MAP_junctionOrderArray[MAP_nextJunctionShort].posY) &&
 			(MAP_currentPos[1] == MAP_junctionOrderArray[MAP_nextJunctionShort].posX))
 		{
 			MAP_travelledDist = 0;
 			MAP_countSquares();
 			MAP_currentJunction = MAP_nextJunctionShort;
+
+			// If the current junction has unexplored squares we go to normal phase
+			// Else we go to far junction phase
 			int fatIf_;
 			fatIf_ = MAP_unexploredSquares -
 					(MAP_array[posY_ - 1][posX_].description == 5 && !MAP_junctionOrderArray[MAP_array[posY_ - 1][posX_].junctionNumber].hasUnex) -
@@ -487,10 +512,13 @@ void MAP_main()
 		}
 	}
 
-	// Go to a junction far, far away
+	// Go to a junction farther away phase
+	// Decides which junction we should be heading to
 	if ((operatingMode_ == 2) && !rotating_ && !movingForward_)
 	{
-		//MAP_decideDestination();
+		// If we have arrived at the desired junction then we start the normal phase
+		// Else if all the map has been explored we quit the main loop
+		// Else we start moving towards the nextJunctionShort, going to that phase
 		if ((MAP_currentPos[0] == MAP_junctionOrderArray[MAP_nextJunctionLong].posY) &&
 			(MAP_currentPos[1] == MAP_junctionOrderArray[MAP_nextJunctionLong].posX))
 		{
@@ -513,25 +541,28 @@ void MAP_main()
 		}
 	}
 
-	// ResQ phase
+	// This phase is activated when we have discovered the goal
 	if (operatingMode_ == 4 && !rotating_ && movingForward_)
 	{
 		// Go ResQ.PL, go!
 	}
 
+	// Checks if all the map has been explored
 	MAP_checkIfDone();
 }
 
 
-
+// detta behövs i en main för kartans del
 int main(void)
 {
+	// initiera robotens position
 	MAP_array[15][15].description = 3;
 	MAP_setVisited();
-	while (LOOPer
+
+
+	while (LOOPer)
 	{
-		updateMap();
-		printMap();
+		//updateMap(); en stycke som uppdaterad kartan med nyförvärvad information
 		MAP_main();
 	}
 

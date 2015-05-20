@@ -26,7 +26,7 @@ struct MAP_square
 	uint8_t description :3;
 	uint8_t junctionNumber :6;
 };
-struct MAP_junction // Contains the distance to every connected junction
+struct MAP_junction
 {
 	// The junction number in the given direction
 	uint8_t right :6;
