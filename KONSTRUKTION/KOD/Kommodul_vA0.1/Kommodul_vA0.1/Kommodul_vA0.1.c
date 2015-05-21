@@ -49,9 +49,7 @@ uint8_t arrMap[3] = {0, 0, 0}; //[0] = {xpos(4) + dir(2)}, [1] = {y-pos(5) + mål
 
 uint8_t sendFlag = 0;
 uint8_t Flag_ = 0;
-int8_t arrSensor[7] = {8,7,6,5,4,3,2};
-
-
+int8_t arrSensor[7] = {7,6,5,4,3,2,1};
 
 uint8_t mapFlag_ = 0;	
 uint8_t sensorFlag_ = 0;
@@ -250,13 +248,20 @@ void BT_StartBitCheck(uint8_t in_)
 		BTsensorFlag_ = 0;
 		BTspeedFlag_ = 0;
 		
+		default:
+		BTmapFlag_ = 0;
+		BTcounter_ = 0;
+		BTspeedoutFlag_ = 0;
+		BTsensorFlag_ = 0;
+		BTspeedFlag_ = 0;
+		
 	}
 }
 // Receive complete - triggered by interrupt
 ISR(USART0_RX_vect) 
 {
 	uint8_t data = UDR0;
-	if ((BTspeedFlag_ == 0) && (BTsensorFlag_ == 0) && (BTspeedoutFlag_ == 0)) //First time check if it's starbit
+	if ((BTspeedFlag_ == 0) && (BTsensorFlag_ == 0) && (BTspeedoutFlag_ == 0) && (BTmapFlag_ == 0)) //First time check if it's starbit
 	{
 		BT_StartBitCheck(data);
 	}
@@ -373,7 +378,7 @@ ISR(SPI_STC_vect)
 {
 	uint8_t data = SPDR;
 	
-	if ( (speedFlag_ == 0) && (sensorFlag_ == 0) && (speedoutFlag_ == 0)){
+	if ( (speedFlag_ == 0) && (sensorFlag_ == 0) && (speedoutFlag_ == 0) && (mapFlag_ == 0)){
 		SPI_StartBitCheck(data);
 	}
 	
@@ -393,7 +398,13 @@ ISR(SPI_STC_vect)
 			speedoutFlag_ = 0;
 		}
 	}
-	
+	else if (mapFlag_ == 1){
+		arrMap[counter_] = data; // Load into corr pos of array 0-2
+		if (counter_ == (sizeof(arrMap)/sizeof(arrMap[0]))){
+			counter_ = 0;
+			mapFlag_ = 0;
+		}
+	}
 	// Speed is to be sent.
 	if (speedFlag_ == 1){
 		SPI_send_arr(arrSpeed,(sizeof(arrSpeed)/sizeof(arrSpeed[0])));
