@@ -1719,7 +1719,25 @@ void AutomaticControl()
 					MAP_array[posY_][posX_ + 1].description = 3;
 					MAP_array[posY_ + 1][posX_].description = 3;
 				}
+				
+				MAP_main();
 				DISCOVERY_SetMode();
+				MOTOR_Stop();
+				LCD_SetPosition(0);
+				LCD_SendString("Y:");
+				LCD_display_uint16(MAP_currentPos[0]);
+				LCD_SendString("  ");
+				LCD_SendString("cDir:");
+				LCD_display_uint8(MAP_currentDir);
+				LCD_SendString("  ");
+				LCD_SetPosition(16);
+				LCD_SendString("X:");
+				LCD_display_uint16(MAP_currentPos[1]);
+				LCD_SendString("  ");
+				for(int i = 0; i<10; i++)
+				{
+					_delay_ms(250);
+				}
 				JUNCTION_FourWay();
 			}
 			else // 3-way-2
@@ -1754,7 +1772,25 @@ void AutomaticControl()
 					MAP_array[posY_][posX_ + 1].description = 3;
 					MAP_array[posY_ + 1][posX_].description = 4;
 				}
+				
+				MAP_main();
 				DISCOVERY_SetMode();
+				MOTOR_Stop();
+				LCD_SetPosition(0);
+				LCD_SendString("Y:");
+				LCD_display_uint16(MAP_currentPos[0]);
+				LCD_SendString("  ");
+				LCD_SendString("cDir:");
+				LCD_display_uint8(MAP_currentDir);
+				LCD_SendString("  ");
+				LCD_SetPosition(16);
+				LCD_SendString("X:");
+				LCD_display_uint16(MAP_currentPos[1]);
+				LCD_SendString("  ");
+				for(int i = 0; i<10; i++)
+				{
+					_delay_ms(250);
+				}
 				JUNCTION_ThreeWayTWO();
 			}
 		}
@@ -1792,7 +1828,25 @@ void AutomaticControl()
 					MAP_array[posY_][posX_ + 1].description = 4;
 					MAP_array[posY_ + 1][posX_].description = 3;
 				}
+				
+				MAP_main();
 				DISCOVERY_SetMode();
+				MOTOR_Stop();
+				LCD_SetPosition(0);
+				LCD_SendString("Y:");
+				LCD_display_uint16(MAP_currentPos[0]);
+				LCD_SendString("  ");
+				LCD_SendString("cDir:");
+				LCD_display_uint8(MAP_currentDir);
+				LCD_SendString("  ");
+				LCD_SetPosition(16);
+				LCD_SendString("X:");
+				LCD_display_uint16(MAP_currentPos[1]);
+				LCD_SendString("  ");
+				for(int i = 0; i<10; i++)
+				{
+					_delay_ms(250);
+				}
 				JUNCTION_ThreeWayTHREE();
 			}
 			else //Right turn
@@ -1827,7 +1881,25 @@ void AutomaticControl()
 					MAP_array[posY_][posX_ + 1].description = 4;
 					MAP_array[posY_ + 1][posX_].description = 4;
 				}
+				
+				MAP_main();
 				DISCOVERY_SetMode();
+				MOTOR_Stop();
+				LCD_SetPosition(0);
+				LCD_SendString("Y:");
+				LCD_display_uint16(MAP_currentPos[0]);
+				LCD_SendString("  ");
+				LCD_SendString("cDir:");
+				LCD_display_uint8(MAP_currentDir);
+				LCD_SendString("  ");
+				LCD_SetPosition(16);
+				LCD_SendString("X:");
+				LCD_display_uint16(MAP_currentPos[1]);
+				LCD_SendString("  ");
+				for(int i = 0; i<10; i++)
+				{
+					_delay_ms(250);
+				}
 				TURN_Right(0);
 			}
 		}
@@ -1865,7 +1937,25 @@ void AutomaticControl()
 					MAP_array[posY_][posX_ + 1].description = 3;
 					MAP_array[posY_ + 1][posX_].description = 3;
 				}
+				
+				MAP_main();
 				DISCOVERY_SetMode();
+				MOTOR_Stop();
+				LCD_SetPosition(0);
+				LCD_SendString("Y:");
+				LCD_display_uint16(MAP_currentPos[0]);
+				LCD_SendString("  ");
+				LCD_SendString("cDir:");
+				LCD_display_uint8(MAP_currentDir);
+				LCD_SendString("  ");
+				LCD_SetPosition(16);
+				LCD_SendString("X:");
+				LCD_display_uint16(MAP_currentPos[1]);
+				LCD_SendString("  ");
+				for(int i = 0; i<10; i++)
+				{
+					_delay_ms(250);
+				}
 				JUNCTION_ThreeWayONE();
 		    }
 			else // Left turn
@@ -1900,7 +1990,25 @@ void AutomaticControl()
 					MAP_array[posY_][posX_ + 1].description = 3;
 					MAP_array[posY_ + 1][posX_].description = 4;
 				}
+				
+				MAP_main();
 				DISCOVERY_SetMode();
+				MOTOR_Stop();
+				LCD_SetPosition(0);
+				LCD_SendString("Y:");
+				LCD_display_uint16(MAP_currentPos[0]);
+				LCD_SendString("  ");
+				LCD_SendString("cDir:");
+				LCD_display_uint8(MAP_currentDir);
+				LCD_SendString("  ");
+				LCD_SetPosition(16);
+				LCD_SendString("X:");
+				LCD_display_uint16(MAP_currentPos[1]);
+				LCD_SendString("  ");
+				for(int i = 0; i<10; i++)
+				{
+					_delay_ms(250);
+				}
 				TURN_Left(0);
 			}
 		}
@@ -1934,11 +2042,29 @@ void AutomaticControl()
 				MAP_array[posY_][posX_ + 1].description = 4;
 				MAP_array[posY_ + 1][posX_].description = 4;
 			}	
+			
+			MAP_main();
 			DISCOVERY_SetMode();
+			MOTOR_Stop();
+			LCD_SetPosition(0);
+			LCD_SendString("Y:");
+			LCD_display_uint16(MAP_currentPos[0]);
+			LCD_SendString("  ");
+			LCD_SendString("cDir:");
+			LCD_display_uint8(MAP_currentDir);
+			LCD_SendString("  ");
+			LCD_SetPosition(16);
+			LCD_SendString("X:");
+			LCD_display_uint16(MAP_currentPos[1]);
+			LCD_SendString("  ");
+			for(int i = 0; i<10; i++)
+			{
+				_delay_ms(250);
+			}
 			DEAD_END();
 		}
 		distance_counter = 0;
-		MAP_main();
+		
 	}
 	else if (!( LEFTPATHONE() || RIGHTPATHONE()))
 	{
@@ -2016,18 +2142,31 @@ void AutomaticControl()
 			MAP_array[posY_][posX_ + 1].description = 4;
 			MAP_array[posY_ + 1][posX_].description = 4;
 		}
+		MAP_main();
 		DISCOVERY_SetMode();
 		DEAD_END();
-		LCD_Clear();
+		MOTOR_Stop();
 		LCD_SetPosition(0);
-		LCD_SendString("Mode: FUCKTARD");
+		LCD_SendString("Y:");
+		LCD_display_uint16(MAP_currentPos[0]);
+		LCD_SendString("  ");
+		LCD_SendString("cDir:");
+		LCD_display_uint8(MAP_currentDir);
+		LCD_SendString("  ");
+		LCD_SetPosition(16);
+		LCD_SendString("X:");
+		LCD_display_uint16(MAP_currentPos[1]);
+		LCD_SendString("  ");
+		for(int i = 0; i<10; i++)
+		{
+			_delay_ms(250);
+		}
 		distance_counter = 0;
-		MAP_main();
 	}
-	if(distance_counter >= 32)
+	if(distance_counter >= 16)
 	{
 		// change description to the front of the robot to path
-		// change description to the left and right of the robot to wall
+		// change description to the left and right of the robot to wall1
 		uint8_t posY_ = MAP_currentPos[0];
 		uint8_t posX_ = MAP_currentPos[1];
 		// change description of all surrounding squares to path
@@ -2059,8 +2198,22 @@ void AutomaticControl()
 		distance_counter = 0;
 		MAP_main();
 		DISCOVERY_SetMode();
+		MOTOR_Stop();
+		LCD_SetPosition(0);
+		LCD_SendString("Y:");
+		LCD_display_uint16(MAP_currentPos[0]);
+		LCD_SendString("  ");
+		LCD_SendString("cDir:");
+		LCD_display_uint8(MAP_currentDir);
+		LCD_SetPosition(16);
+		LCD_SendString("X:");
+		LCD_display_uint16(MAP_currentPos[1]);
+		LCD_SendString("  ");
+		for(int i = 0; i<10; i++)
+		{
+			_delay_ms(250);
+		}
 	}
-	DISCOVERY_SetMode();
 }
 
 // This method is very important to call at the start of the program.
@@ -2080,6 +2233,8 @@ void INIT_ALL()
 	PWM_SetDirRight(1);
 	
 	MAP_array[15][15].description = 3;
+	MAP_currentDir = 1;
+	MAP_nextDir = 1;
 	MAP_setVisited();	// Map initialization
 	sei();	// Enable global interrupts
 }
@@ -2100,14 +2255,6 @@ int main(void)
     		{
 	    		AutomaticControl();
 				Send_sensor_values();
-    			LCD_SetPosition(0);
-    			LCD_SendString("Y:");
-    			LCD_display_uint16(MAP_currentPos[0]);
-				LCD_SendString("  ");
-				LCD_SetPosition(16);
-				LCD_SendString("X:");
-				LCD_display_uint16(MAP_currentPos[1]);
-				LCD_SendString("  ");
 				_delay_ms(50);
     		}
     		
