@@ -738,7 +738,7 @@ int PD_Control()
 	
 	if(control_mode == 'r')
 	{
-		standard_speed_ = 100;
+		standard_speed_ = 60;
 		
 		if(FRONT_SENSOR_VALUE() > 45) //Slow down when approaching wall
 		{
@@ -763,7 +763,7 @@ int PD_Control()
 	}
 	else if(control_mode == 'c')
 	{
-		standard_speed_ = 100;
+		standard_speed_ = 80;
 		standard_speed_ = Side_Control();
 		if(FRONT_SENSOR_VALUE() > 45) //Slow down when approaching wall
 		{
@@ -838,6 +838,7 @@ void DEAD_END()
 	_delay_ms(100);
 	MOTOR_Forward(standard_speed_);
 	distance_counter = 0;
+	distance_flag = 0;
 }
 
 void JUNCTION_delay(int delay)
@@ -876,8 +877,9 @@ void TURN_Right(int mode)
 		}
 		
 		_delay_ms(100);
-		distance_counter = 0;
 		MOTOR_Forward(standard_speed_);
+		distance_counter = 0;
+		distance_flag = 0;
 		
 	}
 	else if ( mode == 1)
@@ -887,8 +889,9 @@ void TURN_Right(int mode)
 		
 		MOTOR_RotateRight(90 - angle_left);
 		_delay_ms(100);
-		distance_counter = 0;
 		MOTOR_Forward(standard_speed_);
+		distance_counter = 0;
+		distance_flag = 0;
 	}
 	else if ( mode == 2)
 	{
@@ -906,20 +909,20 @@ void TURN_Right(int mode)
 			MOTOR_RotateRight(90 + angle_);
 		}
 		_delay_ms(100);
-		distance_counter = 0;
 		MOTOR_Forward(standard_speed_);
+		distance_counter = 0;
+		distance_flag = 0;
 	}
 	while(PATHCOUNT_Right() > 0)
 		{
 			_delay_us(1);
-			LCD_SetPosition(1);
-			LCD_SendString("Turn right");
+			//LCD_SetPosition(1);
+			//LCD_SendString("Turn right");
 			//Wait until robot reaches walls again
 		}
 	// change current direction in map
 	JUNCTION_delay(3);
 
-	distance_counter = 0;
 }
 
 // Stops and rotates right 90 degrees.
@@ -949,8 +952,9 @@ void TURN_Left(int mode)
 		}
 	
 		_delay_ms(100);
-		distance_counter = 0;
 		MOTOR_Forward(standard_speed_);
+		distance_counter = 0;
+		distance_flag = 0;
 	} 
 	
 	else if ( mode == 1)
@@ -960,8 +964,9 @@ void TURN_Left(int mode)
 	
 		MOTOR_RotateLeft(90 - angle_right);	
 		_delay_ms(100);
-		distance_counter = 0;
 		MOTOR_Forward(standard_speed_);
+		distance_counter = 0;
+		distance_flag = 0;
 	}
 	else if ( mode == 2)
 	{
@@ -976,15 +981,16 @@ void TURN_Left(int mode)
 			}
 				
 		_delay_ms(100);
-		distance_counter = 0;
 		MOTOR_Forward(standard_speed_);
+		distance_counter = 0;
+		distance_flag = 0;
 	}
 
 	while(PATHCOUNT_Left() > 0)
 	{
 		_delay_us(1);
-		LCD_SetPosition(1);
-		LCD_SendString("Turn left");
+		//LCD_SetPosition(1);
+		//LCD_SendString("Turn left");
 		//Wait until robot reaches walls again
 	}
 	// change current direction in map
@@ -1006,6 +1012,8 @@ void TURN_Back(int mode)
 		
 		_delay_ms(100);
 		MOTOR_Forward(standard_speed_);
+		distance_counter = 0;
+		distance_flag = 0;
 	}
 	else if(mode == 1) // 3-way-1
 	{
@@ -1029,6 +1037,8 @@ void TURN_Back(int mode)
 		
 		_delay_ms(100);
 		MOTOR_Forward(standard_speed_);
+		distance_counter = 0;
+		distance_flag = 0;
 	}
 	else if(mode == 2) // 3-way-2
 	{
@@ -1043,6 +1053,8 @@ void TURN_Back(int mode)
 				
 		_delay_ms(100);
 		MOTOR_Forward(standard_speed_);
+		distance_counter = 0;
+		distance_flag = 0;
 	}
 	else if(mode == 3) // 3-way-3
 	{
@@ -1066,8 +1078,9 @@ void TURN_Back(int mode)
 		
 		_delay_ms(100);
 		MOTOR_Forward(standard_speed_);
+		distance_counter = 0;
+		distance_flag = 0;
 	}
-	distance_counter = 0;
 	while((PATHCOUNT_Left() > 0) || (PATHCOUNT_Right() > 0))
 	{
 		_delay_us(1);
@@ -1130,6 +1143,8 @@ void JUNCTION_ThreeWayONE()
 {
 	if ((discovery_mode == 'r') || (discovery_mode == 'f'))
 	{
+		distance_counter = 0;
+		distance_flag = 0;
 		// Keep going forward
 		while(PATHCOUNT_Left() > 0 )
 		{
@@ -1140,17 +1155,17 @@ void JUNCTION_ThreeWayONE()
 			if(abs(offset_-20) <= 2)
 			{
 				control_mode = 'c';
-				LCD_Clear();
-				LCD_SetPosition(8);
-				LCD_SendString("Mode: c");
+				//LCD_Clear();
+				//LCD_SetPosition(8);
+				//LCD_SendString("Mode: c");
 			}
 			// Puts the automatic control in rapid mode, push the robot to the middle lane.
 			else
 			{
 				control_mode = 'r';
-				LCD_Clear();
-				LCD_SetPosition(8);
-				LCD_SendString("Mode: r");
+				//LCD_Clear();
+				//LCD_SetPosition(8);
+				//LCD_SendString("Mode: r");
 			}
 		
 			int new_speed_ = PD_Control();
@@ -1232,6 +1247,8 @@ void JUNCTION_ThreeWayTHREE()
 	}
 	else if ((discovery_mode == 'f') || (discovery_mode == 'l'))
 	{
+		distance_counter = 0;
+		distance_flag = 0;
 		// Keep going forward
 		while(PATHCOUNT_Right() > 0 )
 			{
@@ -1242,17 +1259,17 @@ void JUNCTION_ThreeWayTHREE()
 				if(abs(offset_-20) <= 2)
 				{
 					control_mode = 'c';
-					LCD_Clear();
-					LCD_SetPosition(8);
-					LCD_SendString("Mode: c");
+// 					LCD_Clear();
+// 					LCD_SetPosition(8);
+// 					LCD_SendString("Mode: c");
 				}
 				// Puts the automatic control in rapid mode, push the robot to the middle lane.
 				else
 				{
 					control_mode = 'r';
-					LCD_Clear();
-					LCD_SetPosition(8);
-					LCD_SendString("Mode: r");
+// 					§();
+// 					LCD_SetPosition(8);
+// 					LCD_SendString("Mode: r");
 				}
 				
 				int new_speed_ = PD_Control();
@@ -1302,6 +1319,8 @@ void JUNCTION_FourWay()
 	}
 	else if(discovery_mode == 'f')
 	{
+		distance_counter = 0;
+		distance_flag = 0;
 		//keep going forward
 		while ((LEFTPATHONE() || RIGHTPATHONE())
 				 || ((PATHCOUNT_Left() > 0) && (PATHCOUNT_Right() > 0)))
@@ -1455,10 +1474,9 @@ void AutomaticControl()
 } 
 */
 //________________________________AUTOMATIC CONTROL END_____________________________________
-
+/*
 void Display_Position()
 {
-	MOTOR_Stop();
 	LCD_SetPosition(0);
 	LCD_SendString("Y:");
 	LCD_display_uint16(MAP_currentPos[0]);
@@ -1483,7 +1501,7 @@ void Display_Position()
 	}
 	MOTOR_Forward(standard_speed_);
 }
-
+*/
 void MAP_main()
 {
 	// Save these under more convenient names
@@ -1685,8 +1703,10 @@ void AutomaticControl()
 		{
 			_delay_us(250);
 		} 
+		
+		MAP_moveForward();
 		// Now in intersect. Determine what type:
-		LCD_Clear();
+		//LCD_Clear();
 		JUNCTION_delay(2);
 			
 		// Lägg till avsökning av varje möjlig ruta i sådana här
@@ -1727,10 +1747,7 @@ void AutomaticControl()
 				
 				JUNCTION_FourWay();
 				MAP_rotate();
-				MAP_moveForward();
-				Display_Position();
-				distance_counter = 0;
-				distance_flag = 0;
+				 
 			}
 			else // 3-way-2
 			{
@@ -1770,10 +1787,7 @@ void AutomaticControl()
 				
 				JUNCTION_ThreeWayTWO();
 				MAP_rotate();
-				MAP_moveForward();
-				Display_Position();
-				distance_counter = 0;
-				distance_flag = 0;
+				 
 			}
 		}
 		else if (PATHCOUNT_Right() > 0) // 3-way-3 or RightTurn
@@ -1816,10 +1830,7 @@ void AutomaticControl()
 				
 				JUNCTION_ThreeWayTHREE();
 				MAP_rotate();
-				MAP_moveForward();
-				Display_Position();
-				distance_counter = 0;
-				distance_flag = 0;
+				 
 			}
 			else //Right turn
 			{
@@ -1859,10 +1870,7 @@ void AutomaticControl()
 				
 				TURN_Right(0);
 				MAP_rotate();
-				MAP_moveForward();
-				Display_Position();
-				distance_counter = 0;
-				distance_flag = 0;
+				 
 			}
 		}
 		else if (PATHCOUNT_Left() > 0) // 3-way-1 or Left turn
@@ -1905,10 +1913,7 @@ void AutomaticControl()
 				
 				JUNCTION_ThreeWayONE();
 				MAP_rotate();
-				MAP_moveForward();
-				Display_Position();
-				distance_counter = 0;
-				distance_flag = 0;
+				 
 		    }
 			else // Left turn
 			{
@@ -1947,10 +1952,7 @@ void AutomaticControl()
 				DISCOVERY_SetMode();
 				TURN_Left(0);
 				MAP_rotate();
-				MAP_moveForward();
-				Display_Position();
-				distance_counter = 0;
-				distance_flag = 0;
+				 
 			}
 		}
 		else if (WALL_CLOSE_AHEAD())
@@ -1988,10 +1990,7 @@ void AutomaticControl()
 			DISCOVERY_SetMode();
 			DEAD_END();
 			MAP_rotate();
-			MAP_moveForward();
-			Display_Position();
-			distance_counter = 0;
-			distance_flag = 0;
+			 
 		}
 		
 	}
@@ -2013,17 +2012,17 @@ void AutomaticControl()
 		if(abs(offset_-20) <= 2)
 		{
 			control_mode = 'c';
-			LCD_Clear();
-			LCD_SetPosition(8);
-			LCD_SendString("Mode: c");
+			//LCD_Clear();
+			//LCD_SetPosition(8);
+			//LCD_SendString("Mode: c");
 		}
 		// Puts the automatic control in rapid mode, push the robot to the middle lane.
 		else
 		{
 			control_mode = 'r';
-			LCD_Clear();
-			LCD_SetPosition(8);
-			LCD_SendString("Mode: r");
+			//LCD_Clear();
+			//LCD_SetPosition(8);
+			//LCD_SendString("Mode: r");
 		}
 		
 		int new_speed_ = PD_Control();
@@ -2077,10 +2076,10 @@ void AutomaticControl()
 		distance_counter = 0;
 		distance_flag = 0;
 		MAP_rotate();
-		MAP_moveForward();
 	}
-	if((distance_counter >= 5) && (distance_flag == 1))
+	if((distance_counter >= 7) && (distance_flag == 1))
 	{
+		MAP_moveForward();
 		// change description to the front of the robot to path
 		// change description to the left and right of the robot to wall1
 		uint8_t posY_ = MAP_currentPos[0];
@@ -2114,8 +2113,7 @@ void AutomaticControl()
 		MAP_main();
 		DISCOVERY_SetMode();
 		MAP_rotate();
-		MAP_moveForward();
-		Display_Position();				
+		 				
 		distance_flag = 0;
 	}
 }
@@ -2137,7 +2135,7 @@ void INIT_ALL()
 	PWM_SetDirRight(1);
 	
 	distance_counter = 0;
-	MAP_array[15][15].description = 3;
+	MAP_array[16][15].description = 3;
 	MAP_currentDir = 1;
 	MAP_nextDir = 1;
 	MAP_setVisited();	// Map initialization
@@ -2164,17 +2162,9 @@ int main(void)
 				LCD_SendString("Y:");
 				LCD_display_uint16(MAP_currentPos[0]);
 				LCD_SendString("  ");
-				LCD_SendString("cDir:");
-				LCD_display_uint8(MAP_currentDir);
-				LCD_SendString("  ");
-				LCD_SetPosition(16);
 				LCD_SendString("X:");
 				LCD_display_uint16(MAP_currentPos[1]);
 				LCD_SendString("  ");
-				LCD_SendString("nDir:");
-				LCD_display_uint8(MAP_nextDir);
-				LCD_SendString("  ");
-				
     		}
     		
     		_delay_ms(10);
