@@ -45,17 +45,19 @@ volatile uint8_t BT_sent_flag = 0;
 
 uint8_t arrSpeed[5] = {0,0,1,1,0}; //Array with current speed (Left right), direction (1 = forward, 0 = backward) and claw. From/to PC/master left
 uint8_t arrSpeedout[3] = {10, 10, 1}; //Speed left, speed right, dirleft & right
-uint8_t incomingSpeed_ = 0;
+uint8_t arrMap[3] = {0, 0, 0}; //[0] = {xpos(4) + dir(2)}, [1] = {y-pos(5) + mål(1)}, [2] = {left(2) + ahead(2) + right(2)},
 
 uint8_t sendFlag = 0;
 uint8_t Flag_ = 0;
-int8_t arrSensor[] = {9,8,7,6};
-	
+int8_t arrSensor[7] = {7,6,5,4,3,2,1};
+
+uint8_t mapFlag_ = 0;	
 uint8_t sensorFlag_ = 0;
 uint8_t speedFlag_ = 0;
 uint8_t speedoutFlag_ = 0;
 uint8_t counter_ = 0;
 
+uint8_t	BTmapFlag_ = 0;
 uint8_t BTsensorFlag_ = 0;
 uint8_t BTspeedFlag_ = 0;
 uint8_t BTspeedoutFlag_ = 0;
@@ -223,25 +225,43 @@ void BT_StartBitCheck(uint8_t in_)
 		BTsensorFlag_ = 0;
 		BTspeedoutFlag_ = 0;
 		BTcounter_ = 0;
+		BTmapFlag_ = 0;
 		break;
 		
 		case 87:
 		BTspeedoutFlag_ = 0;
 		BTsensorFlag_ = 1;
 		BTspeedFlag_ = 0;
+		BTmapFlag_ = 0;
 		break;
 		
 		case 89:
 		BTspeedoutFlag_ = 1;
 		BTsensorFlag_ = 0;
 		BTspeedFlag_ = 0;
+		BTmapFlag_ = 0;
+		
+		case 69:
+		BTmapFlag_ = 1;
+		BTcounter_ = 0;
+		BTspeedoutFlag_ = 0;
+		BTsensorFlag_ = 0;
+		BTspeedFlag_ = 0;
+		
+		default:
+		BTmapFlag_ = 0;
+		BTcounter_ = 0;
+		BTspeedoutFlag_ = 0;
+		BTsensorFlag_ = 0;
+		BTspeedFlag_ = 0;
+		
 	}
 }
 // Receive complete - triggered by interrupt
 ISR(USART0_RX_vect) 
 {
 	uint8_t data = UDR0;
-	if ((BTspeedFlag_ == 0) && (BTsensorFlag_ == 0) && (BTspeedoutFlag_ == 0)) //First time check if it's starbit
+	if ((BTspeedFlag_ == 0) && (BTsensorFlag_ == 0) && (BTspeedoutFlag_ == 0) && (BTmapFlag_ == 0)) //First time check if it's starbit
 	{
 		BT_StartBitCheck(data);
 	}
@@ -265,6 +285,11 @@ ISR(USART0_RX_vect)
 	{
 		send_BT_buffer(arrSpeedout, (sizeof(arrSpeedout)/sizeof(arrSpeedout[0])));
 		BTspeedoutFlag_ = 0;
+	}
+	if (BTmapFlag_ == 1)
+	{
+		send_BT_buffer(arrMap, (sizeof(arrMap)/sizeof(arrMap[0])));
+		BTmapFlag_ = 0;
 	}
 	
 	
@@ -312,6 +337,7 @@ void SPI_StartBitCheck(uint8_t in_)
 		speedFlag_ = 1;
 		speedoutFlag_ = 0;
 		sensorFlag_ = 0;
+		mapFlag_ = 0;
 		counter_ = 0;
 		break;
 		
@@ -319,6 +345,7 @@ void SPI_StartBitCheck(uint8_t in_)
 		sensorFlag_ = 1;
 		speedoutFlag_ = 0;
 		speedFlag_ = 0;
+		mapFlag_ = 0;		
 		counter_ = 0;
 		break; 
 		
@@ -326,10 +353,20 @@ void SPI_StartBitCheck(uint8_t in_)
 		speedoutFlag_ = 1;
 		sensorFlag_ = 0;
 		speedFlag_ = 0;
+		mapFlag_ = 0;		
+		counter_ = 0;
+		break;
+		
+		case 69:
+		mapFlag_ = 1;
+		speedoutFlag_ = 0;
+		sensorFlag_ = 0;
+		speedFlag_ = 0;
 		counter_ = 0;
 		break;
 		
 		default: 
+		mapFlag_ = 0;
 		speedoutFlag_ = 0;
 		sensorFlag_ = 0;
 		speedFlag_ = 0;
@@ -341,12 +378,12 @@ ISR(SPI_STC_vect)
 {
 	uint8_t data = SPDR;
 	
-	if ( (speedFlag_ == 0) && (sensorFlag_ == 0) && (speedoutFlag_ == 0)){
+	if ( (speedFlag_ == 0) && (sensorFlag_ == 0) && (speedoutFlag_ == 0) && (mapFlag_ == 0)){
 		SPI_StartBitCheck(data);
 	}
 	
 	else if (sensorFlag_ == 1){
-	arrSensor[counter_] = data; //Load into correct pos of array 0-3
+	arrSensor[counter_] = data; //Load into correct pos of array 0-6
 	counter_++;
 		if (counter_ == (sizeof(arrSensor)/sizeof(arrSensor[0])) ){  //all values in.
 				counter_ = 0;
@@ -361,7 +398,13 @@ ISR(SPI_STC_vect)
 			speedoutFlag_ = 0;
 		}
 	}
-	
+	else if (mapFlag_ == 1){
+		arrMap[counter_] = data; // Load into corr pos of array 0-2
+		if (counter_ == (sizeof(arrMap)/sizeof(arrMap[0]))){
+			counter_ = 0;
+			mapFlag_ = 0;
+		}
+	}
 	// Speed is to be sent.
 	if (speedFlag_ == 1){
 		SPI_send_arr(arrSpeed,(sizeof(arrSpeed)/sizeof(arrSpeed[0])));
@@ -379,30 +422,6 @@ ISR(SPI_STC_vect)
 		SPDR = pop_node(&head_SPIout);
 	}
 	
-	//if (data == 1 && Flag_ == 0)
-	//{
-		//SPI_send_arr(arrSpeed,(sizeof(arrSpeed)/sizeof(arrSpeed[0])));
-		//SPDR =  pop_node(&head_SPIout);
-		//return;
-	//}
-	//
-	//if (data == 255 && Flag_ == 0) //sensordata coming, startbit from styr
-		//{
-			//Flag_ = 1; // Set startbitflag
-		//}
-	//else if (Flag_ > 0) //If startbit is set == first value incoming
-		//{
-			//arrSensor[Flag_ - 1] = data;
-			//if (Flag_ == 4)
-			//{
-				//Flag_ = 0;
-				//SPI_send_arr(arrSensor, sizeof(arrSensor)/sizeof(arrSensor[0])); // ************** TEST ************
-			//}
-			//else
-			//{
-				//Flag_++;
-			//}
-		//}
 }
 
 

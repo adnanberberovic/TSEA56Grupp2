@@ -1,0 +1,15 @@
+\boolfalse {citerequest}\boolfalse {citetracker}\boolfalse {pagetracker}\boolfalse {backtracker}\relax 
+\defcounter {refsection}{0}\relax 
+\select@language {swedish}
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {1}Inledning}{1}{section.1}
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {2}F\IeC {\"o}re anv\IeC {\"a}ndning av robot}{2}{section.2}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {2.1}Kalibrering}{2}{subsection.2.1}
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {3}Anv\IeC {\"a}ndning av robot}{2}{section.3}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {3.1}Manuellt l\IeC {\"a}ge}{3}{subsection.3.1}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {3.2}Autonomt l\IeC {\"a}ge}{4}{subsection.3.2}

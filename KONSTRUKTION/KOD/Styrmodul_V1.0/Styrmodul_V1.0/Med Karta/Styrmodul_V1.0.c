@@ -35,7 +35,6 @@ uint8_t TIMER_overflows;
 // This timer will NOT reset every time it reaches 10.
 int16_t TIMER_wheel, TIMER_gyro;
 int16_t TIMER_PD = 0;
-
 	// The following overflow storage corresponds to 131ms. This timer will never reset.
 uint8_t TIMER_overflows_deci;
 // This variable is used to store robots angle in degrees
@@ -229,14 +228,13 @@ void Send_speed_value()
 		SPI_MasterTransmit(arrSpeedout[i],'k');
 	}
 }
-
-//        TIMERS
 ISR(TIMER0_OVF_vect)
 {
 	TIMER_overflows++;
 	TIMER_wheel++;
 	TIMER_gyro++;
 	TIMER_PD++;
+	
 	if (TIMER_overflows >= 10)
 	{
 		TIMER_overflows = 0;
@@ -443,11 +441,10 @@ uint16_t speed_send_new;
 uint16_t ss1;
 uint16_t ss2;
 float current_speed;
-float wheel_circumference = 20.4/4; //Wheel circumference is 204 mm. 4 black sectors
+float  wheel_circumference = 20.4/4; //Wheel circumference is 204 mm. 4 black sectors
 float time_difference;
-volatile uint16_t wheel_counter;
-volatile uint16_t distance_counter = 0; // distance_counter = 1 <=> 12,37 mm
-										// ett hjulvarv = 63*pi = 197 mm => distance_counter = 16
+uint8_t wheel_counter;
+int distance_counter = 0;
 
 
 void Speed_Interrupt_Init()
@@ -458,23 +455,29 @@ void Speed_Interrupt_Init()
 
 ISR(INT0_vect)
 {
-	wheel_counter++;
-	distance_counter++;
-	EIFR = (1<<INTF0); //Clear queued interrupts
-	
-// 		if ((PIND & 0b00000100) == 4)
+	if ((PIND & 0b00000100) == 4)
+	{
+		PORTC &= ~(1 <<PORTC7);
+	}
+	else
+	{
+		PORTC |= 1<<PORTC7; //Increase reference voltage
+		
+// 		ss2 = ss1;
+// 		ss1 = speed_send;
+// 		//Decrease reference voltage
+// 		time_difference = (float)TIMER_wheel / 0.8175 /1000;
+// 		// div by 0.8175 -> time in ms
+// 		if (TIMER_wheel > 20)
 // 		{
-// 			PORTC &= ~(1 <<PORTC7);
-// 			distance_counter++;
-// 		} else {
-// 			PORTC |= 1<<PORTC7; //Increase reference voltage
-// 			wheel_counter++;
-// 			distance_counter++;	
+// 			current_speed = wheel_circumference / time_difference;
+// 			speed_send = (uint16_t)current_speed;
+//			speed_send_new = (ss1+ss2+2*speed_send)/4;
+// 			TIMER_wheel = 0;
 // 		}
-// 			PORTC &= 0xbf;
-// 			PORTC |= 0x40;
-// 			PORTC &= 0xbf;
-// 		EIFR = (1<<INTF0); //Clear queued interrupts
+		wheel_counter++;
+		distance_counter++;
+	}	
 }
 //__________________________SPEEDOMETER END____________________________
 
@@ -527,6 +530,7 @@ void MANUAL_DRIVE()
 {
 	Get_speed_value();
 	Get_sensor_values();
+	offset__ = arrSensor[1];
 	PWM_SetSpeedLeft(arrSpeed[0]);
 	PWM_SetSpeedRight(arrSpeed[1]);
 	PWM_SetDirLeft(arrSpeed[2]);
@@ -853,7 +857,7 @@ void DEAD_END()
 void JUNCTION_delay(int delay)
 {
 	wheel_counter = 0;
-	while (wheel_counter < (2*delay))
+	while (wheel_counter < delay)
 	{
 		_delay_us(1);
 	}
@@ -918,7 +922,7 @@ void TURN_Right(int mode)
 		MOTOR_Forward(standard_speed_);
 	}
 		
-	while(PATHCOUNT_Right() > 0)
+	while((PATHCOUNT_Left() > 0) || (PATHCOUNT_Right() > 0))
 		{
 			_delay_us(1);
 			LCD_SetPosition(1);
@@ -985,7 +989,7 @@ void TURN_Left(int mode)
 		MOTOR_Forward(standard_speed_);
 	}
 	
-	while(PATHCOUNT_Left() > 0)
+	while((PATHCOUNT_Left() > 0) || (PATHCOUNT_Right() > 0))
 	{
 		_delay_us(1);
 		LCD_SetPosition(1);
@@ -993,7 +997,7 @@ void TURN_Left(int mode)
 		//Wait until robot reaches walls again
 	}
 	// change current direction in map
-	JUNCTION_delay(3); // ************** VARFÖR DENNA ?! ******************
+	JUNCTION_delay(3);
 	distance_counter = 0;
 }
 
@@ -1330,35 +1334,9 @@ void JUNCTION_FourWay()
 		discovery_mode = '?';
 	}
 }
-/*
+
 // Call this function to perform automatic control.
 
-//void update_walls(x,y,z);
-//{
-	//if (MAP_currentDir == 0)
-	//{
-		//update_north()
-	//}
-	//else if (MAP_currentDir == 1)
-	//{
-		//MAP_array[posY_][posX_ - 1].description = 3;
-		//MAP_array[posY_][posX_ + 1].description = 3;
-		//MAP_array[posY_ - 1][posX_].description = 3;
-	//}
-	//else if (MAP_currentDir == 2)
-	//{
-		//MAP_array[posY_ - 1][posX_].description = 3;
-		//MAP_array[posY_][posX_ - 1].description = 3;
-		//MAP_array[posY_ + 1][posX_].description = 3;
-	//}
-	//else if (MAP_currentDir == 3)
-	//{
-		//MAP_array[posY_][posX_ - 1].description = 3;
-		//MAP_array[posY_][posX_ + 1].description = 3;
-		//MAP_array[posY_ + 1][posX_].description = 3;
-	//}
-//}
-*/
 /*
 void AutomaticControl()
 {
@@ -1464,6 +1442,404 @@ void AutomaticControl()
 */
 //________________________________AUTOMATIC CONTROL END_____________________________________
 
+void Path_selection()
+{
+	
+}
+
+
+void AutomaticControl()
+{
+	DISCOVERY_SetMode();
+	if (REFLEX_GetMarker())
+	{
+		
+// 		LCD_SetPosition(10);
+// 		resque_mode = 'q';
+// 		LCD_SendString("GOLD");
+// 		JUNCTION_delay(2);
+// 		DEAD_END();
+// 		DEAD_END();
+// 		JUNCTION_delay(2);
+	}
+	
+	if( (PATHCOUNT_Left() > 0) || (PATHCOUNT_Right() > 0) ) //Path to left or right
+	{
+		
+		while (!LEFTPATHBOTH() && !RIGHTPATHBOTH() && !WALL_CLOSE_AHEAD()) //Keep going until center of intersect
+		{
+			_delay_us(250);
+		} 
+		// Now in intersect. Determine what type:
+		LCD_Clear();
+		JUNCTION_delay(2);
+			
+		// Lägg till avsökning av varje möjlig ruta i sådana här
+		if ((PATHCOUNT_Left() > 0) && (PATHCOUNT_Right() > 0)) // 4-way or 3-way-2
+		{
+			if (PATH_AHEAD()) // 4-way
+			{
+				uint8_t posY_ = MAP_currentPos[0];
+				uint8_t posX_ = MAP_currentPos[1];
+				// change description of all surrounding squares to path
+				
+				if (MAP_currentDir == 0)
+				{
+					MAP_array[posY_ - 1][posX_].description = 3;
+					MAP_array[posY_][posX_ + 1].description = 3;
+					MAP_array[posY_ + 1][posX_].description = 3;
+				}
+				else if (MAP_currentDir == 1)
+				{
+					MAP_array[posY_][posX_ - 1].description = 3;
+					MAP_array[posY_][posX_ + 1].description = 3;
+					MAP_array[posY_ - 1][posX_].description = 3;
+				} 
+				else if (MAP_currentDir == 2)
+				{
+					MAP_array[posY_ - 1][posX_].description = 3;
+					MAP_array[posY_][posX_ - 1].description = 3;
+					MAP_array[posY_ + 1][posX_].description = 3;
+				}
+				else if (MAP_currentDir == 3)
+				{
+					MAP_array[posY_][posX_ - 1].description = 3;
+					MAP_array[posY_][posX_ + 1].description = 3;
+					MAP_array[posY_ + 1][posX_].description = 3;
+				}
+				
+				JUNCTION_FourWay();
+			}
+			else // 3-way-2
+			{
+				// change description to the left and right of robot to path
+				// change description to the front of the robot to wall
+				uint8_t posY_ = MAP_currentPos[0];
+				uint8_t posX_ = MAP_currentPos[1];
+				// change description of all surrounding squares to path
+				
+				if (MAP_currentDir == 0)
+				{
+					MAP_array[posY_ - 1][posX_].description = 3;
+					MAP_array[posY_][posX_ + 1].description = 4;
+					MAP_array[posY_ + 1][posX_].description = 3;
+				}
+				else if (MAP_currentDir == 1)
+				{
+					MAP_array[posY_][posX_ - 1].description = 3;
+					MAP_array[posY_][posX_ + 1].description = 3;
+					MAP_array[posY_ - 1][posX_].description = 4;
+				}
+				else if (MAP_currentDir == 2)
+				{
+					MAP_array[posY_ - 1][posX_].description = 3;
+					MAP_array[posY_][posX_ - 1].description = 4;
+					MAP_array[posY_ + 1][posX_].description = 3;
+				}
+				else if (MAP_currentDir == 3)
+				{
+					MAP_array[posY_][posX_ - 1].description = 3;
+					MAP_array[posY_][posX_ + 1].description = 3;
+					MAP_array[posY_ + 1][posX_].description = 4;
+				}
+				
+				JUNCTION_ThreeWayTWO();
+			}
+		}
+		else if (PATHCOUNT_Right() > 0) // 3-way-3 or RightTurn
+		{
+			if (PATH_AHEAD()) // 3-w-3
+			{
+				// change description to the right and front of the robot to path
+				// change description to the left of the robot to wall.
+				uint8_t posY_ = MAP_currentPos[0];
+				uint8_t posX_ = MAP_currentPos[1];
+				// change description of all surrounding squares to path
+				
+				if (MAP_currentDir == 0)
+				{
+					MAP_array[posY_ - 1][posX_].description = 4;
+					MAP_array[posY_][posX_ + 1].description = 3;
+					MAP_array[posY_ + 1][posX_].description = 3;
+				}
+				else if (MAP_currentDir == 1)
+				{
+					MAP_array[posY_][posX_ - 1].description = 4;
+					MAP_array[posY_][posX_ + 1].description = 3;
+					MAP_array[posY_ - 1][posX_].description = 3;
+				}
+				else if (MAP_currentDir == 2)
+				{
+					MAP_array[posY_ - 1][posX_].description = 3;
+					MAP_array[posY_][posX_ - 1].description = 3;
+					MAP_array[posY_ + 1][posX_].description = 4;
+				}
+				else if (MAP_currentDir == 3)
+				{
+					MAP_array[posY_][posX_ - 1].description = 3;
+					MAP_array[posY_][posX_ + 1].description = 4;
+					MAP_array[posY_ + 1][posX_].description = 3;
+				}
+				JUNCTION_ThreeWayTHREE();
+			}
+			else //Right turn
+			{
+				// change description to the right of the robot to path
+				// change description to the left and front of the robot to wall
+				uint8_t posY_ = MAP_currentPos[0];
+				uint8_t posX_ = MAP_currentPos[1];
+				// change description of all surrounding squares to path
+				
+				if (MAP_currentDir == 0)
+				{
+					MAP_array[posY_ - 1][posX_].description = 4;
+					MAP_array[posY_][posX_ + 1].description = 4;
+					MAP_array[posY_ + 1][posX_].description = 3;
+				}
+				else if (MAP_currentDir == 1)
+				{
+					MAP_array[posY_][posX_ - 1].description = 4;
+					MAP_array[posY_][posX_ + 1].description = 3;
+					MAP_array[posY_ - 1][posX_].description = 4;
+				}
+				else if (MAP_currentDir == 2)
+				{
+					MAP_array[posY_ - 1][posX_].description = 3;
+					MAP_array[posY_][posX_ - 1].description = 4;
+					MAP_array[posY_ + 1][posX_].description = 4;
+				}
+				else if (MAP_currentDir == 3)
+				{
+					MAP_array[posY_][posX_ - 1].description = 3;
+					MAP_array[posY_][posX_ + 1].description = 4;
+					MAP_array[posY_ + 1][posX_].description = 4;
+				}
+				TURN_Right(0);
+			}
+		}
+		else if (PATHCOUNT_Left() > 0) // 3-way-1 or Left turn
+		{
+			if (PATH_AHEAD()) // 3-way-1
+			{
+				// change description to the left and front of the robot to path
+				// change description to the right of the robot to wall
+				uint8_t posY_ = MAP_currentPos[0];
+				uint8_t posX_ = MAP_currentPos[1];
+				// change description of all surrounding squares to path
+				
+				if (MAP_currentDir == 0)
+				{
+					MAP_array[posY_ - 1][posX_].description = 3;
+					MAP_array[posY_][posX_ + 1].description = 3;
+					MAP_array[posY_ + 1][posX_].description = 4;
+				}
+				else if (MAP_currentDir == 1)
+				{
+					MAP_array[posY_][posX_ - 1].description = 3;
+					MAP_array[posY_][posX_ + 1].description = 4;
+					MAP_array[posY_ - 1][posX_].description = 3;
+				}
+				else if (MAP_currentDir == 2)
+				{
+					MAP_array[posY_ - 1][posX_].description = 4;
+					MAP_array[posY_][posX_ - 1].description = 3;
+					MAP_array[posY_ + 1][posX_].description = 3;
+				}
+				else if (MAP_currentDir == 3)
+				{
+					MAP_array[posY_][posX_ - 1].description = 4;
+					MAP_array[posY_][posX_ + 1].description = 3;
+					MAP_array[posY_ + 1][posX_].description = 3;
+				}
+				JUNCTION_ThreeWayONE();
+		    }
+			else // Left turn
+			{
+				// change description to the left of the robot to path
+				// change description to the right and front of the robot to wall
+				uint8_t posY_ = MAP_currentPos[0];
+				uint8_t posX_ = MAP_currentPos[1];
+				// change description of all surrounding squares to path
+				
+				if (MAP_currentDir == 0)
+				{
+					MAP_array[posY_ - 1][posX_].description = 3;
+					MAP_array[posY_][posX_ + 1].description = 4;
+					MAP_array[posY_ + 1][posX_].description = 4;
+				}
+				else if (MAP_currentDir == 1)
+				{
+					MAP_array[posY_][posX_ - 1].description = 3;
+					MAP_array[posY_][posX_ + 1].description = 4;
+					MAP_array[posY_ - 1][posX_].description = 4;
+				}
+				else if (MAP_currentDir == 2)
+				{
+					MAP_array[posY_ - 1][posX_].description = 4;
+					MAP_array[posY_][posX_ - 1].description = 4;
+					MAP_array[posY_ + 1][posX_].description = 3;
+				}
+				else if (MAP_currentDir == 3)
+				{
+					MAP_array[posY_][posX_ - 1].description = 4;
+					MAP_array[posY_][posX_ + 1].description = 3;
+					MAP_array[posY_ + 1][posX_].description = 4;
+				}
+				TURN_Left(0);
+			}
+		}
+		else if (WALL_CLOSE_AHEAD())
+		{
+			uint8_t posY_ = MAP_currentPos[0];
+			uint8_t posX_ = MAP_currentPos[1];
+			// change description of all surrounding squares to path
+			
+			if (MAP_currentDir == 0)
+			{
+				MAP_array[posY_ - 1][posX_].description = 4;
+				MAP_array[posY_][posX_ + 1].description = 4;
+				MAP_array[posY_ + 1][posX_].description = 4;
+			}
+			else if (MAP_currentDir == 1)
+			{
+				MAP_array[posY_][posX_ - 1].description = 4;
+				MAP_array[posY_][posX_ + 1].description = 4;
+				MAP_array[posY_ - 1][posX_].description = 4;
+			}
+			else if (MAP_currentDir == 2)
+			{
+				MAP_array[posY_ - 1][posX_].description = 4;
+				MAP_array[posY_][posX_ - 1].description = 4;
+				MAP_array[posY_ + 1][posX_].description = 4;
+			}
+			else if (MAP_currentDir == 3)
+			{
+				MAP_array[posY_][posX_ - 1].description = 4;
+				MAP_array[posY_][posX_ + 1].description = 4;
+				MAP_array[posY_ + 1][posX_].description = 4;
+			}	
+			DEAD_END();
+		}
+		distance_counter = 0;
+	}
+	else if (!( LEFTPATHONE() || RIGHTPATHONE()))
+	{
+		Get_sensor_values();
+		
+		if( ((arrSensor[1] + arrSensor[3]) / 2) < 20)
+		{
+			angle_ =  arrSensor[2];
+			offset_ =  arrSensor[3];
+		}
+		else
+		{
+			angle_ =  arrSensor[0];
+			offset_ =  arrSensor[1];
+		}
+		
+		if(abs(offset_-20) <= 2)
+		{
+			control_mode = 'c';
+			LCD_Clear();
+			LCD_SetPosition(8);
+			LCD_SendString("Mode: c");
+		}
+		// Puts the automatic control in rapid mode, push the robot to the middle lane.
+		else
+		{
+			control_mode = 'r';
+			LCD_Clear();
+			LCD_SetPosition(8);
+			LCD_SendString("Mode: r");
+		}
+		
+		int new_speed_ = PD_Control();
+		LCD_SendString("   ");
+		// Makes sure that the motors don't burn out (i.e go on max velocity)
+		if(new_speed_ > (254-standard_speed_))
+		{
+			new_speed_ = 254 - standard_speed_;
+		}
+		else
+		{
+			PWM_SetSpeedRight(standard_speed_ + new_speed_);
+			PWM_SetSpeedLeft(standard_speed_ - new_speed_);		
+		}
+	}
+	
+	if(WALL_CLOSE_AHEAD()) // dead end square
+	{
+		// change description to the front, left and right of the robot to wall.
+		uint8_t posY_ = MAP_currentPos[0];
+		uint8_t posX_ = MAP_currentPos[1];
+		// change description of all surrounding squares to path
+		
+		if (MAP_currentDir == 0)
+		{
+			MAP_array[posY_ - 1][posX_].description = 4;
+			MAP_array[posY_][posX_ + 1].description = 4;
+			MAP_array[posY_ + 1][posX_].description = 4;
+		}
+		else if (MAP_currentDir == 1)
+		{
+			MAP_array[posY_][posX_ - 1].description = 4;
+			MAP_array[posY_][posX_ + 1].description = 4;
+			MAP_array[posY_ - 1][posX_].description = 4;
+		}
+		else if (MAP_currentDir == 2)
+		{
+			MAP_array[posY_ - 1][posX_].description = 4;
+			MAP_array[posY_][posX_ - 1].description = 4;
+			MAP_array[posY_ + 1][posX_].description = 4;
+		}
+		else if (MAP_currentDir == 3)
+		{
+			MAP_array[posY_][posX_ - 1].description = 4;
+			MAP_array[posY_][posX_ + 1].description = 4;
+			MAP_array[posY_ + 1][posX_].description = 4;
+		}
+		DEAD_END();
+		LCD_Clear();
+		LCD_SetPosition(0);
+		LCD_SendString("Mode: FUCKTARD");
+		distance_counter = 0;
+	}
+	if(distance_counter >= 16)
+	{
+		// change description to the front of the robot to path
+		// change description to the left and right of the robot to wall
+		uint8_t posY_ = MAP_currentPos[0];
+		uint8_t posX_ = MAP_currentPos[1];
+		// change description of all surrounding squares to path
+		
+		if (MAP_currentDir == 0)
+		{
+			MAP_array[posY_ - 1][posX_].description = 4;
+			MAP_array[posY_][posX_ + 1].description = 3;
+			MAP_array[posY_ + 1][posX_].description = 4;
+		}
+		else if (MAP_currentDir == 1)
+		{
+			MAP_array[posY_][posX_ - 1].description = 4;
+			MAP_array[posY_][posX_ + 1].description = 4;
+			MAP_array[posY_ - 1][posX_].description = 3;
+		}
+		else if (MAP_currentDir == 2)
+		{
+			MAP_array[posY_ - 1][posX_].description = 4;
+			MAP_array[posY_][posX_ - 1].description = 3;
+			MAP_array[posY_ + 1][posX_].description = 4;
+		}
+		else if (MAP_currentDir == 3)
+		{
+			MAP_array[posY_][posX_ - 1].description = 4;
+			MAP_array[posY_][posX_ + 1].description = 4;
+			MAP_array[posY_ + 1][posX_].description = 3;
+		}
+		distance_counter = 0;
+	}
+}
+
 void MAP_main()
 {
 	// Save these under more convenient names
@@ -1548,8 +1924,7 @@ void MAP_main()
 	{
 		// Simulation code starts here
 		// Call rotate functions here
-		
-		// MAP_rotate();
+		MAP_rotate();
 		// Simulation code ends here
 	}
 
@@ -1659,426 +2034,6 @@ void MAP_main()
 	// MAP_checkIfDone();
 }
 
-void AutomaticControl()
-{
-	if (REFLEX_GetMarker())
-	{
-		
-// 		LCD_SetPosition(10);
-// 		resque_mode = 'q';
-// 		LCD_SendString("GOLD");
-// 		JUNCTION_delay(2);
-// 		DEAD_END();
-// 		DEAD_END();
-// 		JUNCTION_delay(2);
-	}
-	
-	if( (PATHCOUNT_Left() > 0) || (PATHCOUNT_Right() > 0) ) //Path to left or right
-	{
-		
-		while (!LEFTPATHBOTH() && !RIGHTPATHBOTH() && !WALL_CLOSE_AHEAD()) //Keep going until center of intersect
-		{
-			_delay_us(250);
-		} 
-		// Now in intersect. Determine what type:
-		LCD_Clear();
-		JUNCTION_delay(2);
-			
-		// Lägg till avsökning av varje möjlig ruta i sådana här
-		if ((PATHCOUNT_Left() > 0) && (PATHCOUNT_Right() > 0)) // 4-way or 3-way-2
-		{
-			if (PATH_AHEAD()) // 4-way
-			{
-				uint8_t posY_ = MAP_currentPos[0];
-				uint8_t posX_ = MAP_currentPos[1];
-				// change description of all surrounding squares to path
-				
-				if (MAP_currentDir == 0)
-				{
-					MAP_array[posY_ - 1][posX_].description = 3;
-					MAP_array[posY_][posX_ + 1].description = 3;
-					MAP_array[posY_ + 1][posX_].description = 3;
-				}
-				else if (MAP_currentDir == 1)
-				{
-					MAP_array[posY_][posX_ - 1].description = 3;
-					MAP_array[posY_][posX_ + 1].description = 3;
-					MAP_array[posY_ - 1][posX_].description = 3;
-				} 
-				else if (MAP_currentDir == 2)
-				{
-					MAP_array[posY_ - 1][posX_].description = 3;
-					MAP_array[posY_][posX_ - 1].description = 3;
-					MAP_array[posY_ + 1][posX_].description = 3;
-				}
-				else if (MAP_currentDir == 3)
-				{
-					MAP_array[posY_][posX_ - 1].description = 3;
-					MAP_array[posY_][posX_ + 1].description = 3;
-					MAP_array[posY_ + 1][posX_].description = 3;
-				}
-				
-				MAP_main();
-				DISCOVERY_SetMode();
-				JUNCTION_FourWay();
-				MAP_rotate();
-			}
-			else // 3-way-2
-			{
-				// change description to the left and right of robot to path
-				// change description to the front of the robot to wall
-				uint8_t posY_ = MAP_currentPos[0];
-				uint8_t posX_ = MAP_currentPos[1];
-				// change description of all surrounding squares to path
-				
-				if (MAP_currentDir == 0)
-				{
-					MAP_array[posY_ - 1][posX_].description = 3;
-					MAP_array[posY_][posX_ + 1].description = 4;
-					MAP_array[posY_ + 1][posX_].description = 3;
-				}
-				else if (MAP_currentDir == 1)
-				{
-					MAP_array[posY_][posX_ - 1].description = 3;
-					MAP_array[posY_][posX_ + 1].description = 3;
-					MAP_array[posY_ - 1][posX_].description = 4;
-				}
-				else if (MAP_currentDir == 2)
-				{
-					MAP_array[posY_ - 1][posX_].description = 3;
-					MAP_array[posY_][posX_ - 1].description = 4;
-					MAP_array[posY_ + 1][posX_].description = 3;
-				}
-				else if (MAP_currentDir == 3)
-				{
-					MAP_array[posY_][posX_ - 1].description = 3;
-					MAP_array[posY_][posX_ + 1].description = 3;
-					MAP_array[posY_ + 1][posX_].description = 4;
-				}
-				
-				MAP_main();
-				DISCOVERY_SetMode();
-				JUNCTION_ThreeWayTWO();
-				MAP_rotate();
-			}
-		}
-		else if (PATHCOUNT_Right() > 0) // 3-way-3 or RightTurn
-		{
-			if (PATH_AHEAD()) // 3-w-3
-			{
-				// change description to the right and front of the robot to path
-				// change description to the left of the robot to wall.
-				uint8_t posY_ = MAP_currentPos[0];
-				uint8_t posX_ = MAP_currentPos[1];
-				// change description of all surrounding squares to path
-				
-				if (MAP_currentDir == 0)
-				{
-					MAP_array[posY_ - 1][posX_].description = 4;
-					MAP_array[posY_][posX_ + 1].description = 3;
-					MAP_array[posY_ + 1][posX_].description = 3;
-				}
-				else if (MAP_currentDir == 1)
-				{
-					MAP_array[posY_][posX_ - 1].description = 4;
-					MAP_array[posY_][posX_ + 1].description = 3;
-					MAP_array[posY_ - 1][posX_].description = 3;
-				}
-				else if (MAP_currentDir == 2)
-				{
-					MAP_array[posY_ - 1][posX_].description = 3;
-					MAP_array[posY_][posX_ - 1].description = 3;
-					MAP_array[posY_ + 1][posX_].description = 4;
-				}
-				else if (MAP_currentDir == 3)
-				{
-					MAP_array[posY_][posX_ - 1].description = 3;
-					MAP_array[posY_][posX_ + 1].description = 4;
-					MAP_array[posY_ + 1][posX_].description = 3;
-				}
-				
-				MAP_main();
-				DISCOVERY_SetMode();
-				JUNCTION_ThreeWayTHREE();
-				MAP_rotate();
-			}
-			else //Right turn
-			{
-				// change description to the right of the robot to path
-				// change description to the left and front of the robot to wall
-				uint8_t posY_ = MAP_currentPos[0];
-				uint8_t posX_ = MAP_currentPos[1];
-				// change description of all surrounding squares to path
-				
-				if (MAP_currentDir == 0)
-				{
-					MAP_array[posY_ - 1][posX_].description = 4;
-					MAP_array[posY_][posX_ + 1].description = 4;
-					MAP_array[posY_ + 1][posX_].description = 3;
-				}
-				else if (MAP_currentDir == 1)
-				{
-					MAP_array[posY_][posX_ - 1].description = 4;
-					MAP_array[posY_][posX_ + 1].description = 3;
-					MAP_array[posY_ - 1][posX_].description = 4;
-				}
-				else if (MAP_currentDir == 2)
-				{
-					MAP_array[posY_ - 1][posX_].description = 3;
-					MAP_array[posY_][posX_ - 1].description = 4;
-					MAP_array[posY_ + 1][posX_].description = 4;
-				}
-				else if (MAP_currentDir == 3)
-				{
-					MAP_array[posY_][posX_ - 1].description = 3;
-					MAP_array[posY_][posX_ + 1].description = 4;
-					MAP_array[posY_ + 1][posX_].description = 4;
-				}
-				
-				MAP_main();
-				DISCOVERY_SetMode();
-				TURN_Right(0);
-				MAP_rotate();
-			}
-		}
-		else if (PATHCOUNT_Left() > 0) // 3-way-1 or Left turn
-		{
-			if (PATH_AHEAD()) // 3-way-1
-			{
-				// change description to the left and front of the robot to path
-				// change description to the right of the robot to wall
-				uint8_t posY_ = MAP_currentPos[0];
-				uint8_t posX_ = MAP_currentPos[1];
-				// change description of all surrounding squares to path
-				
-				if (MAP_currentDir == 0)
-				{
-					MAP_array[posY_ - 1][posX_].description = 3;
-					MAP_array[posY_][posX_ + 1].description = 3;
-					MAP_array[posY_ + 1][posX_].description = 4;
-				}
-				else if (MAP_currentDir == 1)
-				{
-					MAP_array[posY_][posX_ - 1].description = 3;
-					MAP_array[posY_][posX_ + 1].description = 4;
-					MAP_array[posY_ - 1][posX_].description = 3;
-				}
-				else if (MAP_currentDir == 2)
-				{
-					MAP_array[posY_ - 1][posX_].description = 4;
-					MAP_array[posY_][posX_ - 1].description = 3;
-					MAP_array[posY_ + 1][posX_].description = 3;
-				}
-				else if (MAP_currentDir == 3)
-				{
-					MAP_array[posY_][posX_ - 1].description = 4;
-					MAP_array[posY_][posX_ + 1].description = 3;
-					MAP_array[posY_ + 1][posX_].description = 3;
-				}
-				
-				MAP_main();
-				DISCOVERY_SetMode();
-				JUNCTION_ThreeWayONE();
-				MAP_rotate();
-		    }
-			else // Left turn
-			{
-				// change description to the left of the robot to path
-				// change description to the right and front of the robot to wall
-				uint8_t posY_ = MAP_currentPos[0];
-				uint8_t posX_ = MAP_currentPos[1];
-				// change description of all surrounding squares to path
-				
-				if (MAP_currentDir == 0)
-				{
-					MAP_array[posY_ - 1][posX_].description = 3;
-					MAP_array[posY_][posX_ + 1].description = 4;
-					MAP_array[posY_ + 1][posX_].description = 4;
-				}
-				else if (MAP_currentDir == 1)
-				{
-					MAP_array[posY_][posX_ - 1].description = 3;
-					MAP_array[posY_][posX_ + 1].description = 4;
-					MAP_array[posY_ - 1][posX_].description = 4;
-				}
-				else if (MAP_currentDir == 2)
-				{
-					MAP_array[posY_ - 1][posX_].description = 4;
-					MAP_array[posY_][posX_ - 1].description = 4;
-					MAP_array[posY_ + 1][posX_].description = 3;
-				}
-				else if (MAP_currentDir == 3)
-				{
-					MAP_array[posY_][posX_ - 1].description = 4;
-					MAP_array[posY_][posX_ + 1].description = 3;
-					MAP_array[posY_ + 1][posX_].description = 4;
-				}
-				
-				MAP_main();
-				DISCOVERY_SetMode();
-				TURN_Left(0);
-				MAP_rotate();
-			}
-		}
-		else if (WALL_CLOSE_AHEAD())
-		{
-			uint8_t posY_ = MAP_currentPos[0];
-			uint8_t posX_ = MAP_currentPos[1];
-			// change description of all surrounding squares to path
-			
-			if (MAP_currentDir == 0)
-			{
-				MAP_array[posY_ - 1][posX_].description = 4;
-				MAP_array[posY_][posX_ + 1].description = 4;
-				MAP_array[posY_ + 1][posX_].description = 4;
-			}
-			else if (MAP_currentDir == 1)
-			{
-				MAP_array[posY_][posX_ - 1].description = 4;
-				MAP_array[posY_][posX_ + 1].description = 4;
-				MAP_array[posY_ - 1][posX_].description = 4;
-			}
-			else if (MAP_currentDir == 2)
-			{
-				MAP_array[posY_ - 1][posX_].description = 4;
-				MAP_array[posY_][posX_ - 1].description = 4;
-				MAP_array[posY_ + 1][posX_].description = 4;
-			}
-			else if (MAP_currentDir == 3)
-			{
-				MAP_array[posY_][posX_ - 1].description = 4;
-				MAP_array[posY_][posX_ + 1].description = 4;
-				MAP_array[posY_ + 1][posX_].description = 4;
-			}	
-			
-			MAP_main();
-			DISCOVERY_SetMode();
-			DEAD_END();
-			MAP_rotate();
-		}
-		distance_counter = 0;
-		
-	}
-	else if (!( LEFTPATHONE() || RIGHTPATHONE()))
-	{
-		Get_sensor_values();
-		
-		if( ((arrSensor[1] + arrSensor[3]) / 2) < 20)
-		{
-			angle_ =  arrSensor[2];
-			offset_ =  arrSensor[3];
-		}
-		else
-		{
-			angle_ =  arrSensor[0];
-			offset_ =  arrSensor[1];
-		}
-		
-		if(abs(offset_-20) <= 2)
-		{
-			control_mode = 'c';
-			LCD_Clear();
-			LCD_SetPosition(8);
-			LCD_SendString("Mode: c");
-		}
-		// Puts the automatic control in rapid mode, push the robot to the middle lane.
-		else
-		{
-			control_mode = 'r';
-			LCD_Clear();
-			LCD_SetPosition(8);
-			LCD_SendString("Mode: r");
-		}
-		
-		int new_speed_ = PD_Control();
-		LCD_SendString("   ");
-		// Makes sure that the motors don't burn out (i.e go on max velocity)
-		if(new_speed_ > (254-standard_speed_))
-		{
-			new_speed_ = 254 - standard_speed_;
-		}
-		else
-		{
-			PWM_SetSpeedRight(standard_speed_ + new_speed_);
-			PWM_SetSpeedLeft(standard_speed_ - new_speed_);		
-		}
-	}
-	
-	if(WALL_CLOSE_AHEAD()) // dead end square
-	{
-		// change description to the front, left and right of the robot to wall.
-		uint8_t posY_ = MAP_currentPos[0];
-		uint8_t posX_ = MAP_currentPos[1];
-		// change description of all surrounding squares to path
-		
-		if (MAP_currentDir == 0)
-		{
-			MAP_array[posY_ - 1][posX_].description = 4;
-			MAP_array[posY_][posX_ + 1].description = 4;
-			MAP_array[posY_ + 1][posX_].description = 4;
-		}
-		else if (MAP_currentDir == 1)
-		{
-			MAP_array[posY_][posX_ - 1].description = 4;
-			MAP_array[posY_][posX_ + 1].description = 4;
-			MAP_array[posY_ - 1][posX_].description = 4;
-		}
-		else if (MAP_currentDir == 2)
-		{
-			MAP_array[posY_ - 1][posX_].description = 4;
-			MAP_array[posY_][posX_ - 1].description = 4;
-			MAP_array[posY_ + 1][posX_].description = 4;
-		}
-		else if (MAP_currentDir == 3)
-		{
-			MAP_array[posY_][posX_ - 1].description = 4;
-			MAP_array[posY_][posX_ + 1].description = 4;
-			MAP_array[posY_ + 1][posX_].description = 4;
-		}
-		MAP_main();
-		DISCOVERY_SetMode();
-		distance_counter = 0;
-		DEAD_END();
-		MAP_rotate();
-	}
-	if(distance_counter >= 32)
-	{
-		// change description to the front of the robot to path
-		// change description to the left and right of the robot to wall1
-		uint8_t posY_ = MAP_currentPos[0];
-		uint8_t posX_ = MAP_currentPos[1];
-		// change description of all surrounding squares to path
-		
-		if (MAP_currentDir == 0)
-		{
-			MAP_array[posY_ - 1][posX_].description = 4;
-			MAP_array[posY_][posX_ + 1].description = 3;
-			MAP_array[posY_ + 1][posX_].description = 4;
-		}
-		else if (MAP_currentDir == 1)
-		{
-			MAP_array[posY_][posX_ - 1].description = 4;
-			MAP_array[posY_][posX_ + 1].description = 4;
-			MAP_array[posY_ - 1][posX_].description = 3;
-		}
-		else if (MAP_currentDir == 2)
-		{
-			MAP_array[posY_ - 1][posX_].description = 4;
-			MAP_array[posY_][posX_ - 1].description = 3;
-			MAP_array[posY_ + 1][posX_].description = 4;
-		}
-		else if (MAP_currentDir == 3)
-		{
-			MAP_array[posY_][posX_ - 1].description = 4;
-			MAP_array[posY_][posX_ + 1].description = 4;
-			MAP_array[posY_ + 1][posX_].description = 3;
-		}
-		distance_counter = 0;
-		MAP_main();
-		DISCOVERY_SetMode();
-	}
-}
-
 // This method is very important to call at the start of the program.
 void INIT_ALL()
 {
@@ -2094,12 +2049,6 @@ void INIT_ALL()
 	Speed_Interrupt_Init(); //KOMMENTERA IN, MEN FUNGERAR EJ ATT MANUELLSTYRA DÅ
 	PWM_SetDirLeft(1);
 	PWM_SetDirRight(1);
-	
-	distance_counter = 0;
-	MAP_array[15][15].description = 3;
-	MAP_currentDir = 1;
-	MAP_nextDir = 1;
-	MAP_setVisited();	// Map initialization
 	sei();	// Enable global interrupts
 }
 
@@ -2117,24 +2066,21 @@ int main(void)
   			LCD_Clear();
     		while(AUTONOM_MODE && MAP_LOOPer)
     		{
-	    		AutomaticControl();
-				Send_sensor_values();
-				LCD_SetPosition(0);
-				LCD_SendString("Y:");
-				LCD_display_uint16(MAP_currentPos[0]);
-				LCD_SendString("  ");
-				LCD_SendString("cDir:");
-				LCD_display_uint8(MAP_currentDir);
+	    		MAP_main();
+    			AutomaticControl();
+				
+    			LCD_SetPosition(0);
+				LCD_SendString("RS:");
+				LCD_display_uint16(OCR2B);
 				LCD_SendString("  ");
 				LCD_SetPosition(16);
-				LCD_SendString("X:");
-				LCD_display_uint16(MAP_currentPos[1]);
+				LCD_SendString("LS:");
+				LCD_display_uint16(OCR2A);
 				LCD_SendString("  ");
+				_delay_ms(50);
     		}
     		
     		_delay_ms(10);
-    		PWM_SetSpeedLeft(0);
-    		PWM_SetSpeedRight(0);
     		LCD_Clear();
     		LCD_SetPosition(2);
     		LCD_SendString("MANUAL_MODE");
@@ -2144,26 +2090,24 @@ int main(void)
 			{
 				MAP_LOOPer = 1;
 			}
-			MOTOR_Forward(150);
     		while(MANUAL_MODE)
     		{
 				//LCD_Clear();
     			MANUAL_DRIVE();
 				LCD_SetPosition(0);
-				LCD_SendString("PCL: ");
+				LCD_SendString("REflex: ");
+    			LCD_display_uint8(REFLEX_GetMarker());
+				LCD_SendString("   resq:");
+				LCD_SendCharacter(resque_mode);
+				PWM_SetSpeedLeft(0);
+    			PWM_SetSpeedRight(0);
+				LCD_SetPosition(16);
+				LCD_SendString("PCL:");
     			LCD_display_uint8(PATHCOUNT_Left());
-				LCD_SendString(" PCR: ");
+				LCD_SendString(" PCR:");
 				LCD_display_uint8(PATHCOUNT_Right());
-				//LCD_SendString("   resq:");
-				//LCD_SendCharacter(resque_mode);
-
-				LCD_SetPosition(0);
-				LCD_SendString("MANUAL MODE");
-				//_delay_ms(1);
-				
     		}
     		PWM_SetSpeedLeft(0);
     		PWM_SetSpeedRight(0);
   	}
-	  
 }
