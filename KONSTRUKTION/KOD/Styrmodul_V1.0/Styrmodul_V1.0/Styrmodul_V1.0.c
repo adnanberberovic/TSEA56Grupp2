@@ -44,6 +44,7 @@ float rotation_angle = 0.00;
 int Manual_Flag = 0;
 int speed_var = 200;
 // --------------------------------------------------------------------------------------
+uint8_t distance_flag = 0;
 
 int reference_ = 20;// Reference value for where we want to place the robot.
 int offset_;		// Compared to reference.
@@ -473,20 +474,11 @@ ISR(INT0_vect)
 	wheel_counter++;
 	distance_counter++;
 	EIFR = (1<<INTF0); //Clear queued interrupts
-	
-// 		if ((PIND & 0b00000100) == 4)
-// 		{
-// 			PORTC &= ~(1 <<PORTC7);
-// 			distance_counter++;
-// 		} else {
-// 			PORTC |= 1<<PORTC7; //Increase reference voltage
-// 			wheel_counter++;
-// 			distance_counter++;	
-// 		}
-// 			PORTC &= 0xbf;
-// 			PORTC |= 0x40;
-// 			PORTC &= 0xbf;
-// 		EIFR = (1<<INTF0); //Clear queued interrupts
+	if (distance_counter >= 32)
+	{
+		distance_flag = 1;
+		distance_counter = 0;
+	}
 }
 //__________________________SPEEDOMETER END____________________________
 
@@ -1689,7 +1681,6 @@ void AutomaticControl()
 	}
 	
 	if( (PATHCOUNT_Left() > 0) || (PATHCOUNT_Right() > 0) ){ //Path to left or right
-		distance_counter = 0;
 		while (!LEFTPATHBOTH() && !RIGHTPATHBOTH() && !WALL_CLOSE_AHEAD()) //Keep going until center of intersect
 		{
 			_delay_us(250);
@@ -1738,6 +1729,7 @@ void AutomaticControl()
 				MAP_rotate();
 				MAP_moveForward();
 				distance_counter = 0;
+				distance_flag = 0;
 			}
 			else // 3-way-2
 			{
@@ -1779,6 +1771,7 @@ void AutomaticControl()
 				MAP_rotate();
 				MAP_moveForward();
 				distance_counter = 0;
+				distance_flag = 0;
 			}
 		}
 		else if (PATHCOUNT_Right() > 0) // 3-way-3 or RightTurn
@@ -1823,6 +1816,7 @@ void AutomaticControl()
 				MAP_rotate();
 				MAP_moveForward();
 				distance_counter = 0;
+				distance_flag = 0;
 			}
 			else //Right turn
 			{
@@ -1864,6 +1858,7 @@ void AutomaticControl()
 				MAP_rotate();
 				MAP_moveForward();
 				distance_counter = 0;
+				distance_flag = 0;
 			}
 		}
 		else if (PATHCOUNT_Left() > 0) // 3-way-1 or Left turn
@@ -1908,6 +1903,7 @@ void AutomaticControl()
 				MAP_rotate();
 				MAP_moveForward();
 				distance_counter = 0;
+				distance_flag = 0;
 		    }
 			else // Left turn
 			{
@@ -1949,6 +1945,7 @@ void AutomaticControl()
 				MAP_rotate();
 				MAP_moveForward();
 				distance_counter = 0;
+				distance_flag = 0;
 			}
 		}
 		else if (WALL_CLOSE_AHEAD())
@@ -1989,6 +1986,7 @@ void AutomaticControl()
 			MAP_rotate();
 			MAP_moveForward();
 			distance_counter = 0;
+			distance_flag = 0;
 		}
 		
 	}
@@ -2072,10 +2070,11 @@ void AutomaticControl()
 		DISCOVERY_SetMode();
 		DEAD_END();
 		distance_counter = 0;
+		distance_flag = 0;
 		MAP_rotate();
 		MAP_moveForward();
 	}
-	if(distance_counter >= 32)
+	if((distance_counter >= 10) && (distance_flag == 1))
 	{
 		// change description to the front of the robot to path
 		// change description to the left and right of the robot to wall1
@@ -2107,13 +2106,12 @@ void AutomaticControl()
 			MAP_array[posY_][posX_ + 1].description = 4;
 			MAP_array[posY_ + 1][posX_].description = 3;
 		}
-		distance_counter = 0;
 		MAP_main();
 		DISCOVERY_SetMode();
 		Display_Position();
 		MAP_rotate();
 		MAP_moveForward();
-		distance_counter = 0;
+		distance_flag = 0;
 	}
 }
 
