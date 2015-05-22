@@ -45,6 +45,29 @@ int Manual_Flag = 0;
 int speed_var = 200;
 // --------------------------------------------------------------------------------------
 
+int reference_ = 20;// Reference value for where we want to place the robot.
+int offset_;		// Compared to reference.
+int current_error_;	// Current error
+int prev_error_ = 0;// Used to compare the errors when computing the "derivative".
+int time_diff_;		// Useful for comparing time, used for the "derivative".
+int time_new_ = 0;	// Useful for comparing time, used for the "derivative".
+int prev_time_ = 0;	// Useful for comparing time, used for the "derivative".
+int angle_ = 0;			// The angle of the robot with respect to the corridor.
+int K_d = 1;		// K (constant) for D regulation.
+int K_p = 1;		// K (proportion) for P regulation.
+int standard_speed_ = 150;	// Keeps track of standard speed.
+
+uint16_t speed_send;
+uint16_t speed_send_new;
+uint16_t ss1;
+uint16_t ss2;
+float current_speed;
+float wheel_circumference = 20.4/4; //Wheel circumference is 204 mm. 4 black sectors
+float time_difference;
+volatile uint16_t wheel_counter;
+volatile uint16_t distance_counter = 0; // distance_counter = 1 <=> 12,37 mm
+// ett hjulvarv = 63*pi = 197 mm => distance_counter = 16
+
 // Setup data direction registers @ ports for out/inputs.
 void Styr_InitPortDirections(void)
 {
@@ -438,17 +461,6 @@ void checkRightAngle(float target_angle)
 //----------------------------GYRO----END-----------------------------
 
 //__________________________SPEEDOMETER_______________________________
-uint16_t speed_send;
-uint16_t speed_send_new;
-uint16_t ss1;
-uint16_t ss2;
-float current_speed;
-float wheel_circumference = 20.4/4; //Wheel circumference is 204 mm. 4 black sectors
-float time_difference;
-volatile uint16_t wheel_counter;
-volatile uint16_t distance_counter = 0; // distance_counter = 1 <=> 12,37 mm
-										// ett hjulvarv = 63*pi = 197 mm => distance_counter = 16
-
 
 void Speed_Interrupt_Init()
 {
@@ -541,8 +553,6 @@ void MANUAL_DRIVE()
 	}
 	Send_sensor_values();
 }
-
-// ????
 void autonom_get_send()
 {
 	Get_sensor_values();
@@ -647,7 +657,6 @@ uint8_t PATHCOUNT_Right()
 //_____________________REFLEX SENSOR AND WALL COUNTER END____________________________
 
 //________________________________AUTOMATIC CONTROL_____________________________________
-
 // Y = PD*G/(1+PD*G) * R
 
 // Reference value = 0
@@ -655,17 +664,6 @@ uint8_t PATHCOUNT_Right()
 // We want to regulate the robot to drive in the middle of the corridor,
 // So the reference value r should correspond to 20 cm.
 
-int reference_ = 20;// Reference value for where we want to place the robot.
-int offset_;		// Compared to reference.
-int current_error_;	// Current error
-int prev_error_ = 0;// Used to compare the errors when computing the "derivative".
-int time_diff_;		// Useful for comparing time, used for the "derivative".
-int time_new_ = 0;	// Useful for comparing time, used for the "derivative".
-int prev_time_ = 0;	// Useful for comparing time, used for the "derivative".
-int angle_ = 0;			// The angle of the robot with respect to the corridor.
-int K_d = 1;		// K (constant) for D regulation.
-int K_p = 1;		// K (proportion) for P regulation.
-int standard_speed_ = 150;	// Keeps track of standard speed.
 char control_mode = 'r';	/*if control_mode == r, then the robot will make a rapid angle
 							 change in angle to steer itself towards the middle lane.
 							 if control_mode == c, then the robot will carefully
@@ -886,6 +884,7 @@ void TURN_Right(int mode)
 		}
 		
 		_delay_ms(100);
+		distance_counter = 0;
 		MOTOR_Forward(standard_speed_);
 		
 	}
@@ -896,6 +895,7 @@ void TURN_Right(int mode)
 		
 		MOTOR_RotateRight(90 - angle_left);
 		_delay_ms(100);
+		distance_counter = 0;
 		MOTOR_Forward(standard_speed_);
 	}
 	else if ( mode == 2)
@@ -915,6 +915,7 @@ void TURN_Right(int mode)
 		}
 		
 		_delay_ms(100);
+		distance_counter = 0;
 		MOTOR_Forward(standard_speed_);
 	}
 		
@@ -927,7 +928,6 @@ void TURN_Right(int mode)
 		}
 	// change current direction in map
 	JUNCTION_delay(3);
-	distance_counter = 0;
 }
 
 // Stops and rotates right 90 degrees.
@@ -957,6 +957,7 @@ void TURN_Left(int mode)
 		}
 	
 		_delay_ms(100);
+		distance_counter = 0;
 		MOTOR_Forward(standard_speed_);
 	} 
 	
@@ -967,6 +968,7 @@ void TURN_Left(int mode)
 	
 		MOTOR_RotateLeft(90 - angle_right);	
 		_delay_ms(100);
+		distance_counter = 0;
 		MOTOR_Forward(standard_speed_);
 	}
 	else if ( mode == 2)
@@ -982,6 +984,7 @@ void TURN_Left(int mode)
 			}
 				
 		_delay_ms(100);
+		distance_counter = 0;
 		MOTOR_Forward(standard_speed_);
 	}
 	
@@ -993,8 +996,7 @@ void TURN_Left(int mode)
 		//Wait until robot reaches walls again
 	}
 	// change current direction in map
-	JUNCTION_delay(3); // ************** VARFÖR DENNA ?! ******************
-	distance_counter = 0;
+	JUNCTION_delay(3);
 }
 
 void TURN_Back(int mode)
@@ -1136,8 +1138,6 @@ void JUNCTION_ThreeWayONE()
 {
 	if ((discovery_mode == 'r') || (discovery_mode == 'f'))
 	{
-	
-		
 		// Keep going forward
 		while(PATHCOUNT_Left() > 0 )
 		{
@@ -1464,6 +1464,34 @@ void AutomaticControl()
 */
 //________________________________AUTOMATIC CONTROL END_____________________________________
 
+void Display_Position()
+{
+	MOTOR_Stop();
+	LCD_SetPosition(0);
+	LCD_SendString("Y:");
+	LCD_display_uint16(MAP_currentPos[0]);
+	LCD_SendString("  ");
+	LCD_SendString("cDir:");
+	LCD_display_uint8(MAP_currentDir);
+	LCD_SendString("  ");
+	LCD_SendString("  ");
+	LCD_SendString("Mode:");
+	LCD_SendCharacter(discovery_mode);
+	LCD_SendString("  ");
+	LCD_SetPosition(16);
+	LCD_SendString("X:");
+	LCD_display_uint16(MAP_currentPos[1]);
+	LCD_SendString("  ");
+	LCD_SendString("nDir:");
+	LCD_display_uint8(MAP_nextDir);
+	LCD_SendString("  ");
+	for(int i = 0; i<10; i++)
+	{
+		_delay_ms(250);
+	}
+	MOTOR_Forward(standard_speed_);
+}
+
 void MAP_main()
 {
 	// Save these under more convenient names
@@ -1503,8 +1531,7 @@ void MAP_main()
 				MAP_currentJunction = MAP_array[posY_][posX_].junctionNumber;
 				MAP_junctionOrderArray[MAP_array[posY_][posX_].junctionNumber].hasUnex = 0;
 			}
-			else
-			{
+			else{
 				MAP_currentJunction = MAP_array[posY_][posX_].junctionNumber;
 				MAP_junctionOrderArray[MAP_currentJunction].hasUnex = 0;
 				MAP_decideDestination();
@@ -1513,8 +1540,7 @@ void MAP_main()
 			}
 		}
 		// Or if it's a new square
-		else
-		{
+		else{
 			// If it's a junction, add it
 			// Else if it's a dead end, trace the way back to the previous junction
 			if (MAP_exploredSquares > 2)
@@ -1538,21 +1564,12 @@ void MAP_main()
 		{
 			MAP_rotating_ = 1;
 		}
-		MAP_movingForward_ = 1;
-	}
+			MAP_movingForward_ = 1;
+		}
 	
 	// Rotating phase
 	// SIM
 	RotatingPhase:
-	if (MAP_rotating_)
-	{
-		// Simulation code starts here
-		// Call rotate functions here
-		
-		// MAP_rotate();
-		// Simulation code ends here
-	}
-
 	// Moving forward phase
 	// SIM
 	if (MAP_movingForward_ && !MAP_rotating_)
@@ -1661,9 +1678,7 @@ void MAP_main()
 
 void AutomaticControl()
 {
-	if (REFLEX_GetMarker())
-	{
-		
+	if (REFLEX_GetMarker()){	
 // 		LCD_SetPosition(10);
 // 		resque_mode = 'q';
 // 		LCD_SendString("GOLD");
@@ -1673,9 +1688,8 @@ void AutomaticControl()
 // 		JUNCTION_delay(2);
 	}
 	
-	if( (PATHCOUNT_Left() > 0) || (PATHCOUNT_Right() > 0) ) //Path to left or right
-	{
-		
+	if( (PATHCOUNT_Left() > 0) || (PATHCOUNT_Right() > 0) ){ //Path to left or right
+		distance_counter = 0;
 		while (!LEFTPATHBOTH() && !RIGHTPATHBOTH() && !WALL_CLOSE_AHEAD()) //Keep going until center of intersect
 		{
 			_delay_us(250);
@@ -1717,11 +1731,12 @@ void AutomaticControl()
 					MAP_array[posY_][posX_ + 1].description = 3;
 					MAP_array[posY_ + 1][posX_].description = 3;
 				}
-				
 				MAP_main();
 				DISCOVERY_SetMode();
-				JUNCTION_FourWay();
 				MAP_rotate();
+				Display_Position();
+				JUNCTION_FourWay();
+				
 			}
 			else // 3-way-2
 			{
@@ -1758,6 +1773,7 @@ void AutomaticControl()
 				
 				MAP_main();
 				DISCOVERY_SetMode();
+				Display_Position();
 				JUNCTION_ThreeWayTWO();
 				MAP_rotate();
 			}
@@ -1799,6 +1815,7 @@ void AutomaticControl()
 				
 				MAP_main();
 				DISCOVERY_SetMode();
+				Display_Position();
 				JUNCTION_ThreeWayTHREE();
 				MAP_rotate();
 			}
@@ -1837,6 +1854,7 @@ void AutomaticControl()
 				
 				MAP_main();
 				DISCOVERY_SetMode();
+				Display_Position();
 				TURN_Right(0);
 				MAP_rotate();
 			}
@@ -1878,6 +1896,7 @@ void AutomaticControl()
 				
 				MAP_main();
 				DISCOVERY_SetMode();
+				Display_Position();
 				JUNCTION_ThreeWayONE();
 				MAP_rotate();
 		    }
@@ -1916,6 +1935,7 @@ void AutomaticControl()
 				
 				MAP_main();
 				DISCOVERY_SetMode();
+				Display_Position();
 				TURN_Left(0);
 				MAP_rotate();
 			}
@@ -1953,10 +1973,10 @@ void AutomaticControl()
 			
 			MAP_main();
 			DISCOVERY_SetMode();
+			Display_Position();
 			DEAD_END();
 			MAP_rotate();
 		}
-		distance_counter = 0;
 		
 	}
 	else if (!( LEFTPATHONE() || RIGHTPATHONE()))
@@ -2037,8 +2057,8 @@ void AutomaticControl()
 		}
 		MAP_main();
 		DISCOVERY_SetMode();
-		distance_counter = 0;
 		DEAD_END();
+		distance_counter = 0;
 		MAP_rotate();
 	}
 	if(distance_counter >= 32)
@@ -2076,6 +2096,30 @@ void AutomaticControl()
 		distance_counter = 0;
 		MAP_main();
 		DISCOVERY_SetMode();
+		MOTOR_Stop();
+		LCD_SetPosition(0);
+		LCD_SendString("Y:");
+		LCD_display_uint16(MAP_currentPos[0]);
+		LCD_SendString("  ");
+		LCD_SendString("cDir:");
+		LCD_display_uint8(MAP_currentDir);
+		LCD_SendString("  ");
+		LCD_SendString("  ");
+		LCD_SendString("Mode:");
+		LCD_SendCharacter(discovery_mode);
+		LCD_SendString("  ");
+		LCD_SetPosition(16);
+		LCD_SendString("X:");
+		LCD_display_uint16(MAP_currentPos[1]);
+		LCD_SendString("  ");
+		LCD_SendString("nDir:");
+		LCD_display_uint8(MAP_nextDir);
+		LCD_SendString("  ");
+		for(int i = 0; i<10; i++)
+		{
+			_delay_ms(250);
+		}
+		MOTOR_Forward(standard_speed_);
 	}
 }
 
@@ -2130,6 +2174,10 @@ int main(void)
 				LCD_SendString("X:");
 				LCD_display_uint16(MAP_currentPos[1]);
 				LCD_SendString("  ");
+				LCD_SendString("nDir:");
+				LCD_display_uint8(MAP_nextDir);
+				LCD_SendString("  ");
+				
     		}
     		
     		_delay_ms(10);

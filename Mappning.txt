@@ -1,0 +1,6 @@
+Analysera
+MAP_main
+-Rotera fysiskt
+MAP_rotate
+-Åk en ruta
+MAP_moveForward
