@@ -35,6 +35,7 @@ uint8_t TIMER_overflows;
 // This timer will NOT reset every time it reaches 10.
 int16_t TIMER_wheel, TIMER_gyro;
 int16_t TIMER_PD = 0;
+
 	// The following overflow storage corresponds to 131ms. This timer will never reset.
 uint8_t TIMER_overflows_deci;
 // This variable is used to store robots angle in degrees
@@ -228,13 +229,14 @@ void Send_speed_value()
 		SPI_MasterTransmit(arrSpeedout[i],'k');
 	}
 }
+
+//        TIMERS
 ISR(TIMER0_OVF_vect)
 {
 	TIMER_overflows++;
 	TIMER_wheel++;
 	TIMER_gyro++;
 	TIMER_PD++;
-	
 	if (TIMER_overflows >= 10)
 	{
 		TIMER_overflows = 0;
@@ -441,10 +443,11 @@ uint16_t speed_send_new;
 uint16_t ss1;
 uint16_t ss2;
 float current_speed;
-float  wheel_circumference = 20.4/4; //Wheel circumference is 204 mm. 4 black sectors
+float wheel_circumference = 20.4/4; //Wheel circumference is 204 mm. 4 black sectors
 float time_difference;
-uint8_t wheel_counter;
-int distance_counter = 0;
+volatile uint16_t wheel_counter;
+volatile uint16_t distance_counter = 0; // distance_counter = 1 <=> 12,37 mm
+										// ett hjulvarv = 63*pi = 197 mm => distance_counter = 16
 
 
 void Speed_Interrupt_Init()
@@ -455,29 +458,23 @@ void Speed_Interrupt_Init()
 
 ISR(INT0_vect)
 {
-	if ((PIND & 0b00000100) == 4)
-	{
-		PORTC &= ~(1 <<PORTC7);
-	}
-	else
-	{
-		PORTC |= 1<<PORTC7; //Increase reference voltage
-		
-// 		ss2 = ss1;
-// 		ss1 = speed_send;
-// 		//Decrease reference voltage
-// 		time_difference = (float)TIMER_wheel / 0.8175 /1000;
-// 		// div by 0.8175 -> time in ms
-// 		if (TIMER_wheel > 20)
+	wheel_counter++;
+	distance_counter++;
+	EIFR = (1<<INTF0); //Clear queued interrupts
+	
+// 		if ((PIND & 0b00000100) == 4)
 // 		{
-// 			current_speed = wheel_circumference / time_difference;
-// 			speed_send = (uint16_t)current_speed;
-//			speed_send_new = (ss1+ss2+2*speed_send)/4;
-// 			TIMER_wheel = 0;
+// 			PORTC &= ~(1 <<PORTC7);
+// 			distance_counter++;
+// 		} else {
+// 			PORTC |= 1<<PORTC7; //Increase reference voltage
+// 			wheel_counter++;
+// 			distance_counter++;	
 // 		}
-		wheel_counter++;
-		distance_counter++;
-	}	
+// 			PORTC &= 0xbf;
+// 			PORTC |= 0x40;
+// 			PORTC &= 0xbf;
+// 		EIFR = (1<<INTF0); //Clear queued interrupts
 }
 //__________________________SPEEDOMETER END____________________________
 
@@ -856,7 +853,7 @@ void DEAD_END()
 void JUNCTION_delay(int delay)
 {
 	wheel_counter = 0;
-	while (wheel_counter < delay)
+	while (wheel_counter < (2*delay))
 	{
 		_delay_us(1);
 	}
@@ -921,7 +918,7 @@ void TURN_Right(int mode)
 		MOTOR_Forward(standard_speed_);
 	}
 		
-	while((PATHCOUNT_Left() > 0) || (PATHCOUNT_Right() > 0))
+	while(PATHCOUNT_Right() > 0)
 		{
 			_delay_us(1);
 			LCD_SetPosition(1);
@@ -988,7 +985,7 @@ void TURN_Left(int mode)
 		MOTOR_Forward(standard_speed_);
 	}
 	
-	while((PATHCOUNT_Left() > 0) || (PATHCOUNT_Right() > 0))
+	while(PATHCOUNT_Left() > 0)
 	{
 		_delay_us(1);
 		LCD_SetPosition(1);
@@ -996,7 +993,7 @@ void TURN_Left(int mode)
 		//Wait until robot reaches walls again
 	}
 	// change current direction in map
-	JUNCTION_delay(3);
+	JUNCTION_delay(3); // ************** VARFÖR DENNA ?! ******************
 	distance_counter = 0;
 }
 
@@ -1333,7 +1330,7 @@ void JUNCTION_FourWay()
 		discovery_mode = '?';
 	}
 }
-
+/*
 // Call this function to perform automatic control.
 
 //void update_walls(x,y,z);
@@ -1361,7 +1358,7 @@ void JUNCTION_FourWay()
 		//MAP_array[posY_ + 1][posX_].description = 3;
 	//}
 //}
-
+*/
 /*
 void AutomaticControl()
 {
@@ -1551,7 +1548,8 @@ void MAP_main()
 	{
 		// Simulation code starts here
 		// Call rotate functions here
-		MAP_rotate();
+		
+		// MAP_rotate();
 		// Simulation code ends here
 	}
 
@@ -1722,23 +1720,8 @@ void AutomaticControl()
 				
 				MAP_main();
 				DISCOVERY_SetMode();
-				MOTOR_Stop();
-				LCD_SetPosition(0);
-				LCD_SendString("Y:");
-				LCD_display_uint16(MAP_currentPos[0]);
-				LCD_SendString("  ");
-				LCD_SendString("cDir:");
-				LCD_display_uint8(MAP_currentDir);
-				LCD_SendString("  ");
-				LCD_SetPosition(16);
-				LCD_SendString("X:");
-				LCD_display_uint16(MAP_currentPos[1]);
-				LCD_SendString("  ");
-				for(int i = 0; i<10; i++)
-				{
-					_delay_ms(250);
-				}
 				JUNCTION_FourWay();
+				MAP_rotate();
 			}
 			else // 3-way-2
 			{
@@ -1775,23 +1758,8 @@ void AutomaticControl()
 				
 				MAP_main();
 				DISCOVERY_SetMode();
-				MOTOR_Stop();
-				LCD_SetPosition(0);
-				LCD_SendString("Y:");
-				LCD_display_uint16(MAP_currentPos[0]);
-				LCD_SendString("  ");
-				LCD_SendString("cDir:");
-				LCD_display_uint8(MAP_currentDir);
-				LCD_SendString("  ");
-				LCD_SetPosition(16);
-				LCD_SendString("X:");
-				LCD_display_uint16(MAP_currentPos[1]);
-				LCD_SendString("  ");
-				for(int i = 0; i<10; i++)
-				{
-					_delay_ms(250);
-				}
 				JUNCTION_ThreeWayTWO();
+				MAP_rotate();
 			}
 		}
 		else if (PATHCOUNT_Right() > 0) // 3-way-3 or RightTurn
@@ -1831,23 +1799,8 @@ void AutomaticControl()
 				
 				MAP_main();
 				DISCOVERY_SetMode();
-				MOTOR_Stop();
-				LCD_SetPosition(0);
-				LCD_SendString("Y:");
-				LCD_display_uint16(MAP_currentPos[0]);
-				LCD_SendString("  ");
-				LCD_SendString("cDir:");
-				LCD_display_uint8(MAP_currentDir);
-				LCD_SendString("  ");
-				LCD_SetPosition(16);
-				LCD_SendString("X:");
-				LCD_display_uint16(MAP_currentPos[1]);
-				LCD_SendString("  ");
-				for(int i = 0; i<10; i++)
-				{
-					_delay_ms(250);
-				}
 				JUNCTION_ThreeWayTHREE();
+				MAP_rotate();
 			}
 			else //Right turn
 			{
@@ -1884,23 +1837,8 @@ void AutomaticControl()
 				
 				MAP_main();
 				DISCOVERY_SetMode();
-				MOTOR_Stop();
-				LCD_SetPosition(0);
-				LCD_SendString("Y:");
-				LCD_display_uint16(MAP_currentPos[0]);
-				LCD_SendString("  ");
-				LCD_SendString("cDir:");
-				LCD_display_uint8(MAP_currentDir);
-				LCD_SendString("  ");
-				LCD_SetPosition(16);
-				LCD_SendString("X:");
-				LCD_display_uint16(MAP_currentPos[1]);
-				LCD_SendString("  ");
-				for(int i = 0; i<10; i++)
-				{
-					_delay_ms(250);
-				}
 				TURN_Right(0);
+				MAP_rotate();
 			}
 		}
 		else if (PATHCOUNT_Left() > 0) // 3-way-1 or Left turn
@@ -1940,23 +1878,8 @@ void AutomaticControl()
 				
 				MAP_main();
 				DISCOVERY_SetMode();
-				MOTOR_Stop();
-				LCD_SetPosition(0);
-				LCD_SendString("Y:");
-				LCD_display_uint16(MAP_currentPos[0]);
-				LCD_SendString("  ");
-				LCD_SendString("cDir:");
-				LCD_display_uint8(MAP_currentDir);
-				LCD_SendString("  ");
-				LCD_SetPosition(16);
-				LCD_SendString("X:");
-				LCD_display_uint16(MAP_currentPos[1]);
-				LCD_SendString("  ");
-				for(int i = 0; i<10; i++)
-				{
-					_delay_ms(250);
-				}
 				JUNCTION_ThreeWayONE();
+				MAP_rotate();
 		    }
 			else // Left turn
 			{
@@ -1993,23 +1916,8 @@ void AutomaticControl()
 				
 				MAP_main();
 				DISCOVERY_SetMode();
-				MOTOR_Stop();
-				LCD_SetPosition(0);
-				LCD_SendString("Y:");
-				LCD_display_uint16(MAP_currentPos[0]);
-				LCD_SendString("  ");
-				LCD_SendString("cDir:");
-				LCD_display_uint8(MAP_currentDir);
-				LCD_SendString("  ");
-				LCD_SetPosition(16);
-				LCD_SendString("X:");
-				LCD_display_uint16(MAP_currentPos[1]);
-				LCD_SendString("  ");
-				for(int i = 0; i<10; i++)
-				{
-					_delay_ms(250);
-				}
 				TURN_Left(0);
+				MAP_rotate();
 			}
 		}
 		else if (WALL_CLOSE_AHEAD())
@@ -2045,23 +1953,8 @@ void AutomaticControl()
 			
 			MAP_main();
 			DISCOVERY_SetMode();
-			MOTOR_Stop();
-			LCD_SetPosition(0);
-			LCD_SendString("Y:");
-			LCD_display_uint16(MAP_currentPos[0]);
-			LCD_SendString("  ");
-			LCD_SendString("cDir:");
-			LCD_display_uint8(MAP_currentDir);
-			LCD_SendString("  ");
-			LCD_SetPosition(16);
-			LCD_SendString("X:");
-			LCD_display_uint16(MAP_currentPos[1]);
-			LCD_SendString("  ");
-			for(int i = 0; i<10; i++)
-			{
-				_delay_ms(250);
-			}
 			DEAD_END();
+			MAP_rotate();
 		}
 		distance_counter = 0;
 		
@@ -2144,26 +2037,11 @@ void AutomaticControl()
 		}
 		MAP_main();
 		DISCOVERY_SetMode();
-		DEAD_END();
-		MOTOR_Stop();
-		LCD_SetPosition(0);
-		LCD_SendString("Y:");
-		LCD_display_uint16(MAP_currentPos[0]);
-		LCD_SendString("  ");
-		LCD_SendString("cDir:");
-		LCD_display_uint8(MAP_currentDir);
-		LCD_SendString("  ");
-		LCD_SetPosition(16);
-		LCD_SendString("X:");
-		LCD_display_uint16(MAP_currentPos[1]);
-		LCD_SendString("  ");
-		for(int i = 0; i<10; i++)
-		{
-			_delay_ms(250);
-		}
 		distance_counter = 0;
+		DEAD_END();
+		MAP_rotate();
 	}
-	if(distance_counter >= 16)
+	if(distance_counter >= 32)
 	{
 		// change description to the front of the robot to path
 		// change description to the left and right of the robot to wall1
@@ -2198,21 +2076,6 @@ void AutomaticControl()
 		distance_counter = 0;
 		MAP_main();
 		DISCOVERY_SetMode();
-		MOTOR_Stop();
-		LCD_SetPosition(0);
-		LCD_SendString("Y:");
-		LCD_display_uint16(MAP_currentPos[0]);
-		LCD_SendString("  ");
-		LCD_SendString("cDir:");
-		LCD_display_uint8(MAP_currentDir);
-		LCD_SetPosition(16);
-		LCD_SendString("X:");
-		LCD_display_uint16(MAP_currentPos[1]);
-		LCD_SendString("  ");
-		for(int i = 0; i<10; i++)
-		{
-			_delay_ms(250);
-		}
 	}
 }
 
@@ -2232,6 +2095,7 @@ void INIT_ALL()
 	PWM_SetDirLeft(1);
 	PWM_SetDirRight(1);
 	
+	distance_counter = 0;
 	MAP_array[15][15].description = 3;
 	MAP_currentDir = 1;
 	MAP_nextDir = 1;
@@ -2255,7 +2119,17 @@ int main(void)
     		{
 	    		AutomaticControl();
 				Send_sensor_values();
-				_delay_ms(50);
+				LCD_SetPosition(0);
+				LCD_SendString("Y:");
+				LCD_display_uint16(MAP_currentPos[0]);
+				LCD_SendString("  ");
+				LCD_SendString("cDir:");
+				LCD_display_uint8(MAP_currentDir);
+				LCD_SendString("  ");
+				LCD_SetPosition(16);
+				LCD_SendString("X:");
+				LCD_display_uint16(MAP_currentPos[1]);
+				LCD_SendString("  ");
     		}
     		
     		_delay_ms(10);
@@ -2270,22 +2144,26 @@ int main(void)
 			{
 				MAP_LOOPer = 1;
 			}
+			MOTOR_Forward(150);
     		while(MANUAL_MODE)
     		{
 				//LCD_Clear();
     			MANUAL_DRIVE();
-				//LCD_SetPosition(0);
-				//LCD_SendString("REflex: ");
-    			//LCD_display_uint8(REFLEX_GetMarker());
+				LCD_SetPosition(0);
+				LCD_SendString("PCL: ");
+    			LCD_display_uint8(PATHCOUNT_Left());
+				LCD_SendString(" PCR: ");
+				LCD_display_uint8(PATHCOUNT_Right());
 				//LCD_SendString("   resq:");
 				//LCD_SendCharacter(resque_mode);
+
 				LCD_SetPosition(0);
 				LCD_SendString("MANUAL MODE");
-				LCD_SetPosition(16);
-				LCD_display_uint8(distance_counter);
-				LCD_SendString("   ");
+				//_delay_ms(1);
+				
     		}
     		PWM_SetSpeedLeft(0);
     		PWM_SetSpeedRight(0);
   	}
+	  
 }
