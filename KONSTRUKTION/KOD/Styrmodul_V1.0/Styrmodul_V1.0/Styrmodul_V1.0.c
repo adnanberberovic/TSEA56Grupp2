@@ -913,12 +913,10 @@ void TURN_Right(int mode)
 		{
 			MOTOR_RotateRight(90 + angle_);
 		}
-		
 		_delay_ms(100);
 		distance_counter = 0;
 		MOTOR_Forward(standard_speed_);
 	}
-		
 	while(PATHCOUNT_Right() > 0)
 		{
 			_delay_us(1);
@@ -928,6 +926,8 @@ void TURN_Right(int mode)
 		}
 	// change current direction in map
 	JUNCTION_delay(3);
+
+	distance_counter = 0;
 }
 
 // Stops and rotates right 90 degrees.
@@ -987,7 +987,7 @@ void TURN_Left(int mode)
 		distance_counter = 0;
 		MOTOR_Forward(standard_speed_);
 	}
-	
+
 	while(PATHCOUNT_Left() > 0)
 	{
 		_delay_us(1);
@@ -1570,18 +1570,18 @@ void MAP_main()
 	// Rotating phase
 	// SIM
 	RotatingPhase:
-	// Moving forward phase
-	// SIM
-	if (MAP_movingForward_ && !MAP_rotating_)
-	{
-		// Simulation code starts here
-		MAP_moveForward();
-		// Update the position variables
-		posY_ = MAP_currentPos[0];
-		posX_ = MAP_currentPos[1];
-
-		// Simulation code ends here
-	}
+	//// Moving forward phase
+	//// SIM
+	//if (MAP_movingForward_ && !MAP_rotating_)
+	//{
+		//// Simulation code starts here
+		//MAP_moveForward();
+		//// Update the position variables
+		//posY_ = MAP_currentPos[0];
+		//posX_ = MAP_currentPos[1];
+//
+		//// Simulation code ends here
+	//}
 
 	// Go until nextJunctionShort phase
 	// This phase is meant to navigate through an explored corridor between two junctions
@@ -1733,10 +1733,11 @@ void AutomaticControl()
 				}
 				MAP_main();
 				DISCOVERY_SetMode();
-				MAP_rotate();
 				Display_Position();
 				JUNCTION_FourWay();
-				
+				MAP_rotate();
+				MAP_moveForward();
+				distance_counter = 0;
 			}
 			else // 3-way-2
 			{
@@ -1776,6 +1777,8 @@ void AutomaticControl()
 				Display_Position();
 				JUNCTION_ThreeWayTWO();
 				MAP_rotate();
+				MAP_moveForward();
+				distance_counter = 0;
 			}
 		}
 		else if (PATHCOUNT_Right() > 0) // 3-way-3 or RightTurn
@@ -1818,6 +1821,8 @@ void AutomaticControl()
 				Display_Position();
 				JUNCTION_ThreeWayTHREE();
 				MAP_rotate();
+				MAP_moveForward();
+				distance_counter = 0;
 			}
 			else //Right turn
 			{
@@ -1857,6 +1862,8 @@ void AutomaticControl()
 				Display_Position();
 				TURN_Right(0);
 				MAP_rotate();
+				MAP_moveForward();
+				distance_counter = 0;
 			}
 		}
 		else if (PATHCOUNT_Left() > 0) // 3-way-1 or Left turn
@@ -1899,6 +1906,8 @@ void AutomaticControl()
 				Display_Position();
 				JUNCTION_ThreeWayONE();
 				MAP_rotate();
+				MAP_moveForward();
+				distance_counter = 0;
 		    }
 			else // Left turn
 			{
@@ -1938,6 +1947,8 @@ void AutomaticControl()
 				Display_Position();
 				TURN_Left(0);
 				MAP_rotate();
+				MAP_moveForward();
+				distance_counter = 0;
 			}
 		}
 		else if (WALL_CLOSE_AHEAD())
@@ -1976,6 +1987,8 @@ void AutomaticControl()
 			Display_Position();
 			DEAD_END();
 			MAP_rotate();
+			MAP_moveForward();
+			distance_counter = 0;
 		}
 		
 	}
@@ -2060,6 +2073,7 @@ void AutomaticControl()
 		DEAD_END();
 		distance_counter = 0;
 		MAP_rotate();
+		MAP_moveForward();
 	}
 	if(distance_counter >= 32)
 	{
@@ -2096,30 +2110,10 @@ void AutomaticControl()
 		distance_counter = 0;
 		MAP_main();
 		DISCOVERY_SetMode();
-		MOTOR_Stop();
-		LCD_SetPosition(0);
-		LCD_SendString("Y:");
-		LCD_display_uint16(MAP_currentPos[0]);
-		LCD_SendString("  ");
-		LCD_SendString("cDir:");
-		LCD_display_uint8(MAP_currentDir);
-		LCD_SendString("  ");
-		LCD_SendString("  ");
-		LCD_SendString("Mode:");
-		LCD_SendCharacter(discovery_mode);
-		LCD_SendString("  ");
-		LCD_SetPosition(16);
-		LCD_SendString("X:");
-		LCD_display_uint16(MAP_currentPos[1]);
-		LCD_SendString("  ");
-		LCD_SendString("nDir:");
-		LCD_display_uint8(MAP_nextDir);
-		LCD_SendString("  ");
-		for(int i = 0; i<10; i++)
-		{
-			_delay_ms(250);
-		}
-		MOTOR_Forward(standard_speed_);
+		Display_Position();
+		MAP_rotate();
+		MAP_moveForward();
+		distance_counter = 0;
 	}
 }
 
