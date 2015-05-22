@@ -1724,10 +1724,11 @@ void AutomaticControl()
 				}
 				MAP_main();
 				DISCOVERY_SetMode();
-				Display_Position();
+				
 				JUNCTION_FourWay();
 				MAP_rotate();
 				MAP_moveForward();
+				Display_Position();
 				distance_counter = 0;
 				distance_flag = 0;
 			}
@@ -1766,10 +1767,11 @@ void AutomaticControl()
 				
 				MAP_main();
 				DISCOVERY_SetMode();
-				Display_Position();
+				
 				JUNCTION_ThreeWayTWO();
 				MAP_rotate();
 				MAP_moveForward();
+				Display_Position();
 				distance_counter = 0;
 				distance_flag = 0;
 			}
@@ -1811,10 +1813,11 @@ void AutomaticControl()
 				
 				MAP_main();
 				DISCOVERY_SetMode();
-				Display_Position();
+				
 				JUNCTION_ThreeWayTHREE();
 				MAP_rotate();
 				MAP_moveForward();
+				Display_Position();
 				distance_counter = 0;
 				distance_flag = 0;
 			}
@@ -1853,10 +1856,11 @@ void AutomaticControl()
 				
 				MAP_main();
 				DISCOVERY_SetMode();
-				Display_Position();
+				
 				TURN_Right(0);
 				MAP_rotate();
 				MAP_moveForward();
+				Display_Position();
 				distance_counter = 0;
 				distance_flag = 0;
 			}
@@ -1898,10 +1902,11 @@ void AutomaticControl()
 				
 				MAP_main();
 				DISCOVERY_SetMode();
-				Display_Position();
+				
 				JUNCTION_ThreeWayONE();
 				MAP_rotate();
 				MAP_moveForward();
+				Display_Position();
 				distance_counter = 0;
 				distance_flag = 0;
 		    }
@@ -1940,10 +1945,10 @@ void AutomaticControl()
 				
 				MAP_main();
 				DISCOVERY_SetMode();
-				Display_Position();
 				TURN_Left(0);
 				MAP_rotate();
 				MAP_moveForward();
+				Display_Position();
 				distance_counter = 0;
 				distance_flag = 0;
 			}
@@ -1981,10 +1986,10 @@ void AutomaticControl()
 			
 			MAP_main();
 			DISCOVERY_SetMode();
-			Display_Position();
 			DEAD_END();
 			MAP_rotate();
 			MAP_moveForward();
+			Display_Position();
 			distance_counter = 0;
 			distance_flag = 0;
 		}
@@ -2074,7 +2079,7 @@ void AutomaticControl()
 		MAP_rotate();
 		MAP_moveForward();
 	}
-	if((distance_counter >= 10) && (distance_flag == 1))
+	if((distance_counter >= 5) && (distance_flag == 1))
 	{
 		// change description to the front of the robot to path
 		// change description to the left and right of the robot to wall1
