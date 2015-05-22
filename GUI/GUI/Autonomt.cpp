@@ -44,8 +44,11 @@ Autonom::Autonom(SetupSDL* sdl_lib, void* hComm_)
     //väg/vägg
     init_Tiles();
     
-    (Tile_vector[13][0])->make_Wall();
-    (Tile_vector[15 ][0])->make_Wall();
+    //(Tile_vector[13][0])->make_Wall();
+    //(Tile_vector[15 ][0])->make_Wall();
+
+	(Tile_vector[13][0])->change_tile(1);
+	(Tile_vector[15][0])->change_tile(2);
     
     Speed_left->Change_speed(140);
     Speed_right->Change_speed(300);
@@ -160,8 +163,11 @@ void Autonom::update(string& statestring, bool& running)
 	DWORD BytesRead_;
 	Get_Sensor_values(arrSensor, (sizeof(arrSensor) / sizeof(arrSensor[0])), 87, hComm, &BytesRead_);
 	Get_Sensor_values(arrSpeed, (sizeof(arrSpeed) / sizeof(arrSpeed[0])), 89, hComm, &BytesRead_);
+	//Get_Sensor_values(arrMap, (sizeof(arrMap) / sizeof(arrMap[0])), 69, hComm, &BytesRead_);
 	SDL_Delay(10);
 	update_texture(arrSensor[0], arrSensor[1], ((0x40 & arrSensor[3]) >> 6), arrSpeed[0], arrSpeed[1]);
+	//update_map(arrMap[0], arrMap[1], arrMap[2]);
+
 }
 
 void Autonom::render()
@@ -332,7 +338,7 @@ void Autonom::run(string& statestring) {
 
 void Autonom::Check_Mode(string &statestring, bool &running)
 {
-	if (arrSensor[3] < 0)
+	if (arrSensor[6] < 0)
 	{
 		statestring = "Manual";
 		running = false;
@@ -349,4 +355,40 @@ void Autonom::update_texture(int A, int O, int Re, int L, int R)
 	Robot_offset->change_offset(O);
 	Speed_left->Change_speed(L);
 	Speed_right->Change_speed(R);
+}
+
+void Autonom::update_map(int8_t xPosD, int8_t yPosM, int8_t LFR)
+{
+	int xPos = xPosD & 0x0f;
+	int yPos = yPosM & 0x1f;
+	int dir = (xPosD & 0xc0)/64;
+	int Left = (LFR & 0x30) / 16;
+	int Front = (LFR & 0x0C) / 4;
+	int Right = (LFR & 0x03);
+
+
+	if (dir == 0)
+	{
+		(Tile_vector[yPos][xPos + 1])->change_tile(Left);
+		(Tile_vector[yPos + 1][xPos])->change_tile(Front);
+		(Tile_vector[yPos][xPos - 1])->change_tile(Right);
+	}
+	else if (dir == 1)
+	{
+		(Tile_vector[yPos - 1][xPos])->change_tile(Left);
+		(Tile_vector[yPos][xPos + 1])->change_tile(Front);
+		(Tile_vector[yPos + 1][xPos])->change_tile(Right);
+	}
+	else if (dir == 2)
+	{
+		(Tile_vector[yPos][xPos - 1])->change_tile(Left);
+		(Tile_vector[yPos - 1][xPos])->change_tile(Front);
+		(Tile_vector[yPos][xPos + 1])->change_tile(Right);
+	}
+	else if (dir == 3)
+	{
+		(Tile_vector[yPos + 1][xPos])->change_tile(Left);
+		(Tile_vector[yPos][xPos - 1])->change_tile(Front);
+		(Tile_vector[yPos - 1][xPos])->change_tile(Right);
+	}
 }

@@ -183,8 +183,12 @@ void Manual::update(string& statestring, bool& running)
 		cerr << "Writing to file failed!\n";
 	}
 	SDL_Delay(10);
-	
-	update_text(arrSensor[0], arrSensor[1], arrSensor[2], ((0x40 & arrSensor[3]) >> 6), (0x07 & arrSensor[3]) /*CR*/, ((0x38 & arrSensor[3]) >> 3)/*CL*/);
+	if ((arrSensor[1] + arrSensor[3])/2 > 20){ //Närmast höger
+		update_text(arrSensor[0], arrSensor[1], arrSensor[4], (arrSensor[6] / 64 & 0x01), (0x03 & arrSensor[6]) /*CR*/, (0x05 & arrSensor[6])/*CL*/);
+	}
+	else{ //Närmast vänster
+		update_text(arrSensor[2], arrSensor[3], arrSensor[4], (arrSensor[6]/64 & 0x01), (0x03 & arrSensor[6]) /*CR*/, (0x05 & arrSensor[6])/*CL*/); 
+	}
 }
 
 void Manual::render()
@@ -350,7 +354,7 @@ void Manual::update_text(int A, int O, int F, int Re, int CR, int CL)
 	
 void Manual::Check_Mode(string &statestring, bool &running)
 {
-	if (arrSensor[3] >= 0)
+	if (arrSensor[6] >= 0)
 	{
 		statestring = "Autonom";
 		running = false;

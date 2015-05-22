@@ -44,8 +44,9 @@ private:
     
 	HANDLE hComm;
     
-	int8_t arrSensor[4];
+	int8_t arrSensor[7];
 	int8_t arrSpeed[3];
+	int8_t arrMap[3];
 
 
     int Event_xSpeed;
@@ -118,6 +119,7 @@ public:
     void Change_right_speed();
 	void Check_Mode(string&, bool&);
 	void update_texture(int, int, int, int, int);
+	void update_map(int8_t, int8_t, int8_t);
 };
 
 

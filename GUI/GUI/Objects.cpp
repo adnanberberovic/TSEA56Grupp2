@@ -167,6 +167,22 @@ int Tile::get_Status()
     return Status_;
 }
 
+void Tile::change_tile(int to_status)
+{
+	if (to_status == 0)
+	{
+		make_Reset();
+	}
+	else if (to_status == 1)
+	{
+		make_Path();
+	}
+	else if (to_status == 2)
+	{
+		make_Wall();
+	}
+}
+
 void Tile::make_Reset()
 {
     Status_ = 0;

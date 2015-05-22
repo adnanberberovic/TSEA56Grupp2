@@ -138,6 +138,7 @@ public:
     void make_Reset();
     void skift_left();
     void skift_right();
+	void change_tile(int to_status);
     
     void render_Tile(SDL_Renderer*);
     int get_Status();

@@ -83,7 +83,7 @@ private:
 	uint8_t Dir_left;
 	uint8_t Dir_right;
 	uint8_t Klo;
-	int8_t arrSensor[4];
+	int8_t arrSensor[7];
 
     int8_t agg;
     
