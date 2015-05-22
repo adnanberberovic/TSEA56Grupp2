@@ -25,25 +25,17 @@
 #define MANUAL_MODE (!AUTONOM_MODE)
 
 
-// GLOBAL VARIABLES --------------------------------------------------------------------
+// _________________________GLOBAL VARIABLES_________________________
 uint8_t arrSpeed[] = {0,0,1,1,0}; //speedLeft, SpeedRight, DirLeft, DirRight, grip
 int8_t arrSensor[] = {-1,0,0,0,0,0,0}; //angle, offset, front_sensor, can_see_information, wall_reflex_information
 uint8_t arrSpeedout[] = {0,0,0}; //Speedleft, speedRight, dirleft/right
-// One overflow corresponds to 13.1 ms if the F_CPU is 20 MHz and the defined prescaler.
-// This timer will reset every time it reaches 10.
-uint8_t TIMER_overflows;
-// This timer will NOT reset every time it reaches 10.
-int16_t TIMER_wheel, TIMER_gyro;
+int16_t TIMER_gyro;
 int16_t TIMER_PD = 0;
-
-	// The following overflow storage corresponds to 131ms. This timer will never reset.
-uint8_t TIMER_overflows_deci;
 // This variable is used to store robots angle in degrees
 float rotation_angle = 0.00;
 // Checks if flags are correctly set in manual/auto loop.
 int Manual_Flag = 0;
 int speed_var = 200;
-// --------------------------------------------------------------------------------------
 uint8_t distance_flag = 0;
 
 int reference_ = 20;// Reference value for where we want to place the robot.
@@ -58,16 +50,11 @@ int K_d = 1;		// K (constant) for D regulation.
 int K_p = 1;		// K (proportion) for P regulation.
 int standard_speed_ = 150;	// Keeps track of standard speed.
 
-uint16_t speed_send;
-uint16_t speed_send_new;
-uint16_t ss1;
-uint16_t ss2;
-float current_speed;
-float wheel_circumference = 20.4/4; //Wheel circumference is 204 mm. 4 black sectors
-float time_difference;
 volatile uint16_t wheel_counter;
 volatile uint16_t distance_counter = 0; // distance_counter = 1 <=> 12,37 mm
 // ett hjulvarv = 63*pi = 197 mm => distance_counter = 16
+
+//__________________________REGISTERS__________________________
 
 // Setup data direction registers @ ports for out/inputs.
 void Styr_InitPortDirections(void)
@@ -123,12 +110,11 @@ unsigned char SPI_MasterTransmit(uint8_t cData, char target)
 	// Reset SS.
 	PORTB |= 1<<PORTB3 | 1<<PORTB4;
 	PORTC |= 1<<PORTC0;
-
-		
+	
 	return SPDR;
 }
 
-//----------------------------PWM------------------------------------
+//__________________________PWM__________________________
 
 void PWM_Init(void)
 {	
@@ -187,7 +173,6 @@ void PWM_SetDirLeft(int dir)
 // 1 for forward, 0 for backward
 void PWM_SetDirRight(int dir)
 {
-	
 	arrSpeedout[2] &= 0b00000001;
 	arrSpeedout[2] += 2 * (uint8_t)dir;
 	if (dir == 0)
@@ -208,7 +193,7 @@ void TIMER_init()
 	TIMSK0 = 1<<TOIE0; // Enable timer interrupts.
 }
 
-//----------------------------PWM----END-----------------------------
+//__________________________SENSOR VALUES__________________________
 
 void Get_sensor_values() //Load all sensor values into sensor-array
 {
@@ -254,21 +239,14 @@ void Send_speed_value()
 	}
 }
 
-//        TIMERS
+//__________________________TIMERS__________________________
 ISR(TIMER0_OVF_vect)
 {
-	TIMER_overflows++;
-	TIMER_wheel++;
 	TIMER_gyro++;
 	TIMER_PD++;
-	if (TIMER_overflows >= 10)
-	{
-		TIMER_overflows = 0;
-		TIMER_overflows_deci++; 
-	}
 }
 
-//----------------------------GYRO------------------------------------
+//__________________________GYRO__________________________
 unsigned char SPI_MasterTransmit_Gyro(unsigned char cData)
 {
 	// Load data into SPI data register.
@@ -290,7 +268,6 @@ void set_GyroSS_High() // disconnect gyro
 }
 void Gyro_Init()
 {
-
 	SPCR &= ~(1<<DORD);
 	int8_t high_byte;
 	do{
@@ -316,7 +293,6 @@ void Gyro_StartConversion()
 
 	} while (high_byte & 0b10000000); // IF  acc.instr. = 1 we continue
 	SPCR |= (1<<DORD);
-
 }
 int16_t Gyro_PollResult()
 {
@@ -344,8 +320,6 @@ int16_t adcToAngularRate(uint16_t adcValue)
 	double AngularRate = (adcValue * 25/12)+400;  // in mV
 	// from the data sheet, R2 gyroscope sensor version is 6,67 mV/deg
 	// for gyroscope with max angular rate 300 deg/s
-	//LCD_SetPosition(16);
-	//LCD_display_uint16((uint16_t)AngularRate);
 	int16_t retval_= (AngularRate - 2500)/6.67;
 	return retval_;
 }
@@ -371,8 +345,7 @@ int16_t Gyro_sequence()
 	return result;
 }
 
-// use in function MOTOR_RotateLeft()
-// delay untill 90 degrees reached;
+// Delay untill 90 degrees reached;
 void checkLeftAngle(float target_angle)
 {
 	int16_t result=0, sum;
@@ -386,43 +359,23 @@ void checkLeftAngle(float target_angle)
 		for (int i=0; i<20; i++)  //for (int i=1; i<21; i++) 
 		{
 			result = Gyro_sequence();
-			//if (result > 0) // ignore positive results
-			//{
-				//result = 0;
-				//i--;
-			//}
 			sum += result;
-			//medel = sum / i; // *****  Läggas utanför för att undvika float-fel? *****
 		}
 		
 		medel = sum / 20;
-		interval = (float)(TIMER_gyro)/1220.7; //(float)(TIMER_gyro - start_time)/1200;
+		interval = (float)(TIMER_gyro)/1220.7;
 		rotation_angle += medel*interval;
 		if ((rotation_angle > ((target_angle - 60)*(255/speed_var))) && (speed_var_local > 70))
 		{
-			speed_var_local = speed_var_local * 0.95; //** eller liknande, för att minska hastigheten gradvis när den närmar sig färdig
+			speed_var_local = speed_var_local * 0.95;
 			PWM_SetSpeedLeft(speed_var_local);
 			PWM_SetSpeedRight(speed_var_local);
 		}
 	}while (rotation_angle < (target_angle - 2));
-	rotation_angle = 0.00; //reset
-	//TIMER_gyro = 0;
-	//for (int i=0; i<100; i++)
-	//{
-		//result = Gyro_sequence();
-		//sum += result;
-	//}
-	//medel = sum / 100;
-	//interval = (float)(TIMER_gyro)/1220.7; //(float)(TIMER_gyro - start_time)/1200;
-	//rotation_angle += medel*interval;
-	//LCD_Clear();
-	//LCD_SetPosition(0);
-	//LCD_display_int16((int16_t)rotation_angle);
-
+	rotation_angle = 0.00; //Reset
 }
 
-// use in function MOTOR_RotateRight()
-// delay untill 90 degrees reached;
+// Delay untill 90 degrees reached;
 void checkRightAngle(float target_angle)
 {
 	int16_t result=0, sum;
@@ -459,9 +412,7 @@ void checkRightAngle(float target_angle)
 	rotation_angle = 0; //reset
 }
 
-//----------------------------GYRO----END-----------------------------
-
-//__________________________SPEEDOMETER_______________________________
+//__________________________DISTANCE COUNTER_______________________________
 
 void Speed_Interrupt_Init()
 {
@@ -474,13 +425,15 @@ ISR(INT0_vect)
 	wheel_counter++;
 	distance_counter++;
 	EIFR = (1<<INTF0); //Clear queued interrupts
+	
 	if (distance_counter >= 32)
 	{
 		distance_flag = 1;
 		distance_counter = 0;
 	}
 }
-//__________________________SPEEDOMETER END____________________________
+
+//__________________________MOTOR_______________________________
 
 //--MOTOR start
 void MOTOR_Forward(int speed)
@@ -552,7 +505,7 @@ void autonom_get_send()
 	Send_speed_value();
 }
 
-//_______________________REFLEX SENSOR AND WALL COUNTER_____________________________
+//_________________________________SENSOR VALUES_______________________________________
 
 uint8_t REFLEX_GetMarker()
 {
@@ -645,9 +598,6 @@ uint8_t PATHCOUNT_Right()
 	return path_right;
 }
 
-
-//_____________________REFLEX SENSOR AND WALL COUNTER END____________________________
-
 //________________________________AUTOMATIC CONTROL_____________________________________
 // Y = PD*G/(1+PD*G) * R
 
@@ -701,12 +651,11 @@ int D_control()
 		prev_time_ = time_new_; // Save the current time for next use
 	}
 	return newSignal_D;   
-	
 }
 
+// Decreases speed as robot approaches wall
 int Front_Control()
 {
-
 		if(FRONT_SENSOR_VALUE() > 65 )
 		{
 			return 60;
@@ -721,6 +670,7 @@ int Front_Control()
 		}
 }
 
+// Decreases speed as robot enters junction
 int Side_Control()
 {
 	if (LEFTPATHONE() || RIGHTPATHONE())
@@ -730,7 +680,7 @@ int Side_Control()
 	return standard_speed_;
 }
 
-// Total control.
+// Total control
 int PD_Control()
 {
 	
@@ -793,7 +743,7 @@ int PD_Control()
 	return newSignal;
 }
 
-// Performs a 180 degree turn in the event of a dead end.
+// Performs a 180 degree turn in the event of a dead end
 void DEAD_END()
 {	
 	MOTOR_Stop();
@@ -801,9 +751,6 @@ void DEAD_END()
 	
 	if (offset_ - 20 > 0)
 	{
-		//Get_sensor_values();
-		//int angle_left =  arrSensor[2];
-		//MOTOR_RotateLeft(180- angle_left);
 		MOTOR_RotateLeft(180 - angle_);
 	}
 	else
@@ -812,6 +759,7 @@ void DEAD_END()
 	}
 	
 	Get_sensor_values();
+	
 	if ( ( (arrSensor[1]  + arrSensor[3]) / 2) - 20 > 0)
 	{
 		if (arrSensor[0] < 0)
@@ -837,6 +785,7 @@ void DEAD_END()
 	
 	_delay_ms(100);
 	MOTOR_Forward(standard_speed_);
+	
 	distance_counter = 0;
 	distance_flag = 0;
 }
@@ -844,11 +793,10 @@ void DEAD_END()
 void JUNCTION_delay(int delay)
 {
 	wheel_counter = 0;
-	while (wheel_counter < (2*delay))
+	while (wheel_counter < (2 * delay))
 	{
 		_delay_us(1);
 	}
-	
 }
 
 // Stops and rotates left 90 degrees.
@@ -878,10 +826,11 @@ void TURN_Right(int mode)
 		
 		_delay_ms(100);
 		MOTOR_Forward(standard_speed_);
+		
 		distance_counter = 0;
 		distance_flag = 0;
-		
 	}
+	
 	else if ( mode == 1)
 	{
 		Get_sensor_values();
@@ -890,9 +839,11 @@ void TURN_Right(int mode)
 		MOTOR_RotateRight(90 - angle_left);
 		_delay_ms(100);
 		MOTOR_Forward(standard_speed_);
+		
 		distance_counter = 0;
 		distance_flag = 0;
 	}
+	
 	else if ( mode == 2)
 	{
 		if (abs(angle_) < 10)
@@ -910,19 +861,17 @@ void TURN_Right(int mode)
 		}
 		_delay_ms(100);
 		MOTOR_Forward(standard_speed_);
+		
 		distance_counter = 0;
 		distance_flag = 0;
 	}
+	
 	while(PATHCOUNT_Right() > 0)
 		{
 			_delay_us(1);
-			//LCD_SetPosition(1);
-			//LCD_SendString("Turn right");
-			//Wait until robot reaches walls again
 		}
-	// change current direction in map
+		
 	JUNCTION_delay(3);
-
 }
 
 // Stops and rotates right 90 degrees.
@@ -933,7 +882,6 @@ void TURN_Left(int mode)
 	
 	if (mode == 0)
 	{
-		
 		Get_sensor_values();
 		int angle_right =  arrSensor[0];
 		MOTOR_RotateLeft(90 - angle_right);
@@ -953,6 +901,7 @@ void TURN_Left(int mode)
 	
 		_delay_ms(100);
 		MOTOR_Forward(standard_speed_);
+		
 		distance_counter = 0;
 		distance_flag = 0;
 	} 
@@ -965,12 +914,13 @@ void TURN_Left(int mode)
 		MOTOR_RotateLeft(90 - angle_right);	
 		_delay_ms(100);
 		MOTOR_Forward(standard_speed_);
+		
 		distance_counter = 0;
 		distance_flag = 0;
 	}
+	
 	else if ( mode == 2)
 	{
-		
 		if( offset_ > 20)
 			{
 				MOTOR_RotateLeft(90 - angle_);
@@ -982,6 +932,7 @@ void TURN_Left(int mode)
 				
 		_delay_ms(100);
 		MOTOR_Forward(standard_speed_);
+		
 		distance_counter = 0;
 		distance_flag = 0;
 	}
@@ -989,11 +940,8 @@ void TURN_Left(int mode)
 	while(PATHCOUNT_Left() > 0)
 	{
 		_delay_us(1);
-		//LCD_SetPosition(1);
-		//LCD_SendString("Turn left");
-		//Wait until robot reaches walls again
 	}
-	// change current direction in map
+	
 	JUNCTION_delay(3);
 }
 
@@ -1009,12 +957,14 @@ void TURN_Back(int mode)
 		{
 			MOTOR_RotateLeft(180 + angle_);
 		}
-		
+
 		_delay_ms(100);
 		MOTOR_Forward(standard_speed_);
+		
 		distance_counter = 0;
 		distance_flag = 0;
 	}
+	
 	else if(mode == 1) // 3-way-1
 	{
 		Get_sensor_values();
@@ -1037,9 +987,11 @@ void TURN_Back(int mode)
 		
 		_delay_ms(100);
 		MOTOR_Forward(standard_speed_);
+		
 		distance_counter = 0;
 		distance_flag = 0;
 	}
+	
 	else if(mode == 2) // 3-way-2
 	{
 		if( offset_ > 20)
@@ -1053,6 +1005,7 @@ void TURN_Back(int mode)
 				
 		_delay_ms(100);
 		MOTOR_Forward(standard_speed_);
+		
 		distance_counter = 0;
 		distance_flag = 0;
 	}
@@ -1078,9 +1031,11 @@ void TURN_Back(int mode)
 		
 		_delay_ms(100);
 		MOTOR_Forward(standard_speed_);
+		
 		distance_counter = 0;
 		distance_flag = 0;
 	}
+	
 	while((PATHCOUNT_Left() > 0) || (PATHCOUNT_Right() > 0))
 	{
 		_delay_us(1);
@@ -1088,9 +1043,10 @@ void TURN_Back(int mode)
 		LCD_SendString("Turn back");
 		//Wait until robot reaches walls again
 	}
-	// change current direction in map
+	
 	JUNCTION_delay(3);
 }
+
 // Sets a random discovery mode to actually decide which way to go.
 // Remember to reset the discovery mode back to '?' after calling this
 // function and deciding on a turn.
@@ -1143,9 +1099,10 @@ void JUNCTION_ThreeWayONE()
 {
 	if ((discovery_mode == 'r') || (discovery_mode == 'f'))
 	{
+		// Keep going forward
 		distance_counter = 0;
 		distance_flag = 0;
-		// Keep going forward
+		
 		while(PATHCOUNT_Left() > 0 )
 		{
 			Get_sensor_values();
@@ -1155,6 +1112,7 @@ void JUNCTION_ThreeWayONE()
 			if(abs(offset_-20) <= 2)
 			{
 				control_mode = 'c';
+				//Utkommenterat för att kunna se kartkoordinater.
 				//LCD_Clear();
 				//LCD_SetPosition(8);
 				//LCD_SendString("Mode: c");
@@ -1163,6 +1121,7 @@ void JUNCTION_ThreeWayONE()
 			else
 			{
 				control_mode = 'r';
+				//Utkommenterat för att kunna se kartkoordinater.
 				//LCD_Clear();
 				//LCD_SetPosition(8);
 				//LCD_SendString("Mode: r");
@@ -1181,20 +1140,23 @@ void JUNCTION_ThreeWayONE()
 				PWM_SetSpeedLeft(standard_speed_ - new_speed_);		
 			}
 				_delay_us(1);
-				LCD_SetPosition(1);
-				LCD_SendString("Threeway One");
+				//Utkommenterat för att kunna se kartkoordinater.
+				//LCD_SetPosition(1);
+				//LCD_SendString("Threeway One");
 			}
 			JUNCTION_delay(3);
 	}
+	
 	else if (discovery_mode == 'l')
 	{
-		// Turn left
 		TURN_Left(1);
 	}
+	
 	else if (discovery_mode == 'b')
 	{
 		TURN_Back(1);
 	}
+	
 	else if (discovery_mode == '?')
 	{
 		DISCOVERY_SetRandom();
@@ -1211,7 +1173,6 @@ void JUNCTION_ThreeWayTWO()
 	if ((discovery_mode == 'l') || (discovery_mode == 'f'))
 	{
 		//Turn Left. Forward becomes left due to right-forward-left cycle.
-		//JUNCTION_delay(3);
 		TURN_Left(0);
 	}
 	else if (discovery_mode == 'r')
@@ -1241,15 +1202,14 @@ void JUNCTION_ThreeWayTHREE()
 {	
 	if (discovery_mode == 'r')
 	{
-		// Turn right
-		//JUNCTION_delay(3);
 		TURN_Right(1);
 	}
 	else if ((discovery_mode == 'f') || (discovery_mode == 'l'))
 	{
+		// Keep going forward
 		distance_counter = 0;
 		distance_flag = 0;
-		// Keep going forward
+		
 		while(PATHCOUNT_Right() > 0 )
 			{
 				Get_sensor_values();
@@ -1259,6 +1219,7 @@ void JUNCTION_ThreeWayTHREE()
 				if(abs(offset_-20) <= 2)
 				{
 					control_mode = 'c';
+					//Utkommenterat för att kunna se kartkoordinater.
 // 					LCD_Clear();
 // 					LCD_SetPosition(8);
 // 					LCD_SendString("Mode: c");
@@ -1267,7 +1228,8 @@ void JUNCTION_ThreeWayTHREE()
 				else
 				{
 					control_mode = 'r';
-// 					§();
+					//Utkommenterat för att kunna se kartkoordinater.
+// 					LCD_Clear();
 // 					LCD_SetPosition(8);
 // 					LCD_SendString("Mode: r");
 				}
@@ -1290,10 +1252,12 @@ void JUNCTION_ThreeWayTHREE()
 			}
 		JUNCTION_delay(3);
 	}
+	
 	else if (discovery_mode == 'b')
 	{
 		TURN_Back(3);
 	}
+	
 	else if (discovery_mode == '?')
 	{
 		DISCOVERY_SetRandom();
@@ -1307,21 +1271,18 @@ void JUNCTION_FourWay()
 {
 	if(discovery_mode == 'r')
 	{
-		//turn right
-		//JUNCTION_delay(3);
 		TURN_Right(2);
 	}
 	else if(discovery_mode == 'l')
 	{
-		//turn left
-		//JUNCTION_delay(3);
 		TURN_Left(2);
 	}
 	else if(discovery_mode == 'f')
 	{
+		//keep going forward
 		distance_counter = 0;
 		distance_flag = 0;
-		//keep going forward
+		
 		while ((LEFTPATHONE() || RIGHTPATHONE())
 				 || ((PATHCOUNT_Left() > 0) && (PATHCOUNT_Right() > 0)))
 		{
@@ -1341,167 +1302,7 @@ void JUNCTION_FourWay()
 		discovery_mode = '?';
 	}
 }
-/*
-// Call this function to perform automatic control.
 
-//void update_walls(x,y,z);
-//{
-	//if (MAP_currentDir == 0)
-	//{
-		//update_north()
-	//}
-	//else if (MAP_currentDir == 1)
-	//{
-		//MAP_array[posY_][posX_ - 1].description = 3;
-		//MAP_array[posY_][posX_ + 1].description = 3;
-		//MAP_array[posY_ - 1][posX_].description = 3;
-	//}
-	//else if (MAP_currentDir == 2)
-	//{
-		//MAP_array[posY_ - 1][posX_].description = 3;
-		//MAP_array[posY_][posX_ - 1].description = 3;
-		//MAP_array[posY_ + 1][posX_].description = 3;
-	//}
-	//else if (MAP_currentDir == 3)
-	//{
-		//MAP_array[posY_][posX_ - 1].description = 3;
-		//MAP_array[posY_][posX_ + 1].description = 3;
-		//MAP_array[posY_ + 1][posX_].description = 3;
-	//}
-//}
-*/
-/*
-void AutomaticControl()
-{
-	TIMER_PD = 0;
-	Get_sensor_values();
-	
-	angle_ = arrSensor[0];
-	offset_ = arrSensor[1];
-	 
-	// Junction, turn, and dead end handling.
-	
-	// Turn 180 deg in a dead end.
-	if( !(LEFTPATHBOTH() || RIGHTPATHBOTH()) && WALL_AHEAD() && (PATHCOUNT_Left() == 0) && (PATHCOUNT_Right() == 0) )
-		{
-			DEAD_END();
-		}
-		
-	else if ((LEFTPATHBOTH() || RIGHTPATHBOTH()) && WALL_AHEAD())
-		{
-			if( ((LEFTPATHBOTH() && RIGHTPATHONE()) || (RIGHTPATHBOTH() && LEFTPATHONE())) 
-				&& (PATHCOUNT_Left() > 0) && (PATHCOUNT_Right() > 0) )
-				//Denna if-sats ser till att vi förstår att det är en trevägs även om robot är sned
-				{
-					//  v
-					//----- TWO is used in junctions of this type.
-					//
-					JUNCTION_ThreeWayTWO();
-				}
-			
-				// Turn right in a corner.
-				else if(RIGHTPATHBOTH() && !LEFTPATHONE() && WALL_AHEAD() 
-						&& (PATHCOUNT_Left() == 0) && (PATHCOUNT_Right() > 0))
-					{
-						TURN_Right();
-					}
-			
-				// Turn left in a corner.
-				else if(!RIGHTPATHONE() && LEFTPATHBOTH() && WALL_AHEAD() 
-						&& (PATHCOUNT_Left() > 0) && (PATHCOUNT_Right() == 0))
-					{
-						TURN_Left();
-					}
-		}
-		
-	else if((LEFTPATHBOTH() || RIGHTPATHBOTH()) && PATH_AHEAD()
-			&& (PATHCOUNT_Left() > 0) && (PATHCOUNT_Right() > 0))
-			{
-				// Make a decision based on discovery mode upon entering a 4-way junction.
-				if( (LEFTPATHBOTH() && RIGHTPATHONE()) || (RIGHTPATHBOTH() && LEFTPATHONE()) )
-					//Denna if-sats ser till att vi förstår att det är en fyrvägs även om robot är sned
-					{
-						JUNCTION_FourWay();
-					}
-					
-					// Three 3-way junction modes, decision depends on entrance to junction
-					// and discovery mode.
-		
-							//  |
-							//->--- ONE is used in junctions of this type.
-							//
-					else if(!RIGHTPATHBOTH() && LEFTPATHBOTH() && (PATHCOUNT_Left() > 0) && (PATHCOUNT_Right() == 0))
-						{
-							JUNCTION_ThreeWayONE();
-						}
-					
-							//  |
-						    //---<- THREE is used in junctions of this type.
-							//
-					else if(RIGHTPATHBOTH() && !LEFTPATHBOTH() && (PATHCOUNT_Left() == 0) && (PATHCOUNT_Right() > 0))
-						{			
-							JUNCTION_ThreeWayTHREE();
-						}
-			}
-			
-	
-	// Puts the automatic control in careful mode, keep the robot on track.
-	if(abs(offset_-20) <= 3)
-	{
-		control_mode = 'c';
-		LCD_SetPosition(8);
-		LCD_SendString("Mode: c");
-	}
-	// Puts the automatic control in rapid mode, push the robot to the middle lane.
-	else
-	{
-		control_mode = 'r';
-		LCD_SetPosition(8);
-		LCD_SendString("Mode: r");
-	}
-	int new_speed_ = PD_Control();
-	LCD_SendString("   ");
-	// Makes sure that the motors don't burn out (i.e go on max velocity)
-	if(new_speed_ > (254-standard_speed_))
-	{
-		new_speed_ = 254 - standard_speed_;
-	}
-	else
-	{
-		PWM_SetSpeedRight(standard_speed_ + new_speed_);
-		PWM_SetSpeedLeft(standard_speed_ - new_speed_);		
-	}
-} 
-*/
-//________________________________AUTOMATIC CONTROL END_____________________________________
-/*
-void Display_Position()
-{
-	LCD_SetPosition(0);
-	LCD_SendString("Y:");
-	LCD_display_uint16(MAP_currentPos[0]);
-	LCD_SendString("  ");
-	LCD_SendString("cDir:");
-	LCD_display_uint8(MAP_currentDir);
-	LCD_SendString("  ");
-	LCD_SendString("  ");
-	LCD_SendString("Mode:");
-	LCD_SendCharacter(discovery_mode);
-	LCD_SendString("  ");
-	LCD_SetPosition(16);
-	LCD_SendString("X:");
-	LCD_display_uint16(MAP_currentPos[1]);
-	LCD_SendString("  ");
-	LCD_SendString("nDir:");
-	LCD_display_uint8(MAP_nextDir);
-	LCD_SendString("  ");
-	for(int i = 0; i<10; i++)
-	{
-		_delay_ms(250);
-	}
-	MOTOR_Forward(standard_speed_);
-}
-*/
 void MAP_main()
 {
 	// Save these under more convenient names
@@ -1580,19 +1381,7 @@ void MAP_main()
 	// Rotating phase
 	// SIM
 	RotatingPhase:
-	//// Moving forward phase
-	//// SIM
-	//if (MAP_movingForward_ && !MAP_rotating_)
-	//{
-		//// Simulation code starts here
-		//MAP_moveForward();
-		//// Update the position variables
-		//posY_ = MAP_currentPos[0];
-		//posX_ = MAP_currentPos[1];
-//
-		//// Simulation code ends here
-	//}
-
+	
 	// Go until nextJunctionShort phase
 	// This phase is meant to navigate through an explored corridor between two junctions
 	//Phase3:
@@ -1688,14 +1477,9 @@ void MAP_main()
 
 void AutomaticControl()
 {
-	if (REFLEX_GetMarker()){	
-// 		LCD_SetPosition(10);
+	if (REFLEX_GetMarker())
+	{	
 // 		resque_mode = 'q';
-// 		LCD_SendString("GOLD");
-// 		JUNCTION_delay(2);
-// 		DEAD_END();
-// 		DEAD_END();
-// 		JUNCTION_delay(2);
 	}
 	
 	if( (PATHCOUNT_Left() > 0) || (PATHCOUNT_Right() > 0) ){ //Path to left or right
@@ -1705,11 +1489,9 @@ void AutomaticControl()
 		} 
 		
 		MAP_moveForward();
-		// Now in intersect. Determine what type:
-		//LCD_Clear();
 		JUNCTION_delay(2);
 			
-		// Lägg till avsökning av varje möjlig ruta i sådana här
+		// Now in intersect. Determine what type:
 		if ((PATHCOUNT_Left() > 0) && (PATHCOUNT_Right() > 0)) // 4-way or 3-way-2
 		{
 			if (PATH_AHEAD()) // 4-way
@@ -1742,6 +1524,7 @@ void AutomaticControl()
 					MAP_array[posY_][posX_ + 1].description = 3;
 					MAP_array[posY_ + 1][posX_].description = 3;
 				}
+				
 				MAP_main();
 				DISCOVERY_SetMode();
 				
@@ -2012,6 +1795,7 @@ void AutomaticControl()
 		if(abs(offset_-20) <= 2)
 		{
 			control_mode = 'c';
+			//Utkommenterat för att visualisera kartkoordinater
 			//LCD_Clear();
 			//LCD_SetPosition(8);
 			//LCD_SendString("Mode: c");
@@ -2020,6 +1804,7 @@ void AutomaticControl()
 		else
 		{
 			control_mode = 'r';
+			//Utkommenterat för att visualisera kartkoordinater
 			//LCD_Clear();
 			//LCD_SetPosition(8);
 			//LCD_SendString("Mode: r");
@@ -2070,6 +1855,7 @@ void AutomaticControl()
 			MAP_array[posY_][posX_ + 1].description = 4;
 			MAP_array[posY_ + 1][posX_].description = 4;
 		}
+		
 		MAP_main();
 		DISCOVERY_SetMode();
 		DEAD_END();
@@ -2110,6 +1896,7 @@ void AutomaticControl()
 			MAP_array[posY_][posX_ + 1].description = 4;
 			MAP_array[posY_ + 1][posX_].description = 3;
 		}
+		
 		MAP_main();
 		DISCOVERY_SetMode();
 		MAP_rotate();
@@ -2117,6 +1904,8 @@ void AutomaticControl()
 		distance_flag = 0;
 	}
 }
+
+//________________________________AUTOMATIC CONTROL END_____________________________________
 
 // This method is very important to call at the start of the program.
 void INIT_ALL()
@@ -2182,16 +1971,12 @@ int main(void)
 			MOTOR_Forward(150);
     		while(MANUAL_MODE)
     		{
-				//LCD_Clear();
     			MANUAL_DRIVE();
 				LCD_SetPosition(0);
 				LCD_SendString("PCL: ");
     			LCD_display_uint8(PATHCOUNT_Left());
 				LCD_SendString(" PCR: ");
 				LCD_display_uint8(PATHCOUNT_Right());
-				//LCD_SendString("   resq:");
-				//LCD_SendCharacter(resque_mode);
-
 				LCD_SetPosition(0);
 				LCD_SendString("MANUAL MODE");
 				//_delay_ms(1);
