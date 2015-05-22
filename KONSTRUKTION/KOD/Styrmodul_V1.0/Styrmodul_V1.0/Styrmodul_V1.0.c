@@ -2113,9 +2113,9 @@ void AutomaticControl()
 		}
 		MAP_main();
 		DISCOVERY_SetMode();
-		Display_Position();
 		MAP_rotate();
 		MAP_moveForward();
+		Display_Position();				
 		distance_flag = 0;
 	}
 }
