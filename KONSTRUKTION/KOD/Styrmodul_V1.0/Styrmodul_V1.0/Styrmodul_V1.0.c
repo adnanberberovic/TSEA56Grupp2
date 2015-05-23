@@ -54,6 +54,18 @@ volatile uint16_t wheel_counter;
 volatile uint16_t distance_counter = 0; // distance_counter = 1 <=> 12,37 mm
 // ett hjulvarv = 63*pi = 197 mm => distance_counter = 16
 
+
+uint8_t LeftPathBoth;
+uint8_t LeftPathOne;
+uint8_t RightPathBoth;
+uint8_t RightPathOne;
+uint8_t PathCountLeft;
+uint8_t PathCountRight;
+uint8_t PathAhead;
+uint8_t WallAhead;
+uint8_t WallCloseAhead;
+uint8_t FrontSensorValue;
+
 //__________________________REGISTERS__________________________
 
 // Setup data direction registers @ ports for out/inputs.
@@ -517,18 +529,21 @@ uint8_t REFLEX_GetMarker()
 uint8_t FRONT_SENSOR_VALUE()
 {
 	Get_sensor_values();
-	return arrSensor[4];
+	FrontSensorValue = arrSensor[4];
+	return FrontSensorValue;
 }
 
 uint8_t PATH_AHEAD()
 {
 	if (FRONT_SENSOR_VALUE() < 40)
 	{
-		return 1;
+		PathAhead = 1;
+		return PathAhead;
 	}
 	else
 	{
-		return 0;	
+		PathAhead = 0;
+		return PathAhead;	
 	}
 }
 
@@ -536,22 +551,26 @@ uint8_t WALL_AHEAD()
 {
 	if (FRONT_SENSOR_VALUE() > 80)
 	{
-		return 1;
+		WallAhead = 1;
+		return WallAhead;
 	}
 	else
 	{
-		return 0;
+		WallAhead = 0;
+		return WallAhead;
 	}
 }
 
 uint8_t WALL_CLOSE_AHEAD()
 {
-	if (FRONT_SENSOR_VALUE() > 100)
+	if (FRONT_SENSOR_VALUE() > 95)
 	{
+		WallCloseAhead = 1;
 		return 1;
 	}
 	else
 	{
+		WallCloseAhead = 0;
 		return 0;
 	}
 }
@@ -559,44 +578,88 @@ uint8_t WALL_CLOSE_AHEAD()
 uint8_t LEFTPATHONE()
 {
 	Get_sensor_values();
-	uint8_t canseewall_left = ((arrSensor[5])/8 & (0b00000001));
-	return canseewall_left;
+	LeftPathOne = ((arrSensor[5])/8 & (0b00000001));
+	return LeftPathOne;
 }
 
 uint8_t RIGHTPATHONE()
 {
 	Get_sensor_values();
-	uint8_t canseewall_right = ((arrSensor[5])/4 & (0b00000001));
-	return canseewall_right;
+	RightPathOne = ((arrSensor[5])/4 & (0b00000001));
+	return RightPathOne;
 }
 
 uint8_t LEFTPATHBOTH()
 {
 	Get_sensor_values();
-	uint8_t canseepath_left = ((arrSensor[5]/2) & (0b00000001));
-	return canseepath_left;
+	LeftPathBoth = ((arrSensor[5]/2) & (0b00000001));
+	return LeftPathBoth;
 }
 
 uint8_t RIGHTPATHBOTH()
 {
 	Get_sensor_values();
-	uint8_t canseepath_right = ((arrSensor[5]) & (0b00000001));
-	return canseepath_right;
+	RightPathBoth = ((arrSensor[5]) & (0b00000001));
+	return RightPathBoth;
 }
 
 uint8_t PATHCOUNT_Left()
 {
 	Get_sensor_values();
-	uint8_t path_left = ((arrSensor[6]/4) & (0b00000011));
-	return path_left;
+	PathCountLeft = ((arrSensor[6]/4) & (0b00000011));
+	return PathCountLeft;
 }
 
 uint8_t PATHCOUNT_Right()
 {
 	Get_sensor_values();
-	uint8_t path_right = (arrSensor[6] & (0b00000011));
-	return path_right;
+	PathCountRight = (arrSensor[6] & (0b00000011));
+	return PathCountRight;
 }
+
+void Update_All_FUCKING_values()
+{
+Get_sensor_values();
+
+	FrontSensorValue = arrSensor[4];
+		
+	if (FrontSensorValue < 40)
+	{
+		PathAhead = 1;
+	}
+	else
+	{
+		PathAhead = 0;	
+	}
+	if (FrontSensorValue > 80)
+	{
+		WallAhead = 1;
+	}
+	else
+	{
+		WallAhead = 0;
+	}
+	if (FrontSensorValue > 100)
+	{
+		WallCloseAhead = 1;
+	}
+	else
+	{
+		WallCloseAhead = 0;
+	}
+	
+
+	LeftPathOne = ((arrSensor[5])/8 & (0b00000001));
+	RightPathOne = ((arrSensor[5])/4 & (0b00000001));
+	LeftPathBoth = ((arrSensor[5]/2) & (0b00000001));
+	RightPathBoth = ((arrSensor[5]) & (0b00000001));
+	PathCountLeft = ((arrSensor[6]/4) & (0b00000011));
+	PathCountRight = (arrSensor[6] & (0b00000011));
+	
+}
+
+
+
 
 //________________________________AUTOMATIC CONTROL_____________________________________
 // Y = PD*G/(1+PD*G) * R
@@ -688,7 +751,7 @@ int PD_Control()
 	
 	if(control_mode == 'r')
 	{
-		standard_speed_ = 60;
+		standard_speed_ = 80;
 		
 		if(FRONT_SENSOR_VALUE() > 45) //Slow down when approaching wall
 		{
@@ -713,15 +776,15 @@ int PD_Control()
 	}
 	else if(control_mode == 'c')
 	{
-		standard_speed_ = 80;
+		standard_speed_ = 100;
 		standard_speed_ = Side_Control();
 		if(FRONT_SENSOR_VALUE() > 45) //Slow down when approaching wall
 		{
 		standard_speed_ = Front_Control();
 		}
 		
-		K_p = 3;
-		K_d = 2;
+		K_p = 6;
+		K_d = 4;
 		if(offset_-20 > 0)
 		{
 			current_error_ = angle_;
@@ -846,6 +909,15 @@ void TURN_Right(int mode)
 	
 	else if ( mode == 2)
 	{
+		if(angle_ > 5)
+		{
+			angle_ = 5;
+		}
+		else if (angle_ < -5)
+		{
+			angle_ = -5;
+		}
+		
 		if (abs(angle_) < 10)
 		{
 			angle_ = angle_ / 2;
@@ -921,6 +993,15 @@ void TURN_Left(int mode)
 	
 	else if ( mode == 2)
 	{
+		if(angle_ > 5)
+		{
+			angle_ = 5;
+		}
+		else if (angle_ < -5)
+		{
+			angle_ = -5;
+		}
+		
 		if( offset_ > 20)
 			{
 				MOTOR_RotateLeft(90 - angle_);
@@ -949,6 +1030,16 @@ void TURN_Back(int mode)
 {
 	if (mode == 0) // 4-way
 	{
+		
+		if(angle_ > 5)
+		{
+			angle_ = 5;
+		}
+		else if (angle_ < -5)
+		{
+			angle_ = -5;
+		}
+		
 		if( offset_ > 20)
 		{
 			MOTOR_RotateLeft(180 - angle_);
@@ -1141,8 +1232,8 @@ void JUNCTION_ThreeWayONE()
 			}
 				_delay_us(1);
 				//Utkommenterat för att kunna se kartkoordinater.
-				//LCD_SetPosition(1);
-				//LCD_SendString("Threeway One");
+				LCD_SetPosition(1);
+				LCD_SendString("Threeway One");
 			}
 			JUNCTION_delay(3);
 	}
@@ -1173,6 +1264,10 @@ void JUNCTION_ThreeWayTWO()
 	if ((discovery_mode == 'l') || (discovery_mode == 'f'))
 	{
 		//Turn Left. Forward becomes left due to right-forward-left cycle.
+		while(!WALL_CLOSE_AHEAD())
+		{
+			_delay_us(250);
+		}
 		TURN_Left(0);
 	}
 	else if (discovery_mode == 'r')
@@ -1180,7 +1275,7 @@ void JUNCTION_ThreeWayTWO()
 		// Turn right
 		while(!WALL_CLOSE_AHEAD())
 		{
-			_delay_us(1);
+			_delay_us(250);
 		}
 		TURN_Right(0);
 	}
@@ -1209,7 +1304,7 @@ void JUNCTION_ThreeWayTHREE()
 		// Keep going forward
 		distance_counter = 0;
 		distance_flag = 0;
-		
+		LCD_Clear();
 		while(PATHCOUNT_Right() > 0 )
 			{
 				Get_sensor_values();
@@ -1400,7 +1495,7 @@ void MAP_main()
 		}
 		MAP_movingForward_ = 1;
 
-		// If we have arriwed to the desired junction
+		// If we have arrived to the desired junction
 		if ((MAP_currentPos[0] == MAP_junctionOrderArray[MAP_nextJunctionShort].posY) &&
 		(MAP_currentPos[1] == MAP_junctionOrderArray[MAP_nextJunctionShort].posX))
 		{
@@ -1477,24 +1572,33 @@ void MAP_main()
 
 void AutomaticControl()
 {
+	
+	
+	Update_All_FUCKING_values();
+	
 	if (REFLEX_GetMarker())
 	{	
 // 		resque_mode = 'q';
 	}
+
 	
-	if( (PATHCOUNT_Left() > 0) || (PATHCOUNT_Right() > 0) ){ //Path to left or right
-		while (!LEFTPATHBOTH() && !RIGHTPATHBOTH() && !WALL_CLOSE_AHEAD()) //Keep going until center of intersect
+	if( (PathCountLeft > 0) || (PathCountRight > 0) ){ //Path to left or right
+		
+		MOTOR_Forward(standard_speed_);
+		
+		while (!(LeftPathBoth) && !(RightPathBoth) && !(WallCloseAhead)) //Keep going until center of intersect
 		{
+			Update_All_FUCKING_values();
 			_delay_us(250);
 		} 
 		
 		MAP_moveForward();
 		JUNCTION_delay(2);
-			
+		
 		// Now in intersect. Determine what type:
-		if ((PATHCOUNT_Left() > 0) && (PATHCOUNT_Right() > 0)) // 4-way or 3-way-2
+		if ((PathCountLeft > 0) && (PathCountRight > 0)) // 4-way or 3-way-2
 		{
-			if (PATH_AHEAD()) // 4-way
+			if (PathAhead) // 4-way
 			{
 				uint8_t posY_ = MAP_currentPos[0];
 				uint8_t posX_ = MAP_currentPos[1];
@@ -1532,7 +1636,7 @@ void AutomaticControl()
 				MAP_rotate();
 				 
 			}
-			else // 3-way-2
+			else if (WallAhead) // 3-way-2
 			{
 				// change description to the left and right of robot to path
 				// change description to the front of the robot to wall
@@ -1573,9 +1677,9 @@ void AutomaticControl()
 				 
 			}
 		}
-		else if (PATHCOUNT_Right() > 0) // 3-way-3 or RightTurn
+		else if (PathCountRight > 0) // 3-way-3 or RightTurn
 		{
-			if (PATH_AHEAD()) // 3-w-3
+			if (PathAhead) // 3-w-3
 			{
 				// change description to the right and front of the robot to path
 				// change description to the left of the robot to wall.
@@ -1615,7 +1719,7 @@ void AutomaticControl()
 				MAP_rotate();
 				 
 			}
-			else //Right turn
+			else if (PathCountLeft == 0) //Right turn
 			{
 				// change description to the right of the robot to path
 				// change description to the left and front of the robot to wall
@@ -1656,9 +1760,9 @@ void AutomaticControl()
 				 
 			}
 		}
-		else if (PATHCOUNT_Left() > 0) // 3-way-1 or Left turn
+		else if (PathCountLeft > 0) // 3-way-1 or Left turn
 		{
-			if (PATH_AHEAD()) // 3-way-1
+			if (PathAhead) // 3-way-1
 			{
 				// change description to the left and front of the robot to path
 				// change description to the right of the robot to wall
@@ -1693,12 +1797,11 @@ void AutomaticControl()
 				
 				MAP_main();
 				DISCOVERY_SetMode();
-				
 				JUNCTION_ThreeWayONE();
 				MAP_rotate();
 				 
 		    }
-			else // Left turn
+			else if (PathCountRight == 0)// Left turn
 			{
 				// change description to the left of the robot to path
 				// change description to the right and front of the robot to wall
@@ -1738,7 +1841,7 @@ void AutomaticControl()
 				 
 			}
 		}
-		else if (WALL_CLOSE_AHEAD())
+		else if (WallCloseAhead)
 		{
 			uint8_t posY_ = MAP_currentPos[0];
 			uint8_t posX_ = MAP_currentPos[1];
@@ -1777,37 +1880,46 @@ void AutomaticControl()
 		}
 		
 	}
-	else if (!( LEFTPATHONE() || RIGHTPATHONE()))
+	else if ( !( LeftPathOne || RightPathOne) || 
+			(LeftPathOne && (arrSensor[1] > 26) /*ROoffs*/) ||  //To close to right wall
+			(RightPathOne && (arrSensor[3] > 14)/*LOffs*/) ) //To close to left wall
 	{
+		
 		Get_sensor_values();
 		
 		if( ((arrSensor[1] + arrSensor[3]) / 2) < 20)
 		{
+			if((arrSensor[2] - angle_) > 10)
+			{
+				_delay_us(1);
+			}
+			else
+			{
 			angle_ =  arrSensor[2];
 			offset_ =  arrSensor[3];
+			}
 		}
 		else
 		{
+			if((arrSensor[0] - angle_) > 10 )
+			{
+				_delay_us(1);
+			}
+			else
+			{
 			angle_ =  arrSensor[0];
 			offset_ =  arrSensor[1];
+			}
 		}
 		
 		if(abs(offset_-20) <= 2)
 		{
 			control_mode = 'c';
-			//Utkommenterat för att visualisera kartkoordinater
-			//LCD_Clear();
-			//LCD_SetPosition(8);
-			//LCD_SendString("Mode: c");
 		}
 		// Puts the automatic control in rapid mode, push the robot to the middle lane.
 		else
 		{
 			control_mode = 'r';
-			//Utkommenterat för att visualisera kartkoordinater
-			//LCD_Clear();
-			//LCD_SetPosition(8);
-			//LCD_SendString("Mode: r");
 		}
 		
 		int new_speed_ = PD_Control();
@@ -1824,13 +1936,14 @@ void AutomaticControl()
 		}
 	}
 	
-	if(WALL_CLOSE_AHEAD()) // dead end square
+	if (WALL_CLOSE_AHEAD()) // dead end square
 	{
+		MAP_moveForward();
 		// change description to the front, left and right of the robot to wall.
 		uint8_t posY_ = MAP_currentPos[0];
 		uint8_t posX_ = MAP_currentPos[1];
 		// change description of all surrounding squares to path
-		
+			
 		if (MAP_currentDir == 0)
 		{
 			MAP_array[posY_ - 1][posX_].description = 4;
@@ -1859,9 +1972,9 @@ void AutomaticControl()
 		MAP_main();
 		DISCOVERY_SetMode();
 		DEAD_END();
-		distance_counter = 0;
-		distance_flag = 0;
 		MAP_rotate();
+		
+		
 	}
 	if((distance_counter >= 7) && (distance_flag == 1))
 	{
@@ -1924,6 +2037,7 @@ void INIT_ALL()
 	PWM_SetDirRight(1);
 	
 	distance_counter = 0;
+	distance_flag = 0;
 	MAP_array[16][15].description = 3;
 	MAP_currentDir = 1;
 	MAP_nextDir = 1;
@@ -1934,7 +2048,6 @@ void INIT_ALL()
 int main(void)
 {
 	INIT_ALL();
-	
    	while (1)
 	   {
     		_delay_ms(10);
@@ -1946,14 +2059,21 @@ int main(void)
     		while(AUTONOM_MODE && MAP_LOOPer)
     		{
 	    		AutomaticControl();
-				Send_sensor_values();
-				LCD_SetPosition(0);
-				LCD_SendString("Y:");
-				LCD_display_uint16(MAP_currentPos[0]);
-				LCD_SendString("  ");
-				LCD_SendString("X:");
-				LCD_display_uint16(MAP_currentPos[1]);
-				LCD_SendString("  ");
+				//Send_sensor_values();
+				//LCD_SetPosition(0);
+				//LCD_SendString("Y:");
+				//LCD_display_uint16(MAP_currentPos[0]);
+				//LCD_SendString("  ");
+				//LCD_SendString("X:");
+				//LCD_display_uint16(MAP_currentPos[1]);
+				//LCD_SendString("  ");
+				//LCD_SetPosition(16);
+				//LCD_SendString("CD:");
+				//LCD_display_uint16(MAP_currentDir);
+				//LCD_SendString("  ");
+				//LCD_SendString("ND:");
+				//LCD_display_uint16(MAP_nextDir);
+				//LCD_SendString("  ");
     		}
     		
     		_delay_ms(10);
@@ -1961,26 +2081,38 @@ int main(void)
     		PWM_SetSpeedRight(0);
     		LCD_Clear();
     		LCD_SetPosition(2);
-    		LCD_SendString("MANUAL_MODE");
-			LCD_Clear();
-			
+    		LCD_SendString("MANUAL_MODE");			
 			if(MANUAL_MODE)
 			{
 				MAP_LOOPer = 1;
 			}
-			MOTOR_Forward(150);
+			MOTOR_Stop();
+			LCD_Clear();
     		while(MANUAL_MODE)
     		{
-    			MANUAL_DRIVE();
+				Get_sensor_values();
+    			//MANUAL_DRIVE();
 				LCD_SetPosition(0);
-				LCD_SendString("PCL: ");
-    			LCD_display_uint8(PATHCOUNT_Left());
-				LCD_SendString(" PCR: ");
+				LCD_SendString("PL");
+				LCD_display_uint8(PATHCOUNT_Left());
+				LCD_SendString(" ");
+				LCD_SendString("BL");
+				LCD_display_int8(LEFTPATHBOTH());
+				LCD_SendString(" ");
+				LCD_SendString("OL");
+				LCD_display_uint8(LEFTPATHONE());
+				LCD_SendString(" ");
+				LCD_SetPosition(16);
+				LCD_SendString("PR");
 				LCD_display_uint8(PATHCOUNT_Right());
-				LCD_SetPosition(0);
-				LCD_SendString("MANUAL MODE");
-				//_delay_ms(1);
-				
+				LCD_SendString(" ");
+				LCD_SendString("BR");
+				LCD_display_int8(RIGHTPATHBOTH());
+				LCD_SendString(" ");
+				LCD_SendString("OR");
+				LCD_display_uint8(RIGHTPATHONE());
+				LCD_SendString(" ");
+				_delay_ms(10);
     		}
     		PWM_SetSpeedLeft(0);
     		PWM_SetSpeedRight(0);

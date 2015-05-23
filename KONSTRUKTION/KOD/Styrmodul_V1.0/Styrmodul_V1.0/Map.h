@@ -8,7 +8,7 @@
 // Variables
 uint8_t MAP_unexploredSquares = 0;
 uint8_t MAP_exploredSquares = 0;
-uint8_t MAP_currentPos[2] = {15, 15}; // NOTE: (y,x) base!!!!!! NOT (x,y)!
+uint8_t MAP_currentPos[2] = {16, 15}; // NOTE: (y,x) base!!!!!! NOT (x,y)!
 uint8_t MAP_currentDir = 1; // 0 = Right, 1 = Up, 2 = Left, 3 = Down 
 uint8_t MAP_goalPosition[2]; // The (y,x) pos of the goal
 uint8_t MAP_nextDir = 1; // Tells which direction we should face before moving forward again
