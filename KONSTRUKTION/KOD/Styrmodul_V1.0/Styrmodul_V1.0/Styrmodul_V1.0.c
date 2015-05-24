@@ -1416,6 +1416,8 @@ void MAP_main()
 		// If it's a visited junction
 		if (MAP_array[posY_][posX_].visited && (MAP_array[posY_][posX_].description == 5))
 		{
+			MAP_LOOPer = 0;
+			goto Phase2;
 			// Add the directions between this and the last junction
 			if (MAP_addJunctionDist(MAP_currentJunction, MAP_array[posY_][posX_].junctionNumber) ||
 			MAP_addJunctionDist(MAP_array[posY_][posX_].junctionNumber, MAP_currentJunction))
@@ -1594,6 +1596,7 @@ void AutomaticControl()
 		//}
 		//else
 		//{
+			//MOTOR_Stop();
 			//for(uint8_t i = 0; i<5; i++){
 				//_delay_ms(250);
 			//}
@@ -1602,6 +1605,7 @@ void AutomaticControl()
 			//for(uint8_t i = 0; i<5; i++){
 				//_delay_ms(250);
 			//}
+			//MOTOR_Forward(standard_speed_);
 		//}
 	}
 
@@ -1659,7 +1663,7 @@ void AutomaticControl()
 				JUNCTION_FourWay();
 				MAP_rotate();
 			}
-			else if (WallAhead) // 3-way-2
+			else // 3-way-2
 			{
 				// change description to the left and right of robot to path
 				// change description to the front of the robot to wall
@@ -1742,7 +1746,7 @@ void AutomaticControl()
 				MAP_rotate();
 				 
 			}
-			else if (PathCountLeft == 0) //Right turn
+			else //if (PathCountLeft == 0) //Right turn
 			{
 				// change description to the right of the robot to path
 				// change description to the left and front of the robot to wall
@@ -1824,7 +1828,7 @@ void AutomaticControl()
 				MAP_rotate();
 				 
 		    }
-			else if (PathCountRight == 0)// Left turn
+			else //if (PathCountRight == 0)// Left turn
 			{
 				// change description to the left of the robot to path
 				// change description to the right and front of the robot to wall
@@ -1869,6 +1873,14 @@ void AutomaticControl()
 			uint8_t posY_ = MAP_currentPos[0];
 			uint8_t posX_ = MAP_currentPos[1];
 			// change description of all surrounding squares to path
+			
+			MOTOR_Stop();
+			LCD_Clear();
+			LCD_SendString("Dead End");
+			LCD_SetPosition(16);
+			LCD_SendString("I sväng IF.. FEL");
+			while(1);
+			
 			//
 			if (MAP_currentDir == 0)
 			{
@@ -2109,10 +2121,10 @@ int main(void)
     		LCD_SendString("AUTOMATIC_MODE");
   			MOTOR_Stop();
   			LCD_Clear();
-    		while(AUTONOM_MODE && MAP_LOOPer)
+    		while(AUTONOM_MODE)
     		{
 	    		AutomaticControl();
-				//Send_sensor_values();
+				Send_sensor_values();
 				LCD_SetPosition(0);
 				LCD_SendString("Y:");
 				LCD_display_uint16(MAP_currentPos[0]);
@@ -2127,18 +2139,20 @@ int main(void)
 				LCD_SendString("ND:");
 				LCD_display_uint16(MAP_nextDir);
 				LCD_SendString("  ");
+				while(!MAP_LOOPer)
+				{
+					LCD_Clear();
+					LCD_SetPosition(0);
+					LCD_SendString("PENIS I ASSE");
+					MOTOR_Stop();
+				}
     		}
     		
     		_delay_ms(10);
-    		PWM_SetSpeedLeft(0);
-    		PWM_SetSpeedRight(0);
+			MOTOR_Stop();
     		LCD_Clear();
     		LCD_SetPosition(2);
     		LCD_SendString("MANUAL_MODE");			
-			if(MANUAL_MODE)
-			{
-				MAP_LOOPer = 1;
-			}
 			MOTOR_Stop();
 			LCD_Clear();
     		while(MANUAL_MODE)
@@ -2167,8 +2181,7 @@ int main(void)
 				LCD_SendString(" ");
 				_delay_ms(10);
     		}
-    		PWM_SetSpeedLeft(0);
-    		PWM_SetSpeedRight(0);
+			MOTOR_Stop();
   	}
 	  
 }
