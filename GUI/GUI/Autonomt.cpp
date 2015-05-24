@@ -35,7 +35,6 @@ Autonom::Autonom(SetupSDL* sdl_lib, void* hComm_)
     Robot_angle = new Robot(Robot_plats.c_str(), renderer_, 194, 50 );
     Robot_offset = new Robot(Robot_plats.c_str(), renderer_, 192, 250);
     Robot_Rotaton = new Robot(Robot_plats.c_str(), renderer_, 194, 660);
-    Robot_Bana = new Robot(Robot_plats.c_str(), renderer_, 814, 670);
     
     //Text
     Text_Angle_ = new Text(Font.c_str(), "01", renderer_, 80, 20, 50, 50);
@@ -47,8 +46,11 @@ Autonom::Autonom(SetupSDL* sdl_lib, void* hComm_)
     //(Tile_vector[x][y])->make_Wall();
     //(Tile_vector[15 ][0])->make_Wall();
 
-	(Tile_vector[13][0])->change_tile(1);
-	(Tile_vector[15][0])->change_tile(2);
+	arrMap[0] = 0x79;
+	arrMap[1] = 0x78;
+	arrMap[2] = 0x88;
+	(Tile_vector[2][0])->change_tile(1);
+	(Tile_vector[2][0])->change_tile(2);
     
     Speed_left->Change_speed(140);
     Speed_right->Change_speed(300);
@@ -162,7 +164,7 @@ void Autonom::update(string& statestring, bool& running)
 	DWORD BytesRead_;
 	Get_Sensor_values(arrSensor, (sizeof(arrSensor) / sizeof(arrSensor[0])), 87, hComm, &BytesRead_);
 	Get_Sensor_values(arrSpeed, (sizeof(arrSpeed) / sizeof(arrSpeed[0])), 89, hComm, &BytesRead_);
-	Get_Sensor_values(arrMap, (sizeof(arrMap) / sizeof(arrMap[0])), 69, hComm, &BytesRead_);
+	//Get_Sensor_values(arrMap, (sizeof(arrMap) / sizeof(arrMap[0])), 69, hComm, &BytesRead_);
 	SDL_Delay(10);
 	update_texture(arrSensor[0], arrSensor[1], ((0x40 & arrSensor[3]) >> 6), arrSpeed[0], arrSpeed[1]);
 	update_map(arrMap[0], arrMap[1], arrMap[2]);
@@ -190,7 +192,6 @@ void Autonom::render()
     Robot_angle->render1(renderer_);
     Robot_offset->render1(renderer_);
     Robot_Rotaton->render1(renderer_);
-    Robot_Bana->render1(renderer_);
     
     Render_Tiles_Helper();
     
@@ -220,9 +221,9 @@ void Autonom::Update_Timer(){
 
 void Autonom::init_Tiles()
 {
-    for (int i = 0; i <= 29; i ++){
+    for (int i = 0; i <= 30; i ++){
         vector<Tile*> row;
-        for (int j = 16; j == 0 ; j++)
+        for (int j = 17; j >= 0; j--)
         {
             row.insert(row.begin(),
                        new Tile(Tiles_plats,
@@ -358,42 +359,46 @@ void Autonom::update_texture(int A, int O, int Re, int L, int R)
 
 void Autonom::update_map(int8_t xPosD, int8_t yPosM, int8_t LFR)
 {
-    (Tile_vector[yPos][xPos])->Place_Robot_Here(0);
+    (Tile_vector[xPos][yPos])->Place_Robot_Here(0);
     
-	xPos = (xPosD & 0xf0) / 16;
-	yPos = (yPosM & 0xf8) / 8;
-	dir =   xPosD & 0x01;
-    Left = (LFR & 0xc0) / 64;
-	Front = (LFR & 0x30) / 16;
-	Right = (LFR & 0x0c) / 4;
+	xPos = ((xPosD & 0xf8) / 8) + 0;
+	yPos = ((yPosM & 0xf8) / 8) + 0;
+	dir =   (xPosD & 0x03) + 0;
+    Left = ((LFR & 0xc0) / 64) + 0;
+	Front = ((LFR & 0x30) / 16) + 0;
+	Right = ((LFR & 0x0c) / 4) + 0;
 
-    (Tile_vector[yPos][xPos])->Place_Robot_Here(1);
-    
-	if (dir == 0)
+	(Tile_vector[xPos]yPos])->Place_Robot_Here(1);
+
+	if ((xPos >= 0) && (xPos <= 16) && (yPos >= 0) && (yPos <= 28))
 	{
-		(Tile_vector[xPos]  [yPos-1])->change_tile(Left);
-		(Tile_vector[xPos+1][yPos]  )->change_tile(Front);
-		(Tile_vector[xPos]  [yPos+1])->change_tile(Right);
+		if (dir == 0)
+		{
+			cout << static_cast<char>(yPos) << " x:" << static_cast<char>(xPos) << endl;
+			(Tile_vector[xPos][yPos - 1])->change_tile(Left);
+			(Tile_vector[xPos + 1][yPos])->change_tile(Front);
+			(Tile_vector[xPos][yPos + 1])->change_tile(Right);
+		}
+		else if (dir == 1)
+		{
+			(Tile_vector[xPos - 1][yPos])->change_tile(Left);
+			(Tile_vector[xPos][yPos - 1])->change_tile(Front);
+			(Tile_vector[xPos + 1][yPos])->change_tile(Right);
+		}
+		else if (dir == 2)
+		{
+			(Tile_vector[xPos][yPos + 1])->change_tile(Left);
+			(Tile_vector[xPos - 1][yPos])->change_tile(Front);
+			(Tile_vector[xPos][yPos - 1])->change_tile(Right);
+		}
+		else if (dir == 3)
+		{
+			(Tile_vector[xPos + 1][yPos])->change_tile(Left);
+			(Tile_vector[xPos][yPos + 1])->change_tile(Front);
+			(Tile_vector[xPos - 1][yPos])->change_tile(Right);
+		}
 	}
-	else if (dir == 1)
-	{
-		(Tile_vector[xPos-1][yPos]  )->change_tile(Left);
-		(Tile_vector[xPos]  [yPos-1])->change_tile(Front);
-		(Tile_vector[xPos+1][yPos]  )->change_tile(Right);
-	}
-	else if (dir == 2)
-	{
-		(Tile_vector[xPos]  [yPos+1])->change_tile(Left);
-		(Tile_vector[xPos-1][yPos]  )->change_tile(Front);
-		(Tile_vector[xPos]  [yPos-1])->change_tile(Right);
-	}
-	else if (dir == 3)
-	{
-		(Tile_vector[xPos+1][yPos]  )->change_tile(Left);
-		(Tile_vector[xPos]  [yPos+1])->change_tile(Front);
-		(Tile_vector[xPos-1][yPos]  )->change_tile(Right);
-	}
-    
+
     if (dir == 0)
     {
         Robot_Rotaton->set_angle(90);

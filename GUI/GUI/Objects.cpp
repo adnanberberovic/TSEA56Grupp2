@@ -226,15 +226,15 @@ void Tile::Place_Robot_Here(int val)
     {
         Robot_Here = 0;
         
-        if(status_ == 0)
+        if(Status_ == 0)
         {
             make_Reset();
         }
-        else if(status_ == 1)
+        else if(Status_ == 1)
         {
             make_Path();
         }
-        else if(status_ == 2)
+        else if(Status_ == 2)
         {
             make_Wall();
         }

@@ -48,7 +48,6 @@ private:
 	int8_t arrSpeed[3];
 	int8_t arrMap[3];
 
-
     int Event_xSpeed;
     int Event_ySpeed;
     
@@ -58,11 +57,11 @@ private:
     int Position = 0;
     
     int xPos;
-    int yPos;
-    int dir;
-    int Left;
-    int Front;
-    int Right;
+	int yPos;
+	int dir;
+	int Left;
+	int Front;
+	int Right;
     
     Text* Text_Angle_;
     Text* Text_Offset_;
@@ -75,7 +74,6 @@ private:
     Robot* Robot_angle;
     Robot* Robot_offset;
     Robot* Robot_Rotaton;
-    Robot* Robot_Bana;
 
     vector< vector<Tile*> > Tile_vector;
     
