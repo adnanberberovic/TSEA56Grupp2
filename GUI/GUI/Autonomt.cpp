@@ -44,7 +44,7 @@ Autonom::Autonom(SetupSDL* sdl_lib, void* hComm_)
     //väg/vägg
     init_Tiles();
     
-    //(Tile_vector[13][0])->make_Wall();
+    //(Tile_vector[x][y])->make_Wall();
     //(Tile_vector[15 ][0])->make_Wall();
 
 	(Tile_vector[13][0])->change_tile(1);
@@ -62,7 +62,6 @@ Autonom::~Autonom()
     delete_Tiles();
     
     delete Robot_angle;
-    delete Robot_Bana;
     delete Robot_Rotaton;
     delete Robot_offset;
     
@@ -163,10 +162,10 @@ void Autonom::update(string& statestring, bool& running)
 	DWORD BytesRead_;
 	Get_Sensor_values(arrSensor, (sizeof(arrSensor) / sizeof(arrSensor[0])), 87, hComm, &BytesRead_);
 	Get_Sensor_values(arrSpeed, (sizeof(arrSpeed) / sizeof(arrSpeed[0])), 89, hComm, &BytesRead_);
-	//Get_Sensor_values(arrMap, (sizeof(arrMap) / sizeof(arrMap[0])), 69, hComm, &BytesRead_);
+	Get_Sensor_values(arrMap, (sizeof(arrMap) / sizeof(arrMap[0])), 69, hComm, &BytesRead_);
 	SDL_Delay(10);
 	update_texture(arrSensor[0], arrSensor[1], ((0x40 & arrSensor[3]) >> 6), arrSpeed[0], arrSpeed[1]);
-	//update_map(arrMap[0], arrMap[1], arrMap[2]);
+	update_map(arrMap[0], arrMap[1], arrMap[2]);
 
 }
 
@@ -221,9 +220,9 @@ void Autonom::Update_Timer(){
 
 void Autonom::init_Tiles()
 {
-    for (int i = 0; i <= 28; i ++){
+    for (int i = 0; i <= 29; i ++){
         vector<Tile*> row;
-        for (int j = 0; j <= 14; j++)
+        for (int j = 16; j == 0 ; j++)
         {
             row.insert(row.begin(),
                        new Tile(Tiles_plats,
@@ -359,36 +358,76 @@ void Autonom::update_texture(int A, int O, int Re, int L, int R)
 
 void Autonom::update_map(int8_t xPosD, int8_t yPosM, int8_t LFR)
 {
-	int xPos = xPosD & 0x0f;
-	int yPos = yPosM & 0x1f;
-	int dir = (xPosD & 0xc0)/64;
-	int Left = (LFR & 0x30) / 16;
-	int Front = (LFR & 0x0C) / 4;
-	int Right = (LFR & 0x03);
+    (Tile_vector[yPos][xPos])->Place_Robot_Here(0);
+    
+	xPos = (xPosD & 0xf0) / 16;
+	yPos = (yPosM & 0xf8) / 8;
+	dir =   xPosD & 0x01;
+    Left = (LFR & 0xc0) / 64;
+	Front = (LFR & 0x30) / 16;
+	Right = (LFR & 0x0c) / 4;
 
-
+    (Tile_vector[yPos][xPos])->Place_Robot_Here(1);
+    
 	if (dir == 0)
 	{
-		(Tile_vector[yPos][xPos + 1])->change_tile(Left);
-		(Tile_vector[yPos + 1][xPos])->change_tile(Front);
-		(Tile_vector[yPos][xPos - 1])->change_tile(Right);
+		(Tile_vector[xPos]  [yPos-1])->change_tile(Left);
+		(Tile_vector[xPos+1][yPos]  )->change_tile(Front);
+		(Tile_vector[xPos]  [yPos+1])->change_tile(Right);
 	}
 	else if (dir == 1)
 	{
-		(Tile_vector[yPos - 1][xPos])->change_tile(Left);
-		(Tile_vector[yPos][xPos + 1])->change_tile(Front);
-		(Tile_vector[yPos + 1][xPos])->change_tile(Right);
+		(Tile_vector[xPos-1][yPos]  )->change_tile(Left);
+		(Tile_vector[xPos]  [yPos-1])->change_tile(Front);
+		(Tile_vector[xPos+1][yPos]  )->change_tile(Right);
 	}
 	else if (dir == 2)
 	{
-		(Tile_vector[yPos][xPos - 1])->change_tile(Left);
-		(Tile_vector[yPos - 1][xPos])->change_tile(Front);
-		(Tile_vector[yPos][xPos + 1])->change_tile(Right);
+		(Tile_vector[xPos]  [yPos+1])->change_tile(Left);
+		(Tile_vector[xPos-1][yPos]  )->change_tile(Front);
+		(Tile_vector[xPos]  [yPos-1])->change_tile(Right);
 	}
 	else if (dir == 3)
 	{
-		(Tile_vector[yPos + 1][xPos])->change_tile(Left);
-		(Tile_vector[yPos][xPos - 1])->change_tile(Front);
-		(Tile_vector[yPos - 1][xPos])->change_tile(Right);
+		(Tile_vector[xPos+1][yPos]  )->change_tile(Left);
+		(Tile_vector[xPos]  [yPos+1])->change_tile(Front);
+		(Tile_vector[xPos-1][yPos]  )->change_tile(Right);
 	}
+    
+    if (dir == 0)
+    {
+        Robot_Rotaton->set_angle(90);
+    }
+    else if (dir == 1)
+    {
+        Robot_Rotaton->set_angle(0);
+    }
+    else if (dir == 2)
+    {
+        Robot_Rotaton->set_angle(270);
+    }
+    else if (dir == 3)
+    {
+        Robot_Rotaton->set_angle(180);
+    }
+    
+    
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//By Bsoson
+
+
+

@@ -57,6 +57,13 @@ private:
     
     int Position = 0;
     
+    int xPos;
+    int yPos;
+    int dir;
+    int Left;
+    int Front;
+    int Right;
+    
     Text* Text_Angle_;
     Text* Text_Offset_;
     
