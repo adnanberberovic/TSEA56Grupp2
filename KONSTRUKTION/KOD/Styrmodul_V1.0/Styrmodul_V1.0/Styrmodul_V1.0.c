@@ -1904,20 +1904,12 @@ void AutomaticControl()
 		}
 		
 	}
-<<<<<<< Updated upstream
+
 	else if ( !( LeftPathOne || RightPathOne) || 
 			(LeftPathOne && (arrSensor[1] > 26) /*ROoffs*/) ||  //To close to right wall
 			(RightPathOne && (arrSensor[3] > 14)/*LOffs*/) ) //To close to left wall
 	{
 		
-=======
-    
-    
-	else if (!( LEFTPATHONE() || RIGHTPATHONE()))
-	
-    
-    {
->>>>>>> Stashed changes
 		Get_sensor_values();
 		if( ((arrSensor[1] + arrSensor[3]) / 2) < 20)
 		{
