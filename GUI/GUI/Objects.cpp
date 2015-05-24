@@ -202,6 +202,12 @@ void Tile::make_Wall()
     srRect_ = {80,0,40,40};
 }
 
+void Tile::make_Robot()
+{
+    srRect_ = {120,0,40,40};
+}
+
+
 void Tile::skift_left()
 {
     Rect_.x =  Rect_.x - 40;
@@ -213,6 +219,34 @@ void Tile::skift_right()
     Rect_.x =  Rect_.x + 40;
     dsRect_.x = dsRect_.x + 40;
 }
+
+void Tile::Place_Robot_Here(int val)
+{
+    if(val == 0)
+    {
+        Robot_Here = 0;
+        
+        if(status_ == 0)
+        {
+            make_Reset();
+        }
+        else if(status_ == 1)
+        {
+            make_Path();
+        }
+        else if(status_ == 2)
+        {
+            make_Wall();
+        }
+        
+    }
+    else
+    {
+        Robot_Here = 1;
+        make_Robot();
+    }
+}
+
 
 //
 // Text
