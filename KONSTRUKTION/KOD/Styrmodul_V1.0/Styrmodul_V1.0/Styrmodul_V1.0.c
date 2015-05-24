@@ -38,6 +38,8 @@ int Manual_Flag = 0;
 int speed_var = 200;
 uint8_t distance_flag = 0;
 
+uint8_t holds_item = 0;
+
 int reference_ = 20;// Reference value for where we want to place the robot.
 int offset_;		// Compared to reference.
 int current_error_;	// Current error
@@ -619,7 +621,7 @@ uint8_t PATHCOUNT_Right()
 
 void Update_All_FUCKING_values()
 {
-Get_sensor_values();
+	Get_sensor_values();
 
 	FrontSensorValue = arrSensor[4];
 		
@@ -1578,7 +1580,29 @@ void AutomaticControl()
 	
 	if (REFLEX_GetMarker())
 	{	
-// 		resque_mode = 'q';
+		//if(MAP_currentPos[0] != 16 && MAP_currentPos[1] != 15)
+		//{
+			//if(resque_mode == 'd')
+			//{
+				//MAP_setGoal();
+				//resque_mode = 'q';
+			//}
+			//else if(resque_mode == 'q' && holds_item)
+			//{
+				//SERVO_ReleaseGrip();
+			//}
+		//}
+		//else
+		//{
+			//for(uint8_t i = 0; i<5; i++){
+				//_delay_ms(250);
+			//}
+			//SERVO_SetGrip();
+			//holds_item = 1;
+			//for(uint8_t i = 0; i<5; i++){
+				//_delay_ms(250);
+			//}
+		//}
 	}
 
 	
@@ -2060,20 +2084,20 @@ int main(void)
     		{
 	    		AutomaticControl();
 				//Send_sensor_values();
-				//LCD_SetPosition(0);
-				//LCD_SendString("Y:");
-				//LCD_display_uint16(MAP_currentPos[0]);
-				//LCD_SendString("  ");
-				//LCD_SendString("X:");
-				//LCD_display_uint16(MAP_currentPos[1]);
-				//LCD_SendString("  ");
-				//LCD_SetPosition(16);
-				//LCD_SendString("CD:");
-				//LCD_display_uint16(MAP_currentDir);
-				//LCD_SendString("  ");
-				//LCD_SendString("ND:");
-				//LCD_display_uint16(MAP_nextDir);
-				//LCD_SendString("  ");
+				LCD_SetPosition(0);
+				LCD_SendString("Y:");
+				LCD_display_uint16(MAP_currentPos[0]);
+				LCD_SendString("  ");
+				LCD_SendString("X:");
+				LCD_display_uint16(MAP_currentPos[1]);
+				LCD_SendString("  ");
+				LCD_SetPosition(16);
+				LCD_SendString("CD:");
+				LCD_display_uint16(MAP_currentDir);
+				LCD_SendString("  ");
+				LCD_SendString("ND:");
+				LCD_display_uint16(MAP_nextDir);
+				LCD_SendString("  ");
     		}
     		
     		_delay_ms(10);

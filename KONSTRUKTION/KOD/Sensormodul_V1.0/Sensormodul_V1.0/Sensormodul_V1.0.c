@@ -295,13 +295,13 @@ int main(void)
 		can_see_information = ( (left_path_one * 8) + (right_path_one * 4) +
 								(left_path_both * 2) + right_path_both );
 		
-		//	CSI	=	x		x		x	x	LP1	RP1	LPB	RPB
-		//			128		64		32	16	8	4	2	1
+		//	CSI	=	x		x		x	  x	  LP1	RP1	LPB	RPB
+		//			  128	64	32  16	8	  4	  2 	1
 		
 		wall_reflex_information = ( (reflex_bool * 64) + (left_wall_counter * 4) + (right_wall_counter) );
 		
-		//	WRI =	!!	REFLEX	x	LW1 LW0 RW1 RW0
-		//			128		64	32	16	8	4	2	1
+		//	WRI =	!   !	      REFLEX	x	  LW1 LW0 RW1 RW0
+		//			  128	64	    32	    16	8	  4	  2	  1
 		
 		//Förhindra avbrott under uppdateringen - höj avbrottsnivån så inga bussavbrott kommer.
 		cli();
