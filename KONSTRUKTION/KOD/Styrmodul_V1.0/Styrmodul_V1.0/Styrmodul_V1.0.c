@@ -860,7 +860,7 @@ void JUNCTION_delay(int delay)
 	wheel_counter = 0;
 	while (wheel_counter < (2 * delay))
 	{
-		_delay_us(1);
+		_delay_us(50);
 	}
 }
 
@@ -942,7 +942,7 @@ void TURN_Right(int mode)
 	
 	while(PATHCOUNT_Right() > 0)
 		{
-			_delay_us(1);
+			_delay_us(250);
 		}
 		
 	JUNCTION_delay(3);
@@ -1022,7 +1022,7 @@ void TURN_Left(int mode)
 
 	while(PATHCOUNT_Left() > 0)
 	{
-		_delay_us(1);
+		_delay_us(250);
 	}
 	
 	JUNCTION_delay(3);
@@ -1131,7 +1131,7 @@ void TURN_Back(int mode)
 	
 	while((PATHCOUNT_Left() > 0) || (PATHCOUNT_Right() > 0))
 	{
-		_delay_us(1);
+		_delay_us(250);
 		LCD_SetPosition(1);
 		LCD_SendString("Turn back");
 		//Wait until robot reaches walls again
@@ -1383,7 +1383,7 @@ void JUNCTION_FourWay()
 		while ((LEFTPATHONE() || RIGHTPATHONE())
 				 || ((PATHCOUNT_Left() > 0) && (PATHCOUNT_Right() > 0)))
 		{
-			_delay_us(1);
+			_delay_us(250);
 			LCD_SetPosition(1);
 			LCD_SendString("Fourway");
 		}
@@ -1399,6 +1399,7 @@ void JUNCTION_FourWay()
 		discovery_mode = '?';
 	}
 }
+
 
 void MAP_main()
 {
@@ -1575,7 +1576,6 @@ void MAP_main()
 void AutomaticControl()
 {
 	
-	
 	Update_All_FUCKING_values();
 	
 	if (REFLEX_GetMarker())
@@ -1617,7 +1617,7 @@ void AutomaticControl()
 		} 
 		
 		MAP_moveForward();
-		JUNCTION_delay(2);
+		JUNCTION_delay(3);
 		
 		// Now in intersect. Determine what type:
 		if ((PathCountLeft > 0) && (PathCountRight > 0)) // 4-way or 3-way-2
@@ -1658,7 +1658,6 @@ void AutomaticControl()
 				
 				JUNCTION_FourWay();
 				MAP_rotate();
-				 
 			}
 			else if (WallAhead) // 3-way-2
 			{
@@ -1902,6 +1901,36 @@ void AutomaticControl()
 			MAP_rotate();
 			 
 		}
+			Get_sensor_values();
+			
+			if( ((arrSensor[1] + arrSensor[3]) / 2) < 20)
+			{
+					angle_ =  arrSensor[2];
+					offset_ =  arrSensor[3];
+			}
+			else
+			{
+					angle_ =  arrSensor[0];
+					offset_ =  arrSensor[1];
+			}
+			
+			while (abs(angle_) > 15)
+			{
+				JUNCTION_delay(1);
+				Get_sensor_values();
+				if( ((arrSensor[1] + arrSensor[3]) / 2) < 20)
+				{
+					angle_ =  arrSensor[2];
+					offset_ =  arrSensor[3];
+				}
+				else
+				{
+					angle_ =  arrSensor[0];
+					offset_ =  arrSensor[1];
+				}
+			}
+	
+
 		
 	}
 	else if ( !( LeftPathOne || RightPathOne) || 
