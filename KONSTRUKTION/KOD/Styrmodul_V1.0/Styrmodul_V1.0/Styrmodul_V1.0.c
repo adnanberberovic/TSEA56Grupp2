@@ -1282,12 +1282,12 @@ void JUNCTION_ThreeWayONE()
 				PWM_SetSpeedRight(standard_speed_ + new_speed_);
 				PWM_SetSpeedLeft(standard_speed_ - new_speed_);		
 			}
-				_delay_us(1);
-				//Utkommenterat för att kunna se kartkoordinater.
-				LCD_SetPosition(1);
-				LCD_SendString("Threeway One");
-			}
-			JUNCTION_delay(3);
+			_delay_us(1);
+			//Utkommenterat för att kunna se kartkoordinater.
+			LCD_SetPosition(1);
+			LCD_SendString("Threeway One");
+		}
+		JUNCTION_delay(3);
 	}
 	
 	else if (discovery_mode == 'l')
@@ -1956,6 +1956,10 @@ void Junction()
             DISCOVERY_SetMode();
             
             JUNCTION_ThreeWayTWO();
+			
+			LCD_Clear();
+			LCD_SetPosition(0);
+			LCD_SendString("junction 3w2");
             MAP_rotate();
             
         }
@@ -2121,6 +2125,7 @@ void AutomaticControl()
 	
 	if( (PathCountLeft > 0) || (PathCountRight > 0) ){ //Path to left or right
 		
+		Send_map_values();
         Junction();
 		Send_map_values();
 		
@@ -2139,6 +2144,7 @@ void AutomaticControl()
 		
 		MAP_main();
 		DISCOVERY_SetMode();
+		Send_map_values();
 		DEAD_END();
 		MAP_rotate();
 		angle_ = 0;
@@ -2196,7 +2202,7 @@ int main(void)
     		LCD_SendString("AUTOMATIC_MODE");
   			MOTOR_Stop();
   			LCD_Clear();
-    		while(AUTONOM_MODE)
+    		while(AUTONOM_MODE && MAP_LOOPer)
     		{
 	    		AutomaticControl();
 				Send_sensor_values();
@@ -2214,14 +2220,23 @@ int main(void)
 				LCD_SendString("ND:");
 				LCD_display_uint16(MAP_nextDir);
 				LCD_SendString("  ");
-				while(!MAP_LOOPer)
-				{
-					LCD_Clear();
-					LCD_SetPosition(0);
-					LCD_SendString("PENIS I ASSE");
-					MOTOR_Stop();
-				}
     		}
+			if(!MAP_LOOPer)
+			{
+				MOTOR_Stop();
+				LCD_Clear();
+				LCD_SetPosition(0);
+				LCD_display_uint8(MAP_array[14][16].description);
+				LCD_SendCharacter(' ');
+				LCD_display_uint8(MAP_array[14][16].visited);
+			}
+			while(!MAP_LOOPer)
+			{
+				if(MANUAL_MODE)
+				{
+					MAP_LOOPer = 1;
+				}				
+			}
     		
     		_delay_ms(10);
 			MOTOR_Stop();
@@ -2233,7 +2248,7 @@ int main(void)
     		while(MANUAL_MODE)
     		{
 				Get_sensor_values();
-    			//MANUAL_DRIVE();
+    			MANUAL_DRIVE();
 				LCD_SetPosition(0);
 				LCD_SendString("PL");
 				LCD_display_uint8(PATHCOUNT_Left());

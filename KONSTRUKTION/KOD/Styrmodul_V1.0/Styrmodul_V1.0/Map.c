@@ -238,6 +238,12 @@ void MAP_addJunction()
 {
 	uint8_t posY_ = MAP_currentPos[0];
 	uint8_t posX_ = MAP_currentPos[1];
+	
+	// Initiate direction to 63 so direction to junction 0 works
+	MAP_junctionOrderArray[MAP_junctionCount].right = 63;
+	MAP_junctionOrderArray[MAP_junctionCount].up = 63;
+	MAP_junctionOrderArray[MAP_junctionCount].left = 63;
+	MAP_junctionOrderArray[MAP_junctionCount].down = 63;
 
 	// Adds directions between last junction and this one
 	if (MAP_addJunctionDist(MAP_currentJunction, MAP_junctionCount) || MAP_addJunctionDist(MAP_junctionCount, MAP_currentJunction))
