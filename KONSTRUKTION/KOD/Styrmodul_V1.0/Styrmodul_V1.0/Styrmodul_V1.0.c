@@ -1416,8 +1416,6 @@ void MAP_main()
 		// If it's a visited junction
 		if (MAP_array[posY_][posX_].visited && (MAP_array[posY_][posX_].description == 5))
 		{
-			MAP_LOOPer = 0;
-			goto Phase2;
 			// Add the directions between this and the last junction
 			if (MAP_addJunctionDist(MAP_currentJunction, MAP_array[posY_][posX_].junctionNumber) ||
 			MAP_addJunctionDist(MAP_array[posY_][posX_].junctionNumber, MAP_currentJunction))
