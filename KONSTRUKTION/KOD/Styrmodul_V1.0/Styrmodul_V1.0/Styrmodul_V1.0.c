@@ -292,9 +292,9 @@ void Send_map_values(){
 	}
 	else if (MAP_currentDir == 3)  // down in map
 	{
-		third_byte = third_byte + (MAP_array[posY_][posX_ + 1].description - 1) * 64; // right in map, left for bot
-		third_byte = third_byte + (MAP_array[posY_ + 1][posX_].description - 1) * 16; // down in map, forward for bot
-		third_byte = third_byte + (MAP_array[posY_][posX_ - 1].description - 1)  * 4; //left in map, right for bot
+		third_byte = third_byte + (MAP_array[posY_][posX_ + 1].description - 2) * 64; // right in map, left for bot
+		third_byte = third_byte + (MAP_array[posY_ + 1][posX_].description - 2) * 16; // down in map, forward for bot
+		third_byte = third_byte + (MAP_array[posY_][posX_ - 1].description - 2)  * 4; //left in map, right for bot
 	}
 	
 	SPI_MasterTransmit(69,'k');
