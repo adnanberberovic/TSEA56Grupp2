@@ -27,7 +27,8 @@ void State::Get_Sensor_values(int8_t arrTarget[], int size, uint8_t startbit_, v
 		cerr << "Reading from file failed!\n";
 	}
 	if (*BytesWritten_ != size){
-		cerr << "Bytes read did not match arr size! :  " << BytesWritten_ << "   " << (sizeof(arrTarget) / sizeof(arrTarget[0])) << endl;
+		cerr << "Bytes read:  " << *BytesWritten_ << endl;
+		cerr << "Targ. arr size: " << (sizeof(arrTarget) / sizeof(arrTarget[0])) << endl;
 	}
 	
 	if (!ReadFile(hComm_, ReadBuff_, 1, BytesWritten_, NULL)) // rid of ninja 0

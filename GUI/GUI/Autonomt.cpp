@@ -144,6 +144,7 @@ void Autonom::event(string& statestring, bool& running)
                 Robot_angle->set_angle(0);
                 Speed_left->Change_speed(Speed);
                 Speed_right->Change_speed(Speed);
+				reset_Tiles();
 
             }
             
@@ -163,8 +164,8 @@ void Autonom::update(string& statestring, bool& running)
 	DWORD BytesWritten_;
 	DWORD BytesRead_;
 	Get_Sensor_values(arrSensor, (sizeof(arrSensor) / sizeof(arrSensor[0])), 87, hComm, &BytesRead_);
-	Get_Sensor_values(arrSpeed, (sizeof(arrSpeed) / sizeof(arrSpeed[0])), 89, hComm, &BytesRead_);
-	//Get_Sensor_values(arrMap, (sizeof(arrMap) / sizeof(arrMap[0])), 69, hComm, &BytesRead_);
+	//Get_Sensor_values(arrSpeed, (sizeof(arrSpeed) / sizeof(arrSpeed[0])), 89, hComm, &BytesRead_);
+	Get_Sensor_values(arrMap, (sizeof(arrMap) / sizeof(arrMap[0])), 69, hComm, &BytesRead_);
 	SDL_Delay(10);
 	update_texture(arrSensor[0], arrSensor[1], ((0x40 & arrSensor[3]) >> 6), arrSpeed[0], arrSpeed[1]);
 	update_map(arrMap[0], arrMap[1], arrMap[2]);
@@ -221,7 +222,7 @@ void Autonom::Update_Timer(){
 
 void Autonom::init_Tiles()
 {
-    for (int i = 0; i <= 30; i ++){
+    for (int i = 30; i >= 0; i --){
         vector<Tile*> row;
         for (int j = 17; j >= 0; j--)
         {
@@ -259,6 +260,20 @@ void Autonom::delete_Tiles()
         
     }
     
+}
+
+void Autonom::reset_Tiles()
+{
+
+	for (vector< vector<Tile*> >::iterator vec = Tile_vector.begin(); vec != Tile_vector.end(); ++vec){
+
+		for (vector<Tile*>::iterator i = (*vec).begin(); i != (*vec).end(); ++i){
+
+			(*i)->make_Reset();
+		}
+
+	}
+
 }
 
 void Autonom::Skift_Tiles_left()
@@ -368,9 +383,9 @@ void Autonom::update_map(int8_t xPosD, int8_t yPosM, int8_t LFR)
 	Front = ((LFR & 0x30) / 16) + 0;
 	Right = ((LFR & 0x0c) / 4) + 0;
 
-	(Tile_vector[xPos]yPos])->Place_Robot_Here(1);
+	(Tile_vector[xPos][yPos])->Place_Robot_Here(1);
 
-	if ((xPos >= 0) && (xPos <= 16) && (yPos >= 0) && (yPos <= 28))
+	if ((xPos >= 0) && (xPos <= 30) && (yPos >= 0) && (yPos <= 16))
 	{
 		if (dir == 0)
 		{
@@ -401,7 +416,7 @@ void Autonom::update_map(int8_t xPosD, int8_t yPosM, int8_t LFR)
 
     if (dir == 0)
     {
-        Robot_Rotaton->set_angle(90);
+        Robot_Rotaton->set_angle(270);
     }
     else if (dir == 1)
     {
@@ -409,7 +424,7 @@ void Autonom::update_map(int8_t xPosD, int8_t yPosM, int8_t LFR)
     }
     else if (dir == 2)
     {
-        Robot_Rotaton->set_angle(270);
+        Robot_Rotaton->set_angle(90);
     }
     else if (dir == 3)
     {

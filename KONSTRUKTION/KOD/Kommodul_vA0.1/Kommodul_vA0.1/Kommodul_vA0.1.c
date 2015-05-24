@@ -45,7 +45,7 @@ volatile uint8_t BT_sent_flag = 0;
 
 uint8_t arrSpeed[5] = {0,0,1,1,0}; //Array with current speed (Left right), direction (1 = forward, 0 = backward) and claw. From/to PC/master left
 uint8_t arrSpeedout[3] = {10, 10, 1}; //Speed left, speed right, dirleft & right
-uint8_t arrMap[3] = {0, 0, 0}; //[0] = {xpos(4) + dir(2)}, [1] = {y-pos(5) + mål(1)}, [2] = {left(2) + ahead(2) + right(2)},
+uint8_t arrMap[3] = {0x79, 0x78, 0x88}; //[0] = {xpos(4) + dir(2)}, [1] = {y-pos(5) + mål(1)}, [2] = {left(2) + ahead(2) + right(2)},
 
 uint8_t sendFlag = 0;
 uint8_t Flag_ = 0;
@@ -240,6 +240,7 @@ void BT_StartBitCheck(uint8_t in_)
 		BTsensorFlag_ = 0;
 		BTspeedFlag_ = 0;
 		BTmapFlag_ = 0;
+		break;
 		
 		case 69:
 		BTmapFlag_ = 1;
@@ -247,6 +248,7 @@ void BT_StartBitCheck(uint8_t in_)
 		BTspeedoutFlag_ = 0;
 		BTsensorFlag_ = 0;
 		BTspeedFlag_ = 0;
+		break;
 		
 		default:
 		BTmapFlag_ = 0;
@@ -400,6 +402,7 @@ ISR(SPI_STC_vect)
 	}
 	else if (mapFlag_ == 1){
 		arrMap[counter_] = data; // Load into corr pos of array 0-2
+		counter_++;
 		if (counter_ == (sizeof(arrMap)/sizeof(arrMap[0]))){
 			counter_ = 0;
 			mapFlag_ = 0;

@@ -118,6 +118,7 @@ public:
     void init_Tiles();
     void Render_Tiles_Helper();
     void delete_Tiles();
+	void reset_Tiles();
     void Skift_Tiles_left();
     void Skift_Tiles_right();
     void Change_left_speed();

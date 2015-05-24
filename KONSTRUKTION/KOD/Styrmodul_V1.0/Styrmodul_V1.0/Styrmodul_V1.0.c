@@ -710,7 +710,276 @@ void Update_All_FUCKING_values()
 	
 }
 
+//
+// _______________________________ Update Map _______________
 
+void set_map_right(int desc)
+{
+	uint8_t posY_ = MAP_currentPos[0];
+	uint8_t posX_ = MAP_currentPos[1];
+	
+	if (MAP_array[posY_][posX_ + 1].description == 0)
+	{
+		MAP_array[posY_][posX_ + 1].description = desc;
+	}
+}
+
+void set_map_up(int desc)
+{
+	uint8_t posY_ = MAP_currentPos[0];
+	uint8_t posX_ = MAP_currentPos[1];
+	
+	if (MAP_array[posY_ - 1][posX_].description == 0)
+	{
+		MAP_array[posY_ - 1][posX_].description = desc;
+	}
+}
+
+void set_map_left(int desc)
+{
+	uint8_t posY_ = MAP_currentPos[0];
+	uint8_t posX_ = MAP_currentPos[1];
+	
+	if (MAP_array[posY_][posX_ - 1].description == 0)
+	{
+		MAP_array[posY_][posX_ - 1].description = desc;
+	}
+}
+
+void set_map_down(int desc)
+{
+	uint8_t posY_ = MAP_currentPos[0];
+	uint8_t posX_ = MAP_currentPos[1];
+	
+	if (MAP_array[posY_ + 1][posX_].description == 0)
+	{
+		MAP_array[posY_ + 1][posX_].description = desc;
+	}
+}
+
+void set_map_FourWay()
+{	
+    if (MAP_currentDir == 0)
+    {
+        set_map_up(3);
+        set_map_right(3);
+        set_map_down(3);
+    }
+    else if (MAP_currentDir == 1)
+    {
+        set_map_left(3);
+        set_map_right(3);
+        set_map_up(3);
+    }
+    else if (MAP_currentDir == 2)
+    {
+        set_map_up(3);
+        set_map_left(3);
+		set_map_down(3);
+    }
+    else if (MAP_currentDir == 3)
+    {
+        set_map_left(3);
+		set_map_right(3);
+        set_map_down(3);
+    }
+}
+
+void set_map_ThreeWay2()
+{
+    if (MAP_currentDir == 0)
+    {
+		set_map_up(3);
+		set_map_right(4);
+		set_map_down(3);
+    }
+    else if (MAP_currentDir == 1)
+    {
+		set_map_left(3);
+		set_map_right(3);
+		set_map_up(4);
+    }
+    else if (MAP_currentDir == 2)
+    {
+		set_map_up(3);
+		set_map_left(4);
+		set_map_down(3);
+    }
+    else if (MAP_currentDir == 3)
+    {
+		set_map_left(3);
+		set_map_right(3);
+		set_map_down(4);
+    }
+}
+
+void set_map_ThreeWay3()
+{
+    if (MAP_currentDir == 0)
+    {
+		set_map_up(4);
+		set_map_right(3);
+		set_map_down(3);
+    }
+    else if (MAP_currentDir == 1)
+    {
+		set_map_left(4);
+		set_map_right(3);
+		set_map_up(3);
+    }
+    else if (MAP_currentDir == 2)
+    {
+		set_map_up(3);
+		set_map_left(3);
+		set_map_down(4);
+    }
+    else if (MAP_currentDir == 3)
+    {
+		set_map_left(3);
+		set_map_right(4);
+		set_map_down(3);
+    }
+}
+
+void set_map_RightTurn()
+{
+    if (MAP_currentDir == 0)
+    {
+		set_map_up(4);
+		set_map_right(4);
+		set_map_down(3);
+    }
+    else if (MAP_currentDir == 1)
+    {
+		set_map_left(4);
+		set_map_right(3);
+		set_map_up(4);
+    }
+    else if (MAP_currentDir == 2)
+    {
+		set_map_up(3);
+		set_map_left(4);
+		set_map_down(4);
+    }
+    else if (MAP_currentDir == 3)
+    {
+		set_map_left(3);
+		set_map_right(4);
+		set_map_down(4);
+    }
+}
+
+void set_map_ThreeWay1()
+{
+    if (MAP_currentDir == 0)
+    {
+		set_map_up(3);
+		set_map_right(3);
+		set_map_down(4);
+    }
+    else if (MAP_currentDir == 1)
+    {
+		set_map_left(3);
+		set_map_right(4);
+		set_map_up(3);
+    }
+    else if (MAP_currentDir == 2)
+    {
+		set_map_up(4);
+		set_map_left(3);
+		set_map_down(3);
+    }
+    else if (MAP_currentDir == 3)
+    {
+		set_map_left(4);
+		set_map_right(3);
+		set_map_down(3);
+    }
+}
+
+void set_map_LeftTurn()
+{
+    if (MAP_currentDir == 0)
+    {
+		set_map_up(3);
+		set_map_right(4);
+		set_map_down(4);
+    }
+    else if (MAP_currentDir == 1)
+    {
+		set_map_left(3);
+		set_map_right(4);
+		set_map_up(4);
+    }
+    else if (MAP_currentDir == 2)
+    {
+		set_map_up(4);
+		set_map_left(4);
+		set_map_down(3);
+    }
+    else if (MAP_currentDir == 3)
+    {
+		set_map_left(4);
+		set_map_right(3);
+		set_map_down(4);
+    }
+}
+
+void set_map_DeadEnd()
+{
+    if (MAP_currentDir == 0)
+    {
+		set_map_up(4);
+		set_map_right(4);
+		set_map_down(4);
+    }
+    else if (MAP_currentDir == 1)
+    {
+		set_map_left(4);
+		set_map_right(4);
+		set_map_up(4);
+    }
+    else if (MAP_currentDir == 2)
+    {
+	    set_map_up(4);
+	    set_map_left(4);
+	    set_map_down(4);
+    }
+    else if (MAP_currentDir == 3)
+    {
+	    set_map_left(4);
+	    set_map_right(4);
+	    set_map_down(4);
+    }
+}
+
+void set_map_Corridor()
+{
+    if (MAP_currentDir == 0)
+    {
+	    set_map_up(4);
+	    set_map_right(3);
+	    set_map_down(4);
+    }
+    else if (MAP_currentDir == 1)
+    {
+	    set_map_left(4);
+	    set_map_right(4);
+	    set_map_up(3);
+    }
+    else if (MAP_currentDir == 2)
+    {
+	    set_map_up(4);
+	    set_map_left(3);
+	    set_map_down(4);
+    }
+    else if (MAP_currentDir == 3)
+    {
+	    set_map_left(4);
+	    set_map_right(4);
+	    set_map_down(3);
+    }
+}
 
 
 //________________________________AUTOMATIC CONTROL_____________________________________
@@ -744,6 +1013,8 @@ char resque_mode = 'd'; /*if resque_mode == d, then the robot will search accord
 						if resque_mode == q, then the robot has found the mark and will
 						start resquing.
 						*/
+
+
 
 // P-control function
 int P_Control()
@@ -919,7 +1190,7 @@ void TURN_Right(int mode)
 {
 	MOTOR_Stop();
 	_delay_ms(100);
-	
+		
 	if (mode == 0)
 	{
 		Get_sensor_values();
@@ -1245,48 +1516,28 @@ void JUNCTION_ThreeWayONE()
 		// Keep going forward
 		distance_counter = 0;
 		distance_flag = 0;
+		LCD_Clear();
 		
-		while(PATHCOUNT_Left() > 0 )
+		MOTOR_Stop();
+		Get_sensor_values();
+		int angle_right =  arrSensor[0];
+		
+		if (angle_right < 0)
 		{
-			Get_sensor_values();
-			angle_ =  arrSensor[0];
-			offset_ =  arrSensor[1];
-
-			if(abs(offset_-20) <= 2)
-			{
-				control_mode = 'c';
-				//Utkommenterat för att kunna se kartkoordinater.
-				//LCD_Clear();
-				//LCD_SetPosition(8);
-				//LCD_SendString("Mode: c");
-			}
-			// Puts the automatic control in rapid mode, push the robot to the middle lane.
-			else
-			{
-				control_mode = 'r';
-				//Utkommenterat för att kunna se kartkoordinater.
-				//LCD_Clear();
-				//LCD_SetPosition(8);
-				//LCD_SendString("Mode: r");
-			}
-		
-			int new_speed_ = PD_Control();
-
-			// Makes sure that the motors don't burn out (i.e go on max velocity)
-			if(new_speed_ > (254-standard_speed_))
-			{
-				new_speed_ = 254 - standard_speed_;
-			}
-			else
-			{
-				PWM_SetSpeedRight(standard_speed_ + new_speed_);
-				PWM_SetSpeedLeft(standard_speed_ - new_speed_);		
-			}
-			_delay_us(1);
-			//Utkommenterat för att kunna se kartkoordinater.
-			LCD_SetPosition(1);
-			LCD_SendString("Threeway One");
+			MOTOR_RotateLeft(-angle_right);
 		}
+		else
+		{
+			MOTOR_RotateRight(angle_right);
+		}
+		
+		MOTOR_Forward(standard_speed_);
+		
+		while( PATHCOUNT_Left() > 0 )
+		{
+			_delay_us(250);
+		}
+		
 		JUNCTION_delay(3);
 	}
 	
@@ -1351,52 +1602,34 @@ void JUNCTION_ThreeWayTHREE()
 	{
 		TURN_Right(1);
 	}
+	
 	else if ((discovery_mode == 'f') || (discovery_mode == 'l'))
 	{
 		// Keep going forward
 		distance_counter = 0;
 		distance_flag = 0;
 		LCD_Clear();
-		while(PATHCOUNT_Right() > 0 )
+		
+		MOTOR_Stop();
+		Get_sensor_values();
+		int angle_left =  arrSensor[2];
+		
+		if (angle_left < 0)
+		{
+			MOTOR_RotateRight(-angle_left);
+		}
+		else
+		{
+			MOTOR_RotateLeft(angle_left);
+		}
+		
+		MOTOR_Forward(standard_speed_);
+		
+		while( PATHCOUNT_Right() > 0 )
 			{
-				Get_sensor_values();
-				angle_ =  arrSensor[2];
-				offset_ =  arrSensor[3];
-
-				if(abs(offset_-20) <= 2)
-				{
-					control_mode = 'c';
-					//Utkommenterat för att kunna se kartkoordinater.
-// 					LCD_Clear();
-// 					LCD_SetPosition(8);
-// 					LCD_SendString("Mode: c");
-				}
-				// Puts the automatic control in rapid mode, push the robot to the middle lane.
-				else
-				{
-					control_mode = 'r';
-					//Utkommenterat för att kunna se kartkoordinater.
-// 					LCD_Clear();
-// 					LCD_SetPosition(8);
-// 					LCD_SendString("Mode: r");
-				}
-				
-				int new_speed_ = PD_Control();
-
-				// Makes sure that the motors don't burn out (i.e go on max velocity)
-				if(new_speed_ > (254-standard_speed_))
-				{
-					new_speed_ = 254 - standard_speed_;
-				}
-				else
-				{
-					PWM_SetSpeedRight(standard_speed_ + new_speed_);
-					PWM_SetSpeedLeft(standard_speed_ - new_speed_);
-				}
-				_delay_us(1);
-				LCD_SetPosition(1);
-				LCD_SendString("Threeway Three");
+				_delay_us(250);
 			}
+		
 		JUNCTION_delay(3);
 	}
 	
@@ -1452,6 +1685,7 @@ void JUNCTION_FourWay()
 
 void MAP_main()
 {
+	Send_map_values();
 	// Save these under more convenient names
 	uint8_t posY_ = MAP_currentPos[0];
 	uint8_t posX_ = MAP_currentPos[1];
@@ -1622,273 +1856,6 @@ void MAP_main()
 	// MAP_checkIfDone();
 }
 
-void set_map_right(int desc)
-{
-	uint8_t posY_ = MAP_currentPos[0];
-	uint8_t posX_ = MAP_currentPos[1];
-	
-	if (MAP_array[posY_][posX_ + 1].description == 0)
-	{
-		MAP_array[posY_][posX_ + 1].description = desc;
-	}
-}
-
-void set_map_up(int desc)
-{
-	uint8_t posY_ = MAP_currentPos[0];
-	uint8_t posX_ = MAP_currentPos[1];
-	
-	if (MAP_array[posY_ - 1][posX_].description == 0)
-	{
-		MAP_array[posY_ - 1][posX_].description = desc;
-	}
-}
-
-void set_map_left(int desc)
-{
-	uint8_t posY_ = MAP_currentPos[0];
-	uint8_t posX_ = MAP_currentPos[1];
-	
-	if (MAP_array[posY_][posX_ - 1].description == 0)
-	{
-		MAP_array[posY_][posX_ - 1].description = desc;
-	}
-}
-
-void set_map_down(int desc)
-{
-	uint8_t posY_ = MAP_currentPos[0];
-	uint8_t posX_ = MAP_currentPos[1];
-	
-	if (MAP_array[posY_ + 1][posX_].description == 0)
-	{
-		MAP_array[posY_ + 1][posX_].description = desc;
-	}
-}
-
-void set_map_FourWay()
-{	
-    if (MAP_currentDir == 0)
-    {
-        set_map_up(3);
-        set_map_right(3);
-        set_map_down(3);
-    }
-    else if (MAP_currentDir == 1)
-    {
-        set_map_left(3);
-        set_map_right(3);
-        set_map_up(3);
-    }
-    else if (MAP_currentDir == 2)
-    {
-        set_map_up(3);
-        set_map_left(3);
-		set_map_down(3);
-    }
-    else if (MAP_currentDir == 3)
-    {
-        set_map_left(3);
-		set_map_right(3);
-        set_map_down(3);
-    }
-}
-
-void set_map_ThreeWay2()
-{
-    if (MAP_currentDir == 0)
-    {
-		set_map_up(3);
-		set_map_right(4);
-		set_map_down(3);
-    }
-    else if (MAP_currentDir == 1)
-    {
-		set_map_left(3);
-		set_map_right(3);
-		set_map_up(4);
-    }
-    else if (MAP_currentDir == 2)
-    {
-		set_map_up(3);
-		set_map_left(4);
-		set_map_down(3);
-    }
-    else if (MAP_currentDir == 3)
-    {
-		set_map_left(3);
-		set_map_right(3);
-		set_map_down(4);
-    }
-}
-
-void set_map_ThreeWay3()
-{
-    if (MAP_currentDir == 0)
-    {
-		set_map_up(4);
-		set_map_right(3);
-		set_map_down(3);
-    }
-    else if (MAP_currentDir == 1)
-    {
-		set_map_left(4);
-		set_map_right(3);
-		set_map_up(3);
-    }
-    else if (MAP_currentDir == 2)
-    {
-		set_map_up(3);
-		set_map_left(3);
-		set_map_down(4);
-    }
-    else if (MAP_currentDir == 3)
-    {
-		set_map_left(3);
-		set_map_right(4);
-		set_map_down(3);
-    }
-}
-
-void set_map_RightTurn()
-{
-    if (MAP_currentDir == 0)
-    {
-		set_map_up(4);
-		set_map_right(4);
-		set_map_down(3);
-    }
-    else if (MAP_currentDir == 1)
-    {
-		set_map_left(4);
-		set_map_right(3);
-		set_map_up(4);
-    }
-    else if (MAP_currentDir == 2)
-    {
-		set_map_up(3);
-		set_map_left(4);
-		set_map_down(4);
-    }
-    else if (MAP_currentDir == 3)
-    {
-		set_map_left(3);
-		set_map_right(4);
-		set_map_down(4);
-    }
-}
-
-void set_map_ThreeWay1()
-{
-    if (MAP_currentDir == 0)
-    {
-		set_map_up(3);
-		set_map_right(3);
-		set_map_down(4);
-    }
-    else if (MAP_currentDir == 1)
-    {
-		set_map_left(3);
-		set_map_right(4);
-		set_map_up(3);
-    }
-    else if (MAP_currentDir == 2)
-    {
-		set_map_up(4);
-		set_map_left(3);
-		set_map_down(3);
-    }
-    else if (MAP_currentDir == 3)
-    {
-		set_map_left(4);
-		set_map_right(3);
-		set_map_down(3);
-    }
-}
-
-void set_map_LeftTurn()
-{
-    if (MAP_currentDir == 0)
-    {
-		set_map_up(3);
-		set_map_right(4);
-		set_map_down(4);
-    }
-    else if (MAP_currentDir == 1)
-    {
-		set_map_left(3);
-		set_map_right(4);
-		set_map_up(4);
-    }
-    else if (MAP_currentDir == 2)
-    {
-		set_map_up(4);
-		set_map_left(4);
-		set_map_down(3);
-    }
-    else if (MAP_currentDir == 3)
-    {
-		set_map_left(4);
-		set_map_right(3);
-		set_map_down(4);
-    }
-}
-
-void set_map_DeadEnd()
-{
-    if (MAP_currentDir == 0)
-    {
-		set_map_up(4);
-		set_map_right(4);
-		set_map_down(4);
-    }
-    else if (MAP_currentDir == 1)
-    {
-		set_map_left(4);
-		set_map_right(4);
-		set_map_up(4);
-    }
-    else if (MAP_currentDir == 2)
-    {
-	    set_map_up(4);
-	    set_map_left(4);
-	    set_map_down(4);
-    }
-    else if (MAP_currentDir == 3)
-    {
-	    set_map_left(4);
-	    set_map_right(4);
-	    set_map_down(4);
-    }
-}
-
-void set_map_Corridor()
-{
-    if (MAP_currentDir == 0)
-    {
-	    set_map_up(4);
-	    set_map_right(3);
-	    set_map_down(4);
-    }
-    else if (MAP_currentDir == 1)
-    {
-	    set_map_left(4);
-	    set_map_right(4);
-	    set_map_up(3);
-    }
-    else if (MAP_currentDir == 2)
-    {
-	    set_map_up(4);
-	    set_map_left(3);
-	    set_map_down(4);
-    }
-    else if (MAP_currentDir == 3)
-    {
-	    set_map_left(4);
-	    set_map_right(4);
-	    set_map_down(3);
-    }
-}
 
 void Floor_Marker()
 {
@@ -1930,11 +1897,19 @@ void Junction()
     {
         Update_All_FUCKING_values();
         _delay_us(250);
+		
+		//Jump out of function if incorrect sensor value was given earlier.
+		if (!((PathCountLeft > 0) || (PathCountRight > 0)))
+		{
+			return;
+		}
     }
     
+	
     MAP_moveForward();
     JUNCTION_delay(3);
     
+	
     // Now in intersect. Determine what type:
     if ((PathCountLeft > 0) && (PathCountRight > 0)) // 4-way or 3-way-2
     {
@@ -1975,7 +1950,6 @@ void Junction()
             
             JUNCTION_ThreeWayTHREE();
             MAP_rotate();
-            
         }
         else //if (PathCountLeft == 0) //Right turn
         {
@@ -1984,9 +1958,63 @@ void Junction()
             MAP_main();
             DISCOVERY_SetMode();
             
-            TURN_Right(0);
-            MAP_rotate();
-            
+			if (discovery_mode == 'r')
+			{
+				TURN_Right(0);
+				MAP_rotate();
+			}
+	
+			else if (discovery_mode == 'l')
+			{
+				MOTOR_Stop();
+				LCD_Clear();
+				LCD_SendString("                        lr            ");
+				TURN_Left(0);
+				MAP_rotate();
+			}
+	
+			else if (discovery_mode == 'b')
+			{
+				MOTOR_Stop();
+				LCD_Clear();
+				LCD_SendString("                        br            ");
+				TURN_Back(1);
+				MAP_rotate();
+			}
+			
+			else if (discovery_mode == 'f')
+			{
+				MOTOR_Stop();
+				LCD_Clear();
+				LCD_SendString("                        fr            ");
+				
+				// Keep going forward
+				distance_counter = 0;
+				distance_flag = 0;
+				LCD_Clear();
+					
+				MOTOR_Stop();
+				Get_sensor_values();
+				int angle_left =  arrSensor[2];
+					
+				if (angle_left < 0)
+				{
+					MOTOR_RotateRight(-angle_left);
+				}
+				else
+				{
+					MOTOR_RotateLeft(angle_left);
+				}
+					
+				MOTOR_Forward(standard_speed_);
+					
+				while( PATHCOUNT_Right() > 0 )
+				{
+					_delay_us(250);
+				}
+					
+				JUNCTION_delay(3);
+			}
         }
     }
     else if (PathCountLeft > 0) // 3-way-1 or Left turn
@@ -1999,17 +2027,73 @@ void Junction()
             DISCOVERY_SetMode();
             JUNCTION_ThreeWayONE();
             MAP_rotate();
-            
-        }
+		}
         else //if (PathCountRight == 0)// Left turn
         {
 			set_map_LeftTurn();
             
             MAP_main();
             DISCOVERY_SetMode();
-            TURN_Left(0);
-            MAP_rotate();
-            
+			
+			if (discovery_mode == 'r')
+			{
+				MOTOR_Stop();
+				LCD_Clear();
+				LCD_SendString("      rl      ");
+				TURN_Right(0);
+				MAP_rotate();
+			}
+	
+			else if (discovery_mode == 'l')
+			{
+				TURN_Left(0);
+				MAP_rotate();
+			}
+			
+			else if (discovery_mode == 'b')
+			{
+				MOTOR_Stop();
+				LCD_Clear();
+				LCD_SendString("      bl    ");
+				TURN_Back(1);
+				MAP_rotate();
+			}
+			
+			else if (discovery_mode == 'f')
+			{
+				
+				
+				MOTOR_Stop();
+				LCD_Clear();
+				LCD_SendString("      fl      ");
+				
+				// Keep going forward
+				distance_counter = 0;
+				distance_flag = 0;
+				LCD_Clear();
+		
+				MOTOR_Stop();
+				Get_sensor_values();
+				int angle_right =  arrSensor[0];
+		
+				if (angle_right < 0)
+				{
+					MOTOR_RotateLeft(-angle_right);
+				}
+				else
+				{
+					MOTOR_RotateRight(angle_right);
+				}
+		
+				MOTOR_Forward(standard_speed_);
+		
+				while( PATHCOUNT_Left() > 0 )
+				{
+					_delay_us(250);
+				}
+		
+				JUNCTION_delay(3);
+			}
         }
     }
     else if (WallCloseAhead)
@@ -2064,7 +2148,6 @@ void Junction()
 
 void Pre_PD_controll()
 {
-    
     Get_sensor_values();
     if( ((arrSensor[1] + arrSensor[3]) / 2) < 20)
     {
@@ -2111,7 +2194,7 @@ void Pre_PD_controll()
     else
     {
         PWM_SetSpeedRight(standard_speed_ + new_speed_);
-        PWM_SetSpeedLeft(standard_speed_ - new_speed_);		
+        PWM_SetSpeedLeft(standard_speed_ - new_speed_);
     }
 }
 
@@ -2125,9 +2208,7 @@ void AutomaticControl()
 	
 	if( (PathCountLeft > 0) || (PathCountRight > 0) ){ //Path to left or right
 		
-		Send_map_values();
         Junction();
-		Send_map_values();
 		
 	}
 	else if ( !( LeftPathOne || RightPathOne) || 
@@ -2144,11 +2225,9 @@ void AutomaticControl()
 		
 		MAP_main();
 		DISCOVERY_SetMode();
-		Send_map_values();
 		DEAD_END();
 		MAP_rotate();
 		angle_ = 0;
-		Send_map_values();
 	}
 	if((distance_counter >= 7) && (distance_flag == 1))
 	{
@@ -2159,7 +2238,6 @@ void AutomaticControl()
 		MAP_main();
 		DISCOVERY_SetMode();
 		MAP_rotate();
-		Send_map_values();
 		distance_flag = 0;
 	}
 }

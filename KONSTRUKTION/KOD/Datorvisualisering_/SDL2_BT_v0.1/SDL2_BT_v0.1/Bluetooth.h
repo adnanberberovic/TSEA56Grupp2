@@ -158,7 +158,13 @@ void Get_Sensor_values(int8_t arrTarget[], int size, uint8_t startbit_)
 		cerr << "Reading from file failed!\n";
 	}
 	if (BytesRead_ != size){
-		cerr << "Bytes read did not match arr size! :  " << BytesRead_ << "   " << (sizeof(arrTarget) / sizeof(arrTarget[0])) << endl;
+		cerr << "Bytes read did not match arr size! :  " << BytesRead_ << endl;
+		cerr << "Size of arr:" << (sizeof(arrTarget) / sizeof(arrTarget[0])) << endl;
+		for (int i = 0; i < (sizeof(arrTarget) / sizeof(arrTarget[0])); i++)
+		{
+			cerr << arrTarget[i] << endl;
+		}
+		
 	}
 	//cout << "Bytes re1ad: " << BytesRead_ << "____" << static_cast<int>(arrTarget[0]) << static_cast<int>(arrTarget[1]) << static_cast<int>(arrTarget[2]) << static_cast<int>(arrTarget[3]) << endl;
 
