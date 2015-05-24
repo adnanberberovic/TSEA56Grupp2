@@ -257,7 +257,7 @@ void Send_speed_value()
 void Send_map_values(){
 	uint8_t posX_ = MAP_currentPos[1];
 	uint8_t posY_ = MAP_currentPos[0];
-	uint8_t first_byte = posX_ * 16; //set X-pos to 4 MSB bits
+	uint8_t first_byte = posX_ * 8; //set X-pos to 5 MSB bits
 	first_byte = first_byte + MAP_currentDir; //set dir to 2 lsb bits
 	
 	uint8_t second_byte = posY_ * 8; // set Y-pos to 5 MSB bits
@@ -2141,7 +2141,7 @@ void AutomaticControl()
 		DISCOVERY_SetMode();
 		DEAD_END();
 		MAP_rotate();
-		
+		angle_ = 0;
 		
 	}
 	if((distance_counter >= 7) && (distance_flag == 1))
