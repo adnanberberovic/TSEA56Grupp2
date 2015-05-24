@@ -1577,6 +1577,9 @@ void MAP_main()
 
 void set_map_FourWay()
 {
+	uint8_t posY_ = MAP_currentPos[0];
+	uint8_t posX_ = MAP_currentPos[1];
+	
     if (MAP_currentDir == 0)
     {
         MAP_array[posY_ - 1][posX_].description = 3;
@@ -1603,9 +1606,11 @@ void set_map_FourWay()
     }
 }
 
-
 void set_map_ThreeWay2()
 {
+	uint8_t posY_ = MAP_currentPos[0];
+	uint8_t posX_ = MAP_currentPos[1];
+	
     if (MAP_currentDir == 0)
     {
         MAP_array[posY_ - 1][posX_].description = 3;
@@ -1632,9 +1637,11 @@ void set_map_ThreeWay2()
     }
 }
 
-
 void set_map_ThreeWay3()
 {
+	uint8_t posY_ = MAP_currentPos[0];
+	uint8_t posX_ = MAP_currentPos[1];
+	
     if (MAP_currentDir == 0)
     {
         MAP_array[posY_ - 1][posX_].description = 4;
@@ -1663,6 +1670,9 @@ void set_map_ThreeWay3()
 
 void set_map_RightTurn()
 {
+	uint8_t posY_ = MAP_currentPos[0];
+	uint8_t posX_ = MAP_currentPos[1];
+
     if (MAP_currentDir == 0)
     {
         MAP_array[posY_ - 1][posX_].description = 4;
@@ -1691,6 +1701,9 @@ void set_map_RightTurn()
 
 void set_map_ThreeWay1()
 {
+	uint8_t posY_ = MAP_currentPos[0];
+	uint8_t posX_ = MAP_currentPos[1];
+	
     if (MAP_currentDir == 0)
     {
         MAP_array[posY_ - 1][posX_].description = 3;
@@ -1719,6 +1732,9 @@ void set_map_ThreeWay1()
 
 void set_map_LeftTurn()
 {
+	uint8_t posY_ = MAP_currentPos[0];
+	uint8_t posX_ = MAP_currentPos[1];
+	
     if (MAP_currentDir == 0)
     {
         MAP_array[posY_ - 1][posX_].description = 3;
@@ -1747,6 +1763,9 @@ void set_map_LeftTurn()
 
 void set_map_DeadEnd()
 {
+	uint8_t posY_ = MAP_currentPos[0];
+	uint8_t posX_ = MAP_currentPos[1];
+	
     if (MAP_currentDir == 0)
     {
         MAP_array[posY_ - 1][posX_].description = 4;
@@ -1775,6 +1794,9 @@ void set_map_DeadEnd()
 
 void set_map_Corridor()
 {
+	uint8_t posY_ = MAP_currentPos[0];
+	uint8_t posX_ = MAP_currentPos[1];
+	
     if (MAP_currentDir == 0)
     {
         MAP_array[posY_ - 1][posX_].description = 4;
@@ -1850,12 +1872,12 @@ void Junction()
     if ((PathCountLeft > 0) && (PathCountRight > 0)) // 4-way or 3-way-2
     {
         if (PathAhead) // 4-way
-        {
-            uint8_t posY_ = MAP_currentPos[0];
-            uint8_t posX_ = MAP_currentPos[1];
-
-            
-            set_map_FourWay();
+        {            
+			
+			if(MAP_array[MAP_currentPos[0]][MAP_currentPos[1]].description == 0)
+			{
+				set_map_FourWay();
+			}
             
             MAP_main();
             DISCOVERY_SetMode();
@@ -1865,10 +1887,11 @@ void Junction()
         }
         else // 3-way-2
         {
-            uint8_t posY_ = MAP_currentPos[0];
-            uint8_t posX_ = MAP_currentPos[1];
-            
-            set_map_ThreeWay2();
+			
+			if(MAP_array[MAP_currentPos[0]][MAP_currentPos[1]].description == 0)
+			{
+				set_map_ThreeWay2();
+			}
             
             MAP_main();
             DISCOVERY_SetMode();
@@ -1882,11 +1905,10 @@ void Junction()
     {
         if (PathAhead) // 3-w-3
         {
-
-            uint8_t posY_ = MAP_currentPos[0];
-            uint8_t posX_ = MAP_currentPos[1];
-            
-            set_map_ThreeWay3();
+			if(MAP_array[MAP_currentPos[0]][MAP_currentPos[1]].description == 0)
+			{
+			    set_map_ThreeWay3();
+			}
             
             MAP_main();
             DISCOVERY_SetMode();
@@ -1897,11 +1919,10 @@ void Junction()
         }
         else //if (PathCountLeft == 0) //Right turn
         {
-
-            uint8_t posY_ = MAP_currentPos[0];
-            uint8_t posX_ = MAP_currentPos[1];
-
-            set_map_RightTurn();
+			if(MAP_array[MAP_currentPos[0]][MAP_currentPos[1]].description == 0)
+			{
+				set_map_RightTurn();
+			}
             
             MAP_main();
             DISCOVERY_SetMode();
@@ -1915,11 +1936,10 @@ void Junction()
     {
         if (PathAhead) // 3-way-1
         {
-
-            uint8_t posY_ = MAP_currentPos[0];
-            uint8_t posX_ = MAP_currentPos[1];
-            
-            set_map_ThreeWay1();
+			if(MAP_array[MAP_currentPos[0]][MAP_currentPos[1]].description == 0)
+			{
+				set_map_ThreeWay1();
+			}
             
             MAP_main();
             DISCOVERY_SetMode();
@@ -1929,11 +1949,10 @@ void Junction()
         }
         else //if (PathCountRight == 0)// Left turn
         {
-
-            uint8_t posY_ = MAP_currentPos[0];
-            uint8_t posX_ = MAP_currentPos[1];
-            
-            set_map_LeftTurn();
+	        if(MAP_array[MAP_currentPos[0]][MAP_currentPos[1]].description == 0)
+			{
+				set_map_LeftTurn();
+			}
             
             MAP_main();
             DISCOVERY_SetMode();
@@ -1944,18 +1963,16 @@ void Junction()
     }
     else if (WallCloseAhead)
     {
-        uint8_t posY_ = MAP_currentPos[0];
-        uint8_t posX_ = MAP_currentPos[1];
-        
         MOTOR_Stop();
         LCD_Clear();
         LCD_SendString("Dead End");
         LCD_SetPosition(16);
         LCD_SendString("I sväng IF.. FEL");
         while(1);
-        
-        set_map_DeadEnd();
-        
+        if(MAP_array[MAP_currentPos[0]][MAP_currentPos[1]].description == 0)
+        {
+			set_map_DeadEnd();
+		}
         
         MAP_main();
         DISCOVERY_SetMode();
@@ -2075,11 +2092,11 @@ void AutomaticControl()
 	if (WALL_CLOSE_AHEAD()) // dead end square
 	{
 		MAP_moveForward();
-
-		uint8_t posY_ = MAP_currentPos[0];
-		uint8_t posX_ = MAP_currentPos[1];
-			
-        set_map_DeadEnd();
+		
+		if(MAP_array[MAP_currentPos[0]][MAP_currentPos[1]].description == 0)
+		{
+			set_map_DeadEnd();			
+		}
 		
 		MAP_main();
 		DISCOVERY_SetMode();
@@ -2091,11 +2108,11 @@ void AutomaticControl()
 	if((distance_counter >= 7) && (distance_flag == 1))
 	{
 		MAP_moveForward();
-
-		uint8_t posY_ = MAP_currentPos[0];
-		uint8_t posX_ = MAP_currentPos[1];
-        
-        set_map_Corridor();
+		
+		if(MAP_array[MAP_currentPos[0]][MAP_currentPos[1]].description == 0)
+		{
+			set_map_Corridor();			
+		}
 		
 		MAP_main();
 		DISCOVERY_SetMode();
