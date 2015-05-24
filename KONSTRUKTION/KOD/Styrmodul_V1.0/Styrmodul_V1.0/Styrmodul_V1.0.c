@@ -2122,6 +2122,7 @@ void AutomaticControl()
 	if( (PathCountLeft > 0) || (PathCountRight > 0) ){ //Path to left or right
 		
         Junction();
+		Send_map_values();
 		
 	}
 	else if ( !( LeftPathOne || RightPathOne) || 
@@ -2134,7 +2135,6 @@ void AutomaticControl()
 	if (WALL_CLOSE_AHEAD()) // dead end square
 	{
 		MAP_moveForward();
-		
 		set_map_DeadEnd();
 		
 		MAP_main();
@@ -2142,7 +2142,7 @@ void AutomaticControl()
 		DEAD_END();
 		MAP_rotate();
 		angle_ = 0;
-		
+		Send_map_values();
 	}
 	if((distance_counter >= 7) && (distance_flag == 1))
 	{
@@ -2153,7 +2153,7 @@ void AutomaticControl()
 		MAP_main();
 		DISCOVERY_SetMode();
 		MAP_rotate();
-		 				
+		Send_map_values();
 		distance_flag = 0;
 	}
 }
