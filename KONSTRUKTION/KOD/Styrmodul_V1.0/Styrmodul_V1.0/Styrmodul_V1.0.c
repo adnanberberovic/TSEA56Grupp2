@@ -1869,7 +1869,7 @@ void AutomaticControl()
 			uint8_t posY_ = MAP_currentPos[0];
 			uint8_t posX_ = MAP_currentPos[1];
 			// change description of all surrounding squares to path
-			
+			//
 			if (MAP_currentDir == 0)
 			{
 				MAP_array[posY_ - 1][posX_].description = 4;
@@ -1933,13 +1933,13 @@ void AutomaticControl()
 
 		
 	}
+
 	else if ( !( LeftPathOne || RightPathOne) || 
 			(LeftPathOne && (arrSensor[1] > 26) /*ROoffs*/) ||  //To close to right wall
 			(RightPathOne && (arrSensor[3] > 14)/*LOffs*/) ) //To close to left wall
 	{
 		
 		Get_sensor_values();
-		
 		if( ((arrSensor[1] + arrSensor[3]) / 2) < 20)
 		{
 			if((arrSensor[2] - angle_) > 10)
