@@ -39,6 +39,8 @@ int speed_var = 200;
 uint8_t distance_flag = 0;
 
 uint8_t holds_item = 0;
+uint8_t arrMap[3] = {0, 0, 0}; //[0] = {xpos(4) + dir(2)}, [1] = {y-pos(5) + mål(1)}, [2] = {left(2) + ahead(2) + right(2)}
+
 
 int reference_ = 20;// Reference value for where we want to place the robot.
 int offset_;		// Compared to reference.
@@ -251,6 +253,54 @@ void Send_speed_value()
 	{
 		SPI_MasterTransmit(arrSpeedout[i],'k');
 	}
+}
+void Send_map_values(){
+	uint8_t posX_ = MAP_currentPos[1];
+	uint8_t posY_ = MAP_currentPos[0];
+	uint8_t first_byte = posX_ * 16; //set X-pos to 4 MSB bits
+	first_byte = first_byte + MAP_currentDir; //set dir to 2 lsb bits
+	
+	uint8_t second_byte = posY_ * 8; // set Y-pos to 5 MSB bits
+	if ((MAP_goalPosition[0] == MAP_currentPos[0]) && (MAP_goalPosition[1] == MAP_currentPos[1])) //Sends goal-bit if goal
+	{
+		second_byte = second_byte + 1;
+	}
+	else
+	{
+		second_byte = second_byte + 0;
+	}
+	
+	uint8_t third_byte = 0;
+	if (MAP_currentDir == 0) // right in map
+	{
+		third_byte = third_byte + (MAP_array[posY_ - 1][posX_].description - 1) * 64; //Up in map, left for bot
+		third_byte = third_byte + (MAP_array[posY_][posX_ + 1].description - 1) * 16; //right in map, forward for bot
+		third_byte = third_byte + (MAP_array[posY_ + 1][posX_].description - 1) * 4; // down in map, right for bot
+	}
+	else if (MAP_currentDir == 1) // up in map
+	{
+		third_byte = third_byte + (MAP_array[posY_][posX_ - 1].description - 1) * 64; //Left in map and bot
+		third_byte = third_byte + (MAP_array[posY_ - 1][posX_].description - 1) * 16; // up in map and forward for bot
+		third_byte = third_byte + (MAP_array[posY_][posX_ + 1].description - 1) * 4; // right in map and bot
+	}
+	else if (MAP_currentDir == 2) // left in map
+	{
+		third_byte = third_byte + (MAP_array[posY_ + 1][posX_].description - 1) * 64; // down in map, left for bot
+		third_byte = third_byte + (MAP_array[posY_][posX_ - 1].description - 1) * 16; // left in map, forward for bot
+		third_byte = third_byte + (MAP_array[posY_ - 1][posX_].description - 1) * 4; // up in map, right for bot
+
+	}
+	else if (MAP_currentDir == 3)  // down in map
+	{
+		third_byte = third_byte + (MAP_array[posY_][posX_ + 1].description - 1) * 64; // right in map, left for bot
+		third_byte = third_byte + (MAP_array[posY_ + 1][posX_].description - 1) * 16; // down in map, forward for bot
+		third_byte = third_byte + (MAP_array[posY_][posX_ - 1].description - 1)  * 4; //left in map, right for bot
+	}
+	
+	SPI_MasterTransmit(69,'k');
+	SPI_MasterTransmit(first_byte,'k');
+	SPI_MasterTransmit(second_byte,'k');
+	SPI_MasterTransmit(third_byte,'k');
 }
 
 //__________________________TIMERS__________________________
