@@ -273,21 +273,21 @@ void Send_map_values(){
 	uint8_t third_byte = 0;
 	if (MAP_currentDir == 0) // right in map
 	{
-		third_byte = third_byte + (MAP_array[posY_ - 1][posX_].description - 1) * 64; //Up in map, left for bot
-		third_byte = third_byte + (MAP_array[posY_][posX_ + 1].description - 1) * 16; //right in map, forward for bot
-		third_byte = third_byte + (MAP_array[posY_ + 1][posX_].description - 1) * 4; // down in map, right for bot
+		third_byte = third_byte + (MAP_array[posY_ - 1][posX_].description - 2) * 64; //Up in map, left for bot
+		third_byte = third_byte + (MAP_array[posY_][posX_ + 1].description - 2) * 16; //right in map, forward for bot
+		third_byte = third_byte + (MAP_array[posY_ + 1][posX_].description - 2) * 4; // down in map, right for bot
 	}
 	else if (MAP_currentDir == 1) // up in map
 	{
-		third_byte = third_byte + (MAP_array[posY_][posX_ - 1].description - 1) * 64; //Left in map and bot
-		third_byte = third_byte + (MAP_array[posY_ - 1][posX_].description - 1) * 16; // up in map and forward for bot
-		third_byte = third_byte + (MAP_array[posY_][posX_ + 1].description - 1) * 4; // right in map and bot
+		third_byte = third_byte + (MAP_array[posY_][posX_ - 1].description - 2) * 64; //Left in map and bot
+		third_byte = third_byte + (MAP_array[posY_ - 1][posX_].description - 2) * 16; // up in map and forward for bot
+		third_byte = third_byte + (MAP_array[posY_][posX_ + 1].description - 2) * 4; // right in map and bot
 	}
 	else if (MAP_currentDir == 2) // left in map
 	{
-		third_byte = third_byte + (MAP_array[posY_ + 1][posX_].description - 1) * 64; // down in map, left for bot
-		third_byte = third_byte + (MAP_array[posY_][posX_ - 1].description - 1) * 16; // left in map, forward for bot
-		third_byte = third_byte + (MAP_array[posY_ - 1][posX_].description - 1) * 4; // up in map, right for bot
+		third_byte = third_byte + (MAP_array[posY_ + 1][posX_].description - 2) * 64; // down in map, left for bot
+		third_byte = third_byte + (MAP_array[posY_][posX_ - 1].description - 2) * 16; // left in map, forward for bot
+		third_byte = third_byte + (MAP_array[posY_ - 1][posX_].description - 2) * 4; // up in map, right for bot
 
 	}
 	else if (MAP_currentDir == 3)  // down in map
