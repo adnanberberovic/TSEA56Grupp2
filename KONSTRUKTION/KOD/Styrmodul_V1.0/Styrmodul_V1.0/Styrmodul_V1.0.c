@@ -1535,12 +1535,6 @@ void DISCOVERY_SetMode()
 	else if(mode == 2)
 	{
 		discovery_mode = 'b';
-				MOTOR_Stop();
-				_delay_ms(250);
-				_delay_ms(250);
-				_delay_ms(250);
-				_delay_ms(250);
-				MOTOR_Forward(standard_speed_);
 	}
 	else if(mode == 3)
 	{
@@ -1565,6 +1559,11 @@ void DISCOVERY_SetMode()
 */
 void JUNCTION_ThreeWayONE()
 {
+	MOTOR_Stop();
+	LCD_SendString("   3V3   ");
+	_delay_ms(25);
+	MOTOR_Forward(standard_speed_);
+	
 	if (discovery_mode == 'l')
 	{
 		TURN_Left(1);
@@ -1719,7 +1718,7 @@ MOTOR_Forward(standard_speed_);
 		}
 		
 		JUNCTION_delay(3);
-		return;
+		//return;
 	}
 	
 	else if (discovery_mode == '?')
@@ -1827,14 +1826,6 @@ void MAP_main()
 			}
 			else if (MAP_unexploredSquares == 0)
 			{
-				LCD_Clear();
-				LCD_SendString("   DEAD END   ");
-				_delay_ms(250);
-				_delay_ms(250);
-				_delay_ms(250);
-				_delay_ms(250);
-				_delay_ms(250);
-				LCD_Clear();
 				MAP_nextDir = (MAP_currentDir + 2) % 4;
 				MAP_rotating_ = 1;
 				MAP_movingForward_ = 1;
@@ -1964,39 +1955,52 @@ void MAP_main()
 	LCD_SendString("nD");
 	LCD_display_uint16(MAP_nextDir);
 	LCD_SendString(" ");
+	LCD_SendString("J:");
+	LCD_display_uint16(MAP_array[posY_][posX_].description);
+	LCD_SendString(" ");
 }
 
 
 void Floor_Marker()
 {
     if (REFLEX_GetMarker())
-    {
+	{
+		MOTOR_Stop();
+		_delay_ms(250);
+		_delay_ms(250);
+		SERVO_LevelLow();
+		_delay_ms(250);
+		_delay_ms(250);
+		SERVO_ReleaseGrip();
+		_delay_ms(250);
+		_delay_ms(250);
+	}
         //if(MAP_currentPos[0] != 16 && MAP_currentPos[1] != 15)
         //{
-        //if(resque_mode == 'd')
-        //{
-        //MAP_setGoal();
-        //resque_mode = 'q';
-        //}
-        //else if(resque_mode == 'q' && holds_item)
-        //{
-        //SERVO_ReleaseGrip();
-        //}
+	        //if(resque_mode == 'd')
+	        //{
+		        //MAP_setGoal();
+		        //resque_mode = 'q';
+	        //}
+	        //else if(resque_mode == 'q' && holds_item)
+	        //{
+		        //SERVO_ReleaseGrip();
+	        //}
         //}
         //else
         //{
-        //MOTOR_Stop();
-        //for(uint8_t i = 0; i<5; i++){
-        //_delay_ms(250);
+	        //MOTOR_Stop();
+	        //for(uint8_t i = 0; i<5; i++){
+		        //_delay_ms(250);
+	        //}
+	        //SERVO_SetGrip();
+	        //holds_item = 1;
+	        //for(uint8_t i = 0; i<5; i++){
+		        //_delay_ms(250);
+	        //}
+	        //MOTOR_Forward(standard_speed_);
         //}
-        //SERVO_SetGrip();
-        //holds_item = 1;
-        //for(uint8_t i = 0; i<5; i++){
-        //_delay_ms(250);
-        //}
-        //MOTOR_Forward(standard_speed_);
-        //}
-    }
+    //}
 }
 
 void Junction()
@@ -2322,7 +2326,18 @@ void AutomaticControl()
 	
 	Update_All_FUCKING_values();
 	
-    Floor_Marker();
+	if (REFLEX_GetMarker())
+	{
+		MOTOR_Stop();
+		_delay_ms(250);
+		_delay_ms(250);
+		SERVO_LevelLow();
+		_delay_ms(250);
+		_delay_ms(250);
+		SERVO_ReleaseGrip();
+		_delay_ms(250);
+		_delay_ms(250);
+	}
 
 	
 	if( (PathCountLeft > 0) || (PathCountRight > 0) ){ //Path to left or right
@@ -2427,12 +2442,14 @@ int main(void)
 				LCD_SendString("nDir:");
 				LCD_display_uint16(MAP_nextDir);
 				LCD_SendString(" ");
-				LCD_SendString("CJ:");
-				LCD_display_uint16(MAP_currentJunction);
+				LCD_SetPosition(16);
+				LCD_SendString("jC:");
+				LCD_display_uint16(MAP_junctionCount);
 				LCD_SendString(" ");
     		}
 			if(!MAP_LOOPer)
 			{
+				
 				MOTOR_Stop();
 				LCD_Clear();
 				LCD_SetPosition(0);
@@ -2476,8 +2493,8 @@ int main(void)
 				LCD_SendString("BR");
 				LCD_display_int8(RIGHTPATHBOTH());
 				LCD_SendString(" ");
-				LCD_SendString("OR");
-				LCD_display_uint8(RIGHTPATHONE());
+				LCD_SendString("Re");
+				LCD_display_uint8(REFLEX_GetMarker());
 				LCD_SendString(" ");
 				_delay_ms(10);
     		}
