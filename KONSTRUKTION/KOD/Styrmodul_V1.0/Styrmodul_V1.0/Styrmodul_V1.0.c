@@ -669,7 +669,7 @@ uint8_t PATHCOUNT_Right()
 	return PathCountRight;
 }
 
-void Update_All_FUCKING_values()
+void Update_All_values()
 {
 	Get_sensor_values();
 
@@ -1426,11 +1426,11 @@ void TURN_Back(int mode)
 	{
 		if( offset_ > 20)
 		{
-			MOTOR_RotateLeft(90 - angle_);
+			MOTOR_RotateLeft(180 - angle_);
 		}
 		else
 		{
-			MOTOR_RotateLeft(90 + angle_);
+			MOTOR_RotateLeft(180 + angle_);
 		}
 				
 		_delay_ms(100);
@@ -1638,6 +1638,14 @@ void JUNCTION_ThreeWayTWO()
 	}
 	else if (discovery_mode == 'b')
 	{
+		MOTOR_Stop();
+		_delay_ms(250);
+		_delay_ms(250);
+		_delay_ms(250);
+		_delay_ms(250);
+		LCD_Clear();
+		LCD_SendString(" TUUURN BACK 3v2");
+		MOTOR_Forward(standard_speed_);
 		TURN_Back(2);
 	}
 	else if ((discovery_mode == 'l') || (discovery_mode == 'f'))
@@ -1796,12 +1804,15 @@ void MAP_main()
 			
 			// And if it has unexplored roads
 			// Else go to far junction phase
+			
+			//lägg till kanske: om korsningen bredvid mig har mig som granne är det okej.
+			//skapa rekursiv funktion?
 			int fatIf_;
 			fatIf_ = MAP_unexploredSquares -
-			(MAP_array[posY_ - 1][posX_].description == 5 && !MAP_junctionOrderArray[MAP_array[posY_ - 1][posX_].junctionNumber].hasUnex) -
-			(MAP_array[posY_ + 1][posX_].description == 5 && !MAP_junctionOrderArray[MAP_array[posY_ + 1][posX_].junctionNumber].hasUnex) -
-			(MAP_array[posY_][posX_ - 1].description == 5 && !MAP_junctionOrderArray[MAP_array[posY_][posX_ - 1].junctionNumber].hasUnex) -
-			(MAP_array[posY_][posX_ + 1].description == 5 && !MAP_junctionOrderArray[MAP_array[posY_][posX_ + 1].junctionNumber].hasUnex);
+					(MAP_array[posY_ - 1][posX_].description == 5 && !MAP_junctionOrderArray[MAP_array[posY_ - 1][posX_].junctionNumber].hasUnex) -
+					(MAP_array[posY_ + 1][posX_].description == 5 && !MAP_junctionOrderArray[MAP_array[posY_ + 1][posX_].junctionNumber].hasUnex) -
+					(MAP_array[posY_][posX_ - 1].description == 5 && !MAP_junctionOrderArray[MAP_array[posY_][posX_ - 1].junctionNumber].hasUnex) -
+					(MAP_array[posY_][posX_ + 1].description == 5 && !MAP_junctionOrderArray[MAP_array[posY_][posX_ + 1].junctionNumber].hasUnex);
 			if (fatIf_ >= 1)
 			{
 				MAP_currentJunction = MAP_array[posY_][posX_].junctionNumber;
@@ -1818,7 +1829,8 @@ void MAP_main()
 
 		}
 		// Or if it's a new square
-		else{
+		else
+		{
 			// If it's a junction, add it
 			// Else if it's a dead end, trace the way back to the previous junction
 			if (MAP_exploredSquares > 2)
@@ -1943,21 +1955,17 @@ void MAP_main()
 	MOTOR_Stop();
 	LCD_Clear();
 	LCD_SetPosition(0);
-	LCD_SendString("Y:");
-	LCD_display_uint16(MAP_currentPos[0]);
+	LCD_SendString("CJ:");
+	LCD_display_uint16(MAP_currentJunction);
 	LCD_SendString(" ");
-	LCD_SendString("X:");
-	LCD_display_uint16(MAP_currentPos[1]);
+	LCD_SendString("NJL:");
+	LCD_display_uint16(MAP_nextJunctionLong);
+	LCD_SendString("  ");
+	LCD_SendString("NJS");
+	LCD_display_uint16(MAP_nextJunctionShort);
 	LCD_SendString(" ");
-	LCD_SetPosition(16);
-	LCD_SendString("cD");
-	LCD_display_uint16(MAP_currentDir);
-	LCD_SendString(" ");
-	LCD_SendString("nD");
-	LCD_display_uint16(MAP_nextDir);
-	LCD_SendString(" ");
-	LCD_SendString("J:");
-	LCD_display_uint16(MAP_array[posY_][posX_].description);
+	LCD_SendString("hU:");
+	LCD_display_uint8(MAP_junctionOrderArray[MAP_array[MAP_currentPos[0]][MAP_currentPos[1]].junctionNumber].hasUnex);
 	LCD_SendString(" ");
 }
 
@@ -2010,7 +2018,7 @@ void Junction()
     
     while (!(LeftPathBoth) && !(RightPathBoth) && !(WallCloseAhead)) //Keep going until center of intersect
     {
-        Update_All_FUCKING_values();
+        Update_All_values();
         _delay_us(250);
 		
 		//Jump out of function if incorrect sensor value was given earlier.
@@ -2023,7 +2031,7 @@ void Junction()
 	
     MAP_moveForward();
     JUNCTION_delay(3);
-    
+    Update_All_values();
 	
     // Now in intersect. Determine what type:
     if ((PathCountLeft > 0) && (PathCountRight > 0)) // 4-way or 3-way-2
@@ -2325,28 +2333,14 @@ void Pre_PD_controll()
 void AutomaticControl()
 {
 	
-	Update_All_FUCKING_values();
+	Update_All_values();
 
-	Floor_Marker();
-
-// 	if (REFLEX_GetMarker())
-// 	{
-// 		MOTOR_Stop();
-// 		_delay_ms(250);
-// 		_delay_ms(250);
-// 		SERVO_LevelLow();
-// 		_delay_ms(250);
-// 		_delay_ms(250);
-// 		SERVO_ReleaseGrip();
-// 		_delay_ms(250);
-// 		_delay_ms(250);
-// 	}
+	//Floor_Marker();
 	
 	if( (PathCountLeft > 0) || (PathCountRight > 0) ){ //Path to left or right
-		
         Junction();
-		
 	}
+	
 	else if ( !( LeftPathOne || RightPathOne) || 
 			(LeftPathOne && (arrSensor[1] > 26) /*ROoffs*/) ||  //To close to right wall
 			(RightPathOne && (arrSensor[3] > 14)/*LOffs*/) ) //To close to left wall
