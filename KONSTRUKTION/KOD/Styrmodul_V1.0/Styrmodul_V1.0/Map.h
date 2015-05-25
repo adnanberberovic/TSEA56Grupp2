@@ -18,6 +18,7 @@ uint8_t MAP_travelledDist = 0; // Number of squares travelled from the previous 
 uint8_t MAP_lastJunctionDir = 0; // Direction out of the last junction
 uint8_t MAP_nextJunctionShort = 0; // The immediate next desired junction
 uint8_t MAP_nextJunctionLong = 0; // The long-term desired junction
+uint8_t MAP_mapped = 0;
 
 // Flags used to navigate between the different phases in the main function
 uint8_t MAP_operatingMode_ = 0; // 0 = normal, 2 = go to next junction long, 3 = go to next junction short, 4 = goal discovered
@@ -72,5 +73,6 @@ void MAP_moveForward();
 uint8_t MAP_getDirection(uint8_t, uint8_t);
 void MAP_main();
 void MAP_checkIfDone();
+void MAP_findPath(unsigned int, unsigned int);
 
 #endif

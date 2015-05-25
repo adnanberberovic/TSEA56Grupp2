@@ -717,44 +717,60 @@ void set_map_right(int desc)
 {
 	uint8_t posY_ = MAP_currentPos[0];
 	uint8_t posX_ = MAP_currentPos[1];
-	
-	if (MAP_array[posY_][posX_ + 1].description == 0)
-	{
-		MAP_array[posY_][posX_ + 1].description = desc;
-	}
+	MAP_array[posY_][posX_ + 1].description = desc;
+// 	if (MAP_array[posY_][posX_ + 1].description == 0)
+// 	{
+// 		MAP_array[posY_][posX_ + 1].description = desc;
+// 	}
+// 	else if (MAP_array[posY_][posX_ + 1].description == 4 && desc == 3)
+// 	{
+// 		MAP_array[posY_][posX_ + 1].description = desc;
+// 	}
 }
 
 void set_map_up(int desc)
 {
 	uint8_t posY_ = MAP_currentPos[0];
 	uint8_t posX_ = MAP_currentPos[1];
-	
-	if (MAP_array[posY_ - 1][posX_].description == 0)
-	{
-		MAP_array[posY_ - 1][posX_].description = desc;
-	}
+	MAP_array[posY_ - 1][posX_].description = desc;
+// 	if (MAP_array[posY_ - 1][posX_].description == 0)
+// 	{
+// 		MAP_array[posY_ - 1][posX_].description = desc;
+// 	}
+// 	else if (MAP_array[posY_ - 1][posX_].description == 4 && desc == 3)
+// 	{
+// 		MAP_array[posY_ - 1][posX_].description = desc;
+// 	}
 }
 
 void set_map_left(int desc)
 {
 	uint8_t posY_ = MAP_currentPos[0];
 	uint8_t posX_ = MAP_currentPos[1];
-	
-	if (MAP_array[posY_][posX_ - 1].description == 0)
-	{
-		MAP_array[posY_][posX_ - 1].description = desc;
-	}
+	MAP_array[posY_][posX_ - 1].description = desc;
+// 	if (MAP_array[posY_][posX_ - 1].description == 0)
+// 	{
+// 		MAP_array[posY_][posX_ - 1].description = desc;
+// 	}
+// 	else if (MAP_array[posY_][posX_ - 1].description == 4 && desc == 3)
+// 	{
+// 		MAP_array[posY_][posX_ - 1].description = desc;
+// 	}
 }
 
 void set_map_down(int desc)
 {
 	uint8_t posY_ = MAP_currentPos[0];
 	uint8_t posX_ = MAP_currentPos[1];
-	
-	if (MAP_array[posY_ + 1][posX_].description == 0)
-	{
-		MAP_array[posY_ + 1][posX_].description = desc;
-	}
+	MAP_array[posY_ + 1][posX_].description = desc;
+// 	if (MAP_array[posY_ + 1][posX_].description == 0)
+// 	{
+// 		MAP_array[posY_ + 1][posX_].description = desc;
+// 	}
+// 	else if (MAP_array[posY_ + 1][posX_].description == 4 && desc == 3)
+// 	{
+// 		MAP_array[posY_ + 1][posX_].description = desc;
+// 	}
 }
 
 void set_map_FourWay()
@@ -1425,6 +1441,9 @@ void TURN_Back(int mode)
 	}
 	else if(mode == 3) // 3-way-3
 	{
+		MOTOR_Stop();
+		MOTOR_RotateRight(180);
+		MOTOR_RotateRight(180);
 		Get_sensor_values();
 		int angle_left =  arrSensor[2];
 		
@@ -1449,6 +1468,26 @@ void TURN_Back(int mode)
 		distance_counter = 0;
 		distance_flag = 0;
 	}
+	
+	else if(mode == 4) // corridor
+	{
+		if( offset_ > 20)
+		{
+			MOTOR_RotateLeft(180 - angle_);
+		}
+		else
+		{
+			MOTOR_RotateLeft(180 + angle_);
+		}
+		
+		_delay_ms(100);
+		MOTOR_Forward(standard_speed_);
+		
+		distance_counter = 0;
+		distance_flag = 0;
+	}
+	
+	
 	
 	while((PATHCOUNT_Left() > 0) || (PATHCOUNT_Right() > 0))
 	{
@@ -1497,6 +1536,12 @@ void DISCOVERY_SetMode()
 	else if(mode == 2)
 	{
 		discovery_mode = 'b';
+				MOTOR_Stop();
+				_delay_ms(250);
+				_delay_ms(250);
+				_delay_ms(250);
+				_delay_ms(250);
+				MOTOR_Forward(standard_speed_);
 	}
 	else if(mode == 3)
 	{
@@ -1548,7 +1593,14 @@ void JUNCTION_ThreeWayONE()
 	
 	else if (discovery_mode == 'b')
 	{
+		MOTOR_Stop();
+		_delay_ms(250);
+		_delay_ms(250);
+		_delay_ms(250);
+		_delay_ms(250);
+		MOTOR_Forward(standard_speed_);
 		TURN_Back(1);
+
 	}
 	
 	else if (discovery_mode == '?')
@@ -1635,6 +1687,12 @@ void JUNCTION_ThreeWayTHREE()
 	
 	else if (discovery_mode == 'b')
 	{
+		MOTOR_Stop();
+		_delay_ms(250);
+		_delay_ms(250);
+		_delay_ms(250);
+		_delay_ms(250);
+		MOTOR_Forward(standard_speed_);
 		TURN_Back(3);
 	}
 	
@@ -1721,9 +1779,15 @@ void MAP_main()
 			if (fatIf_ >= 1)
 			{
 				MAP_currentJunction = MAP_array[posY_][posX_].junctionNumber;
-				MAP_junctionOrderArray[MAP_array[posY_][posX_].junctionNumber].hasUnex = 0;
+				//MAP_junctionOrderArray[MAP_array[posY_][posX_].junctionNumber].hasUnex = 0;
 			}
-			else{
+			else if(fatIf_ == 0)
+			{
+				if (MAP_mapped == 1)
+				{
+					MAP_nextJunctionLong = 0;
+				}
+				
 				MAP_currentJunction = MAP_array[posY_][posX_].junctionNumber;
 				MAP_junctionOrderArray[MAP_currentJunction].hasUnex = 0;
 				MAP_decideDestination();
@@ -1853,7 +1917,8 @@ void MAP_main()
 	}
 
 	// Checks if all the map has been explored
-	// MAP_checkIfDone();
+	//MAP_checkIfDone();
+	
 }
 
 
@@ -2229,7 +2294,7 @@ void AutomaticControl()
 		MAP_rotate();
 		angle_ = 0;
 	}
-	if((distance_counter >= 7) && (distance_flag == 1))
+	if((distance_counter >= 10) && (distance_flag == 1))
 	{
 		MAP_moveForward();
 		
@@ -2237,6 +2302,11 @@ void AutomaticControl()
 		
 		MAP_main();
 		DISCOVERY_SetMode();
+		
+		if (discovery_mode == 'b')
+		{
+			//TURN_Back(4);
+		}
 		MAP_rotate();
 		distance_flag = 0;
 	}
@@ -2262,6 +2332,8 @@ void INIT_ALL()
 	
 	distance_counter = 0;
 	distance_flag = 0;
+	//MAP_addJunction();
+	//MAP_junctionOrderArray[MAP_currentJunction].hasUnex = 0;
 	MAP_array[16][15].description = 3;
 	MAP_currentDir = 1;
 	MAP_nextDir = 1;
@@ -2287,17 +2359,23 @@ int main(void)
 				LCD_SetPosition(0);
 				LCD_SendString("Y:");
 				LCD_display_uint16(MAP_currentPos[0]);
-				LCD_SendString("  ");
+				LCD_SendString(" ");
 				LCD_SendString("X:");
 				LCD_display_uint16(MAP_currentPos[1]);
-				LCD_SendString("  ");
+				LCD_SendString(" ");
+				LCD_SendString("Ar:");
+				LCD_display_uint16(MAP_junctionOrderArray[0].hasUnex);
+				LCD_SendString(" ");
 				LCD_SetPosition(16);
-				LCD_SendString("CD:");
-				LCD_display_uint16(MAP_currentDir);
-				LCD_SendString("  ");
-				LCD_SendString("ND:");
-				LCD_display_uint16(MAP_nextDir);
-				LCD_SendString("  ");
+				LCD_SendString("NJL:");
+				LCD_display_uint16(MAP_nextJunctionLong);
+				LCD_SendString(" ");
+				LCD_SendString("NJS:");
+				LCD_display_uint16(MAP_nextJunctionShort);
+				LCD_SendString(" ");
+				LCD_SendString("CJ:");
+				LCD_display_uint16(MAP_currentJunction);
+				LCD_SendString(" ");
     		}
 			if(!MAP_LOOPer)
 			{

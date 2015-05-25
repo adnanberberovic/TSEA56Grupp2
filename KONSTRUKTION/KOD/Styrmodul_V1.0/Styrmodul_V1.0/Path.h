@@ -27,8 +27,8 @@ typedef struct list_el item;
 
 //-------------------------------------------------------
 
-unsigned int MAP_startJunction = 0; //startrutan
-node * nodeArray[7]; // all junctions and also start/destination squares
+//unsigned int MAP_startJunction = 0; //startrutan
+node * nodeArray[64]; // all junctions and also start/destination squares
 
 // create two path-lists
 item * head1 = NULL, * head2 = NULL;

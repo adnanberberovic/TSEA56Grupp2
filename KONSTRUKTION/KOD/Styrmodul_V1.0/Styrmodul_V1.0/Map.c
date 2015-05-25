@@ -8,6 +8,7 @@
 
 #include <avr/io.h>
 #include "Map.h"
+#include "path.c"
 
 
 // Sets the position of the goal in the map
@@ -128,6 +129,7 @@ uint8_t MAP_checkDir(uint8_t dir)
 // The different modes for choosing direction are: 'r' for right-first, 'l' for left-first or 'a' for random 
 void MAP_decideDirection(char mode)
 {
+
 	char mode_ = mode;
 	uint8_t robotDir = MAP_currentDir;
 	
@@ -182,18 +184,23 @@ void MAP_countSquares()
 // SIM
 void MAP_decideDestination()
 {
+	MAP_lastUnexJunction(MAP_junctionCount);
+	MAP_findPath(MAP_currentJunction, MAP_nextJunctionLong);
+	MAP_nextJunctionShort = getNextJunction();
+	
+	
 	// Simpleton variant
 	//MAP_nextJunctionLong = MAP_lastUnexJunction(MAP_junctionCount);
-	MAP_lastUnexJunction(MAP_junctionCount);
-	if (MAP_nextJunctionLong == 255) {MAP_LOOPer = 0;}
-	else if (MAP_nextJunctionLong < MAP_currentJunction)
-	{
-		MAP_nextJunctionShort = MAP_currentJunction - 1;
-	}
-	else if (MAP_nextJunctionLong > MAP_currentJunction)
-	{
-		MAP_nextJunctionShort = MAP_currentJunction + 1;
-	}
+// 	MAP_lastUnexJunction(MAP_junctionCount);
+// 	if (MAP_nextJunctionLong == 255) {MAP_LOOPer = 0;}
+// 	else if (MAP_nextJunctionLong < MAP_currentJunction)
+// 	{
+// 		MAP_nextJunctionShort = MAP_currentJunction - 1;
+// 	}
+// 	else if (MAP_nextJunctionLong > MAP_currentJunction)
+// 	{
+// 		MAP_nextJunctionShort = MAP_currentJunction + 1;
+// 	}
 }
 
 // Adds the travelled distance from the last junction to specified junction in the junctionDistArray
@@ -351,38 +358,47 @@ uint8_t MAP_getDirection(uint8_t j1, uint8_t j2)
 // Checks if all squares have been explored, and if so, quits the main loop
 void MAP_checkIfDone()
 {
-	uint8_t i = 0;
-	uint8_t done_ = 0;
-
-	while (i < MAP_junctionCount)
-	{
-		done_ += MAP_junctionOrderArray[i].hasUnex;
-		i++;
-	}
-
-	if (!done_ && MAP_junctionCount)
-	{
-		MAP_LOOPer = 0;
-	}
+	uint8_t iterator = 0;
+	uint16_t done_ = 0;
+	
+// 	for (int i = 0; i < 16; i++)
+// 	{
+// 		for (int j = 0; j < 29; j++)
+// 		{
+// 			done_ += (MAP_array[i][j].visited == 0) && (MAP_array[i][j].description == 3);
+// 		}
+//  }
+// 	if (done_ == 0)
+// 	{
+// 		MAP_mapped = 1;
+// 	}
+	
+ 	while (iterator < MAP_junctionCount)
+ 	{
+ 		done_ += MAP_junctionOrderArray[iterator].hasUnex;
+ 		iterator++;
+ 	}
+ 
+ 	if (!done_ && MAP_junctionCount)
+ 	{
+ 		MAP_LOOPer = 0;
+ 	}
 }
 
-// The main searching function. Makes all the decisions
+void MAP_findPath(unsigned int j1, unsigned int j2) {
+	initNodeArray();
+	initPaths();
 
+	node * root;
+	root = nodeArray[j1];
+	root->nr = j1;
+	insert(&root, j2); // eventually the path is saved in a list
 
+	// the tree nodes point to nodeArray (left, middle, right, parent)
+	// should be enough to flush this array to free memory
+	flushNodeArray();
+	root->left = root->middle = root->right = root->parent = NULL;
+	root = NULL;
+	free(root);
 
-// detta behövs i en main för kartans del
-// int main(void)
-// {
-// 	// initiera robotens position
-// 	MAP_array[15][15].description = 3;
-// 	MAP_setVisited();
-// 
-// 
-// 	while (MAP_LOOPer)
-// 	{
-// 		//updateMap(); en stycke som uppdaterad kartan med nyförvärvad information
-// 		MAP_main();
-// 	}
-// 
-// 	return 0;
-// }
+}

@@ -15,9 +15,37 @@
 /* the shortest path will be saved
 either in head1 or head2 */
 
+unsigned int getNextJunction()
+{
+	item * curr;
+	if (head1)
+	{
+		curr = head1;
+	}
+	else
+	{
+		curr = head2;
+	}
+	unsigned int returner_;
+	if (curr->nr == MAP_currentJunction)
+	{
+		curr = curr->next;
+		returner_ = curr->nr;
+	}
+	else
+	{
+		do
+		{
+			curr = curr->next;
+			returner_ = curr->nr;
+		}
+		while (curr->nr != MAP_currentJunction);
+	}
+	return returner_;
+}
 
-void printPath() {
-	printf("shortest path:\n");
+void printPath(FILE *fp) {
+	fprintf(fp,"shortest path:\n");
 	item * curr;
 	if (head1) {
 		curr = head1;
@@ -26,9 +54,10 @@ void printPath() {
 		curr = head2;
 	}
 	while(curr) {
-      printf("%d\n", curr->nr);
+      fprintf(fp,"%d\n", curr->nr);
       curr = curr->next;
 	}
+	fflush(fp);
 }
 
 //för felsökning. tas bort sen
@@ -53,7 +82,7 @@ void printPathsTest() {
 // allocate memory to every node in nodeArray[i]
 void initNodeArray() {
 	unsigned int i;
-	for (i=0; i<7; i++) {
+	for (i=0; i<MAP_junctionCount; i++) {
 		nodeArray[i] = (node *)malloc(sizeof(node));
 		nodeArray[i]->left = nodeArray[i]->middle = nodeArray[i]->right = nodeArray[i]->parent = NULL;
 		nodeArray[i]->nr = i;
@@ -64,7 +93,7 @@ void initNodeArray() {
 // free memory the nodes in nodeArray occupy
 void flushNodeArray() {
 	unsigned int i;
-	for (i=0; i<7; i++) {
+	for (i=0; i<MAP_junctionCount; i++) {
 		nodeArray[i]->left = nodeArray[i]->middle = nodeArray[i]->right = nodeArray[i]->parent = NULL;
 		nodeArray[i] = NULL;
 		free(nodeArray[i]);
@@ -158,9 +187,9 @@ int node_exists(node ** tree, unsigned int nodeNr) {
 	return 0;
 }
 
-void insert(node ** tree) {
+void insert(node ** tree, unsigned int destJunction) {
 	//stop growing branch if reached desired leaf
-	if ((*tree)->nr == MAP_startJunction) { //0
+	if ((*tree)->nr == destJunction) { //0
 		// TO DO: save this path to a list(?) with cost /done
 		if (!head1) { // if list head1 is empty
 			// save path to head1
@@ -177,7 +206,7 @@ void insert(node ** tree) {
 		return;
 	}
 	unsigned int i, dist, child=1; // child shows the branch to insert in
-	for (i=0; i<7; i++) {
+	for (i=0; i<MAP_junctionCount; i++) {
 //			printf("i=");
 //			printf("%d\n", i);
 		if (!node_exists(tree, i)) { // parent control
@@ -193,21 +222,21 @@ void insert(node ** tree) {
 					nodeArray[i]->cost = (*tree)->cost + dist;
 					nodeArray[i]->parent = *tree;
 					(*tree)->left = nodeArray[i]; //connect nodes
-					insert(&(*tree)->left);
+					insert(&(*tree)->left, destJunction);
 					child++;// = 2;
 				}
 				else if (child == 2) {
 					nodeArray[i]->cost = (*tree)->cost + dist;
 					nodeArray[i]->parent = *tree;
 					(*tree)->middle = nodeArray[i]; //connect nodes
-					insert(&(*tree)->middle);
+					insert(&(*tree)->middle, destJunction);
 					child++;// = 3;
 				}
 				else if (child == 3) {
 					nodeArray[i]->cost = (*tree)->cost + dist;
 					nodeArray[i]->parent = *tree;
 					(*tree)->right = nodeArray[i]; //connect nodes
-					insert(&(*tree)->right);
+					insert(&(*tree)->right, destJunction);
 					child = 0;
 				}
 			}
@@ -215,41 +244,41 @@ void insert(node ** tree) {
 	}
 }
 
-void main() {
-	// tas bort sen:
-	MAP_junctionDistArray[0][1] = 3;	MAP_junctionDistArray[1][0] = 3;
-	MAP_junctionDistArray[1][2] = 4;	MAP_junctionDistArray[2][1] = 4;
-	MAP_junctionDistArray[2][3] = 5;	MAP_junctionDistArray[3][2] = 5;
-	MAP_junctionDistArray[3][5] = 7;	MAP_junctionDistArray[5][3] = 7;
-	MAP_junctionDistArray[3][4] = 3;	MAP_junctionDistArray[4][3] = 3;
-	MAP_junctionDistArray[5][0] = 13;	MAP_junctionDistArray[0][5] = 13;
-	MAP_junctionDistArray[5][6] = 2;	MAP_junctionDistArray[6][5] = 2;
-	MAP_junctionDistArray[6][0] = 7;	MAP_junctionDistArray[0][6] = 7;
-	MAP_junctionDistArray[1][6] = 6;	MAP_junctionDistArray[6][1] = 6;
-	/////////////////////////////////////////////////////////////////////
-	initNodeArray();
-	initPaths();
+// void main() {
+// 	// tas bort sen:
+// 	MAP_junctionDistArray[0][1] = 3;	MAP_junctionDistArray[1][0] = 3;
+// 	MAP_junctionDistArray[1][2] = 4;	MAP_junctionDistArray[2][1] = 4;
+// 	MAP_junctionDistArray[2][3] = 5;	MAP_junctionDistArray[3][2] = 5;
+// 	MAP_junctionDistArray[3][5] = 7;	MAP_junctionDistArray[5][3] = 7;
+// 	MAP_junctionDistArray[3][4] = 3;	MAP_junctionDistArray[4][3] = 3;
+// 	MAP_junctionDistArray[5][0] = 13;	MAP_junctionDistArray[0][5] = 13;
+// 	MAP_junctionDistArray[5][6] = 2;	MAP_junctionDistArray[6][5] = 2;
+// 	MAP_junctionDistArray[6][0] = 7;	MAP_junctionDistArray[0][6] = 7;
+// 	MAP_junctionDistArray[1][6] = 6;	MAP_junctionDistArray[6][1] = 6;
+// 	/////////////////////////////////////////////////////////////////////
+// 	initNodeArray();
+// 	initPaths();
 
-	node * root;
-	root = nodeArray[3];//MAP_currentJunction];
-	root->nr = 3;//MAP_currentJunction;
-	insert(&root); // eventually the path is saved in a list
+// 	node * root;
+// 	root = nodeArray[MAP_currentJunction];
+// 	root->nr = MAP_currentJunction;
+// 	insert(&root); // eventually the path is saved in a list
 
-	// the tree nodes point to nodeArray (left, middle, right, parent)
-	// should be enough to flush this array to free memory
-	flushNodeArray();
-	root->left = root->middle = root->right = root->parent = NULL;
-	root = NULL;
-	free(root);
+// 	// the tree nodes point to nodeArray (left, middle, right, parent)
+// 	// should be enough to flush this array to free memory
+// 	flushNodeArray();
+// 	root->left = root->middle = root->right = root->parent = NULL;
+// 	root = NULL;
+// 	free(root);
 
-	printPath();
-}
+// 	printPath();
+// }
 
 // TO DO:
-// - change max value for index i in all functions to MAP_junctionCount +/-1 (?)
-// - MAP_junctionCount should count start/destination squares as junctions (med Robert)
-// - MAP_junctionDistArray do for start/destination squares also (med Robert)
-// - MAP_startJunction needed or not? maybe can just set to 0 instead (med Robert)
+// - change max value for index i in all functions to MAP_junctionCount +/-1 (?) done
+// - MAP_junctionCount should count start/destination squares as junctions (med Robert) done
+// - MAP_junctionDistArray do for start/destination squares also (med Robert) done
+// - MAP_startJunction needed or not? maybe can just set to 0 instead (med Robert) not
 // - free memory where tree nodes are when path is found /done
 // - set node numbers /done
 // - initialize the nodeArray /done
