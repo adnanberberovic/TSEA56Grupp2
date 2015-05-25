@@ -1783,11 +1783,6 @@ void MAP_main()
 			}
 			else if(fatIf_ == 0)
 			{
-				if (MAP_mapped == 1)
-				{
-					MAP_nextJunctionLong = 0;
-				}
-				
 				MAP_currentJunction = MAP_array[posY_][posX_].junctionNumber;
 				MAP_junctionOrderArray[MAP_currentJunction].hasUnex = 0;
 				MAP_decideDestination();
@@ -2357,21 +2352,21 @@ int main(void)
 	    		AutomaticControl();
 				Send_sensor_values();
 				LCD_SetPosition(0);
-				LCD_SendString("Y:");
-				LCD_display_uint16(MAP_currentPos[0]);
-				LCD_SendString(" ");
-				LCD_SendString("X:");
-				LCD_display_uint16(MAP_currentPos[1]);
-				LCD_SendString(" ");
+// 				LCD_SendString("Y:");
+// 				LCD_display_uint16(MAP_currentPos[0]);
+// 				LCD_SendString(" ");
+// 				LCD_SendString("X:");
+// 				LCD_display_uint16(MAP_currentPos[1]);
+// 				LCD_SendString(" ");
 				LCD_SendString("Ar:");
 				LCD_display_uint16(MAP_junctionOrderArray[0].hasUnex);
 				LCD_SendString(" ");
-				LCD_SetPosition(16);
-				LCD_SendString("NJL:");
-				LCD_display_uint16(MAP_nextJunctionLong);
+				//LCD_SetPosition(16);
+				LCD_SendString("cDir:");
+				LCD_display_uint16(MAP_currentDir);
 				LCD_SendString(" ");
-				LCD_SendString("NJS:");
-				LCD_display_uint16(MAP_nextJunctionShort);
+				LCD_SendString("nDir:");
+				LCD_display_uint16(MAP_nextDir);
 				LCD_SendString(" ");
 				LCD_SendString("CJ:");
 				LCD_display_uint16(MAP_currentJunction);
