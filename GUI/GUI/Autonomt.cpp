@@ -389,7 +389,6 @@ void Autonom::update_map(int8_t xPosD, int8_t yPosM, int8_t LFR)
 	{
 		if (dir == 0)
 		{
-			cout << static_cast<char>(yPos) << " x:" << static_cast<char>(xPos) << endl;
 			(Tile_vector[xPos][yPos - 1])->change_tile(Left);
 			(Tile_vector[xPos + 1][yPos])->change_tile(Front);
 			(Tile_vector[xPos][yPos + 1])->change_tile(Right);
