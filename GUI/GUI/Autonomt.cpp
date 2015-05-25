@@ -224,6 +224,7 @@ void Autonom::init_Tiles()
 {
     for (int i = 30; i >= 0; i --){
         vector<Tile*> row;
+
         for (int j = 17; j >= 0; j--)
         {
             row.insert(row.begin(),
