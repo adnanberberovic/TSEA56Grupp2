@@ -1626,16 +1626,8 @@ void JUNCTION_ThreeWayONE()
 */
 void JUNCTION_ThreeWayTWO()
 {
-	if ((discovery_mode == 'l') || (discovery_mode == 'f'))
-	{
-		//Turn Left. Forward becomes left due to right-forward-left cycle.
-		while(!WALL_CLOSE_AHEAD())
-		{
-			_delay_us(250);
-		}
-		TURN_Left(0);
-	}
-	else if (discovery_mode == 'r')
+
+	if (discovery_mode == 'r')
 	{
 		// Turn right
 		while(!WALL_CLOSE_AHEAD())
@@ -1647,6 +1639,15 @@ void JUNCTION_ThreeWayTWO()
 	else if (discovery_mode == 'b')
 	{
 		TURN_Back(2);
+	}
+	else if ((discovery_mode == 'l') || (discovery_mode == 'f'))
+	{
+			//Turn Left. Forward becomes left due to right-forward-left cycle.
+			while(!WALL_CLOSE_AHEAD())
+			{
+				_delay_us(250);
+			}
+			TURN_Left(0);
 	}
 	else if (discovery_mode == '?')
 	{
