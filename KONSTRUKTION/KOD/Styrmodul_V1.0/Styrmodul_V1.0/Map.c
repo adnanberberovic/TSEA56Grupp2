@@ -361,28 +361,26 @@ void MAP_checkIfDone()
 	uint8_t iterator = 0;
 	uint16_t done_ = 0;
 	
-// 	for (int i = 0; i < 16; i++)
-// 	{
-// 		for (int j = 0; j < 29; j++)
-// 		{
-// 			done_ += (MAP_array[i][j].visited == 0) && (MAP_array[i][j].description == 3);
-// 		}
-//  }
-// 	if (done_ == 0)
-// 	{
-// 		MAP_mapped = 1;
-// 	}
+  	for (int i = 0; i < 16; i++)
+  	{
+  		for (int j = 0; j < 29; j++)
+  		{
+  			done_ += (MAP_array[i][j].visited == 0) && (MAP_array[i][j].description == 3);
+  		}
+   }
+   
+   return done_;
 	
- 	while (iterator < MAP_junctionCount)
- 	{
- 		done_ += MAP_junctionOrderArray[iterator].hasUnex;
- 		iterator++;
- 	}
- 
- 	if (!done_ && MAP_junctionCount)
- 	{
- 		MAP_LOOPer = 0;
- 	}
+//  	while (iterator < MAP_junctionCount)
+//  	{
+//  		done_ += MAP_junctionOrderArray[iterator].hasUnex;
+//  		iterator++;
+//  	}
+//  
+//  	if (!done_ && MAP_junctionCount)
+//  	{
+//  		MAP_LOOPer = 0;
+//  	}
 }
 
 void MAP_findPath(unsigned int j1, unsigned int j2) {

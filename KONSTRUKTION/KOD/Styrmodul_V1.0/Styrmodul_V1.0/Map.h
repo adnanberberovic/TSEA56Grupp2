@@ -72,7 +72,7 @@ void MAP_rotate();
 void MAP_moveForward();
 uint8_t MAP_getDirection(uint8_t, uint8_t);
 void MAP_main();
-void MAP_checkIfDone();
+uint8_t MAP_checkIfDone();
 void MAP_findPath(unsigned int, unsigned int);
 
 #endif

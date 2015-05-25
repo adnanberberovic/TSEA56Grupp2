@@ -1912,7 +1912,15 @@ void MAP_main()
 	}
 
 	// Checks if all the map has been explored
-	//MAP_checkIfDone();
+	if (MAP_checkIfDone() == 0 && MAP_array[posY_][posX_].description == 5)
+	{
+		MOTOR_Stop();
+		LCD_Clear();
+		LCD_SendString("Map iz complet");
+		while (1)
+		{
+		}
+	}
 	
 }
 
