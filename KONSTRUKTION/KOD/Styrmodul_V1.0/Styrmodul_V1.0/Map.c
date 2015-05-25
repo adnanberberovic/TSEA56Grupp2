@@ -282,7 +282,7 @@ void MAP_lastUnexJunction(uint8_t x)
 	if (x <= 0)
 	{
 		// The map is fully explored
-		MAP_nextJunctionLong = 255;
+		MAP_nextJunctionLong = 0;
 	}
 	else if (MAP_junctionOrderArray[x - 1].hasUnex == 1)
 	{
@@ -356,9 +356,9 @@ uint8_t MAP_getDirection(uint8_t j1, uint8_t j2)
 }
 
 // Checks if all squares have been explored, and if so, quits the main loop
-void MAP_checkIfDone()
+uint16_t MAP_checkIfDone()
 {
-	uint8_t iterator = 0;
+	//uint8_t iterator = 0;
 	uint16_t done_ = 0;
 	
   	for (int i = 0; i < 16; i++)
