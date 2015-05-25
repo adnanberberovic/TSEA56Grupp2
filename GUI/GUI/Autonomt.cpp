@@ -164,9 +164,11 @@ void Autonom::update(string& statestring, bool& running)
 	DWORD BytesWritten_;
 	DWORD BytesRead_;
 	Get_Sensor_values(arrSensor, (sizeof(arrSensor) / sizeof(arrSensor[0])), 87, hComm, &BytesRead_);
+	SDL_Delay(20);
 	//Get_Sensor_values(arrSpeed, (sizeof(arrSpeed) / sizeof(arrSpeed[0])), 89, hComm, &BytesRead_);
+	//SDL_Delay(20);
 	Get_Sensor_values(arrMap, (sizeof(arrMap) / sizeof(arrMap[0])), 69, hComm, &BytesRead_);
-	SDL_Delay(10);
+	SDL_Delay(20);
 	update_texture(arrSensor[0], arrSensor[1], ((0x40 & arrSensor[3]) >> 6), arrSpeed[0], arrSpeed[1]);
 	update_map(arrMap[0], arrMap[1], arrMap[2]);
 
