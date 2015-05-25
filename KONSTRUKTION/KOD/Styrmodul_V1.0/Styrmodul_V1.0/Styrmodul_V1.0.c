@@ -39,7 +39,7 @@ int speed_var = 200;
 uint8_t distance_flag = 0;
 
 uint8_t holds_item = 0;
-uint8_t arrMap[3] = {0, 0, 0}; //[0] = {xpos(4) + dir(2)}, [1] = {y-pos(5) + mål(1)}, [2] = {left(2) + ahead(2) + right(2)}
+uint8_t arrMap[3] = {0, 0, 0}; //[0] = {xpos(4) + dir(2)}, [1] = {y-pos(5) + m?l(1)}, [2] = {left(2) + ahead(2) + right(2)}
 
 
 int reference_ = 20;// Reference value for where we want to place the robot.
@@ -459,7 +459,7 @@ void checkRightAngle(float target_angle)
 				//i--;
 			//}
 			sum += result;
-			//medel = sum / i; // *****  Läggas utanför för att undvika float-fel? *****
+			//medel = sum / i; // *****  L?ggas utanf?r f?r att undvika float-fel? *****
 		}
 		
 		medel = sum / 20;
@@ -467,7 +467,7 @@ void checkRightAngle(float target_angle)
 		rotation_angle += medel*interval;
 		if ((rotation_angle < (-(target_angle - 60)*(255/speed_var))) && (speed_var_local > 70))
 		{
-			speed_var_local = speed_var_local * 0.95; //** eller liknande, för att minska hastigheten gradvis när den närmar sig färdig
+			speed_var_local = speed_var_local * 0.95; //** eller liknande, f?r att minska hastigheten gradvis n?r den n?rmar sig f?rdig
 			PWM_SetSpeedLeft(speed_var_local);
 			PWM_SetSpeedRight(speed_var_local);
 		}
@@ -480,7 +480,7 @@ void checkRightAngle(float target_angle)
 
 void Speed_Interrupt_Init()
 {
-	EICRA = 1<< ISC00 | 0 <<ISC01; //INT0 genererar avbrott p? båda flanker
+	EICRA = 1<< ISC00 | 0 <<ISC01; //INT0 genererar avbrott p? b?da flanker
 	EIMSK = 1<< INT0;
 }
 
@@ -1439,11 +1439,10 @@ void TURN_Back(int mode)
 		distance_counter = 0;
 		distance_flag = 0;
 	}
+
 	else if(mode == 3) // 3-way-3
 	{
 		MOTOR_Stop();
-		MOTOR_RotateRight(180);
-		MOTOR_RotateRight(180);
 		Get_sensor_values();
 		int angle_left =  arrSensor[2];
 		
@@ -1547,6 +1546,16 @@ void DISCOVERY_SetMode()
 	{
 		discovery_mode = 'l';
 	}
+	
+	LCD_SendString("M:");
+	LCD_SendCharacter(discovery_mode);
+	_delay_ms(250);
+	_delay_ms(250);
+	_delay_ms(250);
+	_delay_ms(250);
+	_delay_ms(250);
+	_delay_ms(250);
+	MOTOR_Forward(standard_speed_);
 }
 
 // One of the following three methods are called in the event of a 
@@ -1556,6 +1565,30 @@ void DISCOVERY_SetMode()
 */
 void JUNCTION_ThreeWayONE()
 {
+	if (discovery_mode == 'l')
+	{
+		TURN_Left(1);
+	}
+	
+	else if (discovery_mode == 'b')
+	{
+		MOTOR_Stop();
+		_delay_ms(250);
+		_delay_ms(250);
+		_delay_ms(250);
+		_delay_ms(250);
+		MOTOR_Forward(standard_speed_);
+		TURN_Back(1);
+
+	}
+	
+	else if (discovery_mode == '?')
+	{
+		DISCOVERY_SetRandom();
+		JUNCTION_ThreeWayONE();
+		discovery_mode = '?';
+	}
+
 	if ((discovery_mode == 'r') || (discovery_mode == 'f'))
 	{
 		// Keep going forward
@@ -1584,31 +1617,9 @@ void JUNCTION_ThreeWayONE()
 		}
 		
 		JUNCTION_delay(3);
+		return;
 	}
-	
-	else if (discovery_mode == 'l')
-	{
-		TURN_Left(1);
-	}
-	
-	else if (discovery_mode == 'b')
-	{
-		MOTOR_Stop();
-		_delay_ms(250);
-		_delay_ms(250);
-		_delay_ms(250);
-		_delay_ms(250);
-		MOTOR_Forward(standard_speed_);
-		TURN_Back(1);
 
-	}
-	
-	else if (discovery_mode == '?')
-	{
-		DISCOVERY_SetRandom();
-		JUNCTION_ThreeWayONE();
-		discovery_mode = '?';
-	}
 }
 
 /*  v
@@ -1650,12 +1661,37 @@ void JUNCTION_ThreeWayTWO()
 */
 void JUNCTION_ThreeWayTHREE()
 {	
+
+LCD_Clear();
+MOTOR_Stop();
+LCD_SendCharacter(discovery_mode);
+LCD_SendCharacter(discovery_mode);
+LCD_SendCharacter(discovery_mode);
+LCD_SendCharacter(discovery_mode);
+LCD_SendCharacter(discovery_mode);
+_delay_ms(250);
+_delay_ms(250);
+MOTOR_Forward(standard_speed_);
+
 	if (discovery_mode == 'r')
 	{
 		TURN_Right(1);
 	}
 	
-	else if ((discovery_mode == 'f') || (discovery_mode == 'l'))
+	else if (discovery_mode == 'b')
+	{
+		MOTOR_Stop();
+		_delay_ms(250);
+		_delay_ms(250);
+		_delay_ms(250);
+		_delay_ms(250);
+		LCD_Clear();
+		LCD_SendString(" TUUURN BACK 3v3");
+		MOTOR_Forward(standard_speed_);
+		TURN_Back(3);
+	}
+
+	else if ( (discovery_mode == 'f') || (discovery_mode == 'l') )
 	{
 		// Keep going forward
 		distance_counter = 0;
@@ -1678,22 +1714,12 @@ void JUNCTION_ThreeWayTHREE()
 		MOTOR_Forward(standard_speed_);
 		
 		while( PATHCOUNT_Right() > 0 )
-			{
-				_delay_us(250);
-			}
+		{
+			_delay_us(250);
+		}
 		
 		JUNCTION_delay(3);
-	}
-	
-	else if (discovery_mode == 'b')
-	{
-		MOTOR_Stop();
-		_delay_ms(250);
-		_delay_ms(250);
-		_delay_ms(250);
-		_delay_ms(250);
-		MOTOR_Forward(standard_speed_);
-		TURN_Back(3);
+		return;
 	}
 	
 	else if (discovery_mode == '?')
@@ -1779,7 +1805,7 @@ void MAP_main()
 			if (fatIf_ >= 1)
 			{
 				MAP_currentJunction = MAP_array[posY_][posX_].junctionNumber;
-				MAP_junctionOrderArray[MAP_array[posY_][posX_].junctionNumber].hasUnex = 0;
+				//MAP_junctionOrderArray[MAP_array[posY_][posX_].junctionNumber].hasUnex = 0;
 			}
 			else if(fatIf_ == 0)
 			{
@@ -1789,6 +1815,7 @@ void MAP_main()
 				MAP_operatingMode_ = 2;
 				goto RotatingPhase; // Exit this phase
 			}
+
 		}
 		// Or if it's a new square
 		else{
@@ -1800,6 +1827,14 @@ void MAP_main()
 			}
 			else if (MAP_unexploredSquares == 0)
 			{
+				LCD_Clear();
+				LCD_SendString("   DEAD END   ");
+				_delay_ms(250);
+				_delay_ms(250);
+				_delay_ms(250);
+				_delay_ms(250);
+				_delay_ms(250);
+				LCD_Clear();
 				MAP_nextDir = (MAP_currentDir + 2) % 4;
 				MAP_rotating_ = 1;
 				MAP_movingForward_ = 1;
@@ -1912,16 +1947,23 @@ void MAP_main()
 	}
 
 	// Checks if all the map has been explored
-	if (MAP_checkIfDone() == 0 && MAP_array[posY_][posX_].description == 5)
-	{
-		MOTOR_Stop();
-		LCD_Clear();
-		LCD_SendString("Map iz complet");
-		while (1)
-		{
-		}
-	}
-	
+	//MAP_checkIfDone();
+	MOTOR_Stop();
+	LCD_Clear();
+	LCD_SetPosition(0);
+	LCD_SendString("Y:");
+	LCD_display_uint16(MAP_currentPos[0]);
+	LCD_SendString(" ");
+	LCD_SendString("X:");
+	LCD_display_uint16(MAP_currentPos[1]);
+	LCD_SendString(" ");
+	LCD_SetPosition(16);
+	LCD_SendString("cD");
+	LCD_display_uint16(MAP_currentDir);
+	LCD_SendString(" ");
+	LCD_SendString("nD");
+	LCD_display_uint16(MAP_nextDir);
+	LCD_SendString(" ");
 }
 
 
@@ -2017,7 +2059,12 @@ void Junction()
             DISCOVERY_SetMode();
             
             JUNCTION_ThreeWayTHREE();
+			
             MAP_rotate();
+			if( (discovery_mode == 'f') || (discovery_mode == 'l'))
+			{
+				return;
+			}
         }
         else //if (PathCountLeft == 0) //Right turn
         {
@@ -2095,6 +2142,10 @@ void Junction()
             DISCOVERY_SetMode();
             JUNCTION_ThreeWayONE();
             MAP_rotate();
+			if( (discovery_mode == 'f') || (discovery_mode == 'r'))
+			{
+				return;
+			}
 		}
         else //if (PathCountRight == 0)// Left turn
         {
@@ -2170,7 +2221,7 @@ void Junction()
         LCD_Clear();
         LCD_SendString("Dead End");
         LCD_SetPosition(16);
-        LCD_SendString("I sväng IF.. FEL");
+        LCD_SendString("I sv?ng IF.. FEL");
         while(1);
 		set_map_DeadEnd();
         
@@ -2304,13 +2355,13 @@ void AutomaticControl()
 		set_map_Corridor();
 		
 		MAP_main();
-		DISCOVERY_SetMode();
+		//DISCOVERY_SetMode();
 		
 		if (discovery_mode == 'b')
 		{
 			//TURN_Back(4);
 		}
-		MAP_rotate();
+		//MAP_rotate();
 		distance_flag = 0;
 	}
 }
@@ -2329,7 +2380,7 @@ void INIT_ALL()
 	TIMER_init();	// Initiate Timer settings
 	LCD_WelcomeScreen();	// Welcomes the user with a nice message ;^)
 	Gyro_Init();	// Initiate gyro settings
-	Speed_Interrupt_Init(); //KOMMENTERA IN, MEN FUNGERAR EJ ATT MANUELLSTYRA DÅ
+	Speed_Interrupt_Init(); //KOMMENTERA IN, MEN FUNGERAR EJ ATT MANUELLSTYRA D?
 	PWM_SetDirLeft(1);
 	PWM_SetDirRight(1);
 	
@@ -2366,11 +2417,10 @@ int main(void)
 // 				LCD_SendString("X:");
 // 				LCD_display_uint16(MAP_currentPos[1]);
 // 				LCD_SendString(" ");
-// 				LCD_SendString("Ar:");
-// 				LCD_display_uint16(MAP_junctionOrderArray[0].hasUnex);
-// 				LCD_SendString(" ");
+				LCD_SendString("Ar:");
+				LCD_display_uint16(MAP_junctionOrderArray[0].hasUnex);
+				LCD_SendString(" ");
 				//LCD_SetPosition(16);
-				
 				LCD_SendString("cDir:");
 				LCD_display_uint16(MAP_currentDir);
 				LCD_SendString(" ");
@@ -2418,7 +2468,7 @@ int main(void)
 				LCD_SendString(" ");
 				LCD_SendString("OL");
 				LCD_display_uint8(LEFTPATHONE());
-				LCD_SendString(" FS");
+				LCD_SendString(" ");
 				LCD_SetPosition(16);
 				LCD_SendString("PR");
 				LCD_display_uint8(PATHCOUNT_Right());
@@ -2429,7 +2479,6 @@ int main(void)
 				LCD_SendString("OR");
 				LCD_display_uint8(RIGHTPATHONE());
 				LCD_SendString(" ");
-				LCD_display_uint8(FRONT_SENSOR_VALUE());
 				_delay_ms(10);
     		}
 			MOTOR_Stop();

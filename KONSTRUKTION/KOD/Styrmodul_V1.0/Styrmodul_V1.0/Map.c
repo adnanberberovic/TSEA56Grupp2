@@ -356,9 +356,9 @@ uint8_t MAP_getDirection(uint8_t j1, uint8_t j2)
 }
 
 // Checks if all squares have been explored, and if so, quits the main loop
-void MAP_checkIfDone()
+uint16_t MAP_checkIfDone()
 {
-	uint8_t iterator = 0;
+	//uint8_t iterator = 0;
 	uint16_t done_ = 0;
 	
   	for (int i = 0; i < 16; i++)
