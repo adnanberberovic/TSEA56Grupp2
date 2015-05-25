@@ -282,7 +282,7 @@ void MAP_lastUnexJunction(uint8_t x)
 	if (x <= 0)
 	{
 		// The map is fully explored
-		MAP_nextJunctionLong = 255;
+		MAP_nextJunctionLong = 0;
 	}
 	else if (MAP_junctionOrderArray[x - 1].hasUnex == 1)
 	{
