@@ -1779,7 +1779,7 @@ void MAP_main()
 			if (fatIf_ >= 1)
 			{
 				MAP_currentJunction = MAP_array[posY_][posX_].junctionNumber;
-				//MAP_junctionOrderArray[MAP_array[posY_][posX_].junctionNumber].hasUnex = 0;
+				MAP_junctionOrderArray[MAP_array[posY_][posX_].junctionNumber].hasUnex = 0;
 			}
 			else if(fatIf_ == 0)
 			{
@@ -2358,10 +2358,11 @@ int main(void)
 // 				LCD_SendString("X:");
 // 				LCD_display_uint16(MAP_currentPos[1]);
 // 				LCD_SendString(" ");
-				LCD_SendString("Ar:");
-				LCD_display_uint16(MAP_junctionOrderArray[0].hasUnex);
-				LCD_SendString(" ");
+// 				LCD_SendString("Ar:");
+// 				LCD_display_uint16(MAP_junctionOrderArray[0].hasUnex);
+// 				LCD_SendString(" ");
 				//LCD_SetPosition(16);
+				
 				LCD_SendString("cDir:");
 				LCD_display_uint16(MAP_currentDir);
 				LCD_SendString(" ");
@@ -2409,7 +2410,7 @@ int main(void)
 				LCD_SendString(" ");
 				LCD_SendString("OL");
 				LCD_display_uint8(LEFTPATHONE());
-				LCD_SendString(" ");
+				LCD_SendString(" FS");
 				LCD_SetPosition(16);
 				LCD_SendString("PR");
 				LCD_display_uint8(PATHCOUNT_Right());
@@ -2420,6 +2421,7 @@ int main(void)
 				LCD_SendString("OR");
 				LCD_display_uint8(RIGHTPATHONE());
 				LCD_SendString(" ");
+				LCD_display_uint8(FRONT_SENSOR_VALUE());
 				_delay_ms(10);
     		}
 			MOTOR_Stop();
