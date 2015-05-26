@@ -45,7 +45,7 @@ volatile uint8_t BT_sent_flag = 0;
 
 uint8_t arrSpeed[5] = {0,0,1,1,0}; //Array with current speed (Left right), direction (1 = forward, 0 = backward) and claw. From/to PC/master left
 uint8_t arrSpeedout[3] = {10, 10, 1}; //Speed left, speed right, dirleft & right
-uint8_t arrMap[3] = {0x79, 0x78, 0x88}; //[0] = {xpos(4) + dir(2)}, [1] = {y-pos(5) + mål(1)}, [2] = {left(2) + ahead(2) + right(2)},
+uint8_t arrMap[3] = {0x79, 0x78, 0x88}; //[0] = {xpos(5) + dir(2)}, [1] = {y-pos(5) + mål(1)}, [2] = {left(2) + ahead(2) + right(2)},
 
 uint8_t sendFlag = 0;
 uint8_t Flag_ = 0;

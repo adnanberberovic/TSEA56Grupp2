@@ -12,6 +12,7 @@
 
 
 // Sets the position of the goal in the map
+// ADD JUNCTION BEHÖVS!!!! OBS!!!!!!!!!!! <---------------------- !!!! OBS !!!! --------
 void MAP_setGoal()
 {
 	uint8_t posY = MAP_currentPos[0];
@@ -19,6 +20,7 @@ void MAP_setGoal()
 	MAP_junctionOrderArray[MAP_currentJunction].goal = 1;
 	MAP_goalPosition[0] = posY;
 	MAP_goalPosition[1] = posX;
+    MAP_operatingMode_ = 4;
 }
 
 // Description:
@@ -281,8 +283,32 @@ void MAP_lastUnexJunction(uint8_t x)
 {
 	if (x <= 0)
 	{
+		_delay_ms(250);
+		_delay_ms(250);
+		_delay_ms(250);
+		_delay_ms(250);
+		_delay_ms(250);
+		_delay_ms(250);
+		_delay_ms(250);
+		_delay_ms(250);
+		_delay_ms(250);
+		_delay_ms(250);
+		_delay_ms(250);
+		_delay_ms(250);
+		_delay_ms(250);
+		_delay_ms(250);
+		_delay_ms(250);
+		_delay_ms(250);
+		_delay_ms(250);
+		_delay_ms(250);
+		_delay_ms(250);
+		
 		// The map is fully explored
 		MAP_nextJunctionLong = 0;
+		if (MAP_currentJunction == 0)
+		{
+			MAP_LOOPer = 0;
+		}
 	}
 	else if (MAP_junctionOrderArray[x - 1].hasUnex == 1)
 	{

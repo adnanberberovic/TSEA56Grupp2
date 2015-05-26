@@ -65,6 +65,7 @@ private:
 	int Left;
 	int Front;
 	int Right;
+    int goal;
     
     Text* Text_Angle_;
     Text* Text_Offset_;

@@ -70,6 +70,10 @@ uint8_t WallAhead;
 uint8_t WallCloseAhead;
 uint8_t FrontSensorValue;
 
+uint8_t ReflexSensor = 0;
+uint8_t Reflex_SetNextForwardGold = 0;
+uint8_t Reflex_StartMarker = 0;
+
 //__________________________REGISTERS__________________________
 
 // Setup data direction registers @ ports for out/inputs.
@@ -218,6 +222,12 @@ void Get_sensor_values() //Load all sensor values into sensor-array
 	{
 		arrSensor[i - 1] = SPI_MasterTransmit(i,'s'); //load all 8 sensor values into sensor position [0-7]
 	}
+    
+    if( (arrSensor[6]/64) && (0b00000001) )
+    {
+        ReflexSensor = 1;
+    }
+    
 }
 void Send_sensor_values() // Can combine with Get speed when in manual mode
 {
@@ -669,7 +679,7 @@ uint8_t PATHCOUNT_Right()
 	return PathCountRight;
 }
 
-void Update_All_FUCKING_values()
+void Update_All_values()
 {
 	Get_sensor_values();
 
@@ -717,60 +727,59 @@ void set_map_right(int desc)
 {
 	uint8_t posY_ = MAP_currentPos[0];
 	uint8_t posX_ = MAP_currentPos[1];
-	MAP_array[posY_][posX_ + 1].description = desc;
-// 	if (MAP_array[posY_][posX_ + 1].description == 0)
-// 	{
-// 		MAP_array[posY_][posX_ + 1].description = desc;
-// 	}
-// 	else if (MAP_array[posY_][posX_ + 1].description == 4 && desc == 3)
-// 	{
-// 		MAP_array[posY_][posX_ + 1].description = desc;
-// 	}
+	
+	if (MAP_array[posY_][posX_ + 1].description == 5)
+	{
+		return;
+	}
+	else
+	{
+		MAP_array[posY_][posX_ + 1].description = desc;
+	}
 }
 
 void set_map_up(int desc)
 {
 	uint8_t posY_ = MAP_currentPos[0];
 	uint8_t posX_ = MAP_currentPos[1];
-	MAP_array[posY_ - 1][posX_].description = desc;
-// 	if (MAP_array[posY_ - 1][posX_].description == 0)
-// 	{
-// 		MAP_array[posY_ - 1][posX_].description = desc;
-// 	}
-// 	else if (MAP_array[posY_ - 1][posX_].description == 4 && desc == 3)
-// 	{
-// 		MAP_array[posY_ - 1][posX_].description = desc;
-// 	}
+	
+	if (MAP_array[posY_ - 1][posX_].description == 5)
+	{
+		return;
+	}
+	else
+	{
+		MAP_array[posY_ - 1][posX_].description = desc;
+	}
 }
 
 void set_map_left(int desc)
 {
 	uint8_t posY_ = MAP_currentPos[0];
 	uint8_t posX_ = MAP_currentPos[1];
-	MAP_array[posY_][posX_ - 1].description = desc;
-// 	if (MAP_array[posY_][posX_ - 1].description == 0)
-// 	{
-// 		MAP_array[posY_][posX_ - 1].description = desc;
-// 	}
-// 	else if (MAP_array[posY_][posX_ - 1].description == 4 && desc == 3)
-// 	{
-// 		MAP_array[posY_][posX_ - 1].description = desc;
-// 	}
+	if (MAP_array[posY_][posX_ - 1].description == 5)
+	{
+		return;
+	}
+	else
+	{
+		MAP_array[posY_][posX_ - 1].description = desc;
+	}
 }
 
 void set_map_down(int desc)
 {
 	uint8_t posY_ = MAP_currentPos[0];
 	uint8_t posX_ = MAP_currentPos[1];
-	MAP_array[posY_ + 1][posX_].description = desc;
-// 	if (MAP_array[posY_ + 1][posX_].description == 0)
-// 	{
-// 		MAP_array[posY_ + 1][posX_].description = desc;
-// 	}
-// 	else if (MAP_array[posY_ + 1][posX_].description == 4 && desc == 3)
-// 	{
-// 		MAP_array[posY_ + 1][posX_].description = desc;
-// 	}
+	
+	if (MAP_array[posY_ + 1][posX_].description == 5)
+	{
+		return;
+	}
+	else
+	{
+		MAP_array[posY_ + 1][posX_].description = desc;	
+	}
 }
 
 void set_map_FourWay()
@@ -1030,8 +1039,6 @@ char resque_mode = 'd'; /*if resque_mode == d, then the robot will search accord
 						start resquing.
 						*/
 
-
-
 // P-control function
 int P_Control()
 {
@@ -1108,7 +1115,7 @@ int PD_Control()
 		{
 			newSignal = P_Control()+D_control()-angle_;	
 		}
-		if(angle_ > 0) // On the right path to the middle.
+		if ((angle_ > 0) && ((offset_ > 12) || (offset_ < 28))) // On the right path to the middle.
 		{
 			newSignal=0;
 		}
@@ -1426,11 +1433,11 @@ void TURN_Back(int mode)
 	{
 		if( offset_ > 20)
 		{
-			MOTOR_RotateLeft(90 - angle_);
+			MOTOR_RotateLeft(180); //TODO - FIXA ANGLE
 		}
 		else
 		{
-			MOTOR_RotateLeft(90 + angle_);
+			MOTOR_RotateLeft(180);
 		}
 				
 		_delay_ms(100);
@@ -1490,9 +1497,8 @@ void TURN_Back(int mode)
 	
 	while((PATHCOUNT_Left() > 0) || (PATHCOUNT_Right() > 0))
 	{
-		_delay_us(250);
+		_delay_us(100);
 		LCD_SetPosition(1);
-		LCD_SendString("Turn back");
 		//Wait until robot reaches walls again
 	}
 	
@@ -1559,11 +1565,6 @@ void DISCOVERY_SetMode()
 */
 void JUNCTION_ThreeWayONE()
 {
-	MOTOR_Stop();
-	LCD_SendString("   3V3   ");
-	_delay_ms(25);
-	MOTOR_Forward(standard_speed_);
-	
 	if (discovery_mode == 'l')
 	{
 		TURN_Left(1);
@@ -1571,14 +1572,7 @@ void JUNCTION_ThreeWayONE()
 	
 	else if (discovery_mode == 'b')
 	{
-		MOTOR_Stop();
-		_delay_ms(250);
-		_delay_ms(250);
-		_delay_ms(250);
-		_delay_ms(250);
-		MOTOR_Forward(standard_speed_);
 		TURN_Back(1);
-
 	}
 	
 	else if (discovery_mode == '?')
@@ -1661,18 +1655,7 @@ void JUNCTION_ThreeWayTWO()
 */
 void JUNCTION_ThreeWayTHREE()
 {	
-
-LCD_Clear();
-MOTOR_Stop();
-LCD_SendCharacter(discovery_mode);
-LCD_SendCharacter(discovery_mode);
-LCD_SendCharacter(discovery_mode);
-LCD_SendCharacter(discovery_mode);
-LCD_SendCharacter(discovery_mode);
-_delay_ms(250);
-_delay_ms(250);
-MOTOR_Forward(standard_speed_);
-
+	
 	if (discovery_mode == 'r')
 	{
 		TURN_Right(1);
@@ -1680,14 +1663,6 @@ MOTOR_Forward(standard_speed_);
 	
 	else if (discovery_mode == 'b')
 	{
-		MOTOR_Stop();
-		_delay_ms(250);
-		_delay_ms(250);
-		_delay_ms(250);
-		_delay_ms(250);
-		LCD_Clear();
-		LCD_SendString(" TUUURN BACK 3v3");
-		MOTOR_Forward(standard_speed_);
 		TURN_Back(3);
 	}
 
@@ -1774,6 +1749,13 @@ void MAP_main()
 	uint8_t posY_ = MAP_currentPos[0];
 	uint8_t posX_ = MAP_currentPos[1];
 	
+    if(Reflex_SetNextForwardGold)
+    {
+        Reflex_SetNextForwardGold = 0;
+        MAP_setGoal();
+    }
+    
+    
 	// Normal searching phase
 	Phase0:
 	if (!MAP_operatingMode_ && !MAP_rotating_ && !MAP_movingForward_)
@@ -1796,20 +1778,29 @@ void MAP_main()
 			
 			// And if it has unexplored roads
 			// Else go to far junction phase
+			
+			//l‰gg till kanske: om korsningen bredvid mig har mig som granne ‰r det okej.
+			//skapa rekursiv funktion?
+			
 			int fatIf_;
 			fatIf_ = MAP_unexploredSquares -
 			(MAP_array[posY_ - 1][posX_].description == 5 && !MAP_junctionOrderArray[MAP_array[posY_ - 1][posX_].junctionNumber].hasUnex) -
 			(MAP_array[posY_ + 1][posX_].description == 5 && !MAP_junctionOrderArray[MAP_array[posY_ + 1][posX_].junctionNumber].hasUnex) -
 			(MAP_array[posY_][posX_ - 1].description == 5 && !MAP_junctionOrderArray[MAP_array[posY_][posX_ - 1].junctionNumber].hasUnex) -
 			(MAP_array[posY_][posX_ + 1].description == 5 && !MAP_junctionOrderArray[MAP_array[posY_][posX_ + 1].junctionNumber].hasUnex);
-			if (fatIf_ >= 1)
+			
+			MAP_currentJunction = MAP_array[posY_][posX_].junctionNumber;
+			
+			if (fatIf_ == 1)
 			{
-				MAP_currentJunction = MAP_array[posY_][posX_].junctionNumber;
-				//MAP_junctionOrderArray[MAP_array[posY_][posX_].junctionNumber].hasUnex = 0;
+				MAP_junctionOrderArray[MAP_currentJunction].hasUnex = 0;
 			}
-			else if(fatIf_ == 0)
+		
+			else if(fatIf_ <= 0)
 			{
-				MAP_currentJunction = MAP_array[posY_][posX_].junctionNumber;
+				MOTOR_Stop();
+				LCD_Clear();
+				LCD_SendString(" FATIF  <= 0 ");
 				MAP_junctionOrderArray[MAP_currentJunction].hasUnex = 0;
 				MAP_decideDestination();
 				MAP_operatingMode_ = 2;
@@ -1818,7 +1809,8 @@ void MAP_main()
 
 		}
 		// Or if it's a new square
-		else{
+		else
+		{
 			// If it's a junction, add it
 			// Else if it's a dead end, trace the way back to the previous junction
 			if (MAP_exploredSquares > 2)
@@ -1941,24 +1933,124 @@ void MAP_main()
 	// Checks if all the map has been explored
 	//MAP_checkIfDone();
 	MOTOR_Stop();
-	LCD_Clear();
-	LCD_SetPosition(0);
-	LCD_SendString("Y:");
-	LCD_display_uint16(MAP_currentPos[0]);
-	LCD_SendString(" ");
-	LCD_SendString("X:");
-	LCD_display_uint16(MAP_currentPos[1]);
-	LCD_SendString(" ");
-	LCD_SetPosition(16);
-	LCD_SendString("cD");
-	LCD_display_uint16(MAP_currentDir);
-	LCD_SendString(" ");
-	LCD_SendString("nD");
-	LCD_display_uint16(MAP_nextDir);
-	LCD_SendString(" ");
-	LCD_SendString("J:");
-	LCD_display_uint16(MAP_array[posY_][posX_].description);
-	LCD_SendString(" ");
+}
+
+
+void Tejp()
+{
+
+    if(ReflexSensor)
+    {
+        if ( (MAP_currentPos[1] == 15) && ( (MAP_currentPos[0] == 16) || (MAP_currentPos[0] == 15) ))
+        {
+            if ( MAP_currentPos[0] == 16 ) // Kommer från starpos == i banan
+                {
+                    Reflex_StartMarker = 1;
+                }
+                else
+                {
+                    Reflex_StartMarker = 0; //Åker tillbaka till startpos == åker ur banan
+                }
+            return;
+            
+        }
+        
+        if( resque_mode == 'd') //The goas hasn't yet been found
+        {
+            MOTOR_Stop();
+            ReflexSensor = 0;
+            
+            //Stall in rätt vinken om möjligt.
+            
+            MOTOR_Forward(50);
+            Get_sensor_values;
+            
+            while( !(ReflexSensor || WallCloseAhead) )
+            {
+                Get_sensor_values;
+                _delay_us(250);
+            }
+            
+            MOTOR_Stop(); // Kanske kolla efter vinkel här om möjligt!
+            
+            Reflex_SetNextForwardGold = 1;
+            
+            if(ReflexSensor)
+            {
+                ReflexSensor = 0;
+                MOTOR_Backward(50);
+                JUNCTION_delay(4); // Detta värdet kanske behövs ändras!!!! <----- OBS
+                MOTOR_Stop();
+                Get_sensor_values();
+                
+                if( !(PathCountLeft > 0) || (PathCountRight > 0) ) // Vi är i en korridor.
+                {
+                    MAP_moveForward();
+                    set_map_Corridor();
+                    MAP_main();
+                }
+                
+                distance_counter = 0;
+                distance_flag = 0;
+            }
+            resque_mode = 'q';
+            
+        }
+        else if( resque_mode == 'q')
+        {
+            MOTOR_Stop();
+            ReflexSensor = 0;
+            
+            //Stall in rätt vinken om möjligt.
+            
+            MOTOR_Forward(50);
+            Get_sensor_values;
+            
+            while( !(ReflexSensor || WallCloseAhead) )
+            {
+                Get_sensor_values;
+                _delay_us(250);
+            }
+            
+            MOTOR_Stop(); // Kanske kolla efter vinkel här om möjligt!
+            
+            if(ReflexSensor)
+            {
+                ReflexSensor = 0;
+                MOTOR_Backward(50); // backa in i rutan igen
+                JUNCTION_delay(3); // Detta värdet kanske behövs ändras!!!! <----- OBS
+                MOTOR_Stop();
+                Get_sensor_values();
+                //Gripklo Släpp
+                
+                if( !(PathCountLeft > 0) || (PathCountRight > 0) ) // Vi är i en korridor.
+                {
+                    MOTOR_Backward(50); // Backa ifrån släppta paketet
+                    JUNCTION_delay(2); // Detta värdet kanske behövs ändras!!!! <----- OBS
+                    MOTOR_Stop();
+                    MAP_moveForward();
+                    MAP_main();
+                    DISCOVERY_SetMode();
+                    TURN_Back(1);
+                    MAP_rotate();
+                    MOTOR_Forward(standard_speed_);
+                    
+                }
+                
+                distance_counter = 0;
+                distance_flag = 0;
+            }
+            else
+            {
+                //Släpp Gripklo
+                MOTOR_Backward(50); //Backa ifrån släpta paketet
+                JUNCTION_delay(2);
+            }
+        
+        }
+        
+    }
+
 }
 
 
@@ -2010,7 +2102,7 @@ void Junction()
     
     while (!(LeftPathBoth) && !(RightPathBoth) && !(WallCloseAhead)) //Keep going until center of intersect
     {
-        Update_All_FUCKING_values();
+        Update_All_values();
         _delay_us(250);
 		
 		//Jump out of function if incorrect sensor value was given earlier.
@@ -2023,7 +2115,7 @@ void Junction()
 	
     MAP_moveForward();
     JUNCTION_delay(3);
-    
+    Update_All_values();
 	
     // Now in intersect. Determine what type:
     if ((PathCountLeft > 0) && (PathCountRight > 0)) // 4-way or 3-way-2
@@ -2325,28 +2417,14 @@ void Pre_PD_controll()
 void AutomaticControl()
 {
 	
-	Update_All_FUCKING_values();
+	Update_All_values();
 
-	Floor_Marker();
-
-// 	if (REFLEX_GetMarker())
-// 	{
-// 		MOTOR_Stop();
-// 		_delay_ms(250);
-// 		_delay_ms(250);
-// 		SERVO_LevelLow();
-// 		_delay_ms(250);
-// 		_delay_ms(250);
-// 		SERVO_ReleaseGrip();
-// 		_delay_ms(250);
-// 		_delay_ms(250);
-// 	}
+	//Floor_Marker();
 	
 	if( (PathCountLeft > 0) || (PathCountRight > 0) ){ //Path to left or right
-		
         Junction();
-		
 	}
+	
 	else if ( !( LeftPathOne || RightPathOne) || 
 			(LeftPathOne && (arrSensor[1] > 26) /*ROoffs*/) ||  //To close to right wall
 			(RightPathOne && (arrSensor[3] > 14)/*LOffs*/) ) //To close to left wall
@@ -2365,19 +2443,24 @@ void AutomaticControl()
 		MAP_rotate();
 		angle_ = 0;
 	}
-	if((distance_counter >= 10) && (distance_flag == 1))
+	if((distance_counter >= 7) && (distance_flag == 1))
 	{
 		MAP_moveForward();
-		
 		set_map_Corridor();
-		
 		MAP_main();
 		//DISCOVERY_SetMode();
+	
+// 		if (discovery_mode == 'b')
+// 		{
+// 			LCD_Clear();
+// 			LCD_SendString(" back in corridor wtf ");
+// 			_delay_ms(250);
+// 			_delay_ms(250);
+// 			_delay_ms(250);
+// 			_delay_ms(250);
+// 			TURN_Back(4);
+// 		}
 		
-		if (discovery_mode == 'b')
-		{
-			//TURN_Back(4);
-		}
 		//MAP_rotate();
 		distance_flag = 0;
 	}
@@ -2403,12 +2486,13 @@ void INIT_ALL()
 	
 	distance_counter = 0;
 	distance_flag = 0;
-	//MAP_addJunction();
-	//MAP_junctionOrderArray[MAP_currentJunction].hasUnex = 0;
-	MAP_array[16][15].description = 3;
+	
 	MAP_currentDir = 1;
 	MAP_nextDir = 1;
 	MAP_setVisited();	// Map initialization
+	
+	MAP_addJunction();
+	set_map_Corridor(); //Kanske ‰ndra till description = 3 ist‰llet
 	sei();	// Enable global interrupts
 }
 
@@ -2427,26 +2511,17 @@ int main(void)
     		{
 	    		AutomaticControl();
 				Send_sensor_values();
+				
 				LCD_SetPosition(0);
-// 				LCD_SendString("Y:");
-// 				LCD_display_uint16(MAP_currentPos[0]);
-// 				LCD_SendString(" ");
-// 				LCD_SendString("X:");
-// 				LCD_display_uint16(MAP_currentPos[1]);
-// 				LCD_SendString(" ");
-				LCD_SendString("Ar:");
-				LCD_display_uint16(MAP_junctionOrderArray[0].hasUnex);
+				LCD_SendString("njl:");
+				LCD_display_uint16(MAP_nextJunctionLong);
 				LCD_SendString(" ");
-				//LCD_SetPosition(16);
-				LCD_SendString("cDir:");
-				LCD_display_uint16(MAP_currentDir);
-				LCD_SendString(" ");
-				LCD_SendString("nDir:");
-				LCD_display_uint16(MAP_nextDir);
+				LCD_SendString("njs:");
+				LCD_display_uint16(MAP_nextJunctionShort);
 				LCD_SendString(" ");
 				LCD_SetPosition(16);
-				LCD_SendString("jC:");
-				LCD_display_uint16(MAP_junctionCount);
+				LCD_SendString("Unex:");
+				LCD_display_uint16(MAP_junctionOrderArray[MAP_currentJunction].hasUnex);
 				LCD_SendString(" ");
     		}
 			while(!MAP_LOOPer)
@@ -2454,7 +2529,7 @@ int main(void)
 				MOTOR_Stop();
 				LCD_Clear();
 				LCD_SetPosition(0);
-				LCD_SendString("Map Looper 0 ");
+				LCD_SendString("   I R WIN   ");
 				_delay_ms(75);
 // 				LCD_display_uint8(MAP_array[14][16].description);
 // 				LCD_SendCharacter(' ');
@@ -2496,6 +2571,9 @@ int main(void)
 				LCD_SendString(" ");
 				LCD_SendString("Re");
 				LCD_display_uint8(REFLEX_GetMarker());
+				LCD_SendString(" ");
+				LCD_SendString("F");
+				LCD_display_uint16(FRONT_SENSOR_VALUE());
 				LCD_SendString(" ");
 				_delay_ms(10);
     		}
