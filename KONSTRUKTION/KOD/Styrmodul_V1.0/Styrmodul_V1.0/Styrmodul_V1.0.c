@@ -717,7 +717,9 @@ void set_map_right(int desc)
 {
 	uint8_t posY_ = MAP_currentPos[0];
 	uint8_t posX_ = MAP_currentPos[1];
+	
 	MAP_array[posY_][posX_ + 1].description = desc;
+	
 // 	if (MAP_array[posY_][posX_ + 1].description == 0)
 // 	{
 // 		MAP_array[posY_][posX_ + 1].description = desc;
@@ -1669,18 +1671,7 @@ void JUNCTION_ThreeWayTWO()
 */
 void JUNCTION_ThreeWayTHREE()
 {	
-
-LCD_Clear();
-MOTOR_Stop();
-LCD_SendCharacter(discovery_mode);
-LCD_SendCharacter(discovery_mode);
-LCD_SendCharacter(discovery_mode);
-LCD_SendCharacter(discovery_mode);
-LCD_SendCharacter(discovery_mode);
-_delay_ms(250);
-_delay_ms(250);
-MOTOR_Forward(standard_speed_);
-
+	
 	if (discovery_mode == 'r')
 	{
 		TURN_Right(1);
@@ -1688,14 +1679,6 @@ MOTOR_Forward(standard_speed_);
 	
 	else if (discovery_mode == 'b')
 	{
-		MOTOR_Stop();
-		_delay_ms(250);
-		_delay_ms(250);
-		_delay_ms(250);
-		_delay_ms(250);
-		LCD_Clear();
-		LCD_SendString(" TUUURN BACK 3v3");
-		MOTOR_Forward(standard_speed_);
 		TURN_Back(3);
 	}
 
@@ -1818,7 +1801,7 @@ void MAP_main()
 				MAP_currentJunction = MAP_array[posY_][posX_].junctionNumber;
 				//MAP_junctionOrderArray[MAP_array[posY_][posX_].junctionNumber].hasUnex = 0;
 			}
-			else if(fatIf_ == 0)
+			else if(fatIf_ <= 0)
 			{
 				MAP_currentJunction = MAP_array[posY_][posX_].junctionNumber;
 				MAP_junctionOrderArray[MAP_currentJunction].hasUnex = 0;
@@ -1954,19 +1937,11 @@ void MAP_main()
 	//MAP_checkIfDone();
 	MOTOR_Stop();
 	LCD_Clear();
-	LCD_SetPosition(0);
-	LCD_SendString("CJ:");
-	LCD_display_uint16(MAP_currentJunction);
-	LCD_SendString(" ");
-	LCD_SendString("NJL:");
-	LCD_display_uint16(MAP_nextJunctionLong);
-	LCD_SendString("  ");
-	LCD_SendString("NJS");
-	LCD_display_uint16(MAP_nextJunctionShort);
-	LCD_SendString(" ");
-	LCD_SendString("hU:");
-	LCD_display_uint8(MAP_junctionOrderArray[MAP_array[MAP_currentPos[0]][MAP_currentPos[1]].junctionNumber].hasUnex);
-	LCD_SendString(" ");
+	LCD_display_uint8(MAP_array[MAP_currentPos[0]][MAP_currentPos[1]].description);
+	_delay_ms(250);
+	_delay_ms(250);
+	_delay_ms(250);
+	_delay_ms(250);	
 }
 
 
@@ -2397,12 +2372,13 @@ void INIT_ALL()
 	
 	distance_counter = 0;
 	distance_flag = 0;
-	//MAP_addJunction();
-	//MAP_junctionOrderArray[MAP_currentJunction].hasUnex = 0;
-	MAP_array[16][15].description = 3;
+	
 	MAP_currentDir = 1;
 	MAP_nextDir = 1;
 	MAP_setVisited();	// Map initialization
+	
+	MAP_addJunction();
+	set_map_Corridor(); //Kanske ändra till description = 3 istället
 	sei();	// Enable global interrupts
 }
 
@@ -2421,26 +2397,20 @@ int main(void)
     		{
 	    		AutomaticControl();
 				Send_sensor_values();
+				LCD_Clear();
 				LCD_SetPosition(0);
-// 				LCD_SendString("Y:");
-// 				LCD_display_uint16(MAP_currentPos[0]);
-// 				LCD_SendString(" ");
-// 				LCD_SendString("X:");
-// 				LCD_display_uint16(MAP_currentPos[1]);
-// 				LCD_SendString(" ");
-				LCD_SendString("Ar:");
-				LCD_display_uint16(MAP_junctionOrderArray[0].hasUnex);
-				LCD_SendString(" ");
-				//LCD_SetPosition(16);
-				LCD_SendString("cDir:");
-				LCD_display_uint16(MAP_currentDir);
-				LCD_SendString(" ");
-				LCD_SendString("nDir:");
-				LCD_display_uint16(MAP_nextDir);
+				LCD_SendString("NJL:");
+				LCD_display_uint16(MAP_nextJunctionLong);
+				LCD_SendString("  ");
+				LCD_SendString("NJS");
+				LCD_display_uint16(MAP_nextJunctionShort);
 				LCD_SendString(" ");
 				LCD_SetPosition(16);
 				LCD_SendString("jC:");
 				LCD_display_uint16(MAP_junctionCount);
+				LCD_SendString(" ");
+				LCD_SendString("CJ:");
+				LCD_display_uint16(MAP_currentJunction);
 				LCD_SendString(" ");
     		}
 			while(!MAP_LOOPer)
