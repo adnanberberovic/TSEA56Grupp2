@@ -1115,7 +1115,7 @@ int PD_Control()
 		{
 			newSignal = P_Control()+D_control()-angle_;	
 		}
-		if(angle_ > 0) // On the right path to the middle.
+		if ((angle_ > 0) && ((offset_ > 12) || (offset_ < 28))) // On the right path to the middle.
 		{
 			newSignal=0;
 		}
@@ -2513,11 +2513,11 @@ int main(void)
 				Send_sensor_values();
 				
 				LCD_SetPosition(0);
-				LCD_SendString("jC:");
-				LCD_display_uint16(MAP_junctionCount);
+				LCD_SendString("njl:");
+				LCD_display_uint16(MAP_nextJunctionLong);
 				LCD_SendString(" ");
-				LCD_SendString("CJ:");
-				LCD_display_uint16(MAP_currentJunction);
+				LCD_SendString("njs:");
+				LCD_display_uint16(MAP_nextJunctionShort);
 				LCD_SendString(" ");
 				LCD_SetPosition(16);
 				LCD_SendString("Unex:");

@@ -293,6 +293,15 @@ void MAP_lastUnexJunction(uint8_t x)
 		_delay_ms(250);
 		_delay_ms(250);
 		_delay_ms(250);
+		_delay_ms(250);
+		_delay_ms(250);
+		_delay_ms(250);
+		_delay_ms(250);
+		_delay_ms(250);
+		_delay_ms(250);
+		_delay_ms(250);
+		_delay_ms(250);
+		_delay_ms(250);
 		
 		// The map is fully explored
 		MAP_nextJunctionLong = 0;
