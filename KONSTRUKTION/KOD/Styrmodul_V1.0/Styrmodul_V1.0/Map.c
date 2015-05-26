@@ -262,7 +262,6 @@ void MAP_addJunction()
 	}
 
 	// Increments counters
-	LCD_SendString("JUNCTION++ LOL");
 	MAP_currentJunction = MAP_junctionCount++;
 
 	// Adds it in the map array

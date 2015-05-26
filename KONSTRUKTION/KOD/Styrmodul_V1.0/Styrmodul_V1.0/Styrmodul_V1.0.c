@@ -1487,9 +1487,8 @@ void TURN_Back(int mode)
 	
 	while((PATHCOUNT_Left() > 0) || (PATHCOUNT_Right() > 0))
 	{
-		_delay_us(250);
+		_delay_us(100);
 		LCD_SetPosition(1);
-		LCD_SendString("Turn back");
 		//Wait until robot reaches walls again
 	}
 	
