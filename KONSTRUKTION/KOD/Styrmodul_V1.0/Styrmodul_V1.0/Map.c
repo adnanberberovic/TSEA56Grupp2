@@ -284,8 +284,23 @@ void MAP_lastUnexJunction(uint8_t x)
 {
 	if (x <= 0)
 	{
+		_delay_ms(250);
+		_delay_ms(250);
+		_delay_ms(250);
+		_delay_ms(250);
+		_delay_ms(250);
+		_delay_ms(250);
+		_delay_ms(250);
+		_delay_ms(250);
+		_delay_ms(250);
+		_delay_ms(250);
+		
 		// The map is fully explored
 		MAP_nextJunctionLong = 0;
+		if (MAP_currentJunction == 0)
+		{
+			MAP_LOOPer = 0;
+		}
 	}
 	else if (MAP_junctionOrderArray[x - 1].hasUnex == 1)
 	{

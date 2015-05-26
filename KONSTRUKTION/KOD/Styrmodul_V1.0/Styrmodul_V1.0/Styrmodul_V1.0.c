@@ -727,60 +727,59 @@ void set_map_right(int desc)
 {
 	uint8_t posY_ = MAP_currentPos[0];
 	uint8_t posX_ = MAP_currentPos[1];
-	MAP_array[posY_][posX_ + 1].description = desc;
-// 	if (MAP_array[posY_][posX_ + 1].description == 0)
-// 	{
-// 		MAP_array[posY_][posX_ + 1].description = desc;
-// 	}
-// 	else if (MAP_array[posY_][posX_ + 1].description == 4 && desc == 3)
-// 	{
-// 		MAP_array[posY_][posX_ + 1].description = desc;
-// 	}
+	
+	if (MAP_array[posY_][posX_ + 1].description == 5)
+	{
+		return;
+	}
+	else
+	{
+		MAP_array[posY_][posX_ + 1].description = desc;
+	}
 }
 
 void set_map_up(int desc)
 {
 	uint8_t posY_ = MAP_currentPos[0];
 	uint8_t posX_ = MAP_currentPos[1];
-	MAP_array[posY_ - 1][posX_].description = desc;
-// 	if (MAP_array[posY_ - 1][posX_].description == 0)
-// 	{
-// 		MAP_array[posY_ - 1][posX_].description = desc;
-// 	}
-// 	else if (MAP_array[posY_ - 1][posX_].description == 4 && desc == 3)
-// 	{
-// 		MAP_array[posY_ - 1][posX_].description = desc;
-// 	}
+	
+	if (MAP_array[posY_ - 1][posX_].description == 5)
+	{
+		return;
+	}
+	else
+	{
+		MAP_array[posY_ - 1][posX_].description = desc;
+	}
 }
 
 void set_map_left(int desc)
 {
 	uint8_t posY_ = MAP_currentPos[0];
 	uint8_t posX_ = MAP_currentPos[1];
-	MAP_array[posY_][posX_ - 1].description = desc;
-// 	if (MAP_array[posY_][posX_ - 1].description == 0)
-// 	{
-// 		MAP_array[posY_][posX_ - 1].description = desc;
-// 	}
-// 	else if (MAP_array[posY_][posX_ - 1].description == 4 && desc == 3)
-// 	{
-// 		MAP_array[posY_][posX_ - 1].description = desc;
-// 	}
+	if (MAP_array[posY_][posX_ - 1].description == 5)
+	{
+		return;
+	}
+	else
+	{
+		MAP_array[posY_][posX_ - 1].description = desc;
+	}
 }
 
 void set_map_down(int desc)
 {
 	uint8_t posY_ = MAP_currentPos[0];
 	uint8_t posX_ = MAP_currentPos[1];
-	MAP_array[posY_ + 1][posX_].description = desc;
-// 	if (MAP_array[posY_ + 1][posX_].description == 0)
-// 	{
-// 		MAP_array[posY_ + 1][posX_].description = desc;
-// 	}
-// 	else if (MAP_array[posY_ + 1][posX_].description == 4 && desc == 3)
-// 	{
-// 		MAP_array[posY_ + 1][posX_].description = desc;
-// 	}
+	
+	if (MAP_array[posY_ + 1][posX_].description == 5)
+	{
+		return;
+	}
+	else
+	{
+		MAP_array[posY_ + 1][posX_].description = desc;	
+	}
 }
 
 void set_map_FourWay()
@@ -1039,8 +1038,6 @@ char resque_mode = 'd'; /*if resque_mode == d, then the robot will search accord
 						if resque_mode == q, then the robot has found the mark and will
 						start resquing.
 						*/
-
-
 
 // P-control function
 int P_Control()
@@ -1436,11 +1433,11 @@ void TURN_Back(int mode)
 	{
 		if( offset_ > 20)
 		{
-			MOTOR_RotateLeft(180 - angle_);
+			MOTOR_RotateLeft(180); //TODO - FIXA ANGLE
 		}
 		else
 		{
-			MOTOR_RotateLeft(180 + angle_);
+			MOTOR_RotateLeft(180);
 		}
 				
 		_delay_ms(100);
@@ -1569,11 +1566,6 @@ void DISCOVERY_SetMode()
 */
 void JUNCTION_ThreeWayONE()
 {
-	MOTOR_Stop();
-	LCD_SendString("   3V3   ");
-	_delay_ms(25);
-	MOTOR_Forward(standard_speed_);
-	
 	if (discovery_mode == 'l')
 	{
 		TURN_Left(1);
@@ -1581,14 +1573,7 @@ void JUNCTION_ThreeWayONE()
 	
 	else if (discovery_mode == 'b')
 	{
-		MOTOR_Stop();
-		_delay_ms(250);
-		_delay_ms(250);
-		_delay_ms(250);
-		_delay_ms(250);
-		MOTOR_Forward(standard_speed_);
 		TURN_Back(1);
-
 	}
 	
 	else if (discovery_mode == '?')
@@ -1648,14 +1633,6 @@ void JUNCTION_ThreeWayTWO()
 	}
 	else if (discovery_mode == 'b')
 	{
-		MOTOR_Stop();
-		_delay_ms(250);
-		_delay_ms(250);
-		_delay_ms(250);
-		_delay_ms(250);
-		LCD_Clear();
-		LCD_SendString(" TUUURN BACK 3v2");
-		MOTOR_Forward(standard_speed_);
 		TURN_Back(2);
 	}
 	else if ((discovery_mode == 'l') || (discovery_mode == 'f'))
@@ -1679,18 +1656,7 @@ void JUNCTION_ThreeWayTWO()
 */
 void JUNCTION_ThreeWayTHREE()
 {	
-
-LCD_Clear();
-MOTOR_Stop();
-LCD_SendCharacter(discovery_mode);
-LCD_SendCharacter(discovery_mode);
-LCD_SendCharacter(discovery_mode);
-LCD_SendCharacter(discovery_mode);
-LCD_SendCharacter(discovery_mode);
-_delay_ms(250);
-_delay_ms(250);
-MOTOR_Forward(standard_speed_);
-
+	
 	if (discovery_mode == 'r')
 	{
 		TURN_Right(1);
@@ -1698,14 +1664,6 @@ MOTOR_Forward(standard_speed_);
 	
 	else if (discovery_mode == 'b')
 	{
-		MOTOR_Stop();
-		_delay_ms(250);
-		_delay_ms(250);
-		_delay_ms(250);
-		_delay_ms(250);
-		LCD_Clear();
-		LCD_SendString(" TUUURN BACK 3v3");
-		MOTOR_Forward(standard_speed_);
 		TURN_Back(3);
 	}
 
@@ -1824,20 +1782,26 @@ void MAP_main()
 			
 			//lägg till kanske: om korsningen bredvid mig har mig som granne är det okej.
 			//skapa rekursiv funktion?
+			
 			int fatIf_;
 			fatIf_ = MAP_unexploredSquares -
-					(MAP_array[posY_ - 1][posX_].description == 5 && !MAP_junctionOrderArray[MAP_array[posY_ - 1][posX_].junctionNumber].hasUnex) -
-					(MAP_array[posY_ + 1][posX_].description == 5 && !MAP_junctionOrderArray[MAP_array[posY_ + 1][posX_].junctionNumber].hasUnex) -
-					(MAP_array[posY_][posX_ - 1].description == 5 && !MAP_junctionOrderArray[MAP_array[posY_][posX_ - 1].junctionNumber].hasUnex) -
-					(MAP_array[posY_][posX_ + 1].description == 5 && !MAP_junctionOrderArray[MAP_array[posY_][posX_ + 1].junctionNumber].hasUnex);
-			if (fatIf_ >= 1)
+			(MAP_array[posY_ - 1][posX_].description == 5 && !MAP_junctionOrderArray[MAP_array[posY_ - 1][posX_].junctionNumber].hasUnex) -
+			(MAP_array[posY_ + 1][posX_].description == 5 && !MAP_junctionOrderArray[MAP_array[posY_ + 1][posX_].junctionNumber].hasUnex) -
+			(MAP_array[posY_][posX_ - 1].description == 5 && !MAP_junctionOrderArray[MAP_array[posY_][posX_ - 1].junctionNumber].hasUnex) -
+			(MAP_array[posY_][posX_ + 1].description == 5 && !MAP_junctionOrderArray[MAP_array[posY_][posX_ + 1].junctionNumber].hasUnex);
+			
+			MAP_currentJunction = MAP_array[posY_][posX_].junctionNumber;
+			
+			if (fatIf_ == 1)
 			{
-				MAP_currentJunction = MAP_array[posY_][posX_].junctionNumber;
-				//MAP_junctionOrderArray[MAP_array[posY_][posX_].junctionNumber].hasUnex = 0;
+				MAP_junctionOrderArray[MAP_currentJunction].hasUnex = 0;
 			}
-			else if(fatIf_ == 0)
+		
+			else if(fatIf_ <= 0)
 			{
-				MAP_currentJunction = MAP_array[posY_][posX_].junctionNumber;
+				MOTOR_Stop();
+				LCD_Clear();
+				LCD_SendString(" FATIF  <= 0 ");
 				MAP_junctionOrderArray[MAP_currentJunction].hasUnex = 0;
 				MAP_decideDestination();
 				MAP_operatingMode_ = 2;
@@ -1970,21 +1934,8 @@ void MAP_main()
 	// Checks if all the map has been explored
 	//MAP_checkIfDone();
 	MOTOR_Stop();
-	LCD_Clear();
-	LCD_SetPosition(0);
-	LCD_SendString("CJ:");
-	LCD_display_uint16(MAP_currentJunction);
-	LCD_SendString(" ");
-	LCD_SendString("NJL:");
-	LCD_display_uint16(MAP_nextJunctionLong);
-	LCD_SendString("  ");
-	LCD_SendString("NJS");
-	LCD_display_uint16(MAP_nextJunctionShort);
-	LCD_SendString(" ");
-	LCD_SendString("hU:");
-	LCD_display_uint8(MAP_junctionOrderArray[MAP_array[MAP_currentPos[0]][MAP_currentPos[1]].junctionNumber].hasUnex);
-	LCD_SendString(" ");
 }
+
 
 void Tejp()
 {
@@ -2102,6 +2053,7 @@ void Tejp()
     }
 
 }
+
 
 void Floor_Marker()
 {
@@ -2492,17 +2444,24 @@ void AutomaticControl()
 		MAP_rotate();
 		angle_ = 0;
 	}
-	if((distance_counter >= 10) && (distance_flag == 1))
+	if((distance_counter >= 7) && (distance_flag == 1))
 	{
 		MAP_moveForward();
 		set_map_Corridor();
 		MAP_main();
 		//DISCOVERY_SetMode();
+	
+// 		if (discovery_mode == 'b')
+// 		{
+// 			LCD_Clear();
+// 			LCD_SendString(" back in corridor wtf ");
+// 			_delay_ms(250);
+// 			_delay_ms(250);
+// 			_delay_ms(250);
+// 			_delay_ms(250);
+// 			TURN_Back(4);
+// 		}
 		
-		if (discovery_mode == 'b')
-		{
-			//TURN_Back(4);
-		}
 		//MAP_rotate();
 		distance_flag = 0;
 	}
@@ -2528,12 +2487,13 @@ void INIT_ALL()
 	
 	distance_counter = 0;
 	distance_flag = 0;
-	//MAP_addJunction();
-	//MAP_junctionOrderArray[MAP_currentJunction].hasUnex = 0;
-	MAP_array[16][15].description = 3;
+	
 	MAP_currentDir = 1;
 	MAP_nextDir = 1;
 	MAP_setVisited();	// Map initialization
+	
+	MAP_addJunction();
+	set_map_Corridor(); //Kanske ändra till description = 3 istället
 	sei();	// Enable global interrupts
 }
 
@@ -2552,26 +2512,17 @@ int main(void)
     		{
 	    		AutomaticControl();
 				Send_sensor_values();
+				
 				LCD_SetPosition(0);
-// 				LCD_SendString("Y:");
-// 				LCD_display_uint16(MAP_currentPos[0]);
-// 				LCD_SendString(" ");
-// 				LCD_SendString("X:");
-// 				LCD_display_uint16(MAP_currentPos[1]);
-// 				LCD_SendString(" ");
-				LCD_SendString("Ar:");
-				LCD_display_uint16(MAP_junctionOrderArray[0].hasUnex);
-				LCD_SendString(" ");
-				//LCD_SetPosition(16);
-				LCD_SendString("cDir:");
-				LCD_display_uint16(MAP_currentDir);
-				LCD_SendString(" ");
-				LCD_SendString("nDir:");
-				LCD_display_uint16(MAP_nextDir);
-				LCD_SendString(" ");
-				LCD_SetPosition(16);
 				LCD_SendString("jC:");
 				LCD_display_uint16(MAP_junctionCount);
+				LCD_SendString(" ");
+				LCD_SendString("CJ:");
+				LCD_display_uint16(MAP_currentJunction);
+				LCD_SendString(" ");
+				LCD_SetPosition(16);
+				LCD_SendString("Unex:");
+				LCD_display_uint16(MAP_junctionOrderArray[MAP_currentJunction].hasUnex);
 				LCD_SendString(" ");
     		}
 			while(!MAP_LOOPer)
@@ -2579,7 +2530,7 @@ int main(void)
 				MOTOR_Stop();
 				LCD_Clear();
 				LCD_SetPosition(0);
-				LCD_SendString("Map Looper 0 ");
+				LCD_SendString("   I R WIN   ");
 				_delay_ms(75);
 // 				LCD_display_uint8(MAP_array[14][16].description);
 // 				LCD_SendCharacter(' ');
@@ -2621,6 +2572,9 @@ int main(void)
 				LCD_SendString(" ");
 				LCD_SendString("Re");
 				LCD_display_uint8(REFLEX_GetMarker());
+				LCD_SendString(" ");
+				LCD_SendString("F");
+				LCD_display_uint16(FRONT_SENSOR_VALUE());
 				LCD_SendString(" ");
 				_delay_ms(10);
     		}
