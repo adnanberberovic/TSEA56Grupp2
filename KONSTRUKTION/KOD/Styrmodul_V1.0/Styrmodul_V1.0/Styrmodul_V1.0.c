@@ -2019,12 +2019,15 @@ void Tejp()
         {
 			ReflexSensor = 0;
             if ( MAP_currentPos[0] == 16 ) // Kommer från starpos == i banan
+
                 {
                     Reflex_StartMarker = 1;
                 }
                 else
                 {
-                    Reflex_StartMarker = 0; //Åker tillbaka till startpos == åker ur banan
+                    Reflex_StartMarker = 0; //Åker tillbaka till startpos <<== åker ur banan
+                    //Nu är roboten påväg tillbaka till startpositionen
+                    //Här kan det hända saker
                 }
             return;
             
