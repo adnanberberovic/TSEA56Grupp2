@@ -17,10 +17,13 @@ void MAP_setGoal()
 {
 	uint8_t posY = MAP_currentPos[0];
 	uint8_t posX = MAP_currentPos[1];
-	MAP_junctionOrderArray[MAP_currentJunction].goal = 1;
+	MAP_addJunction();
+	MAP_goalJunction = MAP_currentJunction;
+	MAP_junctionOrderArray[MAP_goalJunction].goal = 1;
 	MAP_goalPosition[0] = posY;
 	MAP_goalPosition[1] = posX;
     MAP_operatingMode_ = 4;
+	MAP_resQmode = 1;
 }
 
 // Description:
@@ -186,7 +189,7 @@ void MAP_countSquares()
 // SIM
 void MAP_decideDestination()
 {
-	MAP_lastUnexJunction(MAP_junctionCount);
+	//MAP_lastUnexJunction(MAP_junctionCount);
 	MAP_findPath(MAP_currentJunction, MAP_nextJunctionLong);
 	MAP_nextJunctionShort = getNextJunction();
 	
@@ -257,7 +260,7 @@ void MAP_addJunction()
 	// Adds directions between last junction and this one
 	if (MAP_addJunctionDist(MAP_currentJunction, MAP_junctionCount) || MAP_addJunctionDist(MAP_junctionCount, MAP_currentJunction))
 	{
-		// Only adds the direction if the distance is shorter than before, thus onnly the shortest direction
+		// Only adds the direction if the distance is shorter than before, thus only the shortest direction
 		// between two junctions is marked
 		MAP_addJunctionDir(MAP_currentJunction, MAP_junctionCount, MAP_lastJunctionDir);
 		MAP_addJunctionDir(MAP_junctionCount, MAP_currentJunction, (MAP_currentDir + 2) % 4);

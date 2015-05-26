@@ -1802,9 +1802,10 @@ void MAP_main()
 				LCD_Clear();
 				LCD_SendString(" FATIF  <= 0 ");
 				MAP_junctionOrderArray[MAP_currentJunction].hasUnex = 0;
+				MAP_lastUnexJunction(MAP_junctionCount);
 				MAP_decideDestination();
 				MAP_operatingMode_ = 2;
-				goto RotatingPhase; // Exit this phase
+				goto Phase3; // Exit this phase
 			}
 
 		}
@@ -1824,7 +1825,7 @@ void MAP_main()
 				MAP_movingForward_ = 1;
 				MAP_operatingMode_ = 3;
 				MAP_nextJunctionShort = MAP_currentJunction;
-				goto RotatingPhase; // Exit this phase
+				goto Phase3; // Exit this phase
 			}
 		}
 
@@ -1839,11 +1840,11 @@ void MAP_main()
 	
 	// Rotating phase
 	// SIM
-	RotatingPhase:
+	
 	
 	// Go until nextJunctionShort phase
 	// This phase is meant to navigate through an explored corridor between two junctions
-	//Phase3:
+	Phase3:
 	if ((MAP_operatingMode_ == 3) && !MAP_rotating_ && !MAP_movingForward_)
 	{
 		// Checks if we can move right or left, then rotate accordingly, otherwise move forward
@@ -1875,7 +1876,15 @@ void MAP_main()
 			(MAP_array[posY_ + 1][posX_].description == 5 && !MAP_junctionOrderArray[MAP_array[posY_ + 1][posX_].junctionNumber].hasUnex) -
 			(MAP_array[posY_][posX_ - 1].description == 5 && !MAP_junctionOrderArray[MAP_array[posY_][posX_ - 1].junctionNumber].hasUnex) -
 			(MAP_array[posY_][posX_ + 1].description == 5 && !MAP_junctionOrderArray[MAP_array[posY_][posX_ + 1].junctionNumber].hasUnex);
-			if (fatIf_ >= 1)
+			
+			if (MAP_resQmode != 0)
+			{
+				MAP_decideDestination();
+				MAP_operatingMode_ = 2;
+				MAP_movingForward_ = 0;
+				goto Phase2;
+			}
+			else if (fatIf_ >= 1)
 			{
 				MAP_rotating_ = 0;
 				MAP_movingForward_ = 0;
@@ -1884,6 +1893,7 @@ void MAP_main()
 			}
 			else
 			{
+				MAP_lastUnexJunction(MAP_junctionCount);
 				MAP_decideDestination();
 				MAP_operatingMode_ = 2;
 				MAP_movingForward_ = 0;
@@ -1903,9 +1913,31 @@ void MAP_main()
 		if ((MAP_currentPos[0] == MAP_junctionOrderArray[MAP_nextJunctionLong].posY) &&
 		(MAP_currentPos[1] == MAP_junctionOrderArray[MAP_nextJunctionLong].posX))
 		{
-			MAP_travelledDist = 0;
-			MAP_operatingMode_ = 0;
-			goto Phase0;
+			if (MAP_resQmode == 0)
+			{	
+				MAP_travelledDist = 0;
+				MAP_operatingMode_ = 0;
+				goto Phase0;
+			}
+			else if (MAP_resQmode == 1)
+			{
+				// Greppa MER,	
+				MAP_resQmode++;
+				MAP_operatingMode_ = 4;
+			} 
+			else if (MAP_resQmode == 2)
+			{
+				// Släpp MER,
+				MAP_resQmode++;
+				MAP_operatingMode_ = 4;
+			}
+			else if (MAP_resQmode == 3)
+			{
+				MOTOR_Stop();
+				LCD_SendString("DONE WITH THIS SHIT");
+				while (1);
+				// Stanna, mission successful!
+			}
 		}
 		else if (MAP_nextJunctionLong == 255)
 		{
@@ -1920,14 +1952,34 @@ void MAP_main()
 			}
 			MAP_movingForward_ = 1;
 			MAP_operatingMode_ = 3;
-			goto RotatingPhase;
+			goto Phase3;
 		}
 	}
 
 	// This phase is activated when we have discovered the goal
 	if (MAP_operatingMode_ == 4 && !MAP_rotating_ && MAP_movingForward_)
 	{
-		// Go ResQ.PL, go!
+		if (MAP_resQmode == 1)
+		{
+			MAP_nextJunctionLong = 0;
+			MAP_decideDestination();
+			MAP_operatingMode_ = 3;
+			goto Phase3;
+		} 
+		else if (MAP_resQmode == 2)
+		{
+			MAP_nextJunctionLong = MAP_array[MAP_goalPosition[0]][MAP_goalPosition[1]].junctionNumber;
+			MAP_decideDestination();
+			MAP_operatingMode_ = 3;
+			goto Phase3;
+		}
+		else if (MAP_resQmode == 3)
+		{
+			MAP_nextJunctionLong = 0;
+			MAP_decideDestination();
+			MAP_operatingMode_ = 3;
+			goto Phase3;
+		}
 	}
 
 	// Checks if all the map has been explored
