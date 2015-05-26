@@ -382,11 +382,18 @@ void Autonom::update_map(int8_t xPosD, int8_t yPosM, int8_t LFR)
 	xPos = ((xPosD & 0xf8) / 8) + 0;
 	yPos = ((yPosM & 0xf8) / 8) + 0;
 	dir =   (xPosD & 0x03) + 0;
+    goal = (yPosD & 0x03) + 0;
     Left = ((LFR & 0xc0) / 64) + 0;
 	Front = ((LFR & 0x30) / 16) + 0;
 	Right = ((LFR & 0x0c) / 4) + 0;
+  
 
 	(Tile_vector[xPos][yPos])->Place_Robot_Here(1);
+    
+    if(goal)
+    {
+        (Tile_vector[xPos][yPos])->make_Goal();
+    }
 
 	if ((xPos >= 0) && (xPos <= 30) && (yPos >= 0) && (yPos <= 16))
 	{

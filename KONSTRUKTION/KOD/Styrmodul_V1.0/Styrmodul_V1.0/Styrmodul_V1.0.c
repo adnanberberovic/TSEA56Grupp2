@@ -70,6 +70,10 @@ uint8_t WallAhead;
 uint8_t WallCloseAhead;
 uint8_t FrontSensorValue;
 
+uint8_t ReflexSensor = 0;
+uint8_t Reflex_SetNextForwardGold = 0;
+uint8_t Reflex_StartMarker = 0;
+
 //__________________________REGISTERS__________________________
 
 // Setup data direction registers @ ports for out/inputs.
@@ -218,6 +222,12 @@ void Get_sensor_values() //Load all sensor values into sensor-array
 	{
 		arrSensor[i - 1] = SPI_MasterTransmit(i,'s'); //load all 8 sensor values into sensor position [0-7]
 	}
+    
+    if( (arrSensor[6]/64) && (0b00000001) )
+    {
+        ReflexSensor = 1;
+    }
+    
 }
 void Send_sensor_values() // Can combine with Get speed when in manual mode
 {
@@ -1739,6 +1749,13 @@ void MAP_main()
 	uint8_t posY_ = MAP_currentPos[0];
 	uint8_t posX_ = MAP_currentPos[1];
 	
+    if(Reflex_SetNextForwardGold)
+    {
+        Reflex_SetNextForwardGold = 0;
+        MAP_setGoal();
+    }
+    
+    
 	// Normal searching phase
 	Phase0:
 	if (!MAP_operatingMode_ && !MAP_rotating_ && !MAP_movingForward_)
@@ -1917,6 +1934,125 @@ void MAP_main()
 	//MAP_checkIfDone();
 	MOTOR_Stop();
 }
+
+
+void Tejp()
+{
+
+    if(ReflexSensor)
+    {
+        if ( (MAP_currentPos[1] == 15) && ( (MAP_currentPos[0] == 16) || (MAP_currentPos[0] == 15) ))
+        {
+            if ( MAP_currentPos[0] == 16 ) // Kommer från starpos == i banan
+                {
+                    Reflex_StartMarker = 1;
+                }
+                else
+                {
+                    Reflex_StartMarker = 0; //Åker tillbaka till startpos == åker ur banan
+                }
+            return;
+            
+        }
+        
+        if( resque_mode == 'd') //The goas hasn't yet been found
+        {
+            MOTOR_Stop();
+            ReflexSensor = 0;
+            
+            //Stall in rätt vinken om möjligt.
+            
+            MOTOR_Forward(50);
+            Get_sensor_values;
+            
+            while( !(ReflexSensor || WallCloseAhead) )
+            {
+                Get_sensor_values;
+                _delay_us(250);
+            }
+            
+            MOTOR_Stop(); // Kanske kolla efter vinkel här om möjligt!
+            
+            Reflex_SetNextForwardGold = 1;
+            
+            if(ReflexSensor)
+            {
+                ReflexSensor = 0;
+                MOTOR_Backward(50);
+                JUNCTION_delay(4); // Detta värdet kanske behövs ändras!!!! <----- OBS
+                MOTOR_Stop();
+                Get_sensor_values();
+                
+                if( !(PathCountLeft > 0) || (PathCountRight > 0) ) // Vi är i en korridor.
+                {
+                    MAP_moveForward();
+                    set_map_Corridor();
+                    MAP_main();
+                }
+                
+                distance_counter = 0;
+                distance_flag = 0;
+            }
+            resque_mode = 'q';
+            
+        }
+        else if( resque_mode == 'q')
+        {
+            MOTOR_Stop();
+            ReflexSensor = 0;
+            
+            //Stall in rätt vinken om möjligt.
+            
+            MOTOR_Forward(50);
+            Get_sensor_values;
+            
+            while( !(ReflexSensor || WallCloseAhead) )
+            {
+                Get_sensor_values;
+                _delay_us(250);
+            }
+            
+            MOTOR_Stop(); // Kanske kolla efter vinkel här om möjligt!
+            
+            if(ReflexSensor)
+            {
+                ReflexSensor = 0;
+                MOTOR_Backward(50); // backa in i rutan igen
+                JUNCTION_delay(3); // Detta värdet kanske behövs ändras!!!! <----- OBS
+                MOTOR_Stop();
+                Get_sensor_values();
+                //Gripklo Släpp
+                
+                if( !(PathCountLeft > 0) || (PathCountRight > 0) ) // Vi är i en korridor.
+                {
+                    MOTOR_Backward(50); // Backa ifrån släppta paketet
+                    JUNCTION_delay(2); // Detta värdet kanske behövs ändras!!!! <----- OBS
+                    MOTOR_Stop();
+                    MAP_moveForward();
+                    MAP_main();
+                    DISCOVERY_SetMode();
+                    TURN_Back(1);
+                    MAP_rotate();
+                    MOTOR_Forward(standard_speed_);
+                    
+                }
+                
+                distance_counter = 0;
+                distance_flag = 0;
+            }
+            else
+            {
+                //Släpp Gripklo
+                MOTOR_Backward(50); //Backa ifrån släpta paketet
+                JUNCTION_delay(2);
+            }
+        
+        }
+        
+    }
+
+}
+
 
 void Floor_Marker()
 {
@@ -2310,9 +2446,7 @@ void AutomaticControl()
 	if((distance_counter >= 7) && (distance_flag == 1))
 	{
 		MAP_moveForward();
-		
 		set_map_Corridor();
-		
 		MAP_main();
 		//DISCOVERY_SetMode();
 	

@@ -12,6 +12,7 @@
 
 
 // Sets the position of the goal in the map
+// ADD JUNCTION BEHÖVS!!!! OBS!!!!!!!!!!! <---------------------- !!!! OBS !!!! --------
 void MAP_setGoal()
 {
 	uint8_t posY = MAP_currentPos[0];
@@ -19,6 +20,7 @@ void MAP_setGoal()
 	MAP_junctionOrderArray[MAP_currentJunction].goal = 1;
 	MAP_goalPosition[0] = posY;
 	MAP_goalPosition[1] = posX;
+    MAP_operatingMode_ = 4;
 }
 
 // Description:
