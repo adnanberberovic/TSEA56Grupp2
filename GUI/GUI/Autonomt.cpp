@@ -231,7 +231,7 @@ void Autonom::init_Tiles()
         {
             row.insert(row.begin(),
                        new Tile(Tiles_plats,
-                                renderer_, 284+40*i, 101+40*j));
+                                renderer_, 244+40*i, 61+40*j));
         }
         Tile_vector.insert(Tile_vector.begin(), row);
     }
@@ -387,6 +387,17 @@ void Autonom::update_map(int8_t xPosD, int8_t yPosM, int8_t LFR)
 	Front = ((LFR & 0x30) / 16) + 0;
 	Right = ((LFR & 0x0c) / 4) + 0;
   
+
+	if (xPos >= (22 + shift_right))
+	{
+		Skift_Tiles_left();
+		shift_right++;
+	}
+	if (xPos <= (8 - shift_left))
+	{
+		Skift_Tiles_right();
+		shift_left++;
+	}
 
 	(Tile_vector[xPos][yPos])->Place_Robot_Here(1);
     

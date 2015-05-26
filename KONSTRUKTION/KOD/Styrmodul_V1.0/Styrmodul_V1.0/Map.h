@@ -15,10 +15,13 @@ uint8_t MAP_nextDir = 1; // Tells which direction we should face before moving f
 uint8_t MAP_currentJunction = 0; // Tells us which is the current junction (or last visited), 0-63
 uint8_t MAP_junctionCount = 0; // The number of junctions discovered so far
 uint8_t MAP_travelledDist = 0; // Number of squares travelled from the previous junction
-uint8_t MAP_lastJunctionDir = 0; // Direction out of the last junction
+uint8_t MAP_lastJunctionDir = 1; // Direction out of the last junction
 uint8_t MAP_nextJunctionShort = 0; // The immediate next desired junction
 uint8_t MAP_nextJunctionLong = 0; // The long-term desired junction
 uint8_t MAP_mapped = 0;
+//uint8_t MAP_goalFound = 0; // Marks if the goal has been found, OBS VERKAR EJ ANVÄNDAS
+uint8_t MAP_resQmode = 0; // The phase of resQ the robot is in
+uint8_t MAP_goalJunction = 0; // The number of the goal junction
 
 // Flags used to navigate between the different phases in the main function
 uint8_t MAP_operatingMode_ = 0; // 0 = normal, 2 = go to next junction long, 3 = go to next junction short, 4 = goal discovered

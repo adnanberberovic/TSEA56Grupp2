@@ -15,12 +15,20 @@
 // ADD JUNCTION BEHÖVS!!!! OBS!!!!!!!!!!! <---------------------- !!!! OBS !!!! --------
 void MAP_setGoal()
 {
-	uint8_t posY = MAP_currentPos[0];
-	uint8_t posX = MAP_currentPos[1];
-	MAP_junctionOrderArray[MAP_currentJunction].goal = 1;
-	MAP_goalPosition[0] = posY;
-	MAP_goalPosition[1] = posX;
+ 	uint8_t posY = MAP_currentPos[0];
+ 	uint8_t posX = MAP_currentPos[1];
+ 	MAP_addJunction();
+ 	MAP_goalJunction = MAP_currentJunction;
+	MAP_junctionOrderArray[MAP_goalJunction].hasUnex = 0;
+ 	MAP_junctionOrderArray[MAP_goalJunction].goal = 1;
+ 	MAP_goalPosition[0] = posY;
+ 	MAP_goalPosition[1] = posX;
     MAP_operatingMode_ = 4;
+ 	MAP_resQmode = 1;
+	for (int i = 0; i < 100; i++)
+	{
+		_delay_ms(250);
+	}
 }
 
 // Description:
@@ -186,7 +194,7 @@ void MAP_countSquares()
 // SIM
 void MAP_decideDestination()
 {
-	MAP_lastUnexJunction(MAP_junctionCount);
+	//MAP_lastUnexJunction(MAP_junctionCount);
 	MAP_findPath(MAP_currentJunction, MAP_nextJunctionLong);
 	MAP_nextJunctionShort = getNextJunction();
 	
@@ -210,7 +218,7 @@ uint8_t MAP_addJunctionDist(uint8_t j1, uint8_t j2)
 {
 	uint8_t returner_ = 0;
 
-	if ((MAP_junctionDistArray[j1][j2] == 0 || MAP_junctionDistArray[j1][j2] > MAP_travelledDist) && j1 != j2 && MAP_travelledDist != 0)
+	if (((MAP_junctionDistArray[j1][j2] == 0) || (MAP_junctionDistArray[j1][j2] > MAP_travelledDist)) && (j1 != j2) && (MAP_travelledDist != 0))
 	{
 		MAP_junctionDistArray[j1][j2] = MAP_travelledDist;
 		MAP_junctionDistArray[j2][j1] = MAP_travelledDist;
@@ -257,7 +265,7 @@ void MAP_addJunction()
 	// Adds directions between last junction and this one
 	if (MAP_addJunctionDist(MAP_currentJunction, MAP_junctionCount) || MAP_addJunctionDist(MAP_junctionCount, MAP_currentJunction))
 	{
-		// Only adds the direction if the distance is shorter than before, thus onnly the shortest direction
+		// Only adds the direction if the distance is shorter than before, thus only the shortest direction
 		// between two junctions is marked
 		MAP_addJunctionDir(MAP_currentJunction, MAP_junctionCount, MAP_lastJunctionDir);
 		MAP_addJunctionDir(MAP_junctionCount, MAP_currentJunction, (MAP_currentDir + 2) % 4);
@@ -283,32 +291,9 @@ void MAP_lastUnexJunction(uint8_t x)
 {
 	if (x <= 0)
 	{
-		_delay_ms(250);
-		_delay_ms(250);
-		_delay_ms(250);
-		_delay_ms(250);
-		_delay_ms(250);
-		_delay_ms(250);
-		_delay_ms(250);
-		_delay_ms(250);
-		_delay_ms(250);
-		_delay_ms(250);
-		_delay_ms(250);
-		_delay_ms(250);
-		_delay_ms(250);
-		_delay_ms(250);
-		_delay_ms(250);
-		_delay_ms(250);
-		_delay_ms(250);
-		_delay_ms(250);
-		_delay_ms(250);
-		
 		// The map is fully explored
 		MAP_nextJunctionLong = 0;
-		if (MAP_currentJunction == 0)
-		{
-			MAP_LOOPer = 0;
-		}
+		MAP_mapped = 1;
 	}
 	else if (MAP_junctionOrderArray[x - 1].hasUnex == 1)
 	{
@@ -326,6 +311,11 @@ void MAP_rotate()
 {
 	MAP_currentDir = MAP_nextDir;
 	MAP_rotating_ = 0;
+	
+	if (MAP_array[MAP_currentPos[0]][MAP_currentPos[1]].description == 5)
+	{
+		MAP_lastJunctionDir = MAP_currentDir;
+	}	
 }
 
 // Moves the robot one square forward
@@ -350,7 +340,7 @@ void MAP_moveForward()
 	{
 		MAP_currentPos[0]++;
 	}
-	
+		
 	MAP_movingForward_ = 0;
 	MAP_travelledDist++;
 	MAP_setVisited();
@@ -386,7 +376,7 @@ uint16_t MAP_checkIfDone()
 {
 	//uint8_t iterator = 0;
 	uint16_t done_ = 0;
-	
+
   	for (int i = 0; i < 16; i++)
   	{
   		for (int j = 0; j < 29; j++)
