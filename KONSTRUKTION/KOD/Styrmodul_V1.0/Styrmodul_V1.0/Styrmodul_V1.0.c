@@ -1758,9 +1758,6 @@ void MAP_main()
 	{
 		Reflex_SetNextForwardGold = 0;
 		MAP_setGoal();
-		MOTOR_Stop();
-		LCD_SendString("    KOD GULD    ");
-		MOTOR_Forward(standard_speed_);
 		goto Phase2;
 	}
     
@@ -1768,7 +1765,7 @@ void MAP_main()
 	
 	// Normal searching phase
 	Phase0:
-	if (!MAP_operatingMode_ && !MAP_rotating_ && !MAP_movingForward_)
+	if ( (MAP_operatingMode_ == 0) && !MAP_rotating_ && !MAP_movingForward_)
 	{
 		MAP_countSquares();
 
@@ -1844,16 +1841,13 @@ void MAP_main()
 			MAP_rotating_ = 1;
 		}
 			MAP_movingForward_ = 1;
-		}
+	}
 	
-	// Rotating phase
-	// SIM
-	
-	
+		
 	// Go until nextJunctionShort phase
 	// This phase is meant to navigate through an explored corridor between two junctions
 	Phase3:
-	if ((MAP_operatingMode_ == 3) && !MAP_rotating_ && !MAP_movingForward_)
+	if ( (MAP_operatingMode_ == 3) && !MAP_rotating_ && !MAP_movingForward_ )
 	{
 		// Checks if we can move right or left, then rotate accordingly, otherwise move forward
 		if (MAP_checkDir((MAP_currentDir + 3) % 4))
@@ -1913,7 +1907,7 @@ void MAP_main()
 	// Go to a junction farther away phase
 	// Decides which junction we should be heading to
 	Phase2:
-	if ((MAP_operatingMode_ == 2) && !MAP_rotating_ && !MAP_movingForward_)
+	if ( (MAP_operatingMode_ == 2) && !MAP_rotating_ && !MAP_movingForward_)
 	{
 		// If we have arrived at the desired junction then we start the normal phase
 		// Else if all the map has been explored we quit the main loop
@@ -1930,6 +1924,8 @@ void MAP_main()
 			else if (MAP_resQmode == 1)
 			{
 				// Greppa MER,	
+				MOTOR_RotateLeft(180);
+				MOTOR_RotateLeft(180);
 				MAP_resQmode++;
 				MAP_operatingMode_ = 4;
 			} 
@@ -1969,8 +1965,15 @@ void MAP_main()
 	{
 		if (MAP_resQmode == 1)
 		{
+			MOTOR_Stop();
+			LCD_Clear();
+			LCD_SendString("RESQ1");
+			_delay_ms(250);
+			_delay_ms(250);
+			_delay_ms(250);
+			_delay_ms(250);
+			MOTOR_Forward(standard_speed_);
 			MAP_nextJunctionLong = 0;
-			
 		} 
 		else if (MAP_resQmode == 2)
 		{
@@ -2275,8 +2278,8 @@ void Junction()
 			else if (discovery_mode == 'f')
 			{
 				MOTOR_Stop();
-				LCD_Clear();
-				LCD_SendString("                        fr            ");
+				//LCD_Clear();
+				//LCD_SendString("                        fr            ");
 				
 				// Keep going forward
 				distance_counter = 0;
@@ -2540,12 +2543,13 @@ void AutomaticControl()
 		
 		//MAP_rotate();
 		distance_flag = 0;
-	}
-	
-	if ( (MAP_mapped == 1)  && (MAP_currentPos[0] == 15) && (MAP_currentPos[1] == 15) )
-	{
-		JUNCTION_delay(5);
-		MAP_LOOPer = 0;
+		
+		if(MAP_mapped && (MAP_currentPos[0] == MAP_junctionOrderArray[MAP_nextJunctionLong].posY) && 
+		(MAP_currentPos[1] == MAP_junctionOrderArray[MAP_nextJunctionLong].posX))
+		{
+			MOTOR_Stop();
+			MAP_LOOPer = 0;	
+		}
 	}
 	
 }
