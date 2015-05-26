@@ -189,7 +189,7 @@ void MAP_countSquares()
 // SIM
 void MAP_decideDestination()
 {
-	//MAP_lastUnexJunction(MAP_junctionCount);
+	MAP_lastUnexJunction(MAP_junctionCount);
 	MAP_findPath(MAP_currentJunction, MAP_nextJunctionLong);
 	MAP_nextJunctionShort = getNextJunction();
 	
