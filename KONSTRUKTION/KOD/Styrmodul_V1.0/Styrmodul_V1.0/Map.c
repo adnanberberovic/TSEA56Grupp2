@@ -15,12 +15,17 @@
 // ADD JUNCTION BEHÖVS!!!! OBS!!!!!!!!!!! <---------------------- !!!! OBS !!!! --------
 void MAP_setGoal()
 {
-	uint8_t posY = MAP_currentPos[0];
-	uint8_t posX = MAP_currentPos[1];
-	MAP_junctionOrderArray[MAP_currentJunction].goal = 1;
-	MAP_goalPosition[0] = posY;
-	MAP_goalPosition[1] = posX;
-    MAP_operatingMode_ = 4;
+
+//  	uint8_t posY = MAP_currentPos[0];
+//  	uint8_t posX = MAP_currentPos[1];
+// 	MAP_addJunction();
+//  	MAP_junctionOrderArray[MAP_currentJunction].goal = 1;
+//  	MAP_goalPosition[0] = posY;
+//  	MAP_goalPosition[1] = posX;
+//     MAP_operatingMode_ = 4;
+// 	//Add junciton
+// 	// explore junction
+// 	// goal_junction_number = myposition
 }
 
 // Description:

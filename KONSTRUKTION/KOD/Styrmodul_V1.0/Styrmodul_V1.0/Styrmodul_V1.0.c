@@ -73,6 +73,7 @@ uint8_t FrontSensorValue;
 uint8_t ReflexSensor = 0;
 uint8_t Reflex_SetNextForwardGold = 0;
 uint8_t Reflex_StartMarker = 0;
+uint8_t Goal_found = 0;
 
 //__________________________REGISTERS__________________________
 
@@ -1119,6 +1120,18 @@ int PD_Control()
 		{
 			newSignal=0;
 		}
+		if((offset_ < 13) && ( angle_ < 3 ))
+		{
+			MOTOR_Stop();
+			MOTOR_RotateRight(5);
+			MOTOR_Forward(standard_speed_);
+		}
+		if((offset_ > 27) && ( angle_ < 3 ))
+		{
+			MOTOR_Stop();
+			MOTOR_RotateLeft(5);
+			MOTOR_Forward(standard_speed_);
+		}
 	}
 	else if(control_mode == 'c')
 	{
@@ -1204,6 +1217,7 @@ void JUNCTION_delay(int delay)
 	wheel_counter = 0;
 	while (wheel_counter < (2 * delay))
 	{
+		//MOTOR_Forward(standard_speed_);
 		_delay_us(50);
 	}
 }
@@ -1737,7 +1751,7 @@ void MAP_main()
 {	
 	MAP_junctionOrderArray[MAP_array[16][15].junctionNumber].hasUnex = 0;
 	
-	Send_map_values();
+	
 	// Save these under more convenient names
 	uint8_t posY_ = MAP_currentPos[0];
 	uint8_t posX_ = MAP_currentPos[1];
@@ -1746,9 +1760,13 @@ void MAP_main()
     {
         Reflex_SetNextForwardGold = 0;
         MAP_setGoal();
+		MOTOR_Stop();
+		LCD_SendString("    KOD GULD    ");
+		MOTOR_Forward(standard_speed_);
     }
     
-    
+    Send_map_values();
+	
 	// Normal searching phase
 	Phase0:
 	if (!MAP_operatingMode_ && !MAP_rotating_ && !MAP_movingForward_)
@@ -1927,11 +1945,22 @@ void MAP_main()
 
 void Tejp()
 {
-
-    if(ReflexSensor)
+	if((MAP_goalPosition[0] == MAP_currentPos[0]) && (MAP_goalPosition[1] == MAP_currentPos[1]))
+	{
+		ReflexSensor = 0;
+		return; 	
+	}
+	
+	if(Goal_found)
+	{
+		return;
+	}
+	
+	 if(ReflexSensor)
     {
         if ( (MAP_currentPos[1] == 15) && ( (MAP_currentPos[0] == 16) || (MAP_currentPos[0] == 15) ))
         {
+			ReflexSensor = 0;
             if ( MAP_currentPos[0] == 16 ) // Kommer frŒn starpos == i banan
                 {
                     Reflex_StartMarker = 1;
@@ -1943,47 +1972,54 @@ void Tejp()
             return;
             
         }
-        
-        if( resque_mode == 'd') //The goas hasn't yet been found
+        else if( resque_mode == 'd') //The goas hasn't yet been found
         {
-            MOTOR_Stop();
+			Goal_found = 1;
             ReflexSensor = 0;
+			MOTOR_Forward(50);
+			JUNCTION_delay(1);
             
-            //Stall in rAtt vinken om mÖjligt.
-            
-            MOTOR_Forward(50);
-            Get_sensor_values;
-            
-            while( !(ReflexSensor || WallCloseAhead) )
+            //Stall in rAtt vinken om mÖjligt 
+            Update_All_values();
+            while( (ReflexSensor == 0) && (WallCloseAhead == 0) )
             {
-                Get_sensor_values;
+                Update_All_values();
                 _delay_us(250);
             }
-            
-            MOTOR_Stop(); // Kanske kolla efter vinkel hAr om mÖjligt!
-            
-            Reflex_SetNextForwardGold = 1;
+		
+									
+            MOTOR_Stop();
+
+// Kanske kolla efter vinkel hAr om mÖjligt!
+						
+            Reflex_SetNextForwardGold = 1;	
             
             if(ReflexSensor)
             {
                 ReflexSensor = 0;
+				MOTOR_Stop();
+
                 MOTOR_Backward(50);
-                JUNCTION_delay(3); // Detta vŠrdet kanske behšvs Šndras!!!! <----- OBS
+                JUNCTION_delay(6); // Detta vŠrdet kanske behšvs Šndras!!!! <----- OBS
                 MOTOR_Stop();
-                Get_sensor_values();
+                Update_All_values();
                 
                 if( !(PathCountLeft > 0) || (PathCountRight > 0) ) // Vi Šr i en korridor.
                 {
                     MAP_moveForward();
                     set_map_Corridor();
                     MAP_main();
+					MOTOR_Forward(standard_speed_);
                 }
-                
+
+				
                 distance_counter = 0;
                 distance_flag = 0;
-            }
+				
+			}
             resque_mode = 'q';
-            
+            ReflexSensor = 0;
+
         }
         else if( resque_mode == 'q')
         {
@@ -1995,7 +2031,7 @@ void Tejp()
             MOTOR_Forward(50);
             Get_sensor_values;
             
-            while( !(ReflexSensor || WallCloseAhead) )
+            while( (ReflexSensor == 0) && (WallCloseAhead == 0) )
             {
                 Get_sensor_values;
                 _delay_us(250);
@@ -2102,7 +2138,10 @@ void Junction()
     
 	
     MAP_moveForward();
+	if(!Reflex_SetNextForwardGold)
+	{
     JUNCTION_delay(3);
+	}
     Update_All_values();
 	
     // Now in intersect. Determine what type:
