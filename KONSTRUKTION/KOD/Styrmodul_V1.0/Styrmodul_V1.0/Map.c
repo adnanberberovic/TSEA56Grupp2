@@ -23,7 +23,7 @@ void MAP_setGoal()
  	MAP_goalPosition[0] = posY;
  	MAP_goalPosition[1] = posX;
     //MAP_operatingMode_ = 4;
- 	MAP_resQmode = 0;	
+ 	//MAP_resQmode = 1;	
 }
 
 // Description:
@@ -286,10 +286,7 @@ void MAP_lastUnexJunction(uint8_t x)
 {
 	if (x <= 0)
 	{
-		// The map is fully explored
-		//MAP_nextJunctionLong = 0;
 		MAP_mapped = 1;
-		MAP_operatingMode_ = 4;
 		MAP_resQmode = 1;	
 	}
 	else if (MAP_junctionOrderArray[x - 1].hasUnex == 1)
