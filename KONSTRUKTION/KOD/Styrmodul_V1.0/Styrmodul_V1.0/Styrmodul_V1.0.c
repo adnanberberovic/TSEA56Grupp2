@@ -1943,13 +1943,15 @@ void Tejp()
     {
         if ( (MAP_currentPos[1] == 15) && ( (MAP_currentPos[0] == 16) || (MAP_currentPos[0] == 15) ))
         {
-            if ( MAP_currentPos[0] == 16 ) // Kommer frŒn starpos == i banan
+            if ( MAP_currentPos[0] == 16 ) // Kommer frŒn starpos ==>> banan
                 {
                     Reflex_StartMarker = 1;
                 }
                 else
                 {
-                    Reflex_StartMarker = 0; //ker tillbaka till startpos == Œker ur banan
+                    Reflex_StartMarker = 0; //ker tillbaka till startpos <<== Œker ur banan
+                    //Nu Šr roboten pŒvŠg tillbaka till startpositionen
+                    //HŠr kan det hŠnda saker
                 }
             return;
             
