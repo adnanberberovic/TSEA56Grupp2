@@ -55,6 +55,9 @@ private:
     int Offset_ = 0;
     
     int Position = 0;
+
+	int shift_right = 0;
+	int shift_left = 0;
     
     int xPos;
 	int yPos;
