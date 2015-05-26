@@ -1592,7 +1592,6 @@ void JUNCTION_ThreeWayONE()
 		// Keep going forward
 		distance_counter = 0;
 		distance_flag = 0;
-		LCD_Clear();
 		
 		MOTOR_Stop();
 		Get_sensor_values();
@@ -1676,7 +1675,6 @@ void JUNCTION_ThreeWayTHREE()
 		// Keep going forward
 		distance_counter = 0;
 		distance_flag = 0;
-		LCD_Clear();
 		
 		MOTOR_Stop();
 		Get_sensor_values();
@@ -1756,14 +1754,15 @@ void MAP_main()
 	uint8_t posY_ = MAP_currentPos[0];
 	uint8_t posX_ = MAP_currentPos[1];
 	
-    if(Reflex_SetNextForwardGold)
-    {
-        Reflex_SetNextForwardGold = 0;
-        MAP_setGoal();
+	if(Reflex_SetNextForwardGold)
+	{
+		Reflex_SetNextForwardGold = 0;
+		MAP_setGoal();
 		MOTOR_Stop();
 		LCD_SendString("    KOD GULD    ");
 		MOTOR_Forward(standard_speed_);
-    }
+		goto Phase2;
+	}
     
     Send_map_values();
 	
@@ -1971,24 +1970,26 @@ void MAP_main()
 		if (MAP_resQmode == 1)
 		{
 			MAP_nextJunctionLong = 0;
-			MAP_decideDestination();
-			MAP_operatingMode_ = 3;
-			goto Phase3;
+			
 		} 
 		else if (MAP_resQmode == 2)
 		{
 			MAP_nextJunctionLong = MAP_array[MAP_goalPosition[0]][MAP_goalPosition[1]].junctionNumber;
-			MAP_decideDestination();
-			MAP_operatingMode_ = 3;
-			goto Phase3;
 		}
 		else if (MAP_resQmode == 3)
 		{
 			MAP_nextJunctionLong = 0;
-			MAP_decideDestination();
-			MAP_operatingMode_ = 3;
-			goto Phase3;
 		}
+		
+		MAP_decideDestination();
+		MAP_nextDir = MAP_getDirection(MAP_currentJunction, MAP_nextJunctionShort);
+		if (!(MAP_currentDir == MAP_nextDir))
+		{
+			MAP_rotating_ = 1;
+		}
+		MAP_movingForward_ = 1;
+		MAP_operatingMode_ = 3;
+		goto Phase3;	
 	}
 
 	// Checks if all the map has been explored
@@ -2005,10 +2006,11 @@ void Tejp()
 	
 	if(Goal_found)
 	{
+		ReflexSensor = 0;
 		return;
 	}
 	
-	 if(ReflexSensor)
+	if(ReflexSensor)
     {
         if ( (MAP_currentPos[1] == 15) && ( (MAP_currentPos[0] == 16) || (MAP_currentPos[0] == 15) ))
         {
@@ -2081,11 +2083,11 @@ void Tejp()
             //Stall in rätt vinken om möjligt.
             
             MOTOR_Forward(50);
-            Get_sensor_values;
+            Update_All_values();
             
             while( (ReflexSensor == 0) && (WallCloseAhead == 0) )
             {
-                Get_sensor_values;
+                Update_All_values();
                 _delay_us(250);
             }
             
@@ -2097,7 +2099,7 @@ void Tejp()
                 MOTOR_Backward(50); // backa in i rutan igen
                 JUNCTION_delay(3); // Detta värdet kanske behövs ändras!!!! <----- OBS
                 MOTOR_Stop();
-                Get_sensor_values();
+				Update_All_values();
                 //Gripklo Släpp
                 
                 if( !(PathCountLeft > 0) || (PathCountRight > 0) ) // Vi är i en korridor.
@@ -2218,9 +2220,6 @@ void Junction()
             
             JUNCTION_ThreeWayTWO();
 			
-			LCD_Clear();
-			LCD_SetPosition(0);
-			LCD_SendString("junction 3w2");
             MAP_rotate();
             
         }
@@ -2282,7 +2281,6 @@ void Junction()
 				// Keep going forward
 				distance_counter = 0;
 				distance_flag = 0;
-				LCD_Clear();
 					
 				MOTOR_Stop();
 				Get_sensor_values();
@@ -2365,8 +2363,7 @@ void Junction()
 				// Keep going forward
 				distance_counter = 0;
 				distance_flag = 0;
-				LCD_Clear();
-		
+				
 				MOTOR_Stop();
 				Get_sensor_values();
 				int angle_right =  arrSensor[0];
