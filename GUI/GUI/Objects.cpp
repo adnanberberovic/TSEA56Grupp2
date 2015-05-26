@@ -154,10 +154,28 @@ void Tile::render_Tile(SDL_Renderer* renderer)
     if(Status_ == 0){
         return;
     }
-    if (Status_ > 0) {
+    
+    if (Status_ == 1) {
+        make_Path();
         SDL_RenderCopyEx(renderer, Texture_, &srRect_,
                          &dsRect_, NULL, NULL, flip);
     }
+    if (Status_ == 2) {
+        make_Wall();
+        SDL_RenderCopyEx(renderer, Texture_, &srRect_,
+                         &dsRect_, NULL, NULL, flip);
+    }
+    if (Goal_Here) {
+        make_Goal();
+        SDL_RenderCopyEx(renderer, Texture_, &srRect_,
+                         &dsRect_, NULL, NULL, flip);
+    }
+    if (Robot_Here) {
+        Robot_Here();
+        SDL_RenderCopyEx(renderer, Texture_, &srRect_,
+                         &dsRect_, NULL, NULL, flip);
+    }
+    
     else
     return;
 }
@@ -191,6 +209,10 @@ void Tile::make_Reset()
 
 void Tile::make_Path()
 {
+    if (Goal_Here) {
+        return
+    }
+    
     Status_ = 1;
     srRect_ = {40,0,40,40};
     
@@ -198,6 +220,9 @@ void Tile::make_Path()
 
 void Tile::make_Wall()
 {
+    if (Goal_Here) {
+        return
+    }
     Status_ = 2;
     srRect_ = {80,0,40,40};
 }
@@ -205,6 +230,12 @@ void Tile::make_Wall()
 void Tile::make_Robot()
 {
     srRect_ = {120,0,40,40};
+}
+
+void Tile::make_Goal()
+{
+    srRect_ = {160,0,40,40};
+    Goal_Here = 1;
 }
 
 
@@ -225,6 +256,11 @@ void Tile::Place_Robot_Here(int val)
     if(val == 0)
     {
         Robot_Here = 0;
+        
+        if (Goal_Here) {
+            make_Goal();
+            return;
+        }
         
         if(Status_ == 0)
         {

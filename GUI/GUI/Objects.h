@@ -137,6 +137,7 @@ public:
     void make_Path();
     void make_Reset();
     void make_Robot();
+    void make_Goal();
     void skift_left();
     void skift_right();
 	void change_tile(int to_status);
@@ -150,6 +151,7 @@ protected:
     
     int Status_;
     int Robot_Here;
+    int Goal_Here;
     SDL_Rect dsRect_;
     SDL_Rect srRect_;
     //SDL_RendererFlip flip{};
