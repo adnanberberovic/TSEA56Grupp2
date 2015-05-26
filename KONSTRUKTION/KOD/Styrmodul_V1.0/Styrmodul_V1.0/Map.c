@@ -210,7 +210,7 @@ uint8_t MAP_addJunctionDist(uint8_t j1, uint8_t j2)
 {
 	uint8_t returner_ = 0;
 
-	if ((MAP_junctionDistArray[j1][j2] == 0 || MAP_junctionDistArray[j1][j2] > MAP_travelledDist) && j1 != j2 && MAP_travelledDist != 0)
+	if (((MAP_junctionDistArray[j1][j2] == 0) || (MAP_junctionDistArray[j1][j2] > MAP_travelledDist)) && (j1 != j2) && (MAP_travelledDist != 0))
 	{
 		MAP_junctionDistArray[j1][j2] = MAP_travelledDist;
 		MAP_junctionDistArray[j2][j1] = MAP_travelledDist;
@@ -283,32 +283,9 @@ void MAP_lastUnexJunction(uint8_t x)
 {
 	if (x <= 0)
 	{
-		_delay_ms(250);
-		_delay_ms(250);
-		_delay_ms(250);
-		_delay_ms(250);
-		_delay_ms(250);
-		_delay_ms(250);
-		_delay_ms(250);
-		_delay_ms(250);
-		_delay_ms(250);
-		_delay_ms(250);
-		_delay_ms(250);
-		_delay_ms(250);
-		_delay_ms(250);
-		_delay_ms(250);
-		_delay_ms(250);
-		_delay_ms(250);
-		_delay_ms(250);
-		_delay_ms(250);
-		_delay_ms(250);
-		
 		// The map is fully explored
 		MAP_nextJunctionLong = 0;
-		if (MAP_currentJunction == 0)
-		{
-			MAP_LOOPer = 0;
-		}
+		MAP_mapped = 1;
 	}
 	else if (MAP_junctionOrderArray[x - 1].hasUnex == 1)
 	{
@@ -326,6 +303,11 @@ void MAP_rotate()
 {
 	MAP_currentDir = MAP_nextDir;
 	MAP_rotating_ = 0;
+	
+	if (MAP_array[MAP_currentPos[0]][MAP_currentPos[1]].description == 5)
+	{
+		MAP_lastJunctionDir = MAP_currentDir;
+	}	
 }
 
 // Moves the robot one square forward
@@ -350,7 +332,7 @@ void MAP_moveForward()
 	{
 		MAP_currentPos[0]++;
 	}
-	
+		
 	MAP_movingForward_ = 0;
 	MAP_travelledDist++;
 	MAP_setVisited();
@@ -386,7 +368,7 @@ uint16_t MAP_checkIfDone()
 {
 	//uint8_t iterator = 0;
 	uint16_t done_ = 0;
-	
+
   	for (int i = 0; i < 16; i++)
   	{
   		for (int j = 0; j < 29; j++)
