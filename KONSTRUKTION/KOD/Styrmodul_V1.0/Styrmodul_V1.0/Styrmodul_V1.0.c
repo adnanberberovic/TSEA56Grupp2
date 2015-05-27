@@ -1747,7 +1747,7 @@ void JUNCTION_FourWay()
 }
 
 void MAP_main()
-{	
+										{	
 	MAP_junctionOrderArray[MAP_array[16][15].junctionNumber].hasUnex = 0;
 	
 	// Save these under more convenient names
@@ -2002,6 +2002,22 @@ void MAP_main()
 
 	// Checks if all the map has been explored
 	//MAP_checkIfone();
+	
+	MOTOR_Stop();
+	LCD_Clear();
+	LCD_SetPosition(0);
+	LCD_SendString("  CJ ");
+	LCD_display_uint8(MAP_currentJunction);
+	LCD_SendString("  nxt ");
+	LCD_display_uint8(MAP_nextDir);
+	LCD_SetPosition(20);
+	LCD_SendString("  njs: ");
+	LCD_display_uint8(MAP_nextJunctionShort);
+	_delay_ms(250);
+	_delay_ms(250);
+	_delay_ms(250);
+	_delay_ms(250);
+	MOTOR_Forward(standard_speed_);
 }
 
 void Tejp_Home()
@@ -2144,20 +2160,26 @@ void Tejp_GoalFound2()
 	SERVO_SetGrip();
 
 	ReflexSensor = 0;
-	MAP_resQmode = 3;
+	MAP_resQmode++;
 	MAP_operatingMode_ = 4;
 
 	
-	MAP_currentJunction = MAP_goalJunction;
 	
 	if( !((PathCountLeft > 0) || (PathCountRight > 0)) )
 	{ 
 		distance_flag = 0;
 		distance_counter = 0;
 		MAP_moveForward();
+		MAP_currentJunction = 2;//MAP_goalJunction;
 		MAP_main();
 		DISCOVERY_SetMode();
-		//MAP_rotate();
+		LCD_SendCharacter(discovery_mode);
+		_delay_ms(250);
+		_delay_ms(250);
+		_delay_ms(250);
+		_delay_ms(250);
+		
+		
 		
 		if ( discovery_mode == 'f')
 		{
@@ -2166,6 +2188,7 @@ void Tejp_GoalFound2()
 		else if ( discovery_mode == 'b' )
 		{
 			TURN_Back(4);
+			MAP_rotate();			
 		}		
 	}
 	
