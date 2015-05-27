@@ -2144,7 +2144,7 @@ void Tejp_GoalFound2()
 	SERVO_SetGrip();
 
 	ReflexSensor = 0;
-	MAP_resQmode++;
+	MAP_resQmode = 3;
 	MAP_operatingMode_ = 4;
 
 	
@@ -2157,7 +2157,7 @@ void Tejp_GoalFound2()
 		MAP_moveForward();
 		MAP_main();
 		DISCOVERY_SetMode();
-		MAP_rotate();
+		//MAP_rotate();
 		
 		if ( discovery_mode == 'f')
 		{
@@ -2191,10 +2191,10 @@ void Tejp()
         if ( (MAP_currentPos[1] == 15) && ( (MAP_currentPos[0] == 16) || (MAP_currentPos[0] == 15) ))
         {
 			ReflexSensor = 0;
-            if ( MAP_currentPos[0] == 16 ) // Kommer frŒn starpos == i bana
-                {
+            if ( MAP_currentPos[0] == 16) // Kommer frŒn starpos == i bana
+                 {
                     Reflex_StartMarker = 1;
-                }
+                 }
 			else
                 {
 					Tejp_Home();  
@@ -2615,7 +2615,7 @@ void AutomaticControl()
 		MAP_rotate();
 		angle_ = 0;
 	}
-	if((distance_counter >= 1) && (distance_flag == 1))
+	if((distance_counter >= 4) && (distance_flag == 1))
 	{
 		MAP_moveForward();
 		set_map_Corridor();
@@ -2735,8 +2735,8 @@ int main(void)
 				Get_sensor_values();
     			MANUAL_DRIVE();
 				LCD_SetPosition(0);
-				LCD_SendString("PL");
-				LCD_display_uint8(PATHCOUNT_Left());
+				LCD_SendString("DC");
+				LCD_display_uint8(distance_counter);
 				LCD_SendString(" ");
 				LCD_SendString("BL");
 				LCD_display_int8(LEFTPATHBOTH());
