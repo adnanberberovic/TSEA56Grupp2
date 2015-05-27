@@ -75,6 +75,8 @@ uint8_t Reflex_SetNextForwardGold = 0;
 uint8_t Reflex_StartMarker = 0;
 uint8_t Goal_found = 0;
 int IRWIN = 0;
+int tejp_counter = 0;
+int goal_counter = 0;
 
 //__________________________REGISTERS__________________________
 
@@ -226,8 +228,14 @@ void Get_sensor_values() //Load all sensor values into sensor-array
 	}
     
     if( (arrSensor[6]/64) && (0b00000001) )
-    {
+    {	
+		if(ReflexSensor == 0)
+		{
+			tejp_counter++;
+		}
+	
         ReflexSensor = 1;
+		
     }
     
 }
@@ -2199,14 +2207,6 @@ void Tejp_GoalFound2()
 	Update_All_values();
 	while( (ReflexSensor == 0) && (WallCloseAhead == 0) )
 	{
-// 		if((distance_counter >= 4) && (distance_flag == 1))
-// 		{
-// 			MAP_moveForward();
-// 			set_map_Corridor();
-// 			MAP_main();
-// 			distance_flag = 0;
-// 		}
-		
 		Update_All_values();
 		_delay_us(250);
 	}
@@ -2218,7 +2218,7 @@ void Tejp_GoalFound2()
 		MOTOR_Stop();
 
 		MOTOR_Backward(50);
-		JUNCTION_delay(4);  // Detta vŠrdet kanske behšvs Šndras!!!! <----- OBS
+		JUNCTION_delay(3);  // Detta vŠrdet kanske behšvs Šndras!!!! <----- OBS
 		MOTOR_Stop();
 		Update_All_values();
 	}
@@ -2236,10 +2236,11 @@ void Tejp_GoalFound2()
 	}
 	SERVO_SetGrip();
 
-	MOTOR_Backward(50);
-	JUNCTION_delay(3);
-	
+	Update_All_values();
 
+	MOTOR_Backward(50);
+	JUNCTION_delay(2);
+	MOTOR_Stop();
 	MAP_currentJunction = MAP_goalJunction; //Set Currentjunction == 0 because we dont go in there automatically.
 	MAP_resQmode++;
 	MAP_operatingMode_ = 4;
@@ -2274,7 +2275,6 @@ void Tejp()
 
 	if(ReflexSensor)
     {
-
         if ( (MAP_currentPos[1] == 15) && ( (MAP_currentPos[0] == 16) || (MAP_currentPos[0] == 15) || (MAP_currentPos[0] == 14) ) )
         {
 			ReflexSensor = 0;
@@ -2282,6 +2282,7 @@ void Tejp()
             if ( MAP_currentPos[0] == 16) // Kommer frŒn starpos == i bana
                  {
                     Reflex_StartMarker = 1;
+					tejp_counter = 0;
                  }
 			else
                 {
@@ -2291,25 +2292,231 @@ void Tejp()
 						MOTOR_Stop();
 						while(1);	
 					} 
+					tejp_counter = 0;
 				}
             return;
         }
-		
-		else if(Goal_found)
+
+		else if(tejp_counter == 2)
 		{
-			ReflexSensor = 0; //1 -> 0 -> 3
-			return;
+			ReflexSensor = 0;
+			if((distance_flag == 1) || (distance_counter > 28)) // Om den inte hann med att lägga in tilen
+			{
+				MAP_moveForward();
+				set_map_Corridor();
+				MAP_main();
+				distance_flag = 0;
+			}
+			
+			MOTOR_Stop();
+			_delay_ms(100);
+			MOTOR_Backward(45);
+			JUNCTION_delay(5);
+			MOTOR_Stop();
+			LCD_Clear();
+			LCD_SetPosition(0);
+			LCD_SendString("DROP IT Like     IT  HOOOT!"); 
+			_delay_ms(250);
+			_delay_ms(250);
+			_delay_ms(250);
+			_delay_ms(250);
+			LCD_Clear();
+			LCD_SetPosition(0);
+			LCD_SendString("DROP IT Like     IT  HOOOT!"); 
+
+			distance_counter = 0;
+			distance_flag = 0;
+
+			if(goal_counter == 0)
+			{
+				MAP_setGoal();
+				Send_map_values();
+				MOTOR_Forward(60);
+				goal_counter = 1;
+			}
+
+			else if(goal_counter == 1)
+			{
+				MOTOR_Stop();
+				SERVO_LevelHigh();
+				for (int i = 0; i < 5; i++)
+				{
+					_delay_ms(250);
+				}
+
+				SERVO_LevelLow();
+				for (int i = 0; i < 5; i++)
+				{
+					_delay_ms(250);
+				}
+				SERVO_SetGrip();
+				MOTOR_Backward(45);
+				JUNCTION_delay(2);
+
+				MOTOR_Stop();
+
+				MAP_currentJunction = MAP_goalJunction; //Set Currentjunction == 0 because we dont go in there automatically.
+				MAP_resQmode++;
+				MAP_operatingMode_ = 4;
+
+				MAP_main();
+				MAP_nextDir = (MAP_currentDir + 2 ) % 4;//The inverse of current direction.
+				DISCOVERY_SetMode();
+				MAP_rotate();
+				Send_map_values();
+
+				TURN_Back(4);
+				MOTOR_Stop();
+				_delay_ms(100);
+				MOTOR_Backward(45);
+				JUNCTION_delay(5);
+				MOTOR_Stop();
+
+				distance_counter = 0;
+				distance_flag = 0;
+				MOTOR_Forward(standard_speed_);
+				goal_counter = 2;
+				tejp_counter = 0;
+			}
+
+		}
+		else
+		{
+			ReflexSensor = 0;
+			MOTOR_Forward(standard_speed_);
+			JUNCTION_delay(1);
 		}
 		
-        else if( resque_mode == 'd') //The goal hasn't yet been found
-        {
-			Tejp_GoalFound1();
-        }
-        else if( resque_mode == 'q')
-        {
-			 Tejp_GoalFound2();
+//         else if( resque_mode == 'd') //The goal hasn't yet been found
+//         {
+// 			Tejp_GoalFound1();
+//         }
+//         else if( resque_mode == 'q')
+//         {
+// 			 Tejp_GoalFound2();
+// 		}
+
+	}
+}
+
+
+
+void Tejp_Junction()
+{
+		ReflexSensor = 0;
+	//Står i mitten av en korsning och vet om att du står i målet.
+	if(goal_counter == 0) // Om man ska sätta att det är mål där fösta gången, move_forward är INTE gjord
+	{
+		Goal_found = 1;
+		ReflexSensor = 0;	
+		Reflex_SetNextForwardGold = 1;	//Map_main nästa sätter goal
+		//MAP_setGoal(); //Skulle kunnas gora i framiden
+		goal_counter = 1;
+		tejp_counter = 0;
+	}
+	else if(goal_counter == 1 ) //Om man 
+	{
+		MOTOR_Stop();
+		SERVO_LevelHigh();
+		for (int i = 0; i < 5; i++)
+		{
+			_delay_ms(250);
 		}
 
+		SERVO_LevelLow();
+		for (int i = 0; i < 5; i++)
+		{
+			_delay_ms(250);
+		}
+		SERVO_SetGrip();
+		MOTOR_Backward(45);
+		JUNCTION_delay(2);
+
+		MOTOR_Stop();
+
+		MAP_currentJunction = MAP_goalJunction; //Set Currentjunction == 0 because we dont go in there automatically.
+		MAP_resQmode++;
+		MAP_operatingMode_ = 4;
+
+		MAP_main();
+		MAP_nextDir = (MAP_currentDir + 2 ) % 4;//The inverse of current direction.
+		DISCOVERY_SetMode();
+		MAP_rotate();
+		Send_map_values();
+
+		TURN_Back(4);
+		MOTOR_Stop();
+		_delay_ms(100);
+		MOTOR_Backward(45);
+		JUNCTION_delay(5);
+		MOTOR_Stop();
+
+		distance_counter = 0;
+		distance_flag = 0;
+		MOTOR_Forward(45);
+		Update_All_values();
+
+		//Reglera om höger öppen
+		if(PATHCOUNT_Right() > 0)
+	{
+	  MOTOR_Stop();
+	  Get_sensor_values();
+	  int angle_left =  arrSensor[2];
+	  
+	  if (angle_left < 0)
+	  {
+		  MOTOR_RotateRight(-angle_left);
+	  }
+	  else
+	  {
+		  MOTOR_RotateLeft(angle_left);
+	  }
+	  
+	  MOTOR_Forward(standard_speed_);
+	  distance_counter = 0;
+	  distance_flag = 0;
+
+	  while( PATHCOUNT_Right() > 0 )
+	  {
+		  _delay_us(250);
+	  }
+	  
+	  JUNCTION_delay(3);	
+	}
+
+		//Reglera om vänster öppen
+	
+		if(PATHCOUNT_Left() > 0)
+	{
+		MOTOR_Stop();
+		Get_sensor_values();
+		int angle_right =  arrSensor[0];
+	
+		if (angle_right < 0)
+		{
+			MOTOR_RotateLeft(-angle_right);
+		}
+		else
+		{
+			MOTOR_RotateRight(angle_right);
+		}
+
+		distance_counter = 0;
+		distance_flag = 0;
+		MOTOR_Forward(standard_speed_);
+	
+		while( PATHCOUNT_Left() > 0 )
+		{
+			_delay_us(250);
+		}
+	
+		JUNCTION_delay(3);
+	}
+	
+		goal_counter = 2;
+		
+		tejp_counter = 0;
+		return; //Gå ut ur Juction för vi gör våra egna beslut
 	}
 }
 
@@ -2379,6 +2586,18 @@ void Junction()
 	}
     Update_All_values();
 	
+	if (tejp_counter == 1)
+	{
+		Tejp_Junction();
+
+		if(goal_counter == 2)
+		{
+			tejp_counter = 0;
+			return;
+		}
+	}
+
+
     // Now in intersect. Determine what type:
     if ((PathCountLeft > 0) && (PathCountRight > 0)) // 4-way or 3-way-2
     {
@@ -2616,6 +2835,7 @@ void Junction()
         }
     }
     
+	tejp_counter = 0;
 
 }
 
@@ -2676,7 +2896,6 @@ void AutomaticControl()
 	
 	Update_All_values();
 
-	Tejp();
 	//Floor_Marker();
 	
 	if( (PathCountLeft > 0) || (PathCountRight > 0) ){ //Path to left or right
@@ -2694,6 +2913,17 @@ void AutomaticControl()
 	{
 		MAP_moveForward();
 		set_map_DeadEnd();
+
+		if (tejp_counter == 1)
+		{
+			Tejp_Junction();
+
+			if(goal_counter == 2)
+			{
+				tejp_counter = 0;
+				return;
+			}
+		}
 		
 		MAP_main();
 		DISCOVERY_SetMode();
@@ -2706,24 +2936,11 @@ void AutomaticControl()
 		MAP_moveForward();
 		set_map_Corridor();
 		MAP_main();
-		//DISCOVERY_SetMode();
-	
-// 		if (discovery_mode == 'b')
-// 		{
-// 			LCD_Clear();
-// 			LCD_SendString(" back in corridor wtf ");
-// 			_delay_ms(250);
-// 			_delay_ms(250);
-// 			_delay_ms(250);
-// 			_delay_ms(250);
-// 			TURN_Back(4);
-// 		}
-		
-		//MAP_rotate();
-		distance_flag = 0;
-		
-		
+		distance_flag = 0;		
 	}
+
+	
+	Tejp(); // bara för att kolla om vi är nära start;
 
 	if(MAP_mapped && (MAP_currentPos[0] == MAP_junctionOrderArray[MAP_nextJunctionLong].posY) && 
 		(MAP_currentPos[1] == MAP_junctionOrderArray[MAP_nextJunctionLong].posX))
@@ -2784,13 +3001,21 @@ int main(void)
 				LCD_display_uint16(MAP_nextJunctionShort);
 				LCD_SendString(" ");
 				
-				LCD_SendString("   njl:");
-				LCD_display_uint16(MAP_nextJunctionLong);
+				//LCD_SendString("   njl:");
+				//LCD_display_uint16(MAP_nextJunctionLong);
+				LCD_SendString("   GC:");
+				LCD_display_uint16(goal_counter);
 				LCD_SendString(" ");
  				LCD_SetPosition(16);
- 				LCD_SendString("   goal");
- 				LCD_display_uint16(MAP_array[MAP_goalPosition[0]][MAP_goalPosition[1]].junctionNumber);
- 				LCD_SendString(" ");
+ 				//LCD_SendString("goal ");
+ 				//LCD_display_uint16(MAP_array[MAP_goalPosition[0]][MAP_goalPosition[1]].junctionNumber);
+ 				LCD_SendString("RS: ");
+				LCD_display_uint8(ReflexSensor);
+				LCD_SendString(" RC: ");
+
+				LCD_display_uint8(tejp_counter);
+				
+				
 			}
 			while(!MAP_LOOPer)
 			{
