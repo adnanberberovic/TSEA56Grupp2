@@ -2062,7 +2062,7 @@ void Tejp_Home()
 	if (MAP_array[15][15].description != 5)
 	{
 		MOTOR_Forward(50);
-		JUNCTION_delay(6);
+		JUNCTION_delay(2);
 	}
 				
 	MOTOR_Forward(50);
@@ -2993,23 +2993,23 @@ int main(void)
 				Send_sensor_values();
 				
 				LCD_SetPosition(0);
-				LCD_SendString("njs:");
+				LCD_SendString("srt: ");
 				LCD_display_uint16(MAP_nextJunctionShort);
 				LCD_SendString(" ");
 				
-				//LCD_SendString("   njl:");
-				//LCD_display_uint16(MAP_nextJunctionLong);
-				LCD_SendString("   GC:");
-				LCD_display_uint16(goal_counter);
-				LCD_SendString(" ");
+				LCD_SendString(" long:");
+				LCD_display_uint16(MAP_nextJunctionLong);
+				//LCD_SendString("   GC:");
+				//LCD_display_uint16(goal_counter);
+				//LCD_SendString(" ");
  				LCD_SetPosition(16);
- 				//LCD_SendString("goal ");
- 				//LCD_display_uint16(MAP_array[MAP_goalPosition[0]][MAP_goalPosition[1]].junctionNumber);
- 				LCD_SendString("RS: ");
-				LCD_display_uint8(ReflexSensor);
-				LCD_SendString(" RC: ");
+ 				LCD_SendString("goal ");
+ 				LCD_display_uint16(MAP_array[MAP_goalPosition[0]][MAP_goalPosition[1]].junctionNumber);
+ 				LCD_SendString(" cur: ");
+				LCD_display_uint8(MAP_currentJunction);
+				//LCD_SendString(" RC: ");
 
-				LCD_display_uint8(tejp_counter);
+				//LCD_display_uint8(tejp_counter);
 				
 				
 			}
