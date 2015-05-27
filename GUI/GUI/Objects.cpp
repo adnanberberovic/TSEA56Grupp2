@@ -171,7 +171,7 @@ void Tile::render_Tile(SDL_Renderer* renderer)
                          &dsRect_, NULL, NULL, flip);
     }
     if (Robot_Here) {
-        Robot_Here();
+        Place_Robot_Here(1);
         SDL_RenderCopyEx(renderer, Texture_, &srRect_,
                          &dsRect_, NULL, NULL, flip);
     }
@@ -210,7 +210,7 @@ void Tile::make_Reset()
 void Tile::make_Path()
 {
     if (Goal_Here) {
-        return
+		return;
     }
     
     Status_ = 1;
@@ -221,7 +221,7 @@ void Tile::make_Path()
 void Tile::make_Wall()
 {
     if (Goal_Here) {
-        return
+		return;
     }
     Status_ = 2;
     srRect_ = {80,0,40,40};
