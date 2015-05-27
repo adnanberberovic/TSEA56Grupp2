@@ -157,7 +157,7 @@ int main(void)
 	} //Delay så att inte ADMUX-inläsningarna hamnar i oordning
 
 
-	reflex_value_floor= ADCH+10;
+	reflex_value_floor= ADCH+40;
 		
 	while(1)
 	{
