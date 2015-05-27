@@ -109,7 +109,7 @@ void Autonom::event(string& statestring, bool& running)
                 return;
             }
             
-            else if (mainevent_ -> key.keysym.sym == SDLK_RIGHT)
+           /* else if (mainevent_ -> key.keysym.sym == SDLK_RIGHT)
             {
                 Offset_ = Offset_ + 1;
                 Robot_angle->set_angle(90);
@@ -136,7 +136,7 @@ void Autonom::event(string& statestring, bool& running)
                 Speed_right->Change_speed(Speed);
 
                 
-            }
+            }*/
             
             else if (mainevent_ -> key.keysym.sym == SDLK_UP)
             {
@@ -360,6 +360,7 @@ void Autonom::Check_Mode(string &statestring, bool &running)
 	{
 		statestring = "Manual";
 		running = false;
+		reset_Tiles(); 
 		return;
 	}
 
@@ -382,7 +383,7 @@ void Autonom::update_map(int8_t xPosD, int8_t yPosM, int8_t LFR)
 	xPos = ((xPosD & 0xf8) / 8) + 0;
 	yPos = ((yPosM & 0xf8) / 8) + 0;
 	dir =   (xPosD & 0x03) + 0;
-    goal = (yPosD & 0x03) + 0;
+    goal = (yPosM & 0x03) + 0;
     Left = ((LFR & 0xc0) / 64) + 0;
 	Front = ((LFR & 0x30) / 16) + 0;
 	Right = ((LFR & 0x0c) / 4) + 0;
@@ -453,12 +454,6 @@ void Autonom::update_map(int8_t xPosD, int8_t yPosM, int8_t LFR)
     
     
 }
-
-
-
-
-
-
 
 
 
