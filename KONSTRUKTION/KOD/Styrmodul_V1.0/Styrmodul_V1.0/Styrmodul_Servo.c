@@ -36,7 +36,7 @@ void SERVO_SetSpeedGrip(int speed)
 
 void SERVO_ReleaseGrip()
 {
-	OCR1B = 50;
+	OCR1B = 30;
 }
 
 void SERVO_SetGrip()

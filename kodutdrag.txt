@@ -1,0 +1,1157 @@
+/************ UTDRAG FRÅN KOMMUNIKATIONSMODUL V1.0 ********************/
+void BT_init(void)
+{
+	UBRR0H = 0x00; //correct value to change baud rate
+	UBRR0L = 0x07;//^^ same ^^ with a 14.7 mhz, scale with 1111 (7)
+	
+	UCSR0B = (1<<TXEN0) | (1<<RXEN0) | (0<<UCSZ02) | (1<<RXCIE0) | (0<<TXCIE0) | (0<<UDRIE0);
+	/* RXCI, TXCI Complete transmission and complete interrupt is enabled
+	 * UDRIE0 not set, disabled interrupts due to UDRE0 flag. Data register empty
+	 * TXEN, TXEN, transmission and receiver enable 
+	 * UCSZ02 sets the third bit, defining framesize
+	*/
+	UCSR0C = (1<<UCSZ01) | (1<<UCSZ00);
+	/* UMSEL0 = 0 setting Asynchronous operation
+	 * UPM01:0 = 0, Pairty disabled
+	 * USBS0 = 0, 1 stop bit
+	 * UCSZ01:0 = 1, char size = 8
+	 */
+}
+void add_node(buffer_** lst_head, uint8_t val)
+{
+	if (*lst_head == 0)
+	{
+
+		(*lst_head) = (buffer_*)malloc(sizeof(buffer_));
+		(*lst_head)->next = 0;
+		(*lst_head)->val = val;
+	}
+	
+	//UDR0 = val;
+
+	buffer_ * curr = *lst_head;
+	while (curr->next != 0){ // step to end of list
+		curr = curr->next;
+	}
+	curr->next = (buffer_ *)malloc(sizeof(buffer_));
+	curr->val = val;
+	curr->next->next = 0; // Add node last.
+
+}
+void Write_Buffer(char *buffer, char data, volatile uint8_t *position)
+{
+	if ((*position) == (BuffSize - 2)) // If end of buffer restart from first pos, done with read.
+	{
+		(*position) = 0; 
+		//send_BT_buffer(inBT); //Echo back inBT *****************ONLY FOR TEST******************
+	}
+	buffer[(*position)] = data; //Add data to correct location
+	(*position)++;
+	
+}
+char Read_Buffer(char *buffer, volatile uint8_t *pos_read)
+{
+	char data = buffer[(*pos_read)]; //return next value in queue
+	(*pos_read)++;
+	return data;
+}
+uint8_t pop_node(buffer_ ** lst_head)
+{
+	buffer_* next_node = NULL;
+	uint8_t retval = 3;
+	
+	if ( *lst_head != NULL)
+	{
+		next_node = (*lst_head)->next;
+		retval = (*lst_head)->val;
+		free(*lst_head);
+		*lst_head = next_node;
+		return retval;
+	}
+
+	return retval;
+	
+}
+void BT_send(uint8_t val)
+{
+	add_node(&head_BTout, val);
+	UCSR0B |= (1<<UDRIE0); // activate interrupt
+}
+void flush_list(buffer_ ** lst_head)
+{
+	if (*lst_head == NULL)
+	{
+		return;
+	}
+	
+	buffer_* curr_node = *lst_head;
+	*lst_head = NULL;
+	
+	if (curr_node->next != NULL)
+	{
+		flush_list(&(curr_node->next));
+	}
+	free(curr_node);
+}
+void send_BT_buffer(uint8_t buffer[], int size)
+{
+	flush_list(&head_BTout);
+	int i = 0;
+	while(i < size)
+	{
+		add_node(&head_BTout, buffer[i]);
+		i++;
+	}
+
+	UCSR0B |= (1<<UDRIE0);	//Enable UDRE interrupt flag -> send when empty dataregister
+	
+	// maby add while UDRIE0 = 0 here to counter multiple send_BT_buffer in a row
+}
+void BT_StartBitCheck(uint8_t in_)
+{
+	switch (in_){
+		
+		case 1:
+		BTspeedFlag_ = 1;
+		BTsensorFlag_ = 0;
+		BTspeedoutFlag_ = 0;
+		BTcounter_ = 0;
+		BTmapFlag_ = 0;
+		break;
+		
+		case 87:
+		BTspeedoutFlag_ = 0;
+		BTsensorFlag_ = 1;
+		BTspeedFlag_ = 0;
+		BTmapFlag_ = 0;
+		break;
+		
+		case 89:
+		BTspeedoutFlag_ = 1;
+		BTsensorFlag_ = 0;
+		BTspeedFlag_ = 0;
+		BTmapFlag_ = 0;
+		break;
+		
+		case 69:
+		BTmapFlag_ = 1;
+		BTcounter_ = 0;
+		BTspeedoutFlag_ = 0;
+		BTsensorFlag_ = 0;
+		BTspeedFlag_ = 0;
+		break;
+		
+		default:
+		BTmapFlag_ = 0;
+		BTcounter_ = 0;
+		BTspeedoutFlag_ = 0;
+		BTsensorFlag_ = 0;
+		BTspeedFlag_ = 0;
+		
+	}
+}
+// Receive complete - triggered by interrupt
+ISR(USART0_RX_vect) 
+{
+	uint8_t data = UDR0;
+	if ((BTspeedFlag_ == 0) && (BTsensorFlag_ == 0) && (BTspeedoutFlag_ == 0) && (BTmapFlag_ == 0)) //First time check if it's starbit
+	{
+		BT_StartBitCheck(data);
+	}
+	
+	else if ((BTspeedFlag_ == 1) && (data != 87)) // Speed incoming
+	{
+		arrSpeed[BTcounter_] = data; //Load value into speed array
+		BTcounter_++;
+		if (BTcounter_ == (sizeof(arrSpeed)/sizeof(arrSpeed[0]))) // all values red
+		{
+			BTspeedFlag_ = 0;
+			BTcounter_ = 0;
+		}
+	}
+	if (BTsensorFlag_ == 1) //Send out sensordata
+	{
+		send_BT_buffer(arrSensor, (sizeof(arrSensor)/sizeof(arrSensor[0])));
+		BTsensorFlag_ = 0;
+	}
+	if(BTspeedoutFlag_ == 1)
+	{
+		send_BT_buffer(arrSpeedout, (sizeof(arrSpeedout)/sizeof(arrSpeedout[0])));
+		BTspeedoutFlag_ = 0;
+	}
+	if (BTmapFlag_ == 1)
+	{
+		send_BT_buffer(arrMap, (sizeof(arrMap)/sizeof(arrMap[0])));
+		BTmapFlag_ = 0;
+	}
+	
+	
+}
+// Empty dataregister = send next character
+ISR(USART0_UDRE_vect)
+{
+	if (head_BTout == NULL) // Nothing more to send, disable interrupt ******* REMEMBER TO ACTIVATE UDRIE0 WHEN TRANSMITTING (auto in BT_send)
+	{
+		UCSR0B &= ~(1<<UDRIE0);
+	}
+	else
+	{
+		UDR0 = pop_node(&head_BTout); 
+	}
+}
+
+/********************** UTDRAG FRÅN STYRMODUL V1.0 ******************************/
+
+void AutomaticControl()
+{
+	
+	Update_All_values();
+	
+	if( (PathCountLeft > 0) || (PathCountRight > 0) ){ //Path to left or right
+        Junction();
+	}
+	
+	else if ( !( LeftPathOne || RightPathOne) || 
+			(LeftPathOne && (arrSensor[1] > 26) /*ROoffs*/) ||  //To close to right wall
+			(RightPathOne && (arrSensor[3] > 14)/*LOffs*/) ) //To close to left wall
+	{
+        Pre_PD_controll();
+	}
+	
+	if (WALL_CLOSE_AHEAD()) // dead end square
+	{
+		MAP_moveForward();
+		set_map_DeadEnd();
+
+		if (tape_counter == 1)
+		{
+			tape_Junction();
+
+			if(goal_counter == 2)
+			{
+				tape_counter = 0;
+				return;
+			}
+		}
+		
+		MAP_main();
+		DISCOVERY_SetMode();
+		DEAD_END();
+		MAP_rotate();
+		angle_ = 0;
+	}
+	if((distance_counter >= 4) && (distance_flag == 1))
+	{
+		MAP_moveForward();
+		set_map_Corridor();
+		MAP_main();
+		distance_flag = 0;		
+	}
+
+	
+	tape(); // check if close to start
+
+}
+
+
+// Sets a mode based on current direction and next direction.
+void DISCOVERY_SetMode()
+{
+	uint8_t mode = (4 + MAP_currentDir - MAP_nextDir) % 4;
+	
+	if(mode == 0)
+	{
+		discovery_mode = 'f';
+	}
+	else if(mode == 1)
+	{
+		discovery_mode = 'r';
+	}
+	else if(mode == 2)
+	{
+		discovery_mode = 'b';
+	}
+	else if(mode == 3)
+	{
+		discovery_mode = 'l';
+	}
+	
+}
+
+// One of the following three methods are called in the event of a 
+// three way junction described by the ASCII art above each method.
+/*  |
+  ->--- ONE is used in junctions of this type.
+*/
+void JUNCTION_ThreeWayONE()
+{
+	if (discovery_mode == 'l')
+	{
+		TURN_Left(1);
+	}
+	
+	else if (discovery_mode == 'b')
+	{
+		TURN_Back(1);
+	}
+	
+	else if (discovery_mode == '?')
+	{
+		DISCOVERY_SetRandom();
+		JUNCTION_ThreeWayONE();
+		discovery_mode = '?';
+	}
+
+	if ((discovery_mode == 'r') || (discovery_mode == 'f'))
+	{
+		// Keep going forward
+		distance_counter = 0;
+		distance_flag = 0;
+		
+		MOTOR_Stop();
+		Get_sensor_values();
+		int angle_right =  arrSensor[0];
+		
+		if (angle_right < 0)
+		{
+			MOTOR_RotateLeft(-angle_right);
+		}
+		else
+		{
+			MOTOR_RotateRight(angle_right);
+		}
+		
+		MOTOR_Forward(standard_speed_);
+		
+		while( PATHCOUNT_Left() > 0 )
+		{
+			_delay_us(250);
+		}
+		
+		JUNCTION_delay(3);
+		return;
+	}
+
+}
+
+/*  v
+  ----- TWO is used in junctions of this type.
+*/
+void JUNCTION_ThreeWayTWO()
+{
+
+	if (discovery_mode == 'r')
+	{
+		// Turn right
+		while(!WALL_CLOSE_AHEAD())
+		{
+			_delay_us(250);
+		}
+		TURN_Right(0);
+	}
+	else if (discovery_mode == 'b')
+	{
+		TURN_Back(2);
+	}
+	else if ((discovery_mode == 'l') || (discovery_mode == 'f'))
+	{
+			//Turn Left. Forward becomes left due to right-forward-left cycle.
+			while(!WALL_CLOSE_AHEAD())
+			{
+				_delay_us(250);
+			}
+			TURN_Left(0);
+	}
+	else if (discovery_mode == '?')
+	{
+		DISCOVERY_SetRandom();
+		JUNCTION_ThreeWayTWO();
+		discovery_mode = '?';
+	}
+}
+/*  |
+  ---<- THREE is used in junctions of this type.
+*/
+void JUNCTION_ThreeWayTHREE()
+{	
+	
+	if (discovery_mode == 'r')
+	{
+		TURN_Right(1);
+	}
+	
+	else if (discovery_mode == 'b')
+	{
+		TURN_Back(3);
+	}
+
+	else if ( (discovery_mode == 'f') || (discovery_mode == 'l') )
+	{
+		// Keep going forward
+		distance_counter = 0;
+		distance_flag = 0;
+		
+		MOTOR_Stop();
+		Get_sensor_values();
+		int angle_left =  arrSensor[2];
+		
+		if (angle_left < 0)
+		{
+			MOTOR_RotateRight(-angle_left);
+		}
+		else
+		{
+			MOTOR_RotateLeft(angle_left);
+		}
+		
+		MOTOR_Forward(standard_speed_);
+		
+		while( PATHCOUNT_Right() > 0 )
+		{
+			_delay_us(250);
+		}
+		
+		JUNCTION_delay(3);
+		//return;
+	}
+	
+	else if (discovery_mode == '?')
+	{
+		DISCOVERY_SetRandom();
+		JUNCTION_ThreeWayTHREE();
+		discovery_mode = '?';
+	}	
+}
+
+// Called in the event of a four way junction.
+void JUNCTION_FourWay()
+{
+	if(discovery_mode == 'r')
+	{
+		TURN_Right(2);
+	}
+	else if(discovery_mode == 'l')
+	{
+		TURN_Left(2);
+	}
+	else if(discovery_mode == 'f')
+	{
+		//keep going forward
+		distance_counter = 0;
+		distance_flag = 0;
+		
+		while ((LEFTPATHONE() || RIGHTPATHONE())
+				 || ((PATHCOUNT_Left() > 0) && (PATHCOUNT_Right() > 0)))
+		{
+			_delay_us(250);
+			LCD_SetPosition(1);
+			LCD_SendString("Fourway");
+		}
+	}	
+	else if(discovery_mode == 'b')
+	{
+		TURN_Back(0);
+	}
+	else if(discovery_mode == '?')
+	{
+		DISCOVERY_SetRandom();
+		JUNCTION_FourWay();
+		discovery_mode = '?';
+	}
+}
+
+// Total automatic control
+int PD_Control()
+{
+	
+	int newSignal;
+	
+	if(control_mode == 'r')
+	{
+		standard_speed_ = 100;
+		
+		if(FRONT_SENSOR_VALUE() > 45) //Slow down when approaching wall
+		{
+			standard_speed_ = Front_Control();
+		}
+		
+		K_p = 4;
+		K_d = 3;
+		current_error_ = reference_ - offset_;
+		if(offset_- 20 > 0)
+		{
+			newSignal = P_Control()+D_control()+angle_;
+		}
+		else
+		{
+			newSignal = P_Control()+D_control()-angle_;	
+		}
+		if ((angle_ > 0) && ((offset_ >= 12) || (offset_ <= 28))) // On the right path to the middle.
+		{
+			newSignal=0;
+		}
+		if((offset_ < 12) && ( angle_ < 3 ))
+		{
+			MOTOR_Stop();
+			MOTOR_RotateRight(1);
+			MOTOR_Forward(standard_speed_);
+		}
+		if( (offset_ > 28) && ( angle_ < 3 ))
+		{
+			MOTOR_Stop();
+			MOTOR_RotateLeft(1);
+			MOTOR_Forward(standard_speed_);
+		}
+	}
+	else if(control_mode == 'c')
+	{
+		standard_speed_ = 120;
+		standard_speed_ = Side_Control();
+		if(FRONT_SENSOR_VALUE() > 45) //Slow down when approaching wall
+		{
+		standard_speed_ = Front_Control();
+		}
+		
+		K_p = 4;
+		K_d = 3;
+		if(offset_-20 > 0)
+		{
+			current_error_ = angle_;
+		}
+		else
+		{
+			current_error_ = -angle_;	
+		}
+		newSignal = P_Control() + D_control();
+	}
+	else
+	{
+		current_error_ = 0;
+		newSignal = 0;
+	}
+
+	
+	
+	return newSignal;
+}
+
+/*
+ * Map.c
+ *
+ * Created: 4/23/2015 1:13:46 PM
+ *  Author: robop806
+ */ 
+
+
+#include <avr/io.h>
+#include "Map.h"
+#include "path.c"
+
+
+// Sets the position of the goal in the map
+void MAP_setGoal()
+{
+ 	uint8_t posY = MAP_currentPos[0];
+ 	uint8_t posX = MAP_currentPos[1];
+ 	MAP_addJunction();
+ 	MAP_goalJunction = MAP_currentJunction;
+	MAP_junctionOrderArray[MAP_goalJunction].hasUnex = 0;
+ 	MAP_junctionOrderArray[MAP_goalJunction].goal = 1;
+ 	MAP_goalPosition[0] = posY;
+ 	MAP_goalPosition[1] = posX;
+    //MAP_operatingMode_ = 4;
+ 	//MAP_resQmode = 1;
+}
+
+// Description:
+// 0 = Start
+// 1 = Unknown
+// 2 = Uncertain
+// 3 = Road
+// 4 = Wall
+// 5 = Junction
+void MAP_setSquareDescription(uint8_t description, uint8_t posY, uint8_t posX)
+{
+	if(posY <= 16 && posX <= 29) // Is square within map?
+	{
+		MAP_array[posY][posX].description = description;
+	}
+}
+
+// Check if the square is an unexplored road and sets the next direction to face it, send with 0 if exploring
+uint8_t MAP_checkDirDown(uint8_t exploring)
+{
+	if (((MAP_array[MAP_currentPos[0] + 1][MAP_currentPos[1]].description == 3) &&
+		(!MAP_array[MAP_currentPos[0] + 1][MAP_currentPos[1]].visited || exploring)) ||
+		(MAP_array[MAP_currentPos[0] + 1][MAP_currentPos[1]].description == 5))
+	{
+		MAP_nextDir = 3;
+		return 1;
+	}
+	else
+	{
+		return 0;
+	}
+}
+
+// Check if the square is an unexplored road and sets the next direction to face it, send with 0 if exploring
+uint8_t MAP_checkDirUp(uint8_t exploring)
+{
+	if (((MAP_array[MAP_currentPos[0] - 1][MAP_currentPos[1]].description == 3) &&
+		(!MAP_array[MAP_currentPos[0] - 1][MAP_currentPos[1]].visited || exploring)) ||
+		(MAP_array[MAP_currentPos[0] - 1][MAP_currentPos[1]].description == 5))
+	{
+		MAP_nextDir = 1;
+		return 1;
+	}
+	else
+	{
+		return 0;
+	}
+}
+
+// Check if the square is an unexplored road and sets the next direction to face it, send with 0 if exploring
+uint8_t MAP_checkDirLeft(uint8_t exploring)
+{
+	if (((MAP_array[MAP_currentPos[0]][MAP_currentPos[1] - 1].description == 3) &&
+		(!MAP_array[MAP_currentPos[0]][MAP_currentPos[1] - 1].visited || exploring)) ||
+		(MAP_array[MAP_currentPos[0]][MAP_currentPos[1] - 1].description == 5))
+	{
+		MAP_nextDir = 2;
+		return 1;
+	}
+	else
+	{
+		return 0;
+	}
+}
+
+// Check if the square is an unexplored road and sets the next direction to face it, send with 0 if exploring
+uint8_t MAP_checkDirRight(uint8_t exploring)
+{
+	if (((MAP_array[MAP_currentPos[0]][MAP_currentPos[1] + 1].description == 3) &&
+		(!MAP_array[MAP_currentPos[0]][MAP_currentPos[1] + 1].visited || exploring)) ||
+		(MAP_array[MAP_currentPos[0]][MAP_currentPos[1] + 1].description == 5))
+	{
+		MAP_nextDir = 0;
+		return 1;
+	}
+	else
+	{
+		return 0;
+	}
+}
+
+// Checks given direction
+uint8_t MAP_checkDir(uint8_t dir)
+{
+	if (dir == 0)
+	{
+		return MAP_checkDirRight(1);
+	}
+	else if (dir == 1)
+	{
+		return MAP_checkDirUp(1);
+	}
+	else if (dir == 2)
+	{
+		return MAP_checkDirLeft(1);
+	}
+	else if (dir == 3)
+	{
+		return MAP_checkDirDown(1);
+	}
+	else
+	{
+		return 255;
+	}
+}
+
+// Decides which will be the next direction for the robot
+// The different modes for choosing direction are: 'r' for right-first, 'l' for left-first or 'a' for random 
+void MAP_decideDirection(char mode)
+{
+
+	char mode_ = mode;
+	uint8_t robotDir = MAP_currentDir;
+	
+	// Randomizes the direction and mode, thus making the decisions (pseudo) random
+	if (mode == 'a')
+	{
+		
+	}
+	else if (mode_ == 'l')
+	{
+		// Left-first
+		if ( robotDir == 2 && (MAP_checkDirDown(0) || MAP_checkDirLeft(0) || MAP_checkDirUp(0) || MAP_checkDirRight(0)) )
+		{} 
+		else if ( robotDir == 1 && (MAP_checkDirLeft(0) || MAP_checkDirUp(0) || MAP_checkDirRight(0) || MAP_checkDirDown(0)) )
+		{}
+		else if (  robotDir == 0 && (MAP_checkDirUp(0) || MAP_checkDirRight(0) || MAP_checkDirDown(0) || MAP_checkDirLeft(0)) )
+		{}
+		else if (  robotDir == 3 && (MAP_checkDirRight(0) || MAP_checkDirDown(0) || MAP_checkDirLeft(0) || MAP_checkDirUp(0)) )
+		{}
+	}
+	else if (mode_ == 'r')	
+	{
+		// Right-first
+		if (  robotDir == 2 && (MAP_checkDirUp(0) || MAP_checkDirLeft(0) || MAP_checkDirDown(0) || MAP_checkDirRight(0)) )
+		{}
+		else if (  robotDir == 1 && (MAP_checkDirRight(0) ||  MAP_checkDirUp(0) || MAP_checkDirLeft(0) || MAP_checkDirDown(0)) )
+		{}
+		else if (  robotDir == 0 && (MAP_checkDirDown(0) || MAP_checkDirRight(0) ||  MAP_checkDirUp(0) || MAP_checkDirLeft(0)) )
+		{}
+		else if ( robotDir == 3 && (MAP_checkDirLeft(0) || MAP_checkDirDown(0) || MAP_checkDirRight(0) ||  MAP_checkDirUp(0)) )
+		{}
+	}
+}
+
+// Sets the current position as visited
+void MAP_setVisited()
+{
+	MAP_array[MAP_currentPos[0]][MAP_currentPos[1]].visited = 1;
+}
+
+// Counts the number of unexplored squares in a 1 square radius (up, down, left, right)
+void MAP_countSquares()
+{
+	uint8_t dir_ = MAP_currentDir; // The following lines change currentDir which we don't want
+	MAP_unexploredSquares = MAP_checkDirDown(0) + MAP_checkDirLeft(0) + MAP_checkDirRight(0) + MAP_checkDirUp(0);
+	MAP_exploredSquares = MAP_checkDirDown(1) + MAP_checkDirLeft(1) + MAP_checkDirRight(1) + MAP_checkDirUp(1);
+	MAP_currentDir = dir_;
+}
+
+// Uses Dijkstras algorithm to decide which location to set as a destination
+// This function sets the nextJunctionShort
+// SIM
+void MAP_decideDestination()
+{
+	//MAP_lastUnexJunction(MAP_junctionCount);
+	MAP_findPath(MAP_currentJunction, MAP_nextJunctionLong);
+	MAP_nextJunctionShort = getNextJunction();
+	
+	
+	// Simpleton variant
+	//MAP_nextJunctionLong = MAP_lastUnexJunction(MAP_junctionCount);
+// 	MAP_lastUnexJunction(MAP_junctionCount);
+// 	if (MAP_nextJunctionLong == 255) {MAP_LOOPer = 0;}
+// 	else if (MAP_nextJunctionLong < MAP_currentJunction)
+// 	{
+// 		MAP_nextJunctionShort = MAP_currentJunction - 1;
+// 	}
+// 	else if (MAP_nextJunctionLong > MAP_currentJunction)
+// 	{
+// 		MAP_nextJunctionShort = MAP_currentJunction + 1;
+// 	}
+}
+
+// Adds the travelled distance from the last junction to specified junction in the junctionDistArray
+uint8_t MAP_addJunctionDist(uint8_t j1, uint8_t j2)
+{
+	uint8_t returner_ = 0;
+
+	if (((MAP_junctionDistArray[j1][j2] == 0) || (MAP_junctionDistArray[j1][j2] > MAP_travelledDist)) && (j1 != j2) && (MAP_travelledDist != 0))
+	{
+		MAP_junctionDistArray[j1][j2] = MAP_travelledDist;
+		MAP_junctionDistArray[j2][j1] = MAP_travelledDist;
+		returner_ = 1;
+	}
+
+	MAP_travelledDist = 0;
+	return returner_;
+}
+
+// Adds the direction between two junctions, adds it in j1
+void MAP_addJunctionDir(uint8_t j1, uint8_t j2, uint8_t direction)
+{
+	if (direction == 0)
+	{
+		MAP_junctionOrderArray[j1].right = j2;
+	}
+	else if (direction == 1)
+	{
+		MAP_junctionOrderArray[j1].up = j2;
+	}
+	else if (direction == 2)
+	{
+		MAP_junctionOrderArray[j1].left = j2;
+	}
+	else if (direction == 3)
+	{
+		MAP_junctionOrderArray[j1].down = j2;
+	}
+}
+
+// Adds the current square as a junction
+void MAP_addJunction()
+{
+	uint8_t posY_ = MAP_currentPos[0];
+	uint8_t posX_ = MAP_currentPos[1];
+	
+	// Initiate direction to 63 so direction to junction 0 works
+	MAP_junctionOrderArray[MAP_junctionCount].right = 63;
+	MAP_junctionOrderArray[MAP_junctionCount].up = 63;
+	MAP_junctionOrderArray[MAP_junctionCount].left = 63;
+	MAP_junctionOrderArray[MAP_junctionCount].down = 63;
+
+	// Adds directions between last junction and this one
+	if (MAP_addJunctionDist(MAP_currentJunction, MAP_junctionCount) || MAP_addJunctionDist(MAP_junctionCount, MAP_currentJunction))
+	{
+		// Only adds the direction if the distance is shorter than before, thus only the shortest direction
+		// between two junctions is marked
+		MAP_addJunctionDir(MAP_currentJunction, MAP_junctionCount, MAP_lastJunctionDir);
+		MAP_addJunctionDir(MAP_junctionCount, MAP_currentJunction, (MAP_currentDir + 2) % 4);
+	}
+
+	// Increments counters
+	MAP_currentJunction = MAP_junctionCount++;
+
+	// Adds it in the map array
+	MAP_setSquareDescription(5, posY_, posX_);
+	MAP_array[posY_][posX_].junctionNumber = MAP_currentJunction;
+
+	// Adds it in the junction array
+	MAP_junctionOrderArray[MAP_currentJunction].hasUnex = 1;
+	MAP_junctionOrderArray[MAP_currentJunction].posY = posY_;
+	MAP_junctionOrderArray[MAP_currentJunction].posX = posX_;
+}
+
+// Returns the last junction with unexplored roads
+// Call with junctionCount
+// SIM
+void MAP_lastUnexJunction(uint8_t x)
+{
+	if (x <= 0)
+	{
+		MAP_mapped = 1;
+		MAP_resQmode = 1;	
+	}
+	else if (MAP_junctionOrderArray[x - 1].hasUnex == 1)
+	{
+		MAP_nextJunctionLong = x - 1;
+	}
+	else
+	{
+		MAP_lastUnexJunction(x - 1);
+	}
+}
+
+// Rotates the robot to face nextDir
+// SIM
+void MAP_rotate()
+{
+	MAP_currentDir = MAP_nextDir;
+	MAP_rotating_ = 0;
+	
+	if (MAP_array[MAP_currentPos[0]][MAP_currentPos[1]].description == 5)
+	{
+		MAP_lastJunctionDir = MAP_currentDir;
+	}	
+}
+
+// Moves the robot one square forward
+// SIM
+void MAP_moveForward()
+{
+	// Simulation code starts here
+	// Simulation code ends here
+	if (MAP_currentDir == 0)
+	{
+		MAP_currentPos[1]++;
+	}
+	else if (MAP_currentDir == 1)
+	{
+		MAP_currentPos[0]--;
+	}
+	else if (MAP_currentDir == 2)
+	{
+		MAP_currentPos[1]--;
+	}
+	else if (MAP_currentDir == 3)
+	{
+		MAP_currentPos[0]++;
+	}
+		
+	MAP_movingForward_ = 0;
+	MAP_travelledDist++;
+	MAP_setVisited();
+}
+
+// Returns the direction from j1 to j2
+uint8_t MAP_getDirection(uint8_t j1, uint8_t j2)
+{
+	if (MAP_junctionOrderArray[j1].right == j2)
+	{
+		return 0;
+	}
+	else if (MAP_junctionOrderArray[j1].up == j2)
+	{
+		return 1;
+	}
+	else if (MAP_junctionOrderArray[j1].left == j2)
+	{
+		return 2;
+	}
+	else if (MAP_junctionOrderArray[j1].down == j2)
+	{
+		return 3;
+	}
+	else 
+	{
+		return 0;
+	}
+}
+
+
+
+void MAP_findPath(unsigned int j1, unsigned int j2) {
+	initNodeArray();
+	initPaths();
+
+	node * root;
+	root = nodeArray[j1];
+	root->nr = j1;
+	insert(&root, j2); // eventually the path is saved in a list
+
+	// the tree nodes point to nodeArray (left, middle, right, parent)
+	// should be enough to flush this array to free memory
+	flushNodeArray();
+	root->left = root->middle = root->right = root->parent = NULL;
+	root = NULL;
+	free(root);
+
+}
+
+
+/*************** UTDRAG FRÅN SENSORMODUL V1.0 ****************/
+
+void distance_table_generator()
+{
+	for (int i = 0; i < 38; i++)
+	{
+		distance_table[i] = 210;
+	}
+	
+	distance_table[38] = 170;
+	distance_table[39] = 168;
+	distance_table[40] = 164;
+	distance_table[41] = 160;
+	distance_table[42] = 156;
+	distance_table[43] = 150;
+	distance_table[44] = 144;
+	
+	int k = 0;
+	
+	for (int i = 45; i < 65; i++)
+	{
+		distance_table[i] = 140 - k*2;
+		k = k + 1;
+	}
+	
+	k = 0;
+	for(int i = 65; i < 105; i++)
+	{
+		distance_table[i] = 100 - k;
+		k = k + 1;
+	}
+	
+	k = 0;
+	
+	for (int i = 105; i < 150; i++)
+	{
+		distance_table[i] = 60 - k;
+		
+		if ((i/2)*2 == i){
+			k = k + 1;
+		}
+	}
+	
+	for (int i = 150; i < 255; i++)
+	{
+		distance_table[i] = 0;
+	}
+	
+	return;
+	
+}
+
+int8_t angle_generator(int back, int front)
+{
+	float angle;
+	double length_quotient;
+	double length_difference;
+	
+	length_difference = front - back;
+	length_quotient= length_difference/130; //130 är avståndet mellan sensorerna
+	angle = atan(length_quotient) * 180/M_PI;
+	return (int8_t)angle;
+}
+
+int8_t offset_generator(int angle, int back, int front)
+{
+	float hyp;
+	float cath;
+	
+	hyp = (front + back)/2 + 160/2; //160 är avståndet mellan sensorerna
+	cath = hyp * cos(angle*M_PI/180);
+	
+	return (int8_t)(cath/10);
+}
+
+//_________________________________________Avläsning________________________________________
+	
+	for(int i = 0; i < 8; i++) // Addera in värden i arrayen
+		{
+			ADMUX = 32 + i; //Öka admux, sätt ADLAR (bit 5 = 32)
+			ADCSRA |= (1<<6); //Börja ADC
+			
+			while(ADCSRA & 1<<ADSC)
+				{
+				} //Delay så att inte ADMUX-inläsningarna hamnar i oordning
+				
+			if (
+			 (i == 7) || (i == 2) || (i == 5) || (i == 6))
+			{
+				sensor_data[i] = ADCH;
+			}
+			else
+			{
+				sensor_data[i] = distance_table[ADCH];
+			}	
+		}
+		
+
+//_______________________________________Offset och angle______________________________________
+		//Välj den sida som är närmast väggen - den är mest noggrann!
+		//Är höger < vänster? Använd isf höger och vice versa.
+		
+		angle_right= angle_generator(sensor_data[3],sensor_data[4]);
+		offset_right = 40 - offset_generator(angle_right,sensor_data[3],sensor_data[4]);
+		
+		angle_left= angle_generator(sensor_data[0],sensor_data[1]);
+		offset_left = offset_generator(angle_left,sensor_data[0],sensor_data[1]);
+					
+//_________________________________________Frontsensor________________________________________
+
+		//Skickar spänning till styrmodulen. Gör om?
+		front_sensor = (int8_t)(sensor_data[6]);
+		
+		
+
+//_________________________________________Reflexsensor________________________________________
+	
+		if((sensor_data[7] > reflex_value_floor))
+			reflex_bool = 1;
+		else
+			reflex_bool = 0;
+
+//_________________________________________Lång sensor________________________________________
+		//Om kort inte detekterar ett avstånd - läs av lång sensor.
+		//Skicka ut hur många väggar vi ser från tabell.
+
+			//Vänster långsensor
+			if (sensor_data[0] > 170 || sensor_data[1] > 170)
+			{			
+				if(sensor_data[2] >= 85) 
+					left_wall_counter = 0;
+				else if(85 > sensor_data[2] && sensor_data[2] >= 45) 
+					left_wall_counter = 1;
+				else if (45 > sensor_data[2] && sensor_data[2] >= 32)
+					left_wall_counter = 2;
+				else
+					left_wall_counter = 3;	
+			}
+			else
+			{
+				left_wall_counter = 0;
+			}
+			
+			//Höger långsensor
+			if (sensor_data[3] > 170 || sensor_data[4] > 170)
+			{
+				if(sensor_data[5] >= 90)
+					right_wall_counter = 0;
+				else if(90 > sensor_data[5] && sensor_data[5] >= 50)
+					right_wall_counter = 1;
+				else if (50 > sensor_data[5] && sensor_data[5] >= 37)
+					right_wall_counter = 2;
+				else
+					right_wall_counter = 3;
+			}
+			else
+			{
+				right_wall_counter = 0;
+			}
+			
+					
+//_________________________________________Skapa bools för styrbeslut______________________________________
+			if((sensor_data[0] > 200) && (sensor_data[1] > 200)
+				&& left_wall_counter > 0)
+			{
+				left_path_both = 1;
+			}
+			else
+			{
+				left_path_both = 0;
+			}
+					
+			if((sensor_data[3] > 200) && (sensor_data[4] > 200)
+				&& right_wall_counter > 0)
+			{
+				right_path_both = 1;
+			}
+			else
+			{
+				right_path_both = 0;
+			}
+					
+			if((sensor_data[0] > 200) || (sensor_data[1] > 200))
+			{
+				left_path_one = 1;
+			}
+			else
+			{
+				left_path_one = 0;
+			}
+					
+			if((sensor_data[3] > 200) || (sensor_data[4] > 200))
+			{
+				right_path_one = 1;
+			}
+			else
+			{
+				right_path_one = 0;
+			}
+		
+//_________________________________________Uppdatera buffer________________________________________
+		//Samla ihop väggarna och reflexen i en binär talföljd. Lägg reflex_bool på 7 biten
+		//Lägg vänster vägg på 4 och 5 biten, lägg höger vägg på 1 och 2 biten.
+		//För avläsning - and:a bort de ointressanta bitarna och dividera med rätt faktor.
+				
+		can_see_information = ( (left_path_one * 8) + (right_path_one * 4) +
+								(left_path_both * 2) + right_path_both );
+		
+		//	CSI	=	x		x		x	  x	  LP1	RP1	LPB	RPB
+		//			  128	64	32  16	8	  4	  2 	1
+		
+		wall_reflex_information = ( (reflex_bool * 64) + (left_wall_counter * 4) + (right_wall_counter) );
+		
+		//	WRI =	!   !	      REFLEX	x	  LW1 LW0 RW1 RW0
+		//			  128	64	    32	    16	8	  4	  2	  1
+		
+		//Förhindra avbrott under uppdateringen - höj avbrottsnivån så inga bussavbrott kommer.
+		cli();
+	
+		send_buffer[0] = angle_right;
+		send_buffer[1] = offset_right;
+		send_buffer[2] = angle_left;
+		send_buffer[3] = offset_left;
+		send_buffer[4] = front_sensor;
+		send_buffer[5] = can_see_information;
+		send_buffer[6] = wall_reflex_information;
+		
+		sei();
+		
+		//Skicka till Styrmodul via SPI
+	}			
+}

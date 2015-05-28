@@ -23,7 +23,7 @@ void MAP_setGoal()
  	MAP_goalPosition[0] = posY;
  	MAP_goalPosition[1] = posX;
     //MAP_operatingMode_ = 4;
- 	//MAP_resQmode = 1;	
+ 	//MAP_resQmode = 1;
 }
 
 // Description:
@@ -189,7 +189,7 @@ void MAP_countSquares()
 // SIM
 void MAP_decideDestination()
 {
-	MAP_lastUnexJunction(MAP_junctionCount);
+	//MAP_lastUnexJunction(MAP_junctionCount);
 	MAP_findPath(MAP_currentJunction, MAP_nextJunctionLong);
 	MAP_nextJunctionShort = getNextJunction();
 	
