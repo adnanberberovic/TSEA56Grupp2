@@ -151,9 +151,6 @@ Tile::Tile(std::string file_texture, SDL_Renderer* renderer, int xPos, int yPos)
 
 void Tile::render_Tile(SDL_Renderer* renderer)
 {
-    if(Status_ == 0){
-        return;
-    }
     
     if (Status_ == 1) {
         make_Path();
@@ -204,6 +201,8 @@ void Tile::change_tile(int to_status)
 void Tile::make_Reset()
 {
     Status_ = 0;
+	Goal_Here = 0;
+	Robot_Here = 0;
     srRect_ = {0,0,40,40};
 }
 

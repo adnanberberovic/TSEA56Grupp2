@@ -49,8 +49,6 @@ Autonom::Autonom(SetupSDL* sdl_lib, void* hComm_)
 	arrMap[0] = 0x79;
 	arrMap[1] = 0x78;
 	arrMap[2] = 0x88;
-	(Tile_vector[2][0])->change_tile(1);
-	(Tile_vector[2][0])->change_tile(2);
     
     Speed_left->Change_speed(140);
     Speed_right->Change_speed(300);
@@ -133,7 +131,7 @@ void Autonom::event(string& statestring, bool& running)
                 Speed = Speed - 4;
                 Robot_angle->set_angle(0);
                 Speed_left->Change_speed(Speed);
-                Speed_right->Change_speed(Speed);
+                Speed_right->Change_5speed(Speed);
 
                 
             }*/
@@ -311,6 +309,7 @@ void Autonom::Skift_Tiles_right()
         for ( vector<Tile*>::iterator i = (*vec).begin(); i != (*vec).end(); ++i){
             
             (*i)->skift_right();
+			(*i)->render_Tile(renderer_);
             }
         }
     }
