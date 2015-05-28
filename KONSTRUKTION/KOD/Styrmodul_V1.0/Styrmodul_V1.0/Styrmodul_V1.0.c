@@ -173,6 +173,7 @@ void PWM_SetSpeedRight(int speed)
 		OCR2B = speed;
 	}
 }
+
 void PWM_SetSpeedLeft(int speed)
 {
 	if (speed >= 0 && speed <= 210)
@@ -1108,14 +1109,14 @@ int PD_Control()
 	
 	if(control_mode == 'r')
 	{
-		standard_speed_ = 100;
+		standard_speed_ = 80;
 		
 		if(FRONT_SENSOR_VALUE() > 45) //Slow down when approaching wall
 		{
 			standard_speed_ = Front_Control();
 		}
 		
-		K_p = 4;
+		K_p = 5;
 		K_d = 3;
 		current_error_ = reference_ - offset_;
 		if(offset_- 20 > 0)
@@ -1145,14 +1146,14 @@ int PD_Control()
 	}
 	else if(control_mode == 'c')
 	{
-		standard_speed_ = 120;
+		standard_speed_ = 100;
 		standard_speed_ = Side_Control();
 		if(FRONT_SENSOR_VALUE() > 45) //Slow down when approaching wall
 		{
 		standard_speed_ = Front_Control();
 		}
 		
-		K_p = 4;
+		K_p = 5;
 		K_d = 3;
 		if(offset_-20 > 0)
 		{
@@ -1225,6 +1226,11 @@ void DEAD_END()
 
 void JUNCTION_delay(int delay)
 {
+	if( (OCR2B == 0) || (OCR2A == 0) )
+	{
+		MOTOR_Forward(standard_speed_);
+	}
+	
 	wheel_counter = 0;
 	while (wheel_counter < (2 * delay))
 	{
@@ -2084,23 +2090,25 @@ void tape_Home()
 	{
 		MOTOR_RotateLeft(180);
 		MOTOR_RotateLeft(180);
+		LCD_Clear();
 		LCD_SendString("IM DONE HERE");
 		while(1);
 	}
 				
+	SERVO_LevelLow();
+	for (int i = 0; i < 5; i++)
+	{
+		_delay_ms(250);
+	}
+	
+	SERVO_SetGrip();
+					
 	SERVO_LevelMid();
 	for (int i = 0; i < 5; i++)
 	{
 		_delay_ms(250);
 	}
 					
-	SERVO_LevelHigh();
-	for (int i = 0; i < 5; i++)
-	{
-		_delay_ms(250);
-	}
-	SERVO_SetGrip();
-	
 	MAP_currentJunction = 0; //Set Currentjunction == 0 because we dont go in there automatically.
 	MAP_resQmode++;
 	MAP_operatingMode_ = 4;
@@ -2395,12 +2403,20 @@ if(ReflexSensor)
 				MOTOR_Stop();
 
 				SERVO_LevelLow();
-				for (int i = 0; i < 5; i++)
+				for (int i = 0; i < 3; i++)
 				{
 					_delay_ms(250);
 				}
 				SERVO_ReleaseGrip();
-				
+				for (int i = 0; i < 3; i++)
+				{
+					_delay_ms(250);
+				}
+				SERVO_LevelHigh();
+				for (int i = 0; i < 3; i++)
+				{
+					_delay_ms(250);
+				}
 				MOTOR_Backward(45);
 				JUNCTION_delay(2);
 
@@ -2608,14 +2624,8 @@ void Junction()
     }
     
     MAP_moveForward();
-	if(standard_speed_ > 100) // !Reflex_SetNextForwardGold <--- Kanske borde vara här? 
-	{
-		JUNCTION_delay(2);
-	}
-	else 
-	{
+
 		JUNCTION_delay(3);
-	}
 	
 	MOTOR_Stop();
 	_delay_ms(50);
@@ -2948,7 +2958,11 @@ void AutomaticControl()
 	
 	if (WALL_CLOSE_AHEAD()) // dead end square
 	{
-		MAP_moveForward();
+		if( !((distance_flag == 0) && (distance_counter < 8)) )
+		{
+			MAP_moveForward();	
+		}
+		
 		set_map_DeadEnd();
 
 		if (tape_counter == 1)
