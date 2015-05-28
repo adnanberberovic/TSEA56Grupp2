@@ -77,6 +77,7 @@ uint8_t Goal_found = 0;
 int IRWIN = 0;
 int tape_counter = 0;
 int goal_counter = 0;
+int home_visited = 0;
 
 //__________________________REGISTERS__________________________
 
@@ -166,7 +167,7 @@ void PWM_Init(void)
 }
 void PWM_SetSpeedRight(int speed)
 {
-	if (speed >= 0 && speed <= 255)
+	if (speed >= 0 && speed <= 210)
 	{
 		arrSpeedout[1] = (uint8_t)speed;
 		OCR2B = speed;
@@ -174,7 +175,7 @@ void PWM_SetSpeedRight(int speed)
 }
 void PWM_SetSpeedLeft(int speed)
 {
-	if (speed >= 0 && speed <= 255)
+	if (speed >= 0 && speed <= 210)
 	{
 		arrSpeedout[0] = (uint8_t)speed;
 		OCR2A = speed;
@@ -1214,11 +1215,12 @@ void DEAD_END()
 		}
 	}
 	
+	distance_counter = 0;
+	distance_flag = 0;
 	_delay_ms(100);
 	MOTOR_Forward(standard_speed_);
 	
-	distance_counter = 0;
-	distance_flag = 0;
+
 }
 
 void JUNCTION_delay(int delay)
@@ -1399,7 +1401,8 @@ void TURN_Back(int mode)
 {
 	if (mode == 0) // 4-way
 	{
-		
+		MOTOR_Stop();
+		_delay_ms(100);
 		if(angle_ > 5)
 		{
 			angle_ = 5;
@@ -1454,15 +1457,24 @@ void TURN_Back(int mode)
 	
 	else if(mode == 2) // 3-way-2
 	{
+		if(angle_ > 5)
+		{
+			angle_ = 5;
+		}
+		else if (angle_ < -5)
+		{
+			angle_ = -5;
+		}
+		
 		if( offset_ > 20)
 		{
-			MOTOR_RotateLeft(180); //TODO - FIXA ANGLE
+			MOTOR_RotateLeft(180 - angle_);
 		}
 		else
 		{
-			MOTOR_RotateLeft(180);
+			MOTOR_RotateLeft(180 + angle_);
 		}
-				
+
 		_delay_ms(100);
 		MOTOR_Forward(standard_speed_);
 		
@@ -1515,7 +1527,22 @@ void TURN_Back(int mode)
 		distance_counter = 0;
 		distance_flag = 0;
 	}
-	
+	else if (mode == 5) // vid mÂl och start
+	{
+				if( offset_ > 20)
+		{
+			MOTOR_RotateLeft(180 - angle_);
+		}
+		else
+		{
+			MOTOR_RotateLeft(180 + angle_);
+		}
+		
+		_delay_ms(100);
+		distance_counter = 0;
+		distance_flag = 0;
+		return;
+	}
 	
 	
 	while((PATHCOUNT_Left() > 0) || (PATHCOUNT_Right() > 0))
@@ -1734,9 +1761,11 @@ void JUNCTION_FourWay()
 		distance_counter = 0;
 		distance_flag = 0;
 		
+		MOTOR_Forward(standard_speed_);
 		while ((LEFTPATHONE() || RIGHTPATHONE())
 				 || ((PATHCOUNT_Left() > 0) && (PATHCOUNT_Right() > 0)))
 		{
+
 			_delay_us(250);
 			LCD_SetPosition(1);
 			LCD_SendString("Fourway");
@@ -2026,7 +2055,7 @@ void MAP_main()
 
 void tape_Home()
 {
-
+	home_visited = 1;
 	Reflex_StartMarker = 0; 
 	ReflexSensor=0;
 	//Stall in rAtt vinken om m÷jligt <----
@@ -2037,16 +2066,19 @@ void tape_Home()
 	}
 			
 	MAP_moveForward();
+	
+	MOTOR_Forward(50);
+	JUNCTION_delay(5);
+	MOTOR_Stop();
 
-	if (MAP_array[15][15].description != 5)
+	if (MAP_array[15][15].description != 5) // inte korsning innan Âka lite l‰ngre
 	{
 		MOTOR_Forward(50);
-		JUNCTION_delay(2);
+		JUNCTION_delay(6);
 	}
 				
-	MOTOR_Forward(50);
-	JUNCTION_delay(4);
 	MOTOR_Stop();
+	_delay_ms(50);
 	
 	if (goal_counter == 2)
 	{
@@ -2076,13 +2108,16 @@ void tape_Home()
 	MAP_nextDir = 1;
 	DISCOVERY_SetMode();
 	MAP_rotate();
-	TURN_Back(4);
+	TURN_Back(5);
+	distance_counter = 0;
+	distance_flag = 0;
 	_delay_ms(100);
 	MOTOR_Forward(45);
 	Goal_found = 0;
-	distance_counter = 0;
-	distance_flag = 0;
 
+	ReflexSensor = 0;
+	tape_counter = 0;
+	
 	Update_All_values();
 	
 	while(!ReflexSensor && (distance_counter < 15))
@@ -2090,14 +2125,51 @@ void tape_Home()
 		Update_All_values();
 		_delay_us(250);
 	}
+	
+	MOTOR_Stop();
+	_delay_ms(100);
 
 	if(ReflexSensor)
-	{
+	{	
+		MOTOR_Stop();
+		ReflexSensor = 0;
+		tape_counter = 0;
 		distance_counter = 0;
 		distance_flag = 0;	
 	}
-
+	
 	MOTOR_Stop();
+	MOTOR_Backward(45);
+	JUNCTION_delay(3);
+	MOTOR_Stop();
+	
+		Get_sensor_values();
+		
+		if ( ( (arrSensor[1]  + arrSensor[3]) / 2) - 20 > 0)
+		{
+			if (arrSensor[0] < 0)
+			{
+				MOTOR_RotateLeft(- arrSensor[0]);
+			}
+			else
+			{
+				MOTOR_RotateRight(arrSensor[0]);
+			}
+		}
+		else
+		{
+			if (arrSensor[2] < 0)
+			{
+				MOTOR_RotateRight(- arrSensor[2]);
+			}
+			else
+			{
+				MOTOR_RotateLeft(arrSensor[2]);
+			}
+		}
+	distance_counter = 0;
+	distance_flag = 0;
+	_delay_ms(100);
 	LCD_Clear();
 	LCD_SendString("Y: ");
 	LCD_display_uint8(MAP_currentPos[0]);
@@ -2242,21 +2314,26 @@ void tape_GoalFound1()
 	LCD_SendString("GOOOAL");
 }
 */
+
+
 void tape()
+{
+if(ReflexSensor)
 {
 	
 	if( (MAP_goalPosition[0] == MAP_currentPos[0]) && (MAP_goalPosition[1] == MAP_currentPos[1]) )
 	{
-		if(tape_counter == 0)
+		if((tape_counter == 1) && (home_visited == 0))
 		{
-		ReflexSensor = 0;
-		return; 
+			
+			ReflexSensor = 0;
+			tape_counter = 0;
+			return; 
 		}
 	}
 	
 
-	if(ReflexSensor)
-    {
+
         if ( (MAP_currentPos[1] == 15) && ( (MAP_currentPos[0] == 16) || (MAP_currentPos[0] == 15) || (MAP_currentPos[0] == 14) ) )
         {
 			ReflexSensor = 0;
@@ -2307,34 +2384,25 @@ void tape()
 				goal_counter = 1;
 			}
 
-			else if(goal_counter == 1)
+			else if((goal_counter == 1) && (home_visited == 1))
 			{
 				LCD_Clear();
 				LCD_SetPosition(0);
 				LCD_SendString("DROP IT Like     IT  HOOOT!"); 
 				_delay_ms(250);
 				_delay_ms(250);
-				_delay_ms(250);
-				_delay_ms(250);
-				LCD_Clear();
-				LCD_SetPosition(0);
-				LCD_SendString("DROP IT Like     IT  HOOOT!"); 
 
 				MOTOR_Stop();
-				SERVO_LevelHigh();
-				for (int i = 0; i < 5; i++)
-				{
-					_delay_ms(250);
-				}
 
 				SERVO_LevelLow();
 				for (int i = 0; i < 5; i++)
 				{
 					_delay_ms(250);
 				}
-				SERVO_SetGrip();
+				SERVO_ReleaseGrip();
+				
 				MOTOR_Backward(45);
-				JUNCTION_delay(5);
+				JUNCTION_delay(2);
 
 				MOTOR_Stop();
 				_delay_ms(100);
@@ -2349,18 +2417,20 @@ void tape()
 				MAP_rotate();
 				Send_map_values();
 
-				TURN_Back(4);
+				TURN_Back(5);
 				MOTOR_Stop();
 				_delay_ms(100);
 				MOTOR_Backward(45);
-				JUNCTION_delay(5);
+				JUNCTION_delay(3);
 				MOTOR_Stop();
+				_delay_ms(150);
 
 				distance_counter = 0;
 				distance_flag = 0;
 				MOTOR_Forward(standard_speed_);
 				goal_counter = 2;
 				tape_counter = 0;
+				home_visited = 0;
 			}
 
 		}
@@ -2376,8 +2446,6 @@ void tape()
 	}
 }
 
-
-
 void tape_Junction()
 {
 		ReflexSensor = 0;
@@ -2391,29 +2459,37 @@ void tape_Junction()
 		goal_counter = 1;
 		tape_counter = 0;
 	}
-	else if(goal_counter == 1 ) //Om man 
+	else if( (goal_counter == 1) ) //Om man 
 	{
-		MOTOR_Stop();
-		SERVO_LevelHigh();
-		for (int i = 0; i < 5; i++)
+		if( home_visited == 0)
 		{
-			_delay_ms(250);
+			tape_counter = 0;
+			ReflexSensor = 0;
+			return;
 		}
+		MOTOR_Stop();
+
 
 		SERVO_LevelLow();
-		for (int i = 0; i < 5; i++)
+		for (int i = 0; i < 3; i++)
 		{
 			_delay_ms(250);
 		}
-		_delay_ms(250);
-		_delay_ms(250);
-		_delay_ms(250);
-		_delay_ms(250);
-		SERVO_SetGrip();
+		SERVO_ReleaseGrip();
+		for (int i = 0; i < 3; i++)
+		{
+			_delay_ms(250);
+		}
+		SERVO_LevelHigh();
+		for (int i = 0; i < 3; i++)
+		{
+			_delay_ms(250);
+		}
 		MOTOR_Backward(45);
 		JUNCTION_delay(2);
 
 		MOTOR_Stop();
+		_delay_ms(50);
 
 		MAP_currentJunction = MAP_goalJunction; //Set Currentjunction == 0 because we dont go in there automatically.
 		MAP_resQmode++;
@@ -2425,20 +2501,34 @@ void tape_Junction()
 		MAP_rotate();
 		Send_map_values();
 
-		TURN_Back(4);
+		TURN_Back(5);
 		MOTOR_Stop();
 		_delay_ms(100);
 		MOTOR_Backward(45);
-		JUNCTION_delay(5);
+		JUNCTION_delay(4);
 		MOTOR_Stop();
+		_delay_ms(50);
 
 		distance_counter = 0;
 		distance_flag = 0;
-		MOTOR_Forward(45);
 		Update_All_values();
 
+	if((PATHCOUNT_Left() > 0) && (PATHCOUNT_Right() > 0 ))
+	{
+		MOTOR_Forward(standard_speed_);
+		distance_counter = 0;
+		distance_flag = 0;
+
+		while( (PATHCOUNT_Right() > 0) || (PATHCOUNT_Left() > 0) )
+		{
+			_delay_us(250);
+		}
+			  
+		JUNCTION_delay(3);
+	}
+
 		//Reglera om hˆger ˆppen
-		if(PATHCOUNT_Right() > 0)
+	else if( (PATHCOUNT_Right() > 0) && (PATHCOUNT_Left() == 0))
 	{
 	  MOTOR_Stop();
 	  Get_sensor_values();
@@ -2467,7 +2557,7 @@ void tape_Junction()
 
 		//Reglera om v‰nster ˆppen
 	
-		if(PATHCOUNT_Left() > 0)
+	else if((PATHCOUNT_Left() > 0) && (PATHCOUNT_Right() == 0) )
 	{
 		MOTOR_Stop();
 		Get_sensor_values();
@@ -2495,8 +2585,8 @@ void tape_Junction()
 	}
 	
 		goal_counter = 2;
-		
 		tape_counter = 0;
+		MOTOR_Forward(standard_speed_);
 		return; //GÂ ut ur Juction fˆr vi gˆr vÂra egna beslut
 	}
 }
@@ -2517,12 +2607,19 @@ void Junction()
 		}
     }
     
-	
     MAP_moveForward();
-	if(!Reflex_SetNextForwardGold)
+	if(standard_speed_ > 100) // !Reflex_SetNextForwardGold <--- Kanske borde vara h‰r? 
 	{
-    JUNCTION_delay(3);
+		JUNCTION_delay(2);
 	}
+	else 
+	{
+		JUNCTION_delay(3);
+	}
+	
+	MOTOR_Stop();
+	_delay_ms(50);
+	
     Update_All_values();
 	
 	if (tape_counter == 1)
@@ -2585,6 +2682,8 @@ void Junction()
 			set_map_RightTurn();
             
             MAP_main();
+			
+			MAP_nextDir = (MAP_currentDir + 3) % 4;
             DISCOVERY_SetMode();
             
 			if (discovery_mode == 'r')
@@ -2665,6 +2764,8 @@ void Junction()
 			set_map_LeftTurn();
             
             MAP_main();
+			
+			MAP_nextDir = (MAP_currentDir + 1) % 4; //Always turn left.
             DISCOVERY_SetMode();
 			
 			if (discovery_mode == 'r')
@@ -2727,22 +2828,22 @@ void Junction()
 			}
         }
     }
-    else if (WallCloseAhead)
-    {
-        MOTOR_Stop();
-        LCD_Clear();
-        LCD_SendString("Dead End");
-        LCD_SetPosition(16);
-        LCD_SendString("I sv?ng IF.. FEL");
-        while(1);
-		set_map_DeadEnd();
-        
-        MAP_main();
-        DISCOVERY_SetMode();
-        DEAD_END();
-        MAP_rotate();
-        
-    }
+//     else if (WallCloseAhead)
+//     {
+//         MOTOR_Stop();
+//         LCD_Clear();
+//         LCD_SendString("Dead End");
+//         LCD_SetPosition(16);
+//         LCD_SendString("I sv?ng IF.. FEL");
+//         while(1);
+// 		set_map_DeadEnd();
+//         
+//         MAP_main();
+//         DISCOVERY_SetMode();
+//         DEAD_END();
+//         MAP_rotate();
+//         
+//     }
     
     // Ending to make sure robot out of junction
     Get_sensor_values();
@@ -2774,7 +2875,6 @@ void Junction()
         }
     }
     
-	tape_counter = 0;
 
 }
 
@@ -2863,12 +2963,13 @@ void AutomaticControl()
 		}
 		
 		MAP_main();
-		DISCOVERY_SetMode();
+		MAP_nextDir = (MAP_currentDir + 2) % 4;
+//		DISCOVERY_SetMode();
 		DEAD_END();
 		MAP_rotate();
 		angle_ = 0;
 	}
-	if((distance_counter >= 4) && (distance_flag == 1))
+	if((distance_counter >= 6) && (distance_flag == 1))
 	{
 		MAP_moveForward();
 		set_map_Corridor();
@@ -2928,23 +3029,22 @@ int main(void)
 				Send_sensor_values();
 				
 				LCD_SetPosition(0);
-				LCD_SendString("srt: ");
-				LCD_display_uint16(MAP_nextJunctionShort);
-				LCD_SendString(" ");
-				
-				LCD_SendString(" long:");
-				LCD_display_uint16(MAP_nextJunctionLong);
-				//LCD_SendString("   GC:");
-				//LCD_display_uint16(goal_counter);
+				//LCD_SendString("srt: ");
+				//LCD_display_uint16(MAP_nextJunctionShort);
 				//LCD_SendString(" ");
+				
+				//LCD_SendString(" long:");
+				//LCD_display_uint16(MAP_nextJunctionLong);
+				LCD_SendString("   GC:");
+				LCD_display_uint16(goal_counter);
+				LCD_SendString(" ");
  				LCD_SetPosition(16);
- 				LCD_SendString("goal ");
- 				LCD_display_uint16(MAP_array[MAP_goalPosition[0]][MAP_goalPosition[1]].junctionNumber);
- 				LCD_SendString(" cur: ");
-				LCD_display_uint8(MAP_currentJunction);
-				//LCD_SendString(" RC: ");
-
-				//LCD_display_uint8(tape_counter);
+ 				//LCD_SendString("goal ");
+ 				//LCD_display_uint16(MAP_array[MAP_goalPosition[0]][MAP_goalPosition[1]].junctionNumber);
+ 				LCD_SendString("RxS: ");
+				LCD_display_uint8(ReflexSensor);
+				LCD_SendString(" RC: ");
+				LCD_display_uint8(tape_counter);
 				
 				
 			}
