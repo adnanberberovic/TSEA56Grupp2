@@ -35,7 +35,7 @@ int16_t TIMER_PD = 0;
 float rotation_angle = 0.00;
 // Checks if flags are correctly set in manual/auto loop.
 int Manual_Flag = 0;
-int speed_var = 200;
+int speed_var = 180;
 uint8_t distance_flag = 0;
 
 uint8_t holds_item = 0;
@@ -434,6 +434,9 @@ int16_t Gyro_sequence()
 // Delay untill 90 degrees reached;
 void checkLeftAngle(float target_angle)
 {
+    if (target_angle <= 3) {
+        target_angle = target_angle + 2;
+    }
 	int16_t result=0, sum;
 	float interval, medel;
 	int speed_var_local = speed_var;
@@ -464,6 +467,9 @@ void checkLeftAngle(float target_angle)
 // Delay untill 90 degrees reached;
 void checkRightAngle(float target_angle)
 {
+    if (target_angle <= 3) {
+        target_angle = target_angle + 2;
+    }
 	int16_t result=0, sum;
 	float interval, medel;
 	int speed_var_local = speed_var;
@@ -493,7 +499,7 @@ void checkRightAngle(float target_angle)
 			PWM_SetSpeedLeft(speed_var_local);
 			PWM_SetSpeedRight(speed_var_local);
 		}
-	} while (rotation_angle > -(target_angle - 6)); // -6 due to delay from stop of loop until wheels stop and slideing
+	} while (rotation_angle > -(target_angle - 2)); // -6 due to delay from stop of loop until wheels stop and slideing
 	
 	rotation_angle = 0; //reset
 }
@@ -1217,8 +1223,7 @@ int PD_Control()
 			MOTOR_RotateRight(1);
 			MOTOR_Forward(standard_speed_);
 			newSignal=0;
-			_delay_us(250);
- 			JUNCTION_delay(1);
+
 		}
 		if( (offset_ > 28) && ( angle_ < 3 ))
 		{
@@ -1226,8 +1231,6 @@ int PD_Control()
 			MOTOR_RotateLeft(1);
 			MOTOR_Forward(standard_speed_);
 			newSignal=0;
-			_delay_us(250);
-			JUNCTION_delay2(1);
 		}
 	}
 	else if(control_mode == 'c')
@@ -2237,134 +2240,6 @@ void tape_Home()
 ReflexSensor = 0;
 
 }
-/*
-void tape_GoalFound1()
-{
-	Goal_found = 1;
-	ReflexSensor = 0;
-
-	MOTOR_Forward(50);
-	JUNCTION_delay(2);
-            
-	//Stall in rAtt vinken om m÷jligt <---- 
-	Update_All_values();
-	while( (ReflexSensor == 0) && (WallCloseAhead == 0) )
-	{
-
-// 		if((distance_counter >= 4) && (distance_flag == 1))
-// 			{
-// 				MAP_moveForward();
-// 				set_map_Corridor();
-// 				MAP_main();
-// 				distance_flag = 0;
-// 			}
-
-		Update_All_values();
-		_delay_us(250);
-	}
-									
-	MOTOR_Stop();
-	Reflex_SetNextForwardGold = 1;	
-            
-	if(ReflexSensor)
-	{
-		ReflexSensor = 0;
-		MOTOR_Stop();
-
-		MOTOR_Backward(50);
-		JUNCTION_delay(6); // Detta värdet kanske behövs ändras!!!! <----- OBS
-		MOTOR_Stop();
-		Update_All_values();
-                
-		if( !(PathCountLeft > 0) || (PathCountRight > 0) ) // Vi är i en korridor.
-		{
-			MAP_moveForward();
-			set_map_Corridor();
-			MAP_main();
-			MOTOR_Forward(standard_speed_);
-		}
-				
-
-				
-	}
-	
-	distance_counter = 0;
-	distance_flag = 0;
-	resque_mode = 'q';
-	ReflexSensor = 0;
-	Send_map_values();
-
-}
-
-//void tape_GoalFound2()
-{
-	Goal_found = 2;
-	ReflexSensor = 0;
-	MOTOR_Forward(50);
-	JUNCTION_delay(1);
-
-	//Stall in rAtt vinken om m÷jligt <----
-
-	Update_All_values();
-	while( (ReflexSensor == 0) && (WallCloseAhead == 0) )
-	{
-		Update_All_values();
-		_delay_us(250);
-	}
-
-	MOTOR_Stop();
-	if(ReflexSensor)
-	{
-		ReflexSensor = 0;
-		MOTOR_Stop();
-
-		MOTOR_Backward(50);
-		JUNCTION_delay(3);  // Detta värdet kanske behövs ändras!!!! <----- OBS
-		MOTOR_Stop();
-		Update_All_values();
-	}
-
-	SERVO_LevelHigh();
-	for (int i = 0; i < 5; i++)
-	{
-		_delay_ms(250);
-	}
-
-	SERVO_LevelLow();
-	for (int i = 0; i < 5; i++)
-	{
-		_delay_ms(250);
-	}
-	SERVO_SetGrip();
-
-	Update_All_values();
-
-	MOTOR_Backward(50);
-	JUNCTION_delay(2);
-	MOTOR_Stop();
-	MAP_currentJunction = MAP_goalJunction; //Set Currentjunction == 0 because we dont go in there automatically.
-	MAP_resQmode++;
-	MAP_operatingMode_ = 4;
-	MAP_main();
-	MAP_nextDir = (MAP_currentDir + 2 ) % 4;//The inverse of current direction.
-	DISCOVERY_SetMode();
-	MAP_rotate();
-	Send_map_values();
-	TURN_Back(4);
-	MOTOR_Stop();
-	_delay_ms(100);
-	MOTOR_Backward(45);
-	JUNCTION_delay(5);
-	MOTOR_Stop();
-	MOTOR_Forward(45);
-	distance_counter = 0;
-	distance_flag = 0;
-	
-	LCD_Clear();
-	LCD_SendString("GOOOAL");
-}
-*/
-
 
 void tape()
 {
