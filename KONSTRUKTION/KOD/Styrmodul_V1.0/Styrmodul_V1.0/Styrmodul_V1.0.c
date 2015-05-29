@@ -35,7 +35,7 @@ int16_t TIMER_PD = 0;
 float rotation_angle = 0.00;
 // Checks if flags are correctly set in manual/auto loop.
 int Manual_Flag = 0;
-int speed_var = 200;
+int speed_var = 150;
 uint8_t distance_flag = 0;
 
 uint8_t holds_item = 0;
@@ -434,9 +434,15 @@ int16_t Gyro_sequence()
 // Delay untill 90 degrees reached;
 void checkLeftAngle(float target_angle)
 {
+    if (target_angle <= 3) {
+        target_angle = target_angle + 2;
+    }
 	int16_t result=0, sum;
 	float interval, medel;
 	int speed_var_local = speed_var;
+	if (target_angle <= 3) {
+		speed_var_local = 80;
+	}
 	do {
 		sum=0;
 		//start_time = TIMER_gyro;
@@ -453,7 +459,7 @@ void checkLeftAngle(float target_angle)
 		rotation_angle += medel*interval;
 		if ((rotation_angle > ((target_angle - 60)*(255/speed_var))) && (speed_var_local > 70))
 		{
-			speed_var_local = speed_var_local * 0.95;
+			speed_var_local = speed_var_local * 0.96;
 			PWM_SetSpeedLeft(speed_var_local);
 			PWM_SetSpeedRight(speed_var_local);
 		}
@@ -464,9 +470,16 @@ void checkLeftAngle(float target_angle)
 // Delay untill 90 degrees reached;
 void checkRightAngle(float target_angle)
 {
+    if (target_angle <= 3) {
+        target_angle = target_angle + 2;
+		
+    }
 	int16_t result=0, sum;
 	float interval, medel;
 	int speed_var_local = speed_var;
+	if (target_angle <= 3) {
+		 speed_var_local = 80;
+	}
 	do {
 		sum=0;
 		//start_time = TIMER_gyro;
@@ -489,11 +502,11 @@ void checkRightAngle(float target_angle)
 		rotation_angle += medel*interval;
 		if ((rotation_angle < (-(target_angle - 60)*(255/speed_var))) && (speed_var_local > 70))
 		{
-			speed_var_local = speed_var_local * 0.95; //** eller liknande, f?r att minska hastigheten gradvis n?r den n?rmar sig f?rdig
+			speed_var_local = speed_var_local * 0.96; //** eller liknande, f?r att minska hastigheten gradvis n?r den n?rmar sig f?rdig
 			PWM_SetSpeedLeft(speed_var_local);
 			PWM_SetSpeedRight(speed_var_local);
 		}
-	} while (rotation_angle > -(target_angle - 6)); // -6 due to delay from stop of loop until wheels stop and slideing
+	} while (rotation_angle > -(target_angle - 2)); // -6 due to delay from stop of loop until wheels stop and slideing
 	
 	rotation_angle = 0; //reset
 }
@@ -1101,80 +1114,6 @@ int Side_Control()
 	return standard_speed_;
 }
 
-// Total control
-int PD_Control()
-{
-	
-	int newSignal;
-	
-	if(control_mode == 'r')
-	{
-		standard_speed_ = 80;
-		
-		if(FRONT_SENSOR_VALUE() > 45) //Slow down when approaching wall
-		{
-			standard_speed_ = Front_Control();
-		}
-		
-		K_p = 5;
-		K_d = 3;
-		current_error_ = reference_ - offset_;
-		if(offset_- 20 > 0)
-		{
-			newSignal = P_Control()+D_control()+angle_;
-		}
-		else
-		{
-			newSignal = P_Control()+D_control()-angle_;	
-		}
-		if ((angle_ > 0) && ((offset_ >= 12) || (offset_ <= 28))) // On the right path to the middle.
-		{
-			newSignal=0;
-		}
-		if((offset_ < 12) && ( angle_ < 3 ))
-		{
-			MOTOR_Stop();
-			MOTOR_RotateRight(1);
-			MOTOR_Forward(standard_speed_);
-		}
-		if( (offset_ > 28) && ( angle_ < 3 ))
-		{
-			MOTOR_Stop();
-			MOTOR_RotateLeft(1);
-			MOTOR_Forward(standard_speed_);
-		}
-	}
-	else if(control_mode == 'c')
-	{
-		standard_speed_ = 100;
-		standard_speed_ = Side_Control();
-		if(FRONT_SENSOR_VALUE() > 45) //Slow down when approaching wall
-		{
-		standard_speed_ = Front_Control();
-		}
-		
-		K_p = 5;
-		K_d = 3;
-		if(offset_-20 > 0)
-		{
-			current_error_ = angle_;
-		}
-		else
-		{
-			current_error_ = -angle_;	
-		}
-		newSignal = P_Control() + D_control();
-	}
-	else
-	{
-		current_error_ = 0;
-		newSignal = 0;
-	}
-
-	
-	
-	return newSignal;
-}
 
 // Performs a 180 degree turn in the event of a dead end
 void DEAD_END()
@@ -1239,7 +1178,102 @@ void JUNCTION_delay(int delay)
 	}
 }
 
+void JUNCTION_delay2(int delay)
+{
+	if( (OCR2B == 0) || (OCR2A == 0) )
+	{
+		MOTOR_Forward(standard_speed_);
+	}
+	
+	wheel_counter = 0;
+	while (wheel_counter < (delay))
+	{
+		MOTOR_Forward(standard_speed_);
+		_delay_us(150);
+	}	
+}
 // Stops and rotates left 90 degrees.
+
+// Total control
+int PD_Control()
+{
+	
+	int newSignal;
+	
+	if(control_mode == 'r')
+	{
+		standard_speed_ = 100;
+		
+		if(FRONT_SENSOR_VALUE() > 45) //Slow down when approaching wall
+		{
+			standard_speed_ = Front_Control();
+		}
+		
+		K_p = 5;
+		K_d = 3;
+		current_error_ = reference_ - offset_;
+		if(offset_- 20 > 0)
+		{
+			newSignal = P_Control()+D_control()+angle_;
+		}
+		else
+		{
+			newSignal = P_Control()+D_control()-angle_;
+		}
+		if ((angle_ > 1) && ((offset_ >= 12) || (offset_ <= 28))) // On the right path to the middle.
+		{
+			newSignal=0;
+		}
+		if((offset_ < 12) && ( angle_ < 1 ))
+		{
+			MOTOR_Stop();
+			MOTOR_RotateRight(1);
+			MOTOR_Forward(standard_speed_);
+			newSignal=0;
+			JUNCTION_delay2(3);
+
+		}
+		if( (offset_ > 28) && ( angle_ < 1 ))
+		{
+			MOTOR_Stop();
+			MOTOR_RotateLeft(1);
+			MOTOR_Forward(standard_speed_);
+			newSignal=0;
+			JUNCTION_delay2(3);
+		}
+	}
+	else if(control_mode == 'c')
+	{
+		standard_speed_ = 120;
+		standard_speed_ = Side_Control();
+		if(FRONT_SENSOR_VALUE() > 45) //Slow down when approaching wall
+		{
+			standard_speed_ = Front_Control();
+		}
+		
+		K_p = 5;
+		K_d = 3;
+		if(offset_-20 > 0)
+		{
+			current_error_ = angle_;
+		}
+		else
+		{
+			current_error_ = -angle_;
+		}
+		newSignal = P_Control() + D_control();
+	}
+	else
+	{
+		current_error_ = 0;
+		newSignal = 0;
+	}
+
+	
+	
+	return newSignal;
+}
+
 void TURN_Right(int mode)
 {
 	MOTOR_Stop();
@@ -1258,10 +1292,12 @@ void TURN_Right(int mode)
 		if (angle_left < 0)
 		{
 			MOTOR_RotateRight(-angle_left);
+			_delay_ms(50);
 		}
 		else
 		{
 			MOTOR_RotateLeft(angle_left);
+			_delay_ms(50);
 		}
 		
 		_delay_ms(100);
@@ -1303,10 +1339,12 @@ void TURN_Right(int mode)
 		if( offset_ > 20)
 		{
 			MOTOR_RotateRight(90 - angle_);
+			_delay_ms(50);
 		}
 		else
 		{
 			MOTOR_RotateRight(90 + angle_);
+			_delay_ms(50);
 		}
 		_delay_ms(100);
 		MOTOR_Forward(standard_speed_);
@@ -1342,10 +1380,12 @@ void TURN_Left(int mode)
 		if (angle_right < 0)
 		{
 			MOTOR_RotateLeft(-angle_right);
+			_delay_ms(50);
 		}
 		else
 		{
 			MOTOR_RotateRight(angle_right);
+			_delay_ms(50);
 		}
 	
 		_delay_ms(100);
@@ -1382,10 +1422,12 @@ void TURN_Left(int mode)
 		if( offset_ > 20)
 			{
 				MOTOR_RotateLeft(90 - angle_);
+				_delay_ms(50);
 			}
 			else
 			{
 				MOTOR_RotateLeft(90 + angle_);
+				_delay_ms(50);
 			}
 				
 		_delay_ms(100);
@@ -1421,10 +1463,12 @@ void TURN_Back(int mode)
 		if( offset_ > 20)
 		{
 			MOTOR_RotateLeft(180 - angle_);
+			_delay_ms(50);
 		}
 		else
 		{
 			MOTOR_RotateLeft(180 + angle_);
+			_delay_ms(50);
 		}
 
 		_delay_ms(100);
@@ -1448,10 +1492,12 @@ void TURN_Back(int mode)
 		if (angle_left < 0)
 		{
 			MOTOR_RotateRight(-angle_left);
+			_delay_ms(50);
 		}
 		else
 		{
 			MOTOR_RotateLeft(angle_left);
+			_delay_ms(50);
 		}
 		
 		_delay_ms(100);
@@ -1475,10 +1521,12 @@ void TURN_Back(int mode)
 		if( offset_ > 20)
 		{
 			MOTOR_RotateLeft(180 - angle_);
+			_delay_ms(50);
 		}
 		else
 		{
 			MOTOR_RotateLeft(180 + angle_);
+			_delay_ms(50);
 		}
 
 		_delay_ms(100);
@@ -1503,10 +1551,12 @@ void TURN_Back(int mode)
 		if (angle_right < 0)
 		{
 			MOTOR_RotateLeft(-angle_right);
+			_delay_ms(50);
 		}
 		else
 		{
 			MOTOR_RotateRight(angle_right);
+			_delay_ms(50);
 		}
 		
 		_delay_ms(100);
@@ -1521,10 +1571,12 @@ void TURN_Back(int mode)
 		if( offset_ > 20)
 		{
 			MOTOR_RotateLeft(180 - angle_);
+			_delay_ms(50);
 		}
 		else
 		{
 			MOTOR_RotateLeft(180 + angle_);
+			_delay_ms(50);
 		}
 		
 		_delay_ms(100);
@@ -1538,10 +1590,12 @@ void TURN_Back(int mode)
 				if( offset_ > 20)
 		{
 			MOTOR_RotateLeft(180 - angle_);
+			_delay_ms(50);
 		}
 		else
 		{
 			MOTOR_RotateLeft(180 + angle_);
+			_delay_ms(50);
 		}
 		
 		_delay_ms(100);
@@ -2195,134 +2249,6 @@ void tape_Home()
 ReflexSensor = 0;
 
 }
-/*
-void tape_GoalFound1()
-{
-	Goal_found = 1;
-	ReflexSensor = 0;
-
-	MOTOR_Forward(50);
-	JUNCTION_delay(2);
-            
-	//Stall in rAtt vinken om m÷jligt <---- 
-	Update_All_values();
-	while( (ReflexSensor == 0) && (WallCloseAhead == 0) )
-	{
-
-// 		if((distance_counter >= 4) && (distance_flag == 1))
-// 			{
-// 				MAP_moveForward();
-// 				set_map_Corridor();
-// 				MAP_main();
-// 				distance_flag = 0;
-// 			}
-
-		Update_All_values();
-		_delay_us(250);
-	}
-									
-	MOTOR_Stop();
-	Reflex_SetNextForwardGold = 1;	
-            
-	if(ReflexSensor)
-	{
-		ReflexSensor = 0;
-		MOTOR_Stop();
-
-		MOTOR_Backward(50);
-		JUNCTION_delay(6); // Detta värdet kanske behövs ändras!!!! <----- OBS
-		MOTOR_Stop();
-		Update_All_values();
-                
-		if( !(PathCountLeft > 0) || (PathCountRight > 0) ) // Vi är i en korridor.
-		{
-			MAP_moveForward();
-			set_map_Corridor();
-			MAP_main();
-			MOTOR_Forward(standard_speed_);
-		}
-				
-
-				
-	}
-	
-	distance_counter = 0;
-	distance_flag = 0;
-	resque_mode = 'q';
-	ReflexSensor = 0;
-	Send_map_values();
-
-}
-
-//void tape_GoalFound2()
-{
-	Goal_found = 2;
-	ReflexSensor = 0;
-	MOTOR_Forward(50);
-	JUNCTION_delay(1);
-
-	//Stall in rAtt vinken om m÷jligt <----
-
-	Update_All_values();
-	while( (ReflexSensor == 0) && (WallCloseAhead == 0) )
-	{
-		Update_All_values();
-		_delay_us(250);
-	}
-
-	MOTOR_Stop();
-	if(ReflexSensor)
-	{
-		ReflexSensor = 0;
-		MOTOR_Stop();
-
-		MOTOR_Backward(50);
-		JUNCTION_delay(3);  // Detta värdet kanske behövs ändras!!!! <----- OBS
-		MOTOR_Stop();
-		Update_All_values();
-	}
-
-	SERVO_LevelHigh();
-	for (int i = 0; i < 5; i++)
-	{
-		_delay_ms(250);
-	}
-
-	SERVO_LevelLow();
-	for (int i = 0; i < 5; i++)
-	{
-		_delay_ms(250);
-	}
-	SERVO_SetGrip();
-
-	Update_All_values();
-
-	MOTOR_Backward(50);
-	JUNCTION_delay(2);
-	MOTOR_Stop();
-	MAP_currentJunction = MAP_goalJunction; //Set Currentjunction == 0 because we dont go in there automatically.
-	MAP_resQmode++;
-	MAP_operatingMode_ = 4;
-	MAP_main();
-	MAP_nextDir = (MAP_currentDir + 2 ) % 4;//The inverse of current direction.
-	DISCOVERY_SetMode();
-	MAP_rotate();
-	Send_map_values();
-	TURN_Back(4);
-	MOTOR_Stop();
-	_delay_ms(100);
-	MOTOR_Backward(45);
-	JUNCTION_delay(5);
-	MOTOR_Stop();
-	MOTOR_Forward(45);
-	distance_counter = 0;
-	distance_flag = 0;
-	
-	LCD_Clear();
-	LCD_SendString("GOOOAL");
-}
-*/
-
 
 void tape()
 {
@@ -2538,11 +2464,37 @@ void tape_Junction()
 		while( (PATHCOUNT_Right() > 0) || (PATHCOUNT_Left() > 0) )
 		{
 			_delay_us(250);
-		}
-			  
+		}	  
 		JUNCTION_delay(3);
+		
+		Get_sensor_values();
+		if( ((arrSensor[1] + arrSensor[3]) / 2) < 20)
+		{
+			int angle_left1 =  arrSensor[2];
+			if(angle_left1 < 0)
+			{
+				MOTOR_RotateRight(abs(angle_left1));
+			}
+			else
+			{
+				MOTOR_RotateLeft(abs(angle_left1));
+			}	
+		}
+		else
+		{
+			int angle_right1 =  arrSensor[0];
+			if(angle_right1 < 0)
+			{
+				MOTOR_RotateLeft(abs(angle_right1));
+			}
+			else
+			{
+				MOTOR_RotateRight(abs(angle_right1));
+			}
+		}
+		MOTOR_Forward(standard_speed_);
+		
 	}
-
 		//Reglera om hˆger ˆppen
 	else if( (PATHCOUNT_Right() > 0) && (PATHCOUNT_Left() == 0))
 	{
@@ -2624,8 +2576,8 @@ void Junction()
     }
     
     MAP_moveForward();
-
-		JUNCTION_delay(3);
+	MOTOR_Forward(50);
+	JUNCTION_delay2(5);
 	
 	MOTOR_Stop();
 	_delay_ms(50);
@@ -2642,9 +2594,10 @@ void Junction()
 			return;
 		}
 	}
-
-
-    // Now in intersect. Determine what type:
+	
+	
+	MOTOR_Forward(45);
+	// Now in intersect. Determine what type:
     if ((PathCountLeft > 0) && (PathCountRight > 0)) // 4-way or 3-way-2
     {
         if (PathAhead) // 4-way
@@ -2921,17 +2874,56 @@ void Pre_PD_controll()
         control_mode = 'c';
     }
     // Puts the automatic control in rapid mode, push the robot to the middle lane.
-    else
+    else if((offset_ > 15)||(offset_ < 25) ) 
     {
         control_mode = 'r';
     }
+	else
+	{
+		if(offset_ < 20)
+		{
+			Get_sensor_values();
+			MOTOR_Stop();
+			_delay_ms(50);
+			if(arrSensor[2] < 1)
+			{
+				MOTOR_RotateRight(abs(arrSensor[2]));
+			}
+			else
+			{
+			   //MOTOR_RotateRight(1);
+			   _delay_us(1);
+			}
+			MOTOR_Forward(70);
+			JUNCTION_delay2(3);
+		}
+		else
+		{
+			Get_sensor_values();
+			MOTOR_Stop();
+			_delay_ms(50);
+			_delay_ms(50);
+			if(arrSensor[0] < 1)
+			{
+				MOTOR_RotateLeft(abs(arrSensor[0]));
+			}
+			else
+			{
+				//MOTOR_RotateLeft(1);
+				_delay_us(1);
+			}
+			MOTOR_Forward(70);
+			JUNCTION_delay2(3);
+		}
+	}
+
     
     int new_speed_ = PD_Control();
     LCD_SendString("   ");
     // Makes sure that the motors don't burn out (i.e go on max velocity)
-    if(new_speed_ > (254-standard_speed_))
+    if(new_speed_ > 120)
     {
-        new_speed_ = 254 - standard_speed_;
+        new_speed_ = 120;
     }
     else
     {
