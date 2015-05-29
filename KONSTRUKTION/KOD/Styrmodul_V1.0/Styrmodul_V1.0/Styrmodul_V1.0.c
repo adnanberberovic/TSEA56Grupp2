@@ -35,7 +35,7 @@ int16_t TIMER_PD = 0;
 float rotation_angle = 0.00;
 // Checks if flags are correctly set in manual/auto loop.
 int Manual_Flag = 0;
-int speed_var = 180;
+int speed_var = 150;
 uint8_t distance_flag = 0;
 
 uint8_t holds_item = 0;
@@ -440,6 +440,9 @@ void checkLeftAngle(float target_angle)
 	int16_t result=0, sum;
 	float interval, medel;
 	int speed_var_local = speed_var;
+	if (target_angle <= 3) {
+		speed_var_local = 80;
+	}
 	do {
 		sum=0;
 		//start_time = TIMER_gyro;
@@ -456,7 +459,7 @@ void checkLeftAngle(float target_angle)
 		rotation_angle += medel*interval;
 		if ((rotation_angle > ((target_angle - 60)*(255/speed_var))) && (speed_var_local > 70))
 		{
-			speed_var_local = speed_var_local * 0.95;
+			speed_var_local = speed_var_local * 0.96;
 			PWM_SetSpeedLeft(speed_var_local);
 			PWM_SetSpeedRight(speed_var_local);
 		}
@@ -469,10 +472,14 @@ void checkRightAngle(float target_angle)
 {
     if (target_angle <= 3) {
         target_angle = target_angle + 2;
+		
     }
 	int16_t result=0, sum;
 	float interval, medel;
 	int speed_var_local = speed_var;
+	if (target_angle <= 3) {
+		 speed_var_local = 80;
+	}
 	do {
 		sum=0;
 		//start_time = TIMER_gyro;
@@ -495,7 +502,7 @@ void checkRightAngle(float target_angle)
 		rotation_angle += medel*interval;
 		if ((rotation_angle < (-(target_angle - 60)*(255/speed_var))) && (speed_var_local > 70))
 		{
-			speed_var_local = speed_var_local * 0.95; //** eller liknande, f?r att minska hastigheten gradvis n?r den n?rmar sig f?rdig
+			speed_var_local = speed_var_local * 0.96; //** eller liknande, f?r att minska hastigheten gradvis n?r den n?rmar sig f?rdig
 			PWM_SetSpeedLeft(speed_var_local);
 			PWM_SetSpeedRight(speed_var_local);
 		}
@@ -1217,20 +1224,22 @@ int PD_Control()
 		{
 			newSignal=0;
 		}
-		if((offset_ < 12) && ( angle_ < 3 ))
+		if((offset_ < 12) && ( angle_ < 1 ))
 		{
 			MOTOR_Stop();
 			MOTOR_RotateRight(1);
 			MOTOR_Forward(standard_speed_);
 			newSignal=0;
+			JUNCTION_delay2(3);
 
 		}
-		if( (offset_ > 28) && ( angle_ < 3 ))
+		if( (offset_ > 28) && ( angle_ < 1 ))
 		{
 			MOTOR_Stop();
 			MOTOR_RotateLeft(1);
 			MOTOR_Forward(standard_speed_);
 			newSignal=0;
+			JUNCTION_delay2(3);
 		}
 	}
 	else if(control_mode == 'c')
@@ -2878,14 +2887,15 @@ void Pre_PD_controll()
 			_delay_ms(50);
 			if(arrSensor[2] < 1)
 			{
-				MOTOR_RotateRight(0 - arrSensor[2] + 1);
+				MOTOR_RotateRight(abs(arrSensor[2]));
 			}
 			else
 			{
-			   MOTOR_RotateRight(2);
+			   //MOTOR_RotateRight(1);
+			   _delay_us(1);
 			}
-			MOTOR_Forward(50);
-			JUNCTION_delay2(1);
+			MOTOR_Forward(70);
+			JUNCTION_delay2(3);
 		}
 		else
 		{
@@ -2895,14 +2905,15 @@ void Pre_PD_controll()
 			_delay_ms(50);
 			if(arrSensor[0] < 1)
 			{
-				MOTOR_RotateLeft(0 - arrSensor[0] + 1);
+				MOTOR_RotateLeft(abs(arrSensor[0]));
 			}
 			else
 			{
-				MOTOR_RotateLeft(2);
+				//MOTOR_RotateLeft(1);
+				_delay_us(1);
 			}
-			MOTOR_Forward(50);
-			JUNCTION_delay2(1);
+			MOTOR_Forward(70);
+			JUNCTION_delay2(3);
 		}
 	}
 
