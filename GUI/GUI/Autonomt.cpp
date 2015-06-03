@@ -43,6 +43,10 @@ Autonom::Autonom(SetupSDL* sdl_lib, void* hComm_)
     //väg/vägg
     init_Tiles();
     
+    for (i=0; i<15; i++) {
+        Skift_Tiles_up(); // kan behövas down här!
+    }
+    
     //(Tile_vector[x][y])->make_Wall();
     //(Tile_vector[15 ][0])->make_Wall();
 
@@ -225,7 +229,7 @@ void Autonom::init_Tiles()
     for (int i = 30; i >= 0; i --){
         vector<Tile*> row;
 
-        for (int j = 17; j >= 0; j--)
+        for (int j = 30; j >= 0; j--)
         {
             row.insert(row.begin(),
                        new Tile(Tiles_plats,
@@ -288,6 +292,7 @@ void Autonom::Skift_Tiles_left()
         for ( vector<Tile*>::iterator i = (*vec).begin(); i != (*vec).end(); ++i){
             
             (*i)->skift_left();
+            (*i)->render_Tile(renderer_);
             }
         }
     }
@@ -310,6 +315,50 @@ void Autonom::Skift_Tiles_right()
             
             (*i)->skift_right();
 			(*i)->render_Tile(renderer_);
+            }
+        }
+    }
+    else{
+        return;
+    }
+}
+
+
+
+void Autonom::Skift_Tiles_down()
+{
+    if (Position > -7){
+        
+        Position = Position - 1;
+        
+        for (vector< vector<Tile*> >::iterator vec = Tile_vector.begin(); vec != Tile_vector.end(); ++vec){
+            
+            for ( vector<Tile*>::iterator i = (*vec).begin(); i != (*vec).end(); ++i){
+                
+                (*i)->skift_down();
+                (*i)->render_Tile(renderer_);
+            }
+        }
+    }
+    else{
+        return;
+    }
+    
+    
+}
+
+void Autonom::Skift_Tiles_up()
+{
+    if (Position < 7){
+        
+        Position = Position + 1;
+        
+        for (vector< vector<Tile*> >::iterator vec = Tile_vector.begin(); vec != Tile_vector.end(); ++vec){
+            
+            for ( vector<Tile*>::iterator i = (*vec).begin(); i != (*vec).end(); ++i){
+                
+                (*i)->skift_up();
+                (*i)->render_Tile(renderer_);
             }
         }
     }
@@ -398,6 +447,13 @@ void Autonom::update_map(int8_t xPosD, int8_t yPosM, int8_t LFR)
 		Skift_Tiles_right();
 		shift_left++;
 	}
+    
+    
+    if (yPos <= (17 - shift_up))
+    {
+        Skift_Tiles_up();
+        shift_up++;
+    }
 
 	(Tile_vector[xPos][yPos])->Place_Robot_Here(1);
     
@@ -406,7 +462,7 @@ void Autonom::update_map(int8_t xPosD, int8_t yPosM, int8_t LFR)
         (Tile_vector[xPos][yPos])->make_Goal();
     }
 
-	if ((xPos >= 0) && (xPos <= 30) && (yPos >= 0) && (yPos <= 16))
+	if ((xPos >= 0) && (xPos <= 30) && (yPos >= 0) && (yPos <= 30))
 	{
 		if (dir == 0)
 		{

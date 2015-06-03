@@ -250,6 +250,18 @@ void Tile::skift_right()
     dsRect_.x = dsRect_.x + 40;
 }
 
+void Tile::skift_down()
+{
+    Rect_.y =  Rect_.y + 40;
+    dsRect_.y = dsRect_.y + 40;
+}
+
+void Tile::skift_up()
+{
+    Rect_.y =  Rect_.y - 40;
+    dsRect_.y = dsRect_.y - 40;
+}
+
 void Tile::Place_Robot_Here(int val)
 {
     if(val == 0)

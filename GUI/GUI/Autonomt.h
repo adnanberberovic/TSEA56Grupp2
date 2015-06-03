@@ -58,6 +58,7 @@ private:
 
 	int shift_right = 0;
 	int shift_left = 0;
+    int shift_up = 0;
     
     int xPos;
 	int yPos;
@@ -125,6 +126,8 @@ public:
 	void reset_Tiles();
     void Skift_Tiles_left();
     void Skift_Tiles_right();
+    void Skift_Tiles_down();
+    void Skift_Tiles_up();
     void Change_left_speed();
     void Change_right_speed();
 	void Check_Mode(string&, bool&);

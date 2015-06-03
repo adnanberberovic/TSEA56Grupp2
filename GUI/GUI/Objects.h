@@ -140,6 +140,8 @@ public:
     void make_Goal();
     void skift_left();
     void skift_right();
+    void skift_down();
+    void skift_up();
 	void change_tile(int to_status);
     void Place_Robot_Here(int);
     
